@@ -8,9 +8,33 @@ public struct RGSAccount: Codable {
     public let identifiers: RGSIdentifiers
     public let applicability: Applicability
 
+    public init(
+        code: String,
+        label: String,
+        level: Int,
+        direction: Direction?,
+        identifiers: RGSIdentifiers,
+        applicability: Applicability
+    ) {
+        self.code = code
+        self.label = label
+        self.level = level
+        self.direction = direction
+        self.identifiers = identifiers
+        self.applicability = applicability
+    }
+
     public struct RGSIdentifiers: Codable {
         public let rgs: String           // the RGS-code column
         public let omslag: String?       // the Omslagcode column, to flip appearance account based on dr-cr balance
+
+        public init(
+            rgs: String,
+            omslag: String?
+        ) {
+            self.rgs = rgs
+            self.omslag = omslag
+        }
     }
 
     public struct Applicability: Codable {
@@ -19,6 +43,20 @@ public struct RGSAccount: Codable {
         public let bv: Bool
         public let svc: Bool
         public let branche: Bool
+
+        public init(
+            zzp: Bool,
+            ez: Bool,
+            bv: Bool,
+            svc: Bool,
+            branche: Bool
+        ) {
+            self.zzp = zzp
+            self.ez = ez
+            self.bv = bv
+            self.svc = svc
+            self.branche = branche
+        }
     }
 
     public var parentCode: String? {
