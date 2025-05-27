@@ -36,7 +36,8 @@ public struct RGSAccount: Codable {
         do {
             // return try RGSAccountClassifier.classForRekNr(numeric)
             let classification = try RGSAccountClassifier.classForRekNr(numeric)
-            print(classification)
+            let str = "[\(classification)]: ".uppercased() + code + label 
+            print(str)
             return classification
         } catch {
             // Option 1: fallback to unknown (recommended)
