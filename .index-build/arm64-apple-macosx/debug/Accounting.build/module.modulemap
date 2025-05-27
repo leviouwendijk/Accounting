@@ -1,0 +1,4 @@
+module Accounting {
+    header "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/Accounting-Swift.h"
+    requires objc
+}

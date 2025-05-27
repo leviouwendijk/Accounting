@@ -1,0 +1,4 @@
+module AccountingPackageTests {
+    header "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingPackageTests.build/AccountingPackageTests-Swift.h"
+    requires objc
+}

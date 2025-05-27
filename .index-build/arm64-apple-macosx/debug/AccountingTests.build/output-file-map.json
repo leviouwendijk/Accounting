@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingTests.build/master.swiftdeps"
+  },
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Tests/AccountingTests/AccountingTests.swift": {
+    "dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingTests.build/AccountingTests.d",
+    "object": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingTests.build/AccountingTests.swift.o",
+    "swiftmodule": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingTests.build/AccountingTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingTests.build/AccountingTests.swiftdeps"
+  }
+}

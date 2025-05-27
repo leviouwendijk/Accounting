@@ -1,0 +1,88 @@
+client:
+  name: basic
+  file-system: device-agnostic
+tools: {}
+targets:
+  "Accounting-arm64-apple-macosx15.0-debug.module": ["<Accounting-arm64-apple-macosx15.0-debug.module>"]
+  "AccountingPackageTests-arm64-apple-macosx15.0-debug.module": ["<AccountingPackageTests-arm64-apple-macosx15.0-debug.module>"]
+  "AccountingTests-arm64-apple-macosx15.0-debug.module": ["<AccountingTests-arm64-apple-macosx15.0-debug.module>"]
+  "PackageStructure": ["<PackageStructure>"]
+  "main": ["<Accounting-arm64-apple-macosx15.0-debug.module>"]
+  "test": ["<Accounting-arm64-apple-macosx15.0-debug.module>","<AccountingTests-arm64-apple-macosx15.0-debug.module>"]
+default: "main"
+nodes:
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Tests/AccountingTests/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+commands:
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/Accounting.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/account.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/balance-sheet.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/cash-flow-statement.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/entity.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/income-statement.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/journal-entry.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/mutation.swift"]
+    outputs: ["/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/sources"]
+    description: "Write auxiliary file /Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/sources"
+
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingPackageTests.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingPackageTests.derived/runner.swift"]
+    outputs: ["/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingPackageTests.build/sources"]
+    description: "Write auxiliary file /Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingPackageTests.build/sources"
+
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingTests.build/sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Tests/AccountingTests/AccountingTests.swift"]
+    outputs: ["/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingTests.build/sources"]
+    description: "Write auxiliary file /Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingTests.build/sources"
+
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt":
+    tool: write-auxiliary-file
+    inputs: ["<swift-get-version>","/Library/Developer/CommandLineTools/usr/bin/swiftc"]
+    outputs: ["/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"]
+    always-out-of-date: "true"
+    description: "Write auxiliary file /Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt"
+
+  "<Accounting-arm64-apple-macosx15.0-debug.module>":
+    tool: phony
+    inputs: ["/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Modules/Accounting.swiftmodule"]
+    outputs: ["<Accounting-arm64-apple-macosx15.0-debug.module>"]
+
+  "<AccountingPackageTests-arm64-apple-macosx15.0-debug.module>":
+    tool: phony
+    inputs: ["/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Modules/AccountingPackageTests.swiftmodule"]
+    outputs: ["<AccountingPackageTests-arm64-apple-macosx15.0-debug.module>"]
+
+  "<AccountingTests-arm64-apple-macosx15.0-debug.module>":
+    tool: phony
+    inputs: ["/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Modules/AccountingTests.swiftmodule"]
+    outputs: ["<AccountingTests-arm64-apple-macosx15.0-debug.module>"]
+
+  "C.Accounting-arm64-apple-macosx15.0-debug.module":
+    tool: shell
+    inputs: ["/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/Accounting.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/account.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/balance-sheet.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/cash-flow-statement.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/entity.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/income-statement.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/journal-entry.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/mutation.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/sources"]
+    outputs: ["/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Modules/Accounting.swiftmodule"]
+    description: "Compiling Swift Module 'Accounting' (8 sources)"
+    args: ["/Library/Developer/CommandLineTools/usr/bin/swiftc","-module-name","Accounting","-emit-dependencies","-emit-module","-emit-module-path","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Modules/Accounting.swiftmodule","-output-file-map","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/output-file-map.json","-parse-as-library","-incremental","@/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/sources","-I","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Modules","-target","arm64-apple-macosx10.13","-enable-batch-mode","-Onone","-enable-testing","-j8","-DSWIFT_PACKAGE","-DDEBUG","-module-cache-path","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/ModuleCache","-parseable-output","-parse-as-library","-emit-objc-header","-emit-objc-header-path","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/Accounting-Swift.h","-swift-version","6","-Xfrontend","-experimental-lazy-typecheck","-Xfrontend","-experimental-skip-all-function-bodies","-Xfrontend","-experimental-allow-module-with-compiler-errors","-Xfrontend","-empty-abi-descriptor","-F","/Library/Developer/CommandLineTools/Library/Developer/Frameworks","-sdk","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-g","-Xcc","-isysroot","-Xcc","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-Xcc","-fPIC","-Xcc","-g","-package-name","accounting"]
+
+  "C.AccountingPackageTests-arm64-apple-macosx15.0-debug.module":
+    tool: shell
+    inputs: ["/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingPackageTests.derived/runner.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Modules/AccountingTests.swiftmodule","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingPackageTests.build/sources"]
+    outputs: ["/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Modules/AccountingPackageTests.swiftmodule"]
+    description: "Compiling Swift Module 'AccountingPackageTests' (1 sources)"
+    args: ["/Library/Developer/CommandLineTools/usr/bin/swiftc","-module-name","AccountingPackageTests","-emit-dependencies","-emit-module","-emit-module-path","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Modules/AccountingPackageTests.swiftmodule","-output-file-map","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingPackageTests.build/output-file-map.json","-parse-as-library","-incremental","@/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingPackageTests.build/sources","-I","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Modules","-target","arm64-apple-macosx10.13","-enable-batch-mode","-Onone","-enable-testing","-j8","-DSWIFT_PACKAGE","-DDEBUG","-module-cache-path","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/ModuleCache","-parseable-output","-parse-as-library","-emit-objc-header","-emit-objc-header-path","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingPackageTests.build/AccountingPackageTests-Swift.h","-Xfrontend","-experimental-lazy-typecheck","-Xfrontend","-experimental-skip-all-function-bodies","-Xfrontend","-experimental-allow-module-with-compiler-errors","-Xfrontend","-empty-abi-descriptor","-F","/Library/Developer/CommandLineTools/Library/Developer/Frameworks","-sdk","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-g","-Xcc","-isysroot","-Xcc","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-Xcc","-fPIC","-Xcc","-g","-package-name","accounting"]
+
+  "C.AccountingTests-arm64-apple-macosx15.0-debug.module":
+    tool: shell
+    inputs: ["/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Tests/AccountingTests/AccountingTests.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/swift-version--1AB21518FC5DEDBE.txt","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Modules/Accounting.swiftmodule","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingTests.build/sources"]
+    outputs: ["/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Modules/AccountingTests.swiftmodule"]
+    description: "Compiling Swift Module 'AccountingTests' (1 sources)"
+    args: ["/Library/Developer/CommandLineTools/usr/bin/swiftc","-module-name","AccountingTests","-emit-dependencies","-emit-module","-emit-module-path","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Modules/AccountingTests.swiftmodule","-output-file-map","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingTests.build/output-file-map.json","-parse-as-library","-incremental","@/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/AccountingTests.build/sources","-I","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Modules","-target","arm64-apple-macosx10.13","-enable-batch-mode","-Onone","-enable-testing","-j8","-DSWIFT_PACKAGE","-DDEBUG","-module-cache-path","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/ModuleCache","-parseable-output","-parse-as-library","-swift-version","6","-Xfrontend","-experimental-lazy-typecheck","-Xfrontend","-experimental-skip-all-function-bodies","-Xfrontend","-experimental-allow-module-with-compiler-errors","-Xfrontend","-empty-abi-descriptor","-F","/Library/Developer/CommandLineTools/Library/Developer/Frameworks","-sdk","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-g","-Xcc","-isysroot","-Xcc","/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk","-Xcc","-fPIC","-Xcc","-g","-package-name","accounting"]
+
+  "PackageStructure":
+    tool: package-structure-tool
+    inputs: ["/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Tests/AccountingTests/","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Package.swift","/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Package.resolved"]
+    outputs: ["<PackageStructure>"]
+    description: "Planning build"
+    allow-missing-inputs: true
+

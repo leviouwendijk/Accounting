@@ -1,0 +1,53 @@
+{
+  "": {
+    "swift-dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/master.swiftdeps"
+  },
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/Accounting.swift": {
+    "dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/Accounting.d",
+    "object": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/Accounting.swift.o",
+    "swiftmodule": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/Accounting~partial.swiftmodule",
+    "swift-dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/Accounting.swiftdeps"
+  },
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/account.swift": {
+    "dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/account.d",
+    "object": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/account.swift.o",
+    "swiftmodule": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/account~partial.swiftmodule",
+    "swift-dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/account.swiftdeps"
+  },
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/balance-sheet.swift": {
+    "dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/balance-sheet.d",
+    "object": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/balance-sheet.swift.o",
+    "swiftmodule": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/balance-sheet~partial.swiftmodule",
+    "swift-dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/balance-sheet.swiftdeps"
+  },
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/cash-flow-statement.swift": {
+    "dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/cash-flow-statement.d",
+    "object": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/cash-flow-statement.swift.o",
+    "swiftmodule": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/cash-flow-statement~partial.swiftmodule",
+    "swift-dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/cash-flow-statement.swiftdeps"
+  },
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/entity.swift": {
+    "dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/entity.d",
+    "object": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/entity.swift.o",
+    "swiftmodule": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/entity~partial.swiftmodule",
+    "swift-dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/entity.swiftdeps"
+  },
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/income-statement.swift": {
+    "dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/income-statement.d",
+    "object": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/income-statement.swift.o",
+    "swiftmodule": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/income-statement~partial.swiftmodule",
+    "swift-dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/income-statement.swiftdeps"
+  },
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/journal-entry.swift": {
+    "dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/journal-entry.d",
+    "object": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/journal-entry.swift.o",
+    "swiftmodule": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/journal-entry~partial.swiftmodule",
+    "swift-dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/journal-entry.swiftdeps"
+  },
+  "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/Sources/Accounting/mutation.swift": {
+    "dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/mutation.d",
+    "object": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/mutation.swift.o",
+    "swiftmodule": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/mutation~partial.swiftmodule",
+    "swift-dependencies": "/Users/leviouwendijk/myworkdir/programming/libraries/Accounting/.index-build/arm64-apple-macosx/debug/Accounting.build/mutation.swiftdeps"
+  }
+}
