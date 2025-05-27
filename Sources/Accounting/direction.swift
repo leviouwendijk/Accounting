@@ -6,9 +6,9 @@ public enum Direction: String, Codable {
 
     public init?(raw: String) {
         switch raw {
-        case "D", "DR":
+        case "D", "DR", Self.debit.rawValue:
             self = .debit
-        case "C", "CR":
+        case "C", "CR", Self.credit.rawValue:
             self = .credit
         default:
             return nil
