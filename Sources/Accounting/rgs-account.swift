@@ -7,7 +7,6 @@ public struct RGSAccount: Codable {
     public let direction: Direction?
     public let identifiers: RGSIdentifiers
     public let applicability: Applicability
-    public let verbose: Bool
 
     public init(
         code: String,
@@ -23,7 +22,6 @@ public struct RGSAccount: Codable {
         self.direction = direction
         self.identifiers = identifiers
         self.applicability = applicability
-        self.verbose = true
     }
 
     public var accountClass: AccountClass {
@@ -36,14 +34,11 @@ public struct RGSAccount: Codable {
         }()
 
         do {
-            if verbose {
-                let classification = try RGSAccountClassifier.classForRekNr(numeric)
-                let str = "[\(classification)]: ".uppercased() + code + " -- " + label 
-                print(str)
-                return classification
-            } else {
-                return try RGSAccountClassifier.classForRekNr(numeric)
-            }
+            let classification = try RGSAccountClassifier.classForRekNr(numeric)
+            let str = "[\(classification)]: ".uppercased() + code + " -- " + label 
+            print(str)
+            return classification
+            // return try RGSAccountClassifier.classForRekNr(numeric)
         } catch {
             // Option 1: fallback to unknown (recommended)
             return .unknown
