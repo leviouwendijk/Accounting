@@ -25,15 +25,21 @@ public struct RGSAccount: Codable {
     }
 
     public var accountClass: AccountClass {
-        if label.lowercased().contains("dividend") {
-            return .dividend
-        }
-        switch code.prefix(1) {
-        case "0", "1": return .asset
-        case "2", "3": return .liability
-        case "4":      return .equity
-        case "5":      return .revenue
-        default:       return .expense
+        let numeric: Int = {
+            if code.count >= 5 {
+                return Int(code.prefix(5)) ?? 0
+            } else {
+                return Int(code) ?? 0
+            }
+        }()
+
+        do {
+            return try RGSAccountClassifier.classForRekNr(numeric)
+        } catch {
+            // Option 1: fallback to unknown (recommended)
+            return .unknown
+            // Option 2: crash (not recommended)
+            // fatalError(error.localizedDescription)
         }
     }
 

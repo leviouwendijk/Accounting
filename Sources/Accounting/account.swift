@@ -22,6 +22,30 @@ public struct Account {
     }
 }
 
-public enum AccountClass: String, CaseIterable {
-    case dividend, expense, asset, liability, equity, revenue
+public enum AccountClass: String, CaseIterable, Sendable {
+    case dividend, expense, asset, liability, equity, revenue, unknown
+}
+
+public struct RGSAccountClassifier: Sendable {
+    public static let rekNrBoundaries: [(Int, Int, AccountClass)] = [
+        (1000, 2000, .asset), // Immateriële vaste activa
+        (2000, 5000, .asset), // Materiële vaste activa
+        (5000, 8000, .equity), // Groepsvermogen - Eigen vermogen - Kapitaal
+        (8000, 10000, .liability), // Langlopende schulden
+        (10000, 13000, .asset), // Liquide middelen
+        (13000, 16000, .asset), // Vorderingen
+        (16000, 30000, .liability), // Kortlopende schulden
+        (30000, 40000, .asset), // Voorraden
+        (40000, 80000, .expense), // Lasten uit hoofde van personeelsbeloningen (likely expenses)
+        (80000, 90000, .revenue) // Netto-omzet, etc.
+    ]
+
+    public static func classForRekNr(_ rekNr: Int) throws -> AccountClass {
+        for (start, end, accClass) in rekNrBoundaries {
+            if rekNr >= start && rekNr < end {
+                return accClass
+            }
+        }
+        throw NSError(domain: "AccountClass", code: 404, userInfo: [NSLocalizedDescriptionKey: "No AccountClass found for rekNr \(rekNr)"])
+    }
 }
