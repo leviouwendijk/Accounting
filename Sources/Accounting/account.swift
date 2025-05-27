@@ -22,8 +22,6 @@ public struct Account {
     }
 }
 
-public enum AccountClass: String {
+public enum AccountClass: String, CaseIterable {
     case dividend, expense, asset, liability, equity, revenue
 }
-
-
