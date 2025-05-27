@@ -34,7 +34,10 @@ public struct RGSAccount: Codable {
         }()
 
         do {
-            return try RGSAccountClassifier.classForRekNr(numeric)
+            // return try RGSAccountClassifier.classForRekNr(numeric)
+            let classification = try RGSAccountClassifier.classForRekNr(numeric)
+            print(classification)
+            return classification
         } catch {
             // Option 1: fallback to unknown (recommended)
             return .unknown
