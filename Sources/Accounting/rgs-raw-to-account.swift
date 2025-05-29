@@ -1,7 +1,7 @@
 import Foundation
 
 public struct RGSAccountConverter {
-    public static func io(rawJSON input: String, destination output: String) throws {
+    public static func io(rawJSON input: String, converted output: String) throws {
         if let i = URL(string: input), let o = URL(string: output) {
             let rgsAccounts = try convert(rawJSON: i)
             try write(rgsAccounts, to: o)
