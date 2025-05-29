@@ -14,6 +14,7 @@ public struct RGSAccountConverter {
     public static func convert(rawJSON url: URL) throws -> [RGSAccount] {
         let data = try Data(contentsOf: url)
         let rawRows = try JSONDecoder().decode([RGSRawPDFTableObject].self, from: data)
+        print("decoded raw rows: \(rawRows.count)")
         return rawRows.compactMap(RGSAccount.init(raw:))
     }
 
