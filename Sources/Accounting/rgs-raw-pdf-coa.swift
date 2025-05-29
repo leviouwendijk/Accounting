@@ -48,17 +48,22 @@ public enum RGSRawPDFTableParserError: Error {
 
 public struct RGSRawPDFTableParser {
     public static func io(input i: String, output o: String) throws {
+        print("IO: \(i) → \(o)")
         let rows = try RGSRawPDFTableParser.parse(path: i)
+        print("📝 Parsed \(rows.count) rows total")
         let data = try JSONEncoder().encode(rows)
         try data.write(to: URL(fileURLWithPath: o))
+        print("Wrote JSON to \(o)")
     }
 
     public static func parse(path: String) throws -> [RGSRawPDFTable] {
+        print("Opening PDF at \(path)")
         let url = URL(fileURLWithPath: path)
         guard let doc = PDFDocument(url: url) else {
             throw RGSRawPDFTableParserError.fileNotFound(path)
         }
 
+        print("📄 PDF has \(doc.pageCount) pages\n")
         var results: [RGSRawPDFTable] = []
         let digitLine = try NSRegularExpression(pattern: #"^\d"#, options: [])
         let splitCols = try NSRegularExpression(pattern: #" {2,}"#, options: [])
@@ -66,31 +71,41 @@ public struct RGSRawPDFTableParser {
         for i in 0..<doc.pageCount {
             guard let page = doc.page(at: i),
                   let text = page.string else {
+                print("Cannot read page \(i+1)")
                 throw RGSRawPDFTableParserError.cannotReadPage(i+1)
             }
-
+            print("Page \(i+1): scanning lines…")
             let lines = text.components(separatedBy: .newlines)
-            for raw in lines {
+            for (lineno, raw) in lines.enumerated() {
                 let line = raw.trimmingCharacters(in: .whitespaces)
-                if digitLine.firstMatch(in: line, options: [], range: NSRange(location: 0, length: line.utf16.count)) == nil {
+                let range = NSRange(location: 0, length: line.utf16.count)
+                if digitLine.firstMatch(in: line, options: [], range: range) == nil {
                     continue
                 }
+                print(" → Matched data line \(lineno+1): \(line)")
+
                 let ns = line as NSString
-                let ranges = splitCols.matches(in: line, options: [], range: NSRange(location: 0, length: ns.length))
+                let matches = splitCols.matches(in: line, options: [], range: NSRange(location: 0, length: ns.length))
                 var cols: [String] = []
                 var lastEnd = 0
-                for m in ranges {
-                    let segment = ns.substring(with: NSRange(location: lastEnd, length: m.range.location - lastEnd))
-                    cols.append(segment.trimmingCharacters(in: .whitespaces))
+                for m in matches {
+                    let seg = ns.substring(with: NSRange(location: lastEnd, length: m.range.location - lastEnd))
+                    cols.append(seg.trimmingCharacters(in: .whitespaces))
                     lastEnd = m.range.location + m.range.length
                 }
                 cols.append(ns.substring(from: lastEnd).trimmingCharacters(in: .whitespaces))
-                guard cols.count >= 9 else { continue }
+
+                if cols.count < 9 {
+                    print("    Skipping: only \(cols.count) columns (need ≥9)")
+                    continue
+                }
+                print("    ↳ Columns: \(cols)")
 
                 let firstCell = cols[0]
                 let parts = firstCell.split(separator: "\n", maxSplits: 1).map(String.init)
                 let rek = parts[0]
                 let oms = parts.count > 1 ? parts[1] : cols[1]
+                print("    ↳ RekNr=\(rek), Oms=\(oms)")
 
                 let rec = RGSRawPDFTable(
                     RekNr:        rek,
@@ -106,9 +121,9 @@ public struct RGSRawPDFTableParser {
                     Bra:          cols[8]
                 )
                 results.append(rec)
+                print("    Added record for code \(rek)\n")
             }
         }
-
         return results
     }
 }
