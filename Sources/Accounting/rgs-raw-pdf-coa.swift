@@ -68,6 +68,7 @@ public struct RGSRawPDFTableParser {
         print("IO:")
         print("    from: \(i)")
         print("    to: -> \(o)")
+        print()
         let rows = try parse(path: i)
         print("Parsed \(rows.count) rows total")
         let encoder = JSONEncoder()
