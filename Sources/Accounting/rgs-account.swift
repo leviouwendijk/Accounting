@@ -62,10 +62,7 @@ public struct RGSAccount: Codable {
         }
         self.level = lvl
 
-        guard let dir = Direction(raw: raw.DC) else {
-            throw RGSParsingError.invalidDirection(raw.DC)
-        }
-        self.direction = dir
+        self.direction = try Direction(raw: raw.DC)
 
         let oms = raw.Omslag.isEmpty ? nil : raw.Omslag
         self.identifiers = RGSIdentifiers(rgs: raw.RGSCode, omslag: oms)
