@@ -141,6 +141,10 @@ public struct RGSRawPDFTableParser {
             }
         }
 
+        results = results.filter { rec in
+            Int(rec.RekNr) != nil
+        }
+
         var seen = Set<String>()
         let unique = results.filter { rec in
             let key = rec.RekNr + "-" + rec.Nivo
