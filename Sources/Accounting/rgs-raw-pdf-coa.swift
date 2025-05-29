@@ -62,20 +62,33 @@ public struct RGSRawPDFTableParser {
             throw RGSRawPDFTableParserError.fileNotFound(path)
         }
 
-        let pattern = #"(\d{1,5})\s+(.+?)\s+([234])\s+([DC])\s+(\S+)\s+(\S+)\s+([JN])\s+([JN])\s+([JN])\s+([JN])\s+([01])"#
-        let regex = try NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators])
+        // Regex breakdown:
+        // 1:  (\d{1,5})        — RekNr, 1–5 digits
+        // 2:  \s+(.+?)\s+      — Omschrijving, minimal up to the next field
+        // 3:  ([234])          — Nivo
+        // 4:  ([DC])           — DC
+        // 5:  (\S+)            — Omslag
+        // 6:  (\S+)            — RGSCode
+        // 7–10:([JN])×4        — ZZP, EZ, BV, SVC
+        // 11: ([01])           — Bra
+        // (?=\s+\d{1,5}\s|$)   — stop when you see whitespace + next RekNr + whitespace, or end‐of‐string
+        let pattern = #"(\d{1,5})\s+(.+?)\s+([234])\s+([DC])\s+(\S+)\s+(\S+)\s+([JN])\s+([JN])\s+([JN])\s+([JN])\s+([01])(?=\s+\d{1,5}\s|$)"#
+        let regex = try NSRegularExpression(pattern: pattern, options: [])
 
-        var results: [RGSRawPDFTable] = []
+        var results = [RGSRawPDFTable]()
 
-        for i in 0..<doc.pageCount {
-            guard let page = doc.page(at: i), let raw = page.string else {
-                throw RGSRawPDFTableParserError.cannotReadPage(i+1)
+        for pageIndex in 0 ..< doc.pageCount {
+            guard let page = doc.page(at: pageIndex),
+                  let raw = page.string else {
+                throw RGSRawPDFTableParserError.cannotReadPage(pageIndex+1)
             }
-            // collapse newlines so our regex can span rows
+
+            // collapse newlines to spaces so each page is one long string
             let text = raw.replacingOccurrences(of: "\n", with: " ")
             let ns = text as NSString
             let matches = regex.matches(in: text, options: [], range: NSRange(location: 0, length: ns.length))
-            print("Page \(i+1): found \(matches.count) records")
+            print("Page \(pageIndex+1): found \(matches.count) records")
+
             for m in matches {
                 let rek   = ns.substring(with: m.range(at: 1))
                 let oms   = ns.substring(with: m.range(at: 2))
@@ -106,6 +119,7 @@ public struct RGSRawPDFTableParser {
             }
         }
 
+        print("Parsed \(results.count) rows total")
         return results
     }
 }
