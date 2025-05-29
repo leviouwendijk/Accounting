@@ -65,7 +65,7 @@ public enum RGSRawPDFTableParserError: Error {
 
 public struct RGSRawPDFTableParser {
     public static func io(input i: String, output o: String) throws {
-        print("IO: \(i) -> \(o)")
+        print("IO:\n    \(i)\n    -> \(o)\n")
         let rows = try parse(path: i)
         print("Parsed \(rows.count) rows total")
         let encoder = JSONEncoder()
