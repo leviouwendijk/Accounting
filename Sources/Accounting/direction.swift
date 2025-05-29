@@ -4,31 +4,24 @@ public enum Direction: String, Codable {
     case debit
     case credit
 
-    public init?(raw: String) {
-        switch raw {
-        case "D", "DR", Self.debit.rawValue:
+    public init(raw: String) {
+        switch raw.uppercased() {
+        case "D", "DR", Self.debit.rawValue.uppercased(), Self.debit.rawValue:
             self = .debit
-        case "C", "CR", Self.credit.rawValue:
+        case "C", "CR", Self.credit.rawValue.uppercased(), Self.credit.rawValue:
             self = .credit
         default:
-            return nil
+            preconditionFailure("Invalid Direction code: '\(raw)'")
         }
     }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        let s = try container.decode(String.self)
-        guard let d = Direction(raw: s) else {
-            throw DecodingError.dataCorruptedError(
-                in: container,
-                debugDescription: "Unknown direction: \(s)"
-            )
-        }
-        self = d
+        let s = try decoder.singleValueContainer().decode(String.self)
+        self = Direction(raw: s)
     }
 
     public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(self.rawValue)
+        var c = encoder.singleValueContainer()
+        try c.encode(self.rawValue)
     }
 }
