@@ -1,6 +1,7 @@
 import Foundation
+import PDFKit
 
-public struct RawRecord: Codable {
+public struct RGSRawPDFTable: Codable {
     public let RekNr: String
     public let Omschrijving: String
     public let Nivo: String
