@@ -39,6 +39,20 @@ public struct RGSRawPDFTable: Codable {
         self.SVC = SVC
         self.Bra = Bra
     }
+
+    public enum CodingKeys: String, CodingKey {
+        case RekNr
+        case Omschrijving
+        case Nivo
+        case DC
+        case Omslag
+        case RGSCode
+        case ZZP
+        case EZ
+        case BV
+        case SVC
+        case Bra
+    }
 }
 
 public enum RGSRawPDFTableParserError: Error {
