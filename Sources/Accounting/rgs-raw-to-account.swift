@@ -2,10 +2,10 @@ import Foundation
 
 public struct RGSAccountConverter {
     public static func io(rawJSON input: String, converted output: String) throws {
-        if let i = URL(string: input), let o = URL(string: output) {
-            let rgsAccounts = try convert(rawJSON: i)
-            try write(rgsAccounts, to: o)
-        }
+        let i = URL(fileURLWithPath: input) 
+        let o = URL(fileURLWithPath: output) 
+        let rgsAccounts = try convert(rawJSON: i)
+        try write(rgsAccounts, to: o)
     }
 
     public static func convert(rawJSON url: URL) throws -> [RGSAccount] {
