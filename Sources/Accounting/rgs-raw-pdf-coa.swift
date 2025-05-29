@@ -77,7 +77,9 @@ public struct RGSRawPDFTableParser {
             throw RGSRawPDFTableParserError.jsonEncodingFailed
         }
         try data.write(to: URL(fileURLWithPath: o))
-        print("Wrote JSON to \(o)")
+
+        let file = o.components(separatedBy: "/").last ?? ""
+        print("Wrote JSON to \(file)")
     }
 
     public static func parse(path: String) throws -> [RGSRawPDFTable] {
