@@ -46,7 +46,13 @@ public enum RGSRawPDFTableParserError: Error {
     case cannotReadPage(Int)
 }
 
-public struct RGSRawPDFPDFTableParser {
+public struct RGSRawPDFTableParser {
+    public static func io(input i: String, output o: String) throws {
+        let rows = try RGSRawPDFTableParser.parse(path: i)
+        let data = try JSONEncoder().encode(rows)
+        try data.write(to: URL(fileURLWithPath: o))
+    }
+
     public static func parse(path: String) throws -> [RGSRawPDFTable] {
         let url = URL(fileURLWithPath: path)
         guard let doc = PDFDocument(url: url) else {
