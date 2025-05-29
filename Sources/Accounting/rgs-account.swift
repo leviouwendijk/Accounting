@@ -1,5 +1,19 @@
 import Foundation
 
+public enum RGSParsingError: Error, CustomStringConvertible {
+    case invalidLevel(String)
+    case invalidDirection(String)
+
+    public var description: String {
+        switch self {
+        case .invalidLevel(let str):
+            return "Couldn’t parse level from ‘\(str)’"
+        case .invalidDirection(let dc):
+            return "Couldn’t parse direction from ‘\(dc)’"
+        }
+    }
+}
+
 public struct RGSAccount: Codable {
     public let code: String
     public let label: String
@@ -39,17 +53,17 @@ public struct RGSAccount: Codable {
         return String(prefix) + zeros
     }
 
-    public init?(raw: RGSRawPDFTableObject) {
+    public init(raw: RGSRawPDFTableObject) throws {
         self.code = raw.RekNr
         self.label = raw.Omschrijving
 
         guard let lvl = Int(raw.Nivo) else {
-            return nil
+            throw RGSParsingError.invalidLevel(raw.Nivo)
         }
         self.level = lvl
 
         guard let dir = Direction(rawValue: raw.DC) else {
-            return nil
+            throw RGSParsingError.invalidDirection(raw.DC)
         }
         self.direction = dir
 
