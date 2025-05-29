@@ -1,7 +1,14 @@
 import Foundation
 
 public struct RGSAccountConverter {
-    public static func convert(rawJSONAt url: URL) throws -> [RGSAccount] {
+    public static func io(rawJSON input: String, destination output: String) throws {
+        if let i = URL(string: input), let o = URL(string: output) {
+            let rgsAccounts = try convert(rawJSON: i)
+            try write(rgsAccounts, to: o)
+        }
+    }
+
+    public static func convert(rawJSON url: URL) throws -> [RGSAccount] {
         let data = try Data(contentsOf: url)
         let rawRows = try JSONDecoder().decode([RGSRawPDFTableObject].self, from: data)
         return rawRows.compactMap(RGSAccount.init(raw:))

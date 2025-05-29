@@ -39,21 +39,6 @@ public struct RGSRawPDFTableObject: Codable {
         self.SVC = SVC
         self.Bra = Bra
     }
-
-    public func encode(to encoder: Encoder) throws {
-        var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encode(RekNr,        forKey: .RekNr)
-        try c.encode(Omschrijving, forKey: .Omschrijving)
-        try c.encode(Nivo,         forKey: .Nivo)
-        try c.encode(DC,           forKey: .DC)
-        try c.encode(Omslag,       forKey: .Omslag)
-        try c.encode(RGSCode,      forKey: .RGSCode)
-        try c.encode(ZZP,          forKey: .ZZP)
-        try c.encode(EZ,           forKey: .EZ)
-        try c.encode(BV,           forKey: .BV)
-        try c.encode(SVC,          forKey: .SVC)
-        try c.encode(Bra,          forKey: .Bra)
-    }
 }
 
 public enum RGSRawPDFTableObjectParserError: Error {
