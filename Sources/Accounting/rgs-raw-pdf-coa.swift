@@ -141,6 +141,14 @@ public struct RGSRawPDFTableParser {
             }
         }
 
-        return results
+        var seen = Set<String>()
+        let unique = results.filter { rec in
+            let key = rec.RekNr + "-" + rec.Nivo
+            guard !seen.contains(key) else { return false }
+            seen.insert(key)
+            return true
+        }
+
+        return unique
     }
 }
