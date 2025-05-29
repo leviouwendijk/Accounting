@@ -48,9 +48,9 @@ public enum RGSRawPDFTableParserError: Error {
 
 public struct RGSRawPDFTableParser {
     public static func io(input i: String, output o: String) throws {
-        print("IO: \(i) → \(o)")
+        print("IO: \(i) -> \(o)")
         let rows = try RGSRawPDFTableParser.parse(path: i)
-        print("📝 Parsed \(rows.count) rows total")
+        print("Parsed \(rows.count) rows total")
         let data = try JSONEncoder().encode(rows)
         try data.write(to: URL(fileURLWithPath: o))
         print("Wrote JSON to \(o)")
@@ -63,26 +63,37 @@ public struct RGSRawPDFTableParser {
             throw RGSRawPDFTableParserError.fileNotFound(path)
         }
 
-        print("📄 PDF has \(doc.pageCount) pages\n")
+        print("PDF has \(doc.pageCount) pages")
         var results: [RGSRawPDFTable] = []
         let digitLine = try NSRegularExpression(pattern: #"^\d"#, options: [])
         let splitCols = try NSRegularExpression(pattern: #" {2,}"#, options: [])
 
-        for i in 0..<doc.pageCount {
-            guard let page = doc.page(at: i),
+        var totalMatched = 0
+        var totalShortCols = 0
+        var totalParsed = 0
+
+        for pageIndex in 0..<doc.pageCount {
+            guard let page = doc.page(at: pageIndex),
                   let text = page.string else {
-                print("Cannot read page \(i+1)")
-                throw RGSRawPDFTableParserError.cannotReadPage(i+1)
+                print("Cannot read page \(pageIndex + 1)")
+                throw RGSRawPDFTableParserError.cannotReadPage(pageIndex + 1)
             }
-            print("Page \(i+1): scanning lines…")
+
             let lines = text.components(separatedBy: .newlines)
+            var pageMatched = 0
+            var pageShortCols = 0
+            var pageParsed = 0
+
+            print("Page \(pageIndex + 1): scanning \(lines.count) lines")
             for (lineno, raw) in lines.enumerated() {
                 let line = raw.trimmingCharacters(in: .whitespaces)
                 let range = NSRange(location: 0, length: line.utf16.count)
                 if digitLine.firstMatch(in: line, options: [], range: range) == nil {
                     continue
                 }
-                print(" → Matched data line \(lineno+1): \(line)")
+                pageMatched += 1
+                totalMatched += 1
+                print("Matched line \(lineno + 1): \"\(line)\"")
 
                 let ns = line as NSString
                 let matches = splitCols.matches(in: line, options: [], range: NSRange(location: 0, length: ns.length))
@@ -96,16 +107,16 @@ public struct RGSRawPDFTableParser {
                 cols.append(ns.substring(from: lastEnd).trimmingCharacters(in: .whitespaces))
 
                 if cols.count < 9 {
-                    print("    Skipping: only \(cols.count) columns (need ≥9)")
+                    pageShortCols += 1
+                    totalShortCols += 1
+                    print("Skipping: only \(cols.count) columns (need >=9)")
                     continue
                 }
-                print("    ↳ Columns: \(cols)")
 
                 let firstCell = cols[0]
                 let parts = firstCell.split(separator: "\n", maxSplits: 1).map(String.init)
                 let rek = parts[0]
                 let oms = parts.count > 1 ? parts[1] : cols[1]
-                print("    ↳ RekNr=\(rek), Oms=\(oms)")
 
                 let rec = RGSRawPDFTable(
                     RekNr:        rek,
@@ -121,9 +132,22 @@ public struct RGSRawPDFTableParser {
                     Bra:          cols[8]
                 )
                 results.append(rec)
-                print("    Added record for code \(rek)\n")
+                pageParsed += 1
+                totalParsed += 1
+                print("Parsed RekNr=\(rek), Oms=\"\(oms)\"")
             }
+
+            print("Page \(pageIndex + 1) summary:")
+            print("  matched lines: \(pageMatched)")
+            print("  skipped columns: \(pageShortCols)")
+            print("  parsed records: \(pageParsed)")
         }
+
+        print("Overall summary:")
+        print("  total matched lines: \(totalMatched)")
+        print("  total short-col skips: \(totalShortCols)")
+        print("  total parsed records: \(totalParsed)")
+
         return results
     }
 }
