@@ -22,8 +22,30 @@ public struct Account {
     }
 }
 
+public enum BalanceSide: String, CaseIterable, Sendable {
+    case left, right
+}
+
 public enum AccountClass: String, CaseIterable, Sendable {
     case dividend, expense, asset, liability, equity, revenue, unknown
+
+    public var isPermanent: Bool {
+        switch self {
+        case .asset, .liability, .equity:
+            return true
+        case .revenue, .expense, .dividend, .unknown:
+            return false
+        }
+    }
+
+    public var side: BalanceSide {
+        switch self {
+        case .asset:
+            return .left
+        case .liability, .equity:
+            return .right
+        }
+    }
 }
 
 public struct RGSAccountClassifier: Sendable {

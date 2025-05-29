@@ -3,7 +3,7 @@ import Foundation
 public struct RGSAccount: Codable {
     public let code: String
     public let label: String
-    // public let level: Int
+    public let level: Int
     public let direction: Direction?
     public let identifiers: RGSIdentifiers
     public let applicability: Applicability
@@ -11,14 +11,14 @@ public struct RGSAccount: Codable {
     public init(
         code: String,
         label: String,
-        // level: Int,
+        level: Int,
         direction: Direction?,
         identifiers: RGSIdentifiers,
         applicability: Applicability
     ) {
         self.code = code
         self.label = label
-        // self.level = level
+        self.level = level
         self.direction = direction
         self.identifiers = identifiers
         self.applicability = applicability
