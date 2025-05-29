@@ -62,7 +62,7 @@ public struct RGSAccount: Codable {
         }
         self.level = lvl
 
-        guard let dir = Direction(rawValue: raw.DC) else {
+        guard let dir = Direction(raw: raw.DC) else {
             throw RGSParsingError.invalidDirection(raw.DC)
         }
         self.direction = dir
