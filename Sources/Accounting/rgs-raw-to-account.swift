@@ -3,11 +3,9 @@ import Foundation
 public struct RGSAccountConverter {
     public static func io(rawJSON input: String, converted output: String) throws {
         let i = URL(fileURLWithPath: input) 
-        print(i)
         let o = URL(fileURLWithPath: output) 
-        print(o)
         let rgsAccounts = try convert(rawJSON: i)
-        print(rgsAccounts)
+        print("rgs accounts from json: \(rgsAccounts.count)")
         try write(rgsAccounts, to: o)
     }
 
