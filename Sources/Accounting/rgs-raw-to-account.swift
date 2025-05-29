@@ -10,10 +10,22 @@ public struct RGSAccountConverter {
     }
 
     public static func convert(rawJSON url: URL) throws -> [RGSAccount] {
-        let data = try Data(contentsOf: url)
+        let data    = try Data(contentsOf: url)
         let rawRows = try JSONDecoder().decode([RGSRawPDFTableObject].self, from: data)
         print("decoded raw rows: \(rawRows.count)")
-        return try rawRows.compactMap(RGSAccount.init(raw:))
+
+        let accounts = rawRows.compactMap { rawRow -> RGSAccount? in
+            do {
+                return try RGSAccount(raw: rawRow)
+            } catch {
+                // Log and skip this row
+                print("skipping row (code=\(rawRow.RekNr)) due to error: \(error)")
+                return nil
+            }
+        }
+
+        print("kept \(accounts.count) accounts")
+        return accounts
     }
 
     public static func write(_ accounts: [RGSAccount], to url: URL) throws {
