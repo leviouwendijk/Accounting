@@ -40,18 +40,19 @@ public struct RGSRawPDFTable: Codable {
         self.Bra = Bra
     }
 
-    public enum CodingKeys: String, CodingKey {
-        case RekNr
-        case Omschrijving
-        case Nivo
-        case DC
-        case Omslag
-        case RGSCode
-        case ZZP
-        case EZ
-        case BV
-        case SVC
-        case Bra
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(RekNr,        forKey: .RekNr)
+        try c.encode(Omschrijving, forKey: .Omschrijving)
+        try c.encode(Nivo,         forKey: .Nivo)
+        try c.encode(DC,           forKey: .DC)
+        try c.encode(Omslag,       forKey: .Omslag)
+        try c.encode(RGSCode,      forKey: .RGSCode)
+        try c.encode(ZZP,          forKey: .ZZP)
+        try c.encode(EZ,           forKey: .EZ)
+        try c.encode(BV,           forKey: .BV)
+        try c.encode(SVC,          forKey: .SVC)
+        try c.encode(Bra,          forKey: .Bra)
     }
 }
 
