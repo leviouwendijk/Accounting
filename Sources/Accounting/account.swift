@@ -23,7 +23,7 @@ public struct Account {
 }
 
 public enum BalanceSide: String, CaseIterable, Sendable {
-    case left, right
+    case left, right, na
 }
 
 public enum AccountClass: String, CaseIterable, Sendable {
@@ -44,6 +44,8 @@ public enum AccountClass: String, CaseIterable, Sendable {
             return .left
         case .liability, .equity:
             return .right
+        case .revenue, .dividend, .expense, .unknown:
+            return .na
         }
     }
 }
