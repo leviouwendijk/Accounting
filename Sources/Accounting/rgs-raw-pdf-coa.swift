@@ -70,7 +70,7 @@ public struct RGSRawPDFTableParser {
         print("    to: -> \(o)")
         print()
         let rows = try parse(path: i)
-        print("Parsed \(rows.count) rows total")
+        print("Parsed " + "\(rows.count)" + " rows total")
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
         guard let data = try? encoder.encode(rows) else {
@@ -79,6 +79,7 @@ public struct RGSRawPDFTableParser {
         try data.write(to: URL(fileURLWithPath: o))
 
         let file = o.components(separatedBy: "/").last ?? ""
+        print()
         print("Wrote JSON to \(file)")
     }
 
