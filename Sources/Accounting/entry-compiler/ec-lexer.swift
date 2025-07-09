@@ -160,6 +160,16 @@ public struct EntryCompilerLexer: Sendable {
     @inline(__always) private mutating func advance() { 
         index += 1 
     }
+
+    public mutating func collectAllTokens() -> [EntryCompilerToken] {
+        var tokens: [EntryCompilerToken] = []
+        while true {
+            let t = self.nextToken()
+            tokens.append(t)
+            if t == .eof { break }
+        }
+        return tokens
+    }
 }
 
 public struct EntityPath: Hashable, Codable, Sendable {
