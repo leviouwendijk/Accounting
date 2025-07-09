@@ -200,6 +200,23 @@ public struct Entry: Hashable, Codable, Sendable {
         self.lines = lines
         self.details = details
     }
+
+    public var viewableString: String {
+        let fmt = DateFormatter()
+        fmt.dateStyle = .short
+        fmt.timeStyle = .none
+        var out = ["Entry on \(fmt.string(from: date)):"]
+        for line in lines {
+            let ent = "\(line.entity.domain).\(line.entity.alias)"
+            let acc = line.account.segments.joined(separator: ".")
+            let dir = line.direction == .debit ? "DR" : "CR"
+            out.append("  - [\(dir)] \(ent) → \(acc): \(line.amount)")
+        }
+        if let d = details {
+            out.append("Details: \(d)")
+        }
+        return out.joined(separator: "\n")
+    }
 }
 
 public protocol SQLDatabase: Sendable {
