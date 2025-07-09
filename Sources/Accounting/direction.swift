@@ -1,6 +1,6 @@
 import Foundation
 
-public enum DirectionError: Error, CustomStringConvertible {
+public enum DirectionError: Error, CustomStringConvertible, Sendable {
     case invalidCode(String)
 
     public var description: String {
@@ -11,7 +11,7 @@ public enum DirectionError: Error, CustomStringConvertible {
     }
 }
 
-public enum Direction: String, Codable {
+public enum Direction: String, Codable, Sendable {
     case debit
     case credit
 

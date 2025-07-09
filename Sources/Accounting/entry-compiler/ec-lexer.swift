@@ -1,6 +1,6 @@
 import Foundation
 
-public enum EntryCompilerToken: Equatable {
+public enum EntryCompilerToken: Equatable, Sendable {
     case keyword(String)          // entry, for, debit, credit, rm, date, details …
     case ident(String)            // entity, account, people, levi_ouwendijk …
     case number(Decimal)          // 200.00
@@ -18,7 +18,7 @@ public enum EntryCompilerToken: Equatable {
     case eof
 }
 
-public struct EntryCompilerLexer {
+public struct EntryCompilerLexer: Sendable {
     private let scalars: [UnicodeScalar]
     private var index: Int = 0
 
@@ -128,7 +128,7 @@ public struct EntryCompilerLexer {
     @inline(__always) private mutating func advance() { index += 1 }
 }
 
-public struct EntityPath: Hashable, Codable {
+public struct EntityPath: Hashable, Codable, Sendable {
     public let domain: String            // "people"
     public let aliasSegments: [String]   // ["levi", "ouwendijk"]
     public init(domain: String, aliasSegments: [String]) {
@@ -139,12 +139,12 @@ public struct EntityPath: Hashable, Codable {
     public var alias: String { aliasSegments.joined(separator: "_") }
 }
 
-public struct AccountPath: Hashable, Codable {
+public struct AccountPath: Hashable, Codable, Sendable {
     public let segments: [String]
     public init(segments: [String]) { self.segments = segments }
 }
 
-public struct Line: Hashable, Codable {
+public struct Line: Hashable, Codable, Sendable {
     public let entity: EntityPath
     public let account: AccountPath
     public let direction: Direction
@@ -157,7 +157,7 @@ public struct Line: Hashable, Codable {
     }
 }
 
-public struct Entry: Hashable, Codable {
+public struct Entry: Hashable, Codable, Sendable {
     public var date: Date
     public var lines: [Line]
     public var details: String? = nil
@@ -168,11 +168,11 @@ public struct Entry: Hashable, Codable {
     }
 }
 
-public protocol SQLDatabase {
+public protocol SQLDatabase: Sendable {
     func query<T>(_ sql: String, binds: [Encodable]) throws -> T
 }
 
-public struct Resolver {
+public struct Resolver: Sendable {
     public let db: SQLDatabase
     public init(db: SQLDatabase) { self.db = db }
     public func entityID(for path: EntityPath) throws -> Int {
@@ -183,7 +183,7 @@ public struct Resolver {
     }
 }
 
-public struct SourceLocation: CustomStringConvertible {
+public struct SourceLocation: CustomStringConvertible, Sendable {
     public let line: Int
     public let column: Int
     public var description: String { "\(line):\(column)" }
