@@ -21,7 +21,9 @@ public enum EntryCompilerToken: Equatable, Sendable {
 public struct EntryCompilerLexer: Sendable {
     private let scalars: [UnicodeScalar]
     private var index: Int = 0
-    private var pendingDetailsBlock: Bool = false
+
+    private enum DetailsState { case none, awaitingOpen, awaitingContent, awaitingClose }
+    private var detailsState: DetailsState = .none
 
     public init(source: String) {
         self.scalars = Array(source.unicodeScalars)
@@ -30,10 +32,26 @@ public struct EntryCompilerLexer: Sendable {
     public mutating func nextToken() -> EntryCompilerToken {
         skipWhitespaceAndComments()
 
-        if pendingDetailsBlock {
-            pendingDetailsBlock = false
+        switch detailsState {
+        case .awaitingOpen:
+            guard peek() == "{" else { return .eof }
             advance()
+            detailsState = .awaitingContent
             return .lBrace
+
+        case .awaitingContent:
+            let text = readUntilClosingBrace()
+            detailsState = .awaitingClose
+            return .string(text)
+
+        case .awaitingClose:
+            guard peek() == "}" else { return .eof }
+            advance()
+            detailsState = .none
+            return .rBrace
+
+        case .none:
+            break
         }
         
         guard let c = peek() else { return .eof }
@@ -60,17 +78,16 @@ public struct EntryCompilerLexer: Sendable {
 
         if CharacterSet.letters.union(CharacterSet(charactersIn: "_")).contains(c) {
             let ident = readIdent()
+            let kwSet: Set<String> = ["entry","for","debit","credit","date","in","rm","to","from"]
 
             if ident == "details" {
-                pendingDetailsBlock = true
+                detailsState = .awaitingOpen
+                return .keyword("details")
+            } else if kwSet.contains(ident) {
                 return .keyword(ident)
+            } else {
+                return .ident(ident)
             }
-
-            let kwSet: Set<String> = ["entry","for","debit","credit","date","in","rm","to","from"]
-            if kwSet.contains(ident) {
-                return .keyword(ident)
-            }
-            return .ident(ident)
         }
 
         advance()
