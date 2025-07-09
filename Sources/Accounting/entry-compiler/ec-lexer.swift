@@ -56,10 +56,10 @@ public struct EntryCompilerLexer: Sendable {
             break
         }
 
-        if let lit = try? readPattern("\\d{4}-\\d{2}-\\d{2}") {
+        if let lit = try? readPattern("\\d{4}[-/.]\\d{2}[-/.]\\d{2}") {
             return .dateLiteral(lit)
         }
-        if let lit = try? readPattern("\\d{2}/\\d{2}/\\d{4}") {
+        if let lit = try? readPattern("\\d{2}[-/.]\\d{2}[-/.]\\d{4}") {
             return .dateLiteral(lit)
         }
 
