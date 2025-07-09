@@ -50,30 +50,42 @@ public struct EntryCompilerParser {
     private mutating func parseEntry() throws -> Entry {
         try expect(.keyword("entry"))
         try expect(.lBrace)
+
         var entry = Entry()
+
         while current != .rBrace && current != .eof {
-            if case .keyword("date") = current {
-                advance() // keyword
-                try expect(.equals)
-                if case let .number(val) = current {
-                    entry.date = Date(timeIntervalSince1970: (val as NSDecimalNumber).doubleValue)
-                    advance()
-                }
-            }
-            else if case .keyword("details") = current {
+            switch current {
+            case .keyword("date"):
                 advance()
-                if case let .string(txt) = current {
-                    entry.details = txt
-                    advance()
+                try expect(.equals)
+                guard case let .number(val) = current else {
+                    throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
                 }
-            }
-            else if case .keyword("for") = current {
+                entry.date = Date(timeIntervalSince1970: (val as NSDecimalNumber).doubleValue)
+                advance()
+
+            case .keyword("details"):
+                advance()                       // consume 'details'
+                try expect(.lBrace)            // now expect '{'
+                guard case let .string(txt) = current else {
+                    throw ParserError.unexpectedToken(current, expected: "string block", at: currentLocation())
+                }
+                entry.details = txt
+                advance()                       // consume string
+                try expect(.rBrace)            // consume closing '}'
+
+            case .keyword("for"):
                 entry.lines.append(try parseLine())
-            }
-            else {
-                throw ParserError.unexpectedToken(current, expected: "date, details, or for", at: .init(line: line, column: column))
+
+            default:
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "date, details, or for",
+                    at: currentLocation()
+                )
             }
         }
+
         try expect(.rBrace)
         return entry
     }
@@ -159,5 +171,9 @@ public struct EntryCompilerParser {
         }
         try expect(.rPar)
         return AccountPath(segments: segments)
+    }
+
+    private func currentLocation() -> SourceLocation {
+        return SourceLocation(line: line, column: column)
     }
 }

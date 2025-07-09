@@ -21,6 +21,7 @@ public enum EntryCompilerToken: Equatable, Sendable {
 public struct EntryCompilerLexer: Sendable {
     private let scalars: [UnicodeScalar]
     private var index: Int = 0
+    private var pendingDetailsBlock: Bool = false
 
     public init(source: String) {
         self.scalars = Array(source.unicodeScalars)
@@ -28,6 +29,13 @@ public struct EntryCompilerLexer: Sendable {
 
     public mutating func nextToken() -> EntryCompilerToken {
         skipWhitespaceAndComments()
+
+        if pendingDetailsBlock {
+            let text = readUntilClosingBrace()
+            pendingDetailsBlock = false
+            return .string(text)
+        }
+        
         guard let c = peek() else { return .eof }
 
         // punctuation
@@ -125,7 +133,9 @@ public struct EntryCompilerLexer: Sendable {
         let i = index + n
         return i < scalars.count ? scalars[i] : nil
     }
-    @inline(__always) private mutating func advance() { index += 1 }
+    @inline(__always) private mutating func advance() { 
+        index += 1 
+    }
 }
 
 public struct EntityPath: Hashable, Codable, Sendable {
