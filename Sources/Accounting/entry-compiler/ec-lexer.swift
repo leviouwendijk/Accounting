@@ -31,9 +31,9 @@ public struct EntryCompilerLexer: Sendable {
         skipWhitespaceAndComments()
 
         if pendingDetailsBlock {
-            let text = readUntilClosingBrace()
             pendingDetailsBlock = false
-            return .string(text)
+            advance()
+            return .lBrace
         }
         
         guard let c = peek() else { return .eof }
@@ -62,11 +62,8 @@ public struct EntryCompilerLexer: Sendable {
             let ident = readIdent()
 
             if ident == "details" {
-                skipWhitespaceAndComments()
-                guard peek() == "{" else { return .keyword(ident) }
-                advance() // consume '{'
-                let text = readUntilClosingBrace()
-                return .string(text)
+                pendingDetailsBlock = true
+                return .keyword(ident)
             }
 
             let kwSet: Set<String> = ["entry","for","debit","credit","date","in","rm","to","from"]
