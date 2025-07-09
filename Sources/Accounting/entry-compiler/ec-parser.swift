@@ -1,4 +1,5 @@
 import Foundation
+import plate
 
 public enum ParserError: Error, CustomStringConvertible {
     case unexpectedToken(EntryCompilerToken, expected: String, at: SourceLocation)
@@ -64,7 +65,7 @@ public struct EntryCompilerParser {
                         entry.date = Date(timeIntervalSince1970: (n as NSDecimalNumber).doubleValue)
                         advance()
                     case let .dateLiteral(text):
-                        entry.date = parseDateLiteral(text)   // split on "-" or "/"
+                        entry.date = try text.date()
                         advance()
                     default:
                         throw ParserError.unexpectedToken(current, expected: "number or dateLiteral", at: currentLocation())
@@ -244,17 +245,6 @@ public struct EntryCompilerParser {
         let abbr = Calendar.current.shortMonthSymbols.map { $0.lowercased() }
         if let idx = abbr.firstIndex(of: lower) { return idx + 1 }
         return Int(m) ?? 1
-    }
-
-    private func parseDateLiteral(_ text: String) -> Date {
-        let sep = text.contains("/") ? "/" : "-"
-        let parts = text.split(separator: Character(sep)).map(String.init)
-        let (y,m,d) = sep == "/" 
-            ? (Int(parts[2])!, Int(parts[1])!, Int(parts[0])!)
-            : (Int(parts[0])!, Int(parts[1])!, Int(parts[2])!)
-        var comps = DateComponents()
-        comps.year = y; comps.month = m; comps.day = d
-        return Calendar.current.date(from: comps) ?? Date()
     }
 
     private func currentLocation() -> SourceLocation {
