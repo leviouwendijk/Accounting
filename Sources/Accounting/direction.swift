@@ -15,7 +15,6 @@ public enum Direction: String, Codable {
     case debit
     case credit
 
-    /// Now throws instead of crashing
     public init(raw: String) throws {
         let upper = raw.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
         switch upper {
