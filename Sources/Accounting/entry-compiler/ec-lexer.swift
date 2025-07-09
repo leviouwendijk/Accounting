@@ -132,13 +132,22 @@ public struct EntryCompilerLexer: Sendable {
         var depth = 1
         var buffer = ""
         while let c = peek() {
-            advance()
-            if c == "{" { depth += 1; buffer.append("{"); continue }
+            if c == "{" {
+                advance()
+                depth += 1
+                buffer.append("{")
+                continue
+            }
             if c == "}" {
                 depth -= 1
-                if depth == 0 { break }
-                buffer.append("}"); continue
+                if depth == 0 {
+                    break
+                }
+                advance()
+                buffer.append("}")
+                continue
             }
+            advance()
             buffer.append(Character(c))
         }
         return buffer.trimmingCharacters(in: .whitespacesAndNewlines)
