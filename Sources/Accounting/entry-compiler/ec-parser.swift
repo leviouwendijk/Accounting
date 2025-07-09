@@ -57,12 +57,22 @@ public struct EntryCompilerParser {
             switch current {
             case .keyword("date"):
                 advance()
-                try expect(.equals)
-                guard case let .number(val) = current else {
-                    throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
-                }
-                entry.date = Date(timeIntervalSince1970: (val as NSDecimalNumber).doubleValue)
+                if current == .equals {
                 advance()
+                    switch current {
+                    case let .number(n):
+                        entry.date = Date(timeIntervalSince1970: (n as NSDecimalNumber).doubleValue)
+                        advance()
+                    case let .dateLiteral(text):
+                        entry.date = parseDateLiteral(text)   // split on "-" or "/"
+                        advance()
+                    default:
+                        throw ParserError.unexpectedToken(current, expected: "number or dateLiteral", at: currentLocation())
+                    }
+                } else if current == .lBrace {
+                    // handle block-style date { year = …; month = …; day = … }
+                    entry.date = try parseDateBlock()
+                }
 
             case .keyword("details"):
                 advance()                       // consume 'details'
@@ -171,6 +181,80 @@ public struct EntryCompilerParser {
         }
         try expect(.rPar)
         return AccountPath(segments: segments)
+    }
+
+    private mutating func parseDateBlock() throws -> Date {
+        try expect(.lBrace)
+
+        var comps = DateComponents()
+        while current != .rBrace {
+            switch current {
+            case .keyword("year"):
+                try expect(.keyword("year"))
+                try expect(.equals)
+                // extract number
+                guard case let .number(n) = current else {
+                    throw ParserError.unexpectedToken(current,
+                        expected: "number", at: currentLocation())
+                }
+                comps.year = (n as NSDecimalNumber).intValue
+                advance()
+
+            case .keyword("month"):
+                try expect(.keyword("month"))
+                try expect(.equals)
+                // extract identifier or number
+                if case let .ident(s) = current {
+                    let mstr = s.lowercased()
+                    // map "jan"/"january"/"01"→1 etc.
+                    comps.month = monthIndex(from: mstr)
+                    advance()
+                } else if case let .number(n) = current {
+                    comps.month = (n as NSDecimalNumber).intValue
+                    advance()
+                } else {
+                    throw ParserError.unexpectedToken(current,
+                        expected: "identifier or number", at: currentLocation())
+                }
+
+            case .keyword("day"):
+                try expect(.keyword("day"))
+                try expect(.equals)
+                guard case let .number(n) = current else {
+                    throw ParserError.unexpectedToken(current,
+                        expected: "number", at: currentLocation())
+                }
+                comps.day = (n as NSDecimalNumber).intValue
+                advance()
+
+            default:
+                throw ParserError.unexpectedToken(current,
+                    expected: "year, month, or day", at: currentLocation())
+            }
+        }
+
+        try expect(.rBrace)
+        return Calendar.current.date(from: comps) ?? Date()
+    }
+
+    private func monthIndex(from m: String) -> Int {
+        let lower = m.lowercased()
+        let names = Calendar.current.monthSymbols.map { $0.lowercased() }
+        if let idx = names.firstIndex(of: lower) { return idx + 1 }
+        let abbr = Calendar.current.shortMonthSymbols.map { $0.lowercased() }
+        if let idx = abbr.firstIndex(of: lower) { return idx + 1 }
+        return Int(m) ?? 1
+    }
+
+    private func parseDateLiteral(_ text: String) -> Date {
+        let sep = text.contains("/") ? "/" : "-"
+        let parts = text.split(separator: Character(sep)).map(String.init)
+        let (y,m,d) = sep == "/" 
+            ? (Int(parts[2])!, Int(parts[1])!, Int(parts[0])!)
+            : (Int(parts[0])!, Int(parts[1])!, Int(parts[2])!)
+        var comps = DateComponents()
+        comps.year = y; comps.month = m; comps.day = d
+        return Calendar.current.date(from: comps) ?? Date()
     }
 
     private func currentLocation() -> SourceLocation {

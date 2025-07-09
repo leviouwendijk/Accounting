@@ -15,6 +15,8 @@ public enum EntryCompilerToken: Equatable, Sendable {
 
     case string(String)           // details { … }
 
+    case dateLiteral(String)   // e.g. "2025-02-03" or "03/02/2025"
+
     case eof
 }
 
@@ -52,6 +54,13 @@ public struct EntryCompilerLexer: Sendable {
 
         case .none:
             break
+        }
+
+        if let lit = try? readPattern("\\d{4}-\\d{2}-\\d{2}") {
+            return .dateLiteral(lit)
+        }
+        if let lit = try? readPattern("\\d{2}/\\d{2}/\\d{4}") {
+            return .dateLiteral(lit)
         }
 
         guard let c = peek() else { return .eof }
@@ -126,6 +135,19 @@ public struct EntryCompilerLexer: Sendable {
             advance()
         }
         return buffer
+    }
+
+    private mutating func readPattern(_ pattern: String) throws -> String {
+        let regex = try NSRegularExpression(pattern: "^\(pattern)")
+        let remaining = String(scalars[index...].map { Character($0) })
+        let nsrange = NSRange(location: 0, length: remaining.utf16.count)
+        if let m = regex.firstMatch(in: remaining, options: [], range: nsrange),
+           let range = Range(m.range, in: remaining) {
+            let lit = String(remaining[range])
+            index += lit.utf16.count  // consume matched chars
+            return lit
+        }
+        throw NSError(domain: "NoPattern", code: 1)
     }
 
     private mutating func readUntilClosingBrace() -> String {
