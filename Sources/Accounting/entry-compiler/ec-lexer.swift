@@ -53,10 +53,10 @@ public struct EntryCompilerLexer: Sendable {
         case .none:
             break
         }
-        
+
         guard let c = peek() else { return .eof }
 
-        // punctuation
+        // 2) punctuation
         switch c {
         case "{": advance(); return .lBrace
         case "}": advance(); return .rBrace
@@ -72,14 +72,15 @@ public struct EntryCompilerLexer: Sendable {
         default: break
         }
 
+        // 3) number
         if CharacterSet.decimalDigits.contains(c) {
             return .number(readNumber())
         }
 
+        // 4) identifiers & keywords
         if CharacterSet.letters.union(CharacterSet(charactersIn: "_")).contains(c) {
             let ident = readIdent()
-            let kwSet: Set<String> = ["entry","for","debit","credit","date","in","rm","to","from"]
-
+            let kwSet: Set<String> = ["entry","for","debit","credit","date","in","rm","to","from","details"]
             if ident == "details" {
                 detailsState = .awaitingOpen
                 return .keyword("details")
