@@ -95,7 +95,8 @@ public struct EntryCompilerLexer: Sendable {
                 "details",
                 "date", "infer",
                 "rm","to","from",
-                "adding", "removing"
+                "adding", "removing",
+                "year","month","day"
             ]
             if ident == "details" {
                 detailsState = .awaitingOpen
