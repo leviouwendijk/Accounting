@@ -1,16 +1,16 @@
 import Foundation
 
-public struct JournalEntry {
+public struct RGSJournalEntry {
     public let id: String
     public let date: Date
     public let description: String
-    public var postings: [Posting]
+    public var postings: [RGSPosting]
 
     public init(
         id: String, 
         date: Date, 
         description: String, 
-        postings: [Posting]
+        postings: [RGSPosting]
     ) {
         self.id = id
         self.date = date
@@ -19,22 +19,24 @@ public struct JournalEntry {
     }
 }
 
-public struct Posting {
-    public let account: Account
-    public let entity: Entity?
+public struct RGSPosting {
+    public let account: RGSAccount
+    public let entity: Entity
     public let amount: Double
     public let mutation: Direction
+    public let adjustments: [InventoryAdjustment]?
 
     public init(
-        account: Account, 
-        entity: Entity?, 
+        account: RGSAccount, 
+        entity: Entity,
         amount: Double, 
-        mutation: Direction
+        mutation: Direction,
+        adjustments: [InventoryAdjustment]? = nil
     ) {
         self.account = account
         self.entity = entity
         self.amount = amount
         self.mutation = mutation
+        self.adjustments = adjustments
     }
 }
-

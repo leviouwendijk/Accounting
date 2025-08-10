@@ -58,21 +58,34 @@ public struct EntryCompilerParser {
             switch current {
             case .keyword("date"):
                 advance()
-                if current == .equals {
-                advance()
+                // date infer <day>
+                if case .keyword("infer") = current {
+                    advance()
+                    guard case let .number(n) = current else {
+                        throw ParserError.unexpectedToken(current, expected: "number (day of month)", at: currentLocation())
+                    }
+                    entry.date = .infer(day: (n as NSDecimalNumber).intValue)
+                    advance()
+
+                } else if current == .equals {
+                    // date = <unix-seconds> | <date-literal>
+                    advance()
                     switch current {
                     case let .number(n):
-                        entry.date = Date(timeIntervalSince1970: (n as NSDecimalNumber).doubleValue)
+                        entry.date = .absolute(Date(timeIntervalSince1970: (n as NSDecimalNumber).doubleValue))
                         advance()
                     case let .dateLiteral(text):
-                        entry.date = try text.date()
+                        entry.date = .absolute(try text.date())
                         advance()
                     default:
                         throw ParserError.unexpectedToken(current, expected: "number or dateLiteral", at: currentLocation())
                     }
+
                 } else if current == .lBrace {
-                    // handle block-style date { year = …; month = …; day = … }
-                    entry.date = try parseDateBlock()
+                    // date { year=.. month=.. day=.. }
+                    entry.date = .absolute(try parseDateBlock())
+                } else {
+                    throw ParserError.unexpectedToken(current, expected: "infer, '=', or '{'", at: currentLocation())
                 }
 
             case .keyword("details"):
@@ -102,38 +115,73 @@ public struct EntryCompilerParser {
     }
 
     private mutating func parseLine() throws -> Line {
-        advance()                      // consume 'for'
+        advance() // consumed 'for'
         let entity = try parseEntityPath()
         try expect(.keyword("in"))
         let account = try parseAccountPath()
         try expect(.lBrace)
 
-        var direction: Direction = .debit
-        var amount: Decimal = 0
+        // mandatory posting amount
+        var direction: Direction?
+        var amount: Decimal?
 
-        if case .keyword("debit") = current {
-            direction = .debit
-            advance()
-        } else if case .keyword("credit") = current {
-            direction = .credit
-            advance()
-        } else if case .keyword("rm") = current {
-            direction = .credit // or custom enum
-            advance()
-        } else {
-            throw ParserError.unexpectedToken(current, expected: "debit, credit, or rm", at: .init(line: line, column: column))
-        }
+        // optional single inventory adjustment
+        var adjustment: InventoryAdjustment?
 
-        try expect(.equals)
-        if case let .number(val) = current {
-            amount = val
-            advance()
-        } else {
-            throw ParserError.unexpectedToken(current, expected: "number", at: .init(line: line, column: column))
+        // line body: one or more statements in any order
+        lineBody: while current != .rBrace && current != .eof {
+            switch current {
+
+            case .keyword("debit"), .keyword("credit"), .keyword("rm"):
+                if direction != nil {
+                    throw ParserError.unexpectedToken(current, expected: "only one of debit/credit per line", at: currentLocation())
+                }
+                let isDebit = (current == .keyword("debit"))
+                let isCredit = (current == .keyword("credit") || current == .keyword("rm"))
+                direction = isDebit ? .debit : (isCredit ? .credit : nil)
+                advance()
+                try expect(.equals)
+                guard case let .number(val) = current else {
+                    throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
+                }
+                amount = val
+                advance()
+
+            case .keyword("adding"), .keyword("removing"):
+                if adjustment != nil {
+                    throw ParserError.unexpectedToken(current, expected: "only one inventory adjustment per line", at: currentLocation())
+                }
+                let kindTok = current
+                advance()
+                try expect(.equals)
+                guard case let .number(qtyDec) = current else {
+                    throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
+                }
+                let qty = (qtyDec as NSDecimalNumber).doubleValue
+                let dir: InventoryAdjustmentDirection =
+                    (kindTok == .keyword("adding")) ? .addition : .reduction
+                adjustment = InventoryAdjustment(mutation: dir, count: qty)
+                advance()
+
+            default:
+                // unknown token in line body
+                throw ParserError.unexpectedToken(current, expected: "debit/credit or adding/removing", at: currentLocation())
+            }
         }
 
         try expect(.rBrace)
-        return Line(entity: entity, account: account, direction: direction, amount: amount)
+
+        guard let dir = direction, let amt = amount else {
+            throw ParserError.unexpectedToken(current, expected: "posting amount (debit/credit = …)", at: currentLocation())
+        }
+
+        return Line(
+            entity: entity,
+            account: account,
+            direction: dir,
+            amount: amt,
+            adjustment: adjustment
+        )
     }
 
     private mutating func parseEntityPath() throws -> EntityPath {

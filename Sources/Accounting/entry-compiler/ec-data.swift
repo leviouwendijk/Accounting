@@ -1,5 +1,10 @@
 import Foundation
 
+public enum DateSpecification: Hashable, Codable, Sendable, Equatable {
+    case absolute(Date)
+    case infer(day: Int)
+}
+
 public struct EntityPath: Hashable, Codable, Sendable {
     public let domain: String            // "people"
     public let aliasSegments: [String]   // ["levi", "ouwendijk"]
@@ -21,19 +26,33 @@ public struct Line: Hashable, Codable, Sendable {
     public let account: AccountPath
     public let direction: Direction
     public let amount: Decimal
-    public init(entity: EntityPath, account: AccountPath, direction: Direction, amount: Decimal) {
+    public let adjustment: InventoryAdjustment?
+
+    public init(
+        entity: EntityPath,
+        account: AccountPath,
+        direction: Direction,
+        amount: Decimal,
+        adjustment: InventoryAdjustment? = nil
+    ) {
         self.entity = entity
         self.account = account
         self.direction = direction
         self.amount = amount
+        self.adjustment = adjustment
     }
 }
 
 public struct Entry: Hashable, Codable, Sendable {
-    public var date: Date
+    public var date: DateSpecification
     public var lines: [Line]
     public var details: String? = nil
-    public init(date: Date = Date(), lines: [Line] = [], details: String? = nil) {
+
+    public init(
+        date: DateSpecification = .absolute(Date()),
+        lines: [Line] = [],
+        details: String? = nil
+    ) {
         self.date = date
         self.lines = lines
         self.details = details
@@ -43,12 +62,23 @@ public struct Entry: Hashable, Codable, Sendable {
         let fmt = DateFormatter()
         fmt.dateStyle = .short
         fmt.timeStyle = .none
-        var out = ["Entry on \(fmt.string(from: date)):"]
+        let dateStr: String = {
+            switch date {
+            case .absolute(let d): return fmt.string(from: d)
+            case .infer(let day):  return "inferred-day \(day)"
+            }
+        }()
+        var out = ["Entry on \(dateStr):"]
         for line in lines {
             let ent = "\(line.entity.domain).\(line.entity.alias)"
             let acc = line.account.segments.joined(separator: ".")
             let dir = line.direction == .debit ? "DR" : "CR"
-            out.append("  - [\(dir)] \(ent) → \(acc): \(line.amount)")
+            var lineStr = "  - [\(dir)] \(ent) → \(acc): \(line.amount)"
+            if let adj = line.adjustment {
+                let tag = (adj.mutation == .addition || adj.mutation == .add) ? "ADD" : "REM"
+                lineStr += "  (\(tag) \(adj.count))"
+            }
+            out.append(lineStr)
         }
         if let d = details {
             out.append("Details: \(d)")

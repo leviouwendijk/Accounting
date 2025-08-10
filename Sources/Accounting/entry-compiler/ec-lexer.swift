@@ -89,7 +89,14 @@ public struct EntryCompilerLexer: Sendable {
         // 4) identifiers & keywords
         if CharacterSet.letters.union(CharacterSet(charactersIn: "_")).contains(c) {
             let ident = readIdent()
-            let kwSet: Set<String> = ["entry","for","debit","credit","date","in","rm","to","from","details"]
+            let kwSet: Set<String> = [
+                "entry", "for", "in", 
+                "debit", "credit",
+                "details",
+                "date", "infer",
+                "rm","to","from",
+                "adding", "removing"
+            ]
             if ident == "details" {
                 detailsState = .awaitingOpen
                 return .keyword("details")
