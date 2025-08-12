@@ -466,7 +466,8 @@ public struct EntryCompilerParser {
                     throw ParserError.unexpectedToken(current, expected: "number or path", at: currentLocation())
                 }
 
-            case .ident("debit"), .ident("credit"), .ident("dr"), .ident("cr"):
+            // case .ident("debit"), .ident("credit"), .ident("dr"), .ident("cr"):
+            case .keyword("debit"), .keyword("credit"), .keyword("dr"), .keyword("cr"):
                 let tok = current; advance(); try expect(.equals)
                 guard case let .number(n) = current else {
                     throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())

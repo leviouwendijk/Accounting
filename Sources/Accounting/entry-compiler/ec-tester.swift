@@ -48,3 +48,43 @@ public struct EntryCompilerTester: Sendable {
         }
     }
 }
+
+// testing helpers
+
+public struct TokenDTO: Codable {
+    public let type: String
+    public let value: String?
+}
+
+public func tokensToDTO(_ toks: [EntryCompilerToken]) -> [TokenDTO] {
+    toks.map {
+        switch $0 {
+        case .keyword(let s):   return .init(type: "keyword", value: s)
+        case .ident(let s):     return .init(type: "ident",   value: s)
+        case .number(let d):    return .init(type: "number",  value: "\(d)")
+        case .lBrace:           return .init(type: "lBrace",  value: nil)
+        case .rBrace:           return .init(type: "rBrace",  value: nil)
+        case .lPar:             return .init(type: "lPar",    value: nil)
+        case .rPar:             return .init(type: "rPar",    value: nil)
+        case .arrow:            return .init(type: "arrow",   value: nil)
+        case .dot:              return .init(type: "dot",     value: nil)
+        case .equals:           return .init(type: "equals",  value: nil)
+        case .string(let s):    return .init(type: "string",  value: s)
+        case .dateLiteral(let s): return .init(type: "date",  value: s)
+        case .eof:              return .init(type: "eof",     value: nil)
+        }
+    }
+}
+
+public func encodeTokensJSON(_ toks: [EntryCompilerToken]) throws -> Data {
+    let enc = JSONEncoder()
+    enc.outputFormatting = [.prettyPrinted, .sortedKeys]
+    return try enc.encode(tokensToDTO(toks))
+}
+
+public func encodeASTJSON(_ entries: [Entry]) throws -> Data {
+    let enc = JSONEncoder()
+    enc.outputFormatting = [.prettyPrinted, .sortedKeys]
+    enc.dateEncodingStrategy = .iso8601
+    return try enc.encode(entries)
+}
