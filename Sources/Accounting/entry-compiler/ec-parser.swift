@@ -104,13 +104,13 @@ public struct EntryCompilerParser {
             case .keyword("for"), .keyword("in"):
                 entry.lines.append(try parseLineOrSwap())
 
-            case .keyword("posting"):
+            case .keyword("posting"), .keyword("line"):
                 entry.lines.append(try parsePostingBlock())
 
             default:
                 throw ParserError.unexpectedToken(
                     current,
-                    expected: "date, details, or for",
+                    expected: "date, details, for, posting, or line",
                     at: currentLocation()
                 )
             }
@@ -471,7 +471,10 @@ public struct EntryCompilerParser {
     }
 
     private mutating func parsePostingBlock() throws -> Line {
-        try expect(.keyword("posting"))
+        guard current == .keyword("posting") || current == .keyword("line") else {
+            throw ParserError.unexpectedToken(current, expected: "posting or line", at: currentLocation())
+        }
+        advance()
         try expect(.lBrace)
 
         var entityPath: EntityPath?
