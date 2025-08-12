@@ -423,36 +423,9 @@ public struct EntryCompilerParser {
 
         while current != .rBrace && current != .eof {
             switch current {
-            // case .keyword("debit"), .keyword("credit"), .keyword("dr"), .keyword("cr"):
-            //     if direction != nil { throw ParserError.unexpectedToken(current, expected: "only one of debit/credit", at: currentLocation()) }
-            //     let isDebit  = (current == .keyword("debit") || current == .keyword("dr"))
-            //     let isCredit = (current == .keyword("credit") || current == .keyword("cr"))
-            //     direction = isDebit ? .debit : (isCredit ? .credit : nil)
-            //     advance()
-            //     try expect(.equals)
-            //     guard case let .number(val) = current else {
-            //         throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
-            //     }
-            //     amount = val
-            //     advance()
-
             case .keyword("debit"), .keyword("credit"), .keyword("dr"), .keyword("cr"):
                 if direction != nil { throw ParserError.unexpectedToken(current, expected: "only one of debit/credit", at: currentLocation()) }
                 (direction, amount) = try parseAmountDirective()
-
-            // case .keyword("adding"), .keyword("add"), .keyword("removing"), .keyword("remove"), .keyword("reduction"):
-            //     if adjustment != nil { throw ParserError.unexpectedToken(current, expected: "single inventory adjustment", at: currentLocation()) }
-            //     let kindTok = current; advance()
-            //     try expect(.equals)
-            //     guard case let .number(qtyDec) = current else {
-            //         throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
-            //     }
-            //     let qty = (qtyDec as NSDecimalNumber).doubleValue
-            //     let dir: InventoryAdjustmentDirection =
-            //         (kindTok == .keyword("adding") || kindTok == .keyword("add"))
-            //         ? .addition : .reduction
-            //     adjustment = InventoryAdjustment(mutation: dir, count: qty)
-            //     advance()
 
             case .keyword("adding"), .keyword("addition"), .keyword("add"), .keyword("removing"), .keyword("reduction"), .keyword("remove"), .keyword("rm"):
                 if adjustment != nil { throw ParserError.unexpectedToken(current, expected: "single inventory adjustment", at: currentLocation()) }
@@ -470,6 +443,20 @@ public struct EntryCompilerParser {
         return Line(entity: entity, account: account, direction: dir, amount: amt, adjustment: adjustment)
     }
 
+    // Read dotted/arrow-separated path segments until a non-segment token.
+    private mutating func readFlatSegments() -> [String] {
+        var segs: [String] = []
+        while true {
+            switch current {
+            case let .ident(s):  segs.append(s); advance()
+            case let .number(n): segs.append("\(n)"); advance()
+            default:             return segs
+            }
+            if current == .dot || current == .arrow { advance(); continue }
+            return segs
+        }
+    }
+
     private mutating func parsePostingBlock() throws -> Line {
         guard current == .keyword("posting") || current == .keyword("line") else {
             throw ParserError.unexpectedToken(current, expected: "posting or line", at: currentLocation())
@@ -481,36 +468,58 @@ public struct EntryCompilerParser {
         var accountPath: AccountPath?
         var direction: Direction?
         var amount: Decimal?
+        var adjustment: InventoryAdjustment?
 
         while current != .rBrace && current != .eof {
             switch current {
+            // case .ident("entity"):
+            //     advance(); try expect(.equals)
+            //     // entity = processes.deliverable.session   (no parens here)
+            //     var segs: [String] = []
+            //     while case let .ident(s) = current {
+            //         segs.append(s); advance()
+            //         if current == .dot || current == .arrow { advance() }
+            //         else { break }
+            //     }
+            //     guard segs.count >= 2 else { throw ParserError.unexpectedToken(current, expected: "domain.alias.path", at: currentLocation()) }
+            //     let domain = segs.removeFirst()
+            //     entityPath = EntityPath(domain: domain, aliasSegments: segs)
+
             case .ident("entity"):
                 advance(); try expect(.equals)
-                // entity = processes.deliverable.session   (no parens here)
-                var segs: [String] = []
-                while case let .ident(s) = current {
-                    segs.append(s); advance()
-                    if current == .dot || current == .arrow { advance() }
-                    else { break }
+                // entity = processes.deliverable.session
+                let segs = readFlatSegments()
+                guard segs.count >= 2 else {
+                    throw ParserError.unexpectedToken(current, expected: "domain.alias.path", at: currentLocation())
                 }
-                guard segs.count >= 2 else { throw ParserError.unexpectedToken(current, expected: "domain.alias.path", at: currentLocation()) }
-                let domain = segs.removeFirst()
-                entityPath = EntityPath(domain: domain, aliasSegments: segs)
+                let domain = segs.first!
+                entityPath = EntityPath(domain: domain, aliasSegments: Array(segs.dropFirst()))
 
+            // case .ident("account"):
+            //     advance(); try expect(.equals)
+            //     switch current {
+            //     case let .number(n): accountPath = AccountPath(segments: ["\(n)"]); advance()
+            //     case let .ident(s):
+            //         var segs = [s]; advance()
+            //         while current == .dot || current == .arrow {
+            //             advance()
+            //             if case let .ident(next) = current { segs.append(next); advance() }
+            //             else if case let .number(n) = current { segs.append("\(n)"); advance() }
+            //         }
+            //         accountPath = AccountPath(segments: segs)
+            //     default:
+            //         throw ParserError.unexpectedToken(current, expected: "number or path", at: currentLocation())
+            //     }
             case .ident("account"):
                 advance(); try expect(.equals)
-                switch current {
-                case let .number(n): accountPath = AccountPath(segments: ["\(n)"]); advance()
-                case let .ident(s):
-                    var segs = [s]; advance()
-                    while current == .dot || current == .arrow {
-                        advance()
-                        if case let .ident(next) = current { segs.append(next); advance() }
-                        else if case let .number(n) = current { segs.append("\(n)"); advance() }
+                // number or dotted path
+                if case let .number(n) = current { accountPath = AccountPath(segments: ["\(n)"]); advance() }
+                else {
+                    let segs = readFlatSegments()
+                    guard !segs.isEmpty else {
+                        throw ParserError.unexpectedToken(current, expected: "number or path", at: currentLocation())
                     }
                     accountPath = AccountPath(segments: segs)
-                default:
-                    throw ParserError.unexpectedToken(current, expected: "number or path", at: currentLocation())
                 }
 
             // case .ident("debit"), .ident("credit"), .ident("dr"), .ident("cr"):
