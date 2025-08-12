@@ -120,6 +120,43 @@ public struct EntryCompilerParser {
         return entry
     }
 
+    private mutating func parseAmountDirective() throws -> (Direction, Decimal) {
+        // expects: (debit|credit|dr|cr) = <number>
+        guard current == .keyword("debit") || current == .keyword("credit")
+            || current == .keyword("dr")   || current == .keyword("cr")
+        else {
+            throw ParserError.unexpectedToken(current, expected: "debit/credit/dr/cr", at: currentLocation())
+        }
+        let dir: Direction = (current == .keyword("debit") || current == .keyword("dr")) ? .debit : .credit
+        advance()
+        try expect(.equals)
+        guard case let .number(n) = current else {
+            throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
+        }
+        let amt = n
+        advance()
+        return (dir, amt)
+    }
+
+    private mutating func parseSingleInventoryAdjustment(after tok: EntryCompilerToken? = nil) throws -> InventoryAdjustment {
+        // supports: adding|addition|add|removing|reduction|remove|rm = <number>
+        let t = tok ?? current
+        let isAdd = (t == .keyword("adding") || t == .keyword("addition") || t == .keyword("add"))
+        let isRed = (t == .keyword("removing") || t == .keyword("reduction") || t == .keyword("remove") || t == .keyword("rm"))
+        guard isAdd || isRed else {
+            throw ParserError.unexpectedToken(current, expected: "inventory adjustment keyword", at: currentLocation())
+        }
+        if tok == nil { advance() } // consume the keyword only if caller didn’t pass it
+        try expect(.equals)
+        guard case let .number(qDec) = current else {
+            throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
+        }
+        let qty = (qDec as NSDecimalNumber).doubleValue
+        advance()
+        return InventoryAdjustment(mutation: isAdd ? .addition : .reduction, count: qty)
+    }
+
+
     private mutating func parseLine() throws -> Line {
         advance() // consumed 'for'
         let entity = try parseEntityPath()
@@ -386,32 +423,40 @@ public struct EntryCompilerParser {
 
         while current != .rBrace && current != .eof {
             switch current {
+            // case .keyword("debit"), .keyword("credit"), .keyword("dr"), .keyword("cr"):
+            //     if direction != nil { throw ParserError.unexpectedToken(current, expected: "only one of debit/credit", at: currentLocation()) }
+            //     let isDebit  = (current == .keyword("debit") || current == .keyword("dr"))
+            //     let isCredit = (current == .keyword("credit") || current == .keyword("cr"))
+            //     direction = isDebit ? .debit : (isCredit ? .credit : nil)
+            //     advance()
+            //     try expect(.equals)
+            //     guard case let .number(val) = current else {
+            //         throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
+            //     }
+            //     amount = val
+            //     advance()
+
             case .keyword("debit"), .keyword("credit"), .keyword("dr"), .keyword("cr"):
                 if direction != nil { throw ParserError.unexpectedToken(current, expected: "only one of debit/credit", at: currentLocation()) }
-                let isDebit  = (current == .keyword("debit") || current == .keyword("dr"))
-                let isCredit = (current == .keyword("credit") || current == .keyword("cr"))
-                direction = isDebit ? .debit : (isCredit ? .credit : nil)
-                advance()
-                try expect(.equals)
-                guard case let .number(val) = current else {
-                    throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
-                }
-                amount = val
-                advance()
+                (direction, amount) = try parseAmountDirective()
 
-            case .keyword("adding"), .keyword("add"), .keyword("removing"), .keyword("remove"), .keyword("reduction"):
+            // case .keyword("adding"), .keyword("add"), .keyword("removing"), .keyword("remove"), .keyword("reduction"):
+            //     if adjustment != nil { throw ParserError.unexpectedToken(current, expected: "single inventory adjustment", at: currentLocation()) }
+            //     let kindTok = current; advance()
+            //     try expect(.equals)
+            //     guard case let .number(qtyDec) = current else {
+            //         throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
+            //     }
+            //     let qty = (qtyDec as NSDecimalNumber).doubleValue
+            //     let dir: InventoryAdjustmentDirection =
+            //         (kindTok == .keyword("adding") || kindTok == .keyword("add"))
+            //         ? .addition : .reduction
+            //     adjustment = InventoryAdjustment(mutation: dir, count: qty)
+            //     advance()
+
+            case .keyword("adding"), .keyword("addition"), .keyword("add"), .keyword("removing"), .keyword("reduction"), .keyword("remove"), .keyword("rm"):
                 if adjustment != nil { throw ParserError.unexpectedToken(current, expected: "single inventory adjustment", at: currentLocation()) }
-                let kindTok = current; advance()
-                try expect(.equals)
-                guard case let .number(qtyDec) = current else {
-                    throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
-                }
-                let qty = (qtyDec as NSDecimalNumber).doubleValue
-                let dir: InventoryAdjustmentDirection =
-                    (kindTok == .keyword("adding") || kindTok == .keyword("add"))
-                    ? .addition : .reduction
-                adjustment = InventoryAdjustment(mutation: dir, count: qty)
-                advance()
+                adjustment = try parseSingleInventoryAdjustment()
 
             default:
                 throw ParserError.unexpectedToken(current, expected: "debit/credit or adding/removing", at: currentLocation())
@@ -466,33 +511,43 @@ public struct EntryCompilerParser {
                 }
 
             // case .ident("debit"), .ident("credit"), .ident("dr"), .ident("cr"):
-            case .keyword("debit"), .keyword("credit"), .keyword("dr"), .keyword("cr"):
-                let tok = current; advance(); try expect(.equals)
-                guard case let .number(n) = current else {
-                    throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
-                }
-                amount = n
-                direction = (tok == .keyword("debit") || tok == .keyword("dr")) ? .debit : .credit
-                advance()
+            // case .keyword("debit"), .keyword("credit"), .keyword("dr"), .keyword("cr"):
+            //     let tok = current; advance(); try expect(.equals)
+            //     guard case let .number(n) = current else {
+            //         throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
+            //     }
+            //     amount = n
+            //     direction = (tok == .keyword("debit") || tok == .keyword("dr")) ? .debit : .credit
+            //     advance()
 
+            case .keyword("debit"), .keyword("credit"), .keyword("dr"), .keyword("cr"):
+                let (dir, amt) = try parseAmountDirective()
+                direction = dir
+                amount = amt
 
             case .keyword("inventory"):
                 advance()
                 try expect(.lBrace)
                 // parse inner inventory fields
                 while current != .rBrace && current != .eof {
-                    switch current {
-                    case .keyword("addition"), .keyword("add"):
-                        advance(); try expect(.equals)
-                        guard case let .number(qty) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation()) }
-                        // store qty in some postingInventoryAdditions array/struct
-                        advance()
+                    // switch current {
+                    // case .keyword("addition"), .keyword("add"):
+                    //     advance(); try expect(.equals)
+                    //     guard case let .number(qty) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation()) }
+                    //     // store qty in some postingInventoryAdditions array/struct
+                    //     advance()
 
-                    case .keyword("remove"), .keyword("rm"):
-                        advance(); try expect(.equals)
-                        guard case let .number(qty) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation()) }
-                        // store qty in postingInventoryReductions array/struct
-                        advance()
+                    // case .keyword("remove"), .keyword("rm"):
+                    //     advance(); try expect(.equals)
+                    //     guard case let .number(qty) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation()) }
+                    //     // store qty in postingInventoryReductions array/struct
+                    //     advance()
+
+                    switch current {
+                    case .keyword("addition"), .keyword("adding"), .keyword("add"),
+                         .keyword("reduction"), .keyword("removing"), .keyword("remove"), .keyword("rm"):
+                        let adj = try parseSingleInventoryAdjustment()
+                        // TODO: store `adj` in a posting-level inventory struct/array
 
                     default:
                         throw ParserError.unexpectedToken(current, expected: "inventory field", at: currentLocation())
