@@ -471,42 +471,38 @@ public struct EntryCompilerParser {
         try expect(.keyword("inventory"))
         try expect(.lBrace)
 
-        var adjustment: InventoryAdjustment?        // final result
+        var net: Double = 0.0
         var pendingMutation: InventoryAdjustmentDirection?
         var pendingCount: Double?
 
-        func merge(_ newAdj: InventoryAdjustment) throws {
-            if let existing = adjustment {
-                // allow exact duplicates; reject conflicts
-                if existing.mutation == newAdj.mutation && existing.count == newAdj.count {
-                    return // duplicate synonym; ignore
-                }
-                throw ParserError.unexpectedToken(current, expected: "single, non-conflicting inventory adjustment", at: currentLocation())
-            } else {
-                adjustment = newAdj
+        func flushPendingIfReady() throws {
+            if let m = pendingMutation, let c = pendingCount {
+                net += (m == .addition ? c : -c)
+                pendingMutation = nil
+                pendingCount = nil
             }
         }
 
         while current != .rBrace && current != .eof {
             switch current {
-            // direct form(s): add/remove = <n> (incl. synonyms)
+            // direct forms: add/remove (+ synonyms)
             case .keyword("addition"), .keyword("adding"), .keyword("add"),
                  .keyword("reduction"), .keyword("removing"), .keyword("remove"), .keyword("rm"):
-                let newAdj = try parseSingleInventoryAdjustment()
-                try merge(newAdj)
+                let adj = try parseSingleInventoryAdjustment()
+                net += (adj.mutation == .addition ? adj.count : -adj.count)
 
             // split form: mutation = add|remove ; count = <n>
             case .ident("mutation"):
                 advance(); try expect(.equals)
                 switch current {
-                case .keyword("addition"), .keyword("adding"), .keyword("add"):
-                    pendingMutation = .addition
+                case .keyword("addition"), .keyword("adding"), .keyword("add"):       pendingMutation = .addition
                 case .keyword("reduction"), .keyword("removing"), .keyword("remove"), .keyword("rm"):
                     pendingMutation = .reduction
                 default:
                     throw ParserError.unexpectedToken(current, expected: "add/remove", at: currentLocation())
                 }
                 advance()
+                try flushPendingIfReady()
 
             case .ident("count"):
                 advance(); try expect(.equals)
@@ -515,6 +511,7 @@ public struct EntryCompilerParser {
                 }
                 pendingCount = (qDec as NSDecimalNumber).doubleValue
                 advance()
+                try flushPendingIfReady()
 
             default:
                 throw ParserError.unexpectedToken(current, expected: "inventory field", at: currentLocation())
@@ -523,15 +520,15 @@ public struct EntryCompilerParser {
 
         try expect(.rBrace)
 
-        // If the block used split form, finalize and merge it too.
-        if let m = pendingMutation, let c = pendingCount {
-            try merge(InventoryAdjustment(mutation: m, count: c))
+        // if one of mutation/count was provided without the other
+        if (pendingMutation != nil) != (pendingCount != nil) {
+            throw ParserError.unexpectedToken(current, expected: "both mutation and count", at: currentLocation())
         }
 
-        guard let adj = adjustment else {
-            throw ParserError.unexpectedToken(current, expected: "addition/remove or mutation+count", at: currentLocation())
-        }
-        return adj
+        // Collapse to a single adjustment (addition for ≥0, reduction for <0)
+        let finalDir: InventoryAdjustmentDirection = (net >= 0) ? .addition : .reduction
+        let finalCount = abs(net)
+        return InventoryAdjustment(mutation: finalDir, count: finalCount)
     }
 
     private mutating func parsePostingBlock() throws -> Line {
