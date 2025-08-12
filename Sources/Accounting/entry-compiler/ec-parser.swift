@@ -98,8 +98,14 @@ public struct EntryCompilerParser {
                 advance()                       // consume string
                 try expect(.rBrace)            // consume closing '}'
 
-            case .keyword("for"):
-                entry.lines.append(try parseLine())
+            // case .keyword("for"):
+            //     entry.lines.append(try parseLine())
+
+            case .keyword("for"), .keyword("in"):
+                entry.lines.append(try parseLineOrSwap())
+
+            case .keyword("posting"):
+                entry.lines.append(try parsePostingBlock())
 
             default:
                 throw ParserError.unexpectedToken(
@@ -132,12 +138,13 @@ public struct EntryCompilerParser {
         lineBody: while current != .rBrace && current != .eof {
             switch current {
 
-            case .keyword("debit"), .keyword("credit"), .keyword("rm"):
+            case .keyword("debit"), .keyword("credit"):
                 if direction != nil {
                     throw ParserError.unexpectedToken(current, expected: "only one of debit/credit per line", at: currentLocation())
                 }
-                let isDebit = (current == .keyword("debit"))
-                let isCredit = (current == .keyword("credit") || current == .keyword("rm"))
+                let isDebit = (current == .keyword("debit") || current == .keyword("dr"))
+                // let isCredit = (current == .keyword("credit") || current == .keyword("rm"))
+                let isCredit = (current == .keyword("credit") || current == .keyword("cr"))
                 direction = isDebit ? .debit : (isCredit ? .credit : nil)
                 advance()
                 try expect(.equals)
@@ -147,7 +154,7 @@ public struct EntryCompilerParser {
                 amount = val
                 advance()
 
-            case .keyword("adding"), .keyword("removing"):
+            case .keyword("adding"), .keyword("removing"), .keyword("add"), .keyword("remove"), .keyword("rm"), .keyword("reduction"):
                 if adjustment != nil {
                     throw ParserError.unexpectedToken(current, expected: "only one inventory adjustment per line", at: currentLocation())
                 }
@@ -158,8 +165,7 @@ public struct EntryCompilerParser {
                     throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
                 }
                 let qty = (qtyDec as NSDecimalNumber).doubleValue
-                let dir: InventoryAdjustmentDirection =
-                    (kindTok == .keyword("adding")) ? .addition : .reduction
+                let dir: InventoryAdjustmentDirection = (kindTok == .keyword("adding") || kindTok == .keyword("add")) ? .addition : .reduction
                 adjustment = InventoryAdjustment(mutation: dir, count: qty)
                 advance()
 
@@ -182,6 +188,34 @@ public struct EntryCompilerParser {
             amount: amt,
             adjustment: adjustment
         )
+    }
+
+    private mutating func parseLineOrSwap() throws -> Line {
+        // supports:
+        //   for (entity.path) in <account> { ... }
+        //   in <account> for (entity.path) { ... }
+        switch current {
+        case .keyword("for"):  return try parseLine_for_then_in()
+        case .keyword("in"):   return try parseLine_in_then_for()
+        default:
+            throw ParserError.unexpectedToken(current, expected: "for or in", at: currentLocation())
+        }
+    }
+
+    private mutating func parseLine_for_then_in() throws -> Line {
+        advance() // 'for'
+        let entity = try parseEntityGroup(flexible: true)
+        try expect(.keyword("in"))
+        let account = try parseAccountGroup(flexible: true)
+        return try parseLineBody(entity: entity, account: account)
+    }
+
+    private mutating func parseLine_in_then_for() throws -> Line {
+        advance() // 'in'
+        let account = try parseAccountGroup(flexible: true)
+        try expect(.keyword("for"))
+        let entity = try parseEntityGroup(flexible: true)
+        return try parseLineBody(entity: entity, account: account)
     }
 
     private mutating func parseEntityPath() throws -> EntityPath {
@@ -297,5 +331,184 @@ public struct EntryCompilerParser {
 
     private func currentLocation() -> SourceLocation {
         return SourceLocation(line: line, column: column)
+    }
+
+    private mutating func parseEntityGroup(flexible: Bool) throws -> EntityPath {
+        // (liquids->money->main)  OR  (liquids.money.main)
+        // also allow: entity(liquids.money.main) if you still want the old form
+        if case .ident("entity") = current { return try parseEntityPath() } // legacy
+        try expect(.lPar)
+        let (domain, alias) = try readSegmentsUntilRPar()
+        return EntityPath(domain: domain, aliasSegments: alias)
+    }
+
+    private mutating func parseAccountGroup(flexible: Bool) throws -> AccountPath {
+        // account(...) (legacy), or a raw number, or a dotted/arrow group in parens
+        if case .ident("account") = current { return try parseAccountPath() } // legacy
+        switch current {
+        case let .number(n):
+            advance()
+            return AccountPath(segments: ["\(n)"])
+        case .lPar:
+            try expect(.lPar)
+            let (_, segs) = try readSegmentsUntilRPar(allowAllAsAlias: true)
+            return AccountPath(segments: segs)
+        default:
+            throw ParserError.unexpectedToken(current, expected: "number or (account.path)", at: currentLocation())
+        }
+    }
+
+    private mutating func readSegmentsUntilRPar(allowAllAsAlias: Bool = false) throws -> (String, [String]) {
+        var segs: [String] = []
+        while current != .rPar && current != .eof {
+            switch current {
+            case let .ident(s): segs.append(s); advance()
+            case let .number(n): segs.append("\(n)"); advance()
+            default: advance()
+            }
+            if current == .arrow || current == .dot { advance() }
+        }
+        try expect(.rPar)
+        guard !segs.isEmpty else {
+            throw ParserError.unexpectedToken(current, expected: "non-empty path", at: currentLocation())
+        }
+        if allowAllAsAlias { return (segs.first ?? "", segs) }
+        let domain = segs.removeFirst()
+        return (domain, segs)
+    }
+
+    private mutating func parseLineBody(entity: EntityPath, account: AccountPath) throws -> Line {
+        try expect(.lBrace)
+
+        var direction: Direction?
+        var amount: Decimal?
+        var adjustment: InventoryAdjustment?
+
+        while current != .rBrace && current != .eof {
+            switch current {
+            case .keyword("debit"), .keyword("credit"), .keyword("dr"), .keyword("cr"), .keyword("rm"):
+                if direction != nil { throw ParserError.unexpectedToken(current, expected: "only one of debit/credit", at: currentLocation()) }
+                let isDebit  = (current == .keyword("debit") || current == .keyword("dr"))
+                let isCredit = (current == .keyword("credit") || current == .keyword("cr") || current == .keyword("rm"))
+                direction = isDebit ? .debit : (isCredit ? .credit : nil)
+                advance()
+                try expect(.equals)
+                guard case let .number(val) = current else {
+                    throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
+                }
+                amount = val
+                advance()
+
+            case .keyword("adding"), .keyword("add"),
+                 .keyword("removing"), .keyword("remove"), .keyword("reduction"):
+                if adjustment != nil { throw ParserError.unexpectedToken(current, expected: "single inventory adjustment", at: currentLocation()) }
+                let kindTok = current; advance()
+                try expect(.equals)
+                guard case let .number(qtyDec) = current else {
+                    throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
+                }
+                let qty = (qtyDec as NSDecimalNumber).doubleValue
+                let dir: InventoryAdjustmentDirection =
+                    (kindTok == .keyword("adding") || kindTok == .keyword("add"))
+                    ? .addition : .reduction
+                adjustment = InventoryAdjustment(mutation: dir, count: qty)
+                advance()
+
+            default:
+                throw ParserError.unexpectedToken(current, expected: "debit/credit or adding/removing", at: currentLocation())
+            }
+        }
+
+        try expect(.rBrace)
+        guard let dir = direction, let amt = amount else {
+            throw ParserError.unexpectedToken(current, expected: "posting amount (debit/credit = …)", at: currentLocation())
+        }
+        return Line(entity: entity, account: account, direction: dir, amount: amt, adjustment: adjustment)
+    }
+
+    private mutating func parsePostingBlock() throws -> Line {
+        try expect(.keyword("posting"))
+        try expect(.lBrace)
+
+        var entityPath: EntityPath?
+        var accountPath: AccountPath?
+        var direction: Direction?
+        var amount: Decimal?
+
+        while current != .rBrace && current != .eof {
+            switch current {
+            case .ident("entity"):
+                advance(); try expect(.equals)
+                // entity = processes.deliverable.session   (no parens here)
+                var segs: [String] = []
+                while case let .ident(s) = current {
+                    segs.append(s); advance()
+                    if current == .dot || current == .arrow { advance() }
+                    else { break }
+                }
+                guard segs.count >= 2 else { throw ParserError.unexpectedToken(current, expected: "domain.alias.path", at: currentLocation()) }
+                let domain = segs.removeFirst()
+                entityPath = EntityPath(domain: domain, aliasSegments: segs)
+
+            case .ident("account"):
+                advance(); try expect(.equals)
+                switch current {
+                case let .number(n): accountPath = AccountPath(segments: ["\(n)"]); advance()
+                case let .ident(s):
+                    var segs = [s]; advance()
+                    while current == .dot || current == .arrow {
+                        advance()
+                        if case let .ident(next) = current { segs.append(next); advance() }
+                        else if case let .number(n) = current { segs.append("\(n)"); advance() }
+                    }
+                    accountPath = AccountPath(segments: segs)
+                default:
+                    throw ParserError.unexpectedToken(current, expected: "number or path", at: currentLocation())
+                }
+
+            case .ident("debit"), .ident("credit"), .ident("dr"), .ident("cr"):
+                let tok = current; advance(); try expect(.equals)
+                guard case let .number(n) = current else {
+                    throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
+                }
+                amount = n
+                direction = (tok == .ident("debit") || tok == .ident("dr")) ? .debit : .credit
+                advance()
+
+
+            case .keyword("inventory"):
+                advance()
+                try expect(.lBrace)
+                // parse inner inventory fields
+                while current != .rBrace && current != .eof {
+                    switch current {
+                    case .ident("addition"), .ident("add"):
+                        advance(); try expect(.equals)
+                        guard case let .number(qty) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation()) }
+                        // store qty in some postingInventoryAdditions array/struct
+                        advance()
+
+                    case .ident("remove"), .ident("rm"):
+                        advance(); try expect(.equals)
+                        guard case let .number(qty) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation()) }
+                        // store qty in postingInventoryReductions array/struct
+                        advance()
+
+                    default:
+                        throw ParserError.unexpectedToken(current, expected: "inventory field", at: currentLocation())
+                    }
+                }
+                try expect(.rBrace)
+
+            default:
+                throw ParserError.unexpectedToken(current, expected: "entity/account/debit|credit|dr|cr", at: currentLocation())
+            }
+        }
+
+        try expect(.rBrace)
+        guard let e = entityPath, let a = accountPath, let dir = direction, let amt = amount else {
+            throw ParserError.unexpectedToken(current, expected: "entity, account, and amount", at: currentLocation())
+        }
+        return Line(entity: e, account: a, direction: dir, amount: amt)
     }
 }

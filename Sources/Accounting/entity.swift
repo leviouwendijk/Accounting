@@ -1,5 +1,6 @@
 import Foundation
 
+// BACKWARDS COMPAT
 public struct Entity {
     public let id: String
     public let name: String

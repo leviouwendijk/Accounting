@@ -91,12 +91,14 @@ public struct EntryCompilerLexer: Sendable {
             let ident = readIdent()
             let kwSet: Set<String> = [
                 "entry", "for", "in", 
-                "debit", "credit",
+                "debit", "credit", "dr", "cr",
                 "details",
                 "date", "infer",
                 "rm","to","from",
                 "adding", "removing",
-                "year","month","day"
+                "year","month","day",
+                "posting",
+                "inventory"
             ]
             if ident == "details" {
                 detailsState = .awaitingOpen
