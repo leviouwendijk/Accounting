@@ -448,9 +448,14 @@ public struct EntryCompilerParser {
         var segs: [String] = []
         while true {
             switch current {
-            case let .ident(s):  segs.append(s); advance()
-            case let .number(n): segs.append("\(n)"); advance()
-            default:             return segs
+            case let .ident(s):  
+                segs.append(s); advance()
+            case let .number(n): 
+                segs.append("\(n)"); advance()
+            case let .keyword(k) where k == "inventory":
+                segs.append(k); advance()
+            default:             
+                return segs
             }
             if current == .dot || current == .arrow { advance(); continue }
             return segs
