@@ -586,6 +586,6 @@ public struct EntryCompilerParser {
         guard let e = entityPath, let a = accountPath, let dir = direction, let amt = amount else {
             throw ParserError.unexpectedToken(current, expected: "entity, account, and amount", at: currentLocation())
         }
-        return Line(entity: e, account: a, direction: dir, amount: amt)
+        return Line(entity: e, account: a, direction: dir, amount: amt, adjustment: adjustment)
     }
 }
