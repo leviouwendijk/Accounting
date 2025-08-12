@@ -483,13 +483,13 @@ public struct EntryCompilerParser {
                 // parse inner inventory fields
                 while current != .rBrace && current != .eof {
                     switch current {
-                    case .ident("addition"), .ident("add"):
+                    case .keyword("addition"), .keyword("add"):
                         advance(); try expect(.equals)
                         guard case let .number(qty) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation()) }
                         // store qty in some postingInventoryAdditions array/struct
                         advance()
 
-                    case .ident("remove"), .ident("rm"):
+                    case .keyword("remove"), .keyword("rm"):
                         advance(); try expect(.equals)
                         guard case let .number(qty) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation()) }
                         // store qty in postingInventoryReductions array/struct
