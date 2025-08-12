@@ -90,15 +90,27 @@ public struct EntryCompilerLexer: Sendable {
         if CharacterSet.letters.union(CharacterSet(charactersIn: "_")).contains(c) {
             let ident = readIdent()
             let kwSet: Set<String> = [
-                "entry", "for", "in", 
-                "debit", "credit", "dr", "cr",
+                "entry", 
+
                 "details",
+
                 "date", "infer",
-                "rm","to","from",
-                "adding", "removing",
                 "year","month","day",
+
+                "for", "in",
+
+                "to","from",
+
+                "debit", "credit", 
+                "dr", "cr",
+
                 "posting",
-                "inventory"
+                "line",
+
+                "inventory",
+                "adding", "removing",
+                "addition", "reduction",
+                "add", "rm", "remove"
             ]
             if ident == "details" {
                 detailsState = .awaitingOpen

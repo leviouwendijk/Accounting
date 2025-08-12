@@ -386,10 +386,10 @@ public struct EntryCompilerParser {
 
         while current != .rBrace && current != .eof {
             switch current {
-            case .keyword("debit"), .keyword("credit"), .keyword("dr"), .keyword("cr"), .keyword("rm"):
+            case .keyword("debit"), .keyword("credit"), .keyword("dr"), .keyword("cr"):
                 if direction != nil { throw ParserError.unexpectedToken(current, expected: "only one of debit/credit", at: currentLocation()) }
                 let isDebit  = (current == .keyword("debit") || current == .keyword("dr"))
-                let isCredit = (current == .keyword("credit") || current == .keyword("cr") || current == .keyword("rm"))
+                let isCredit = (current == .keyword("credit") || current == .keyword("cr"))
                 direction = isDebit ? .debit : (isCredit ? .credit : nil)
                 advance()
                 try expect(.equals)
@@ -399,8 +399,7 @@ public struct EntryCompilerParser {
                 amount = val
                 advance()
 
-            case .keyword("adding"), .keyword("add"),
-                 .keyword("removing"), .keyword("remove"), .keyword("reduction"):
+            case .keyword("adding"), .keyword("add"), .keyword("removing"), .keyword("remove"), .keyword("reduction"):
                 if adjustment != nil { throw ParserError.unexpectedToken(current, expected: "single inventory adjustment", at: currentLocation()) }
                 let kindTok = current; advance()
                 try expect(.equals)
@@ -473,7 +472,7 @@ public struct EntryCompilerParser {
                     throw ParserError.unexpectedToken(current, expected: "number", at: currentLocation())
                 }
                 amount = n
-                direction = (tok == .ident("debit") || tok == .ident("dr")) ? .debit : .credit
+                direction = (tok == .keyword("debit") || tok == .keyword("dr")) ? .debit : .credit
                 advance()
 
 
