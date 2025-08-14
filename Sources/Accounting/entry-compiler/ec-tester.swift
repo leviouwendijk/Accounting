@@ -40,7 +40,7 @@ public struct EntryCompilerTester: Sendable {
             throw EntryCompilerTesterError.mismatch
         }
 
-        var parser = EntryCompilerParser(tokens: actual)
+        let parser = EntryCompilerEntriesParser(tokens: actual)
         let entries = try parser.parseEntries()
         print("Parsed entries:")
         for e in entries {
