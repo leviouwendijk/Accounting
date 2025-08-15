@@ -80,10 +80,10 @@ public struct RGSAccount: Codable {
         let identifiersBlock: String
         if let omslag = identifiers.omslag {
             identifiersBlock = """
-                identifiers {
-                    rgs = \(identifiers.rgs)
-                    omslag = \(omslag)
-                }
+            identifiers {
+                rgs = \(identifiers.rgs)
+                omslag = \(omslag)
+            }
             """
 
         } else {
