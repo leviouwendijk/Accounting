@@ -95,27 +95,27 @@ public struct RGSAccount: Codable {
         }
 
         return """
-            account {
-                use code \(code)
+        account {
+            use code \(code)
 
-                label {
-                    \(label)
-                }
-
-                direction = \(direction)
-
-                level = \(level)
-
-                applicability {
-                    branche = \(applicability.branche)
-                    bv = \(applicability.bv)
-                    ez = \(applicability.ez)
-                    svc = \(applicability.svc)
-                    zzp = \(applicability.zzp)
-                }
-
-                \(identifiersBlock.indent())
+            label {
+                \(label)
             }
+
+            direction = \(direction)
+
+            level = \(level)
+
+            applicability {
+                branche = \(applicability.branche)
+                bv = \(applicability.bv)
+                ez = \(applicability.ez)
+                svc = \(applicability.svc)
+                zzp = \(applicability.zzp)
+            }
+
+            \(identifiersBlock.indent(times: 2))
+        }
             
         """
     }
