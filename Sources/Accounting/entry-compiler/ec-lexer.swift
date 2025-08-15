@@ -113,7 +113,8 @@ public struct EntryCompilerLexer: Sendable {
                 "add", "rm", "remove",
 
                 "settings", "aggregation",
-                "true", "false"
+                "true", "false",
+                "timezone"
             ]
             if ident == "details" {
                 detailsState = .awaitingOpen
