@@ -1,5 +1,5 @@
 import Foundation
 
-public protocol EntryCompilerParsing {
-    var core: EntryCompilerParserCore { get }
+public protocol EntryCompilerParsing: AnyObject {
+    var core: EntryCompilerParserCore { get set }
 }

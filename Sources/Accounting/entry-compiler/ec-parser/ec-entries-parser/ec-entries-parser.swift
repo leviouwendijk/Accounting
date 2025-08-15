@@ -1,11 +1,16 @@
 import Foundation
+import plate
 
 public final class EntryCompilerEntriesParser: EntryCompilerParsing {
-    public let core: EntryCompilerParserCore
-    public init(core: EntryCompilerParserCore) { self.core = core }
+    public var core: EntryCompilerParserCore
+    public let defaultTZ: TimeZone
+    public init(core: EntryCompilerParserCore, defaultTimeZone: TimeZone) {
+        self.core = core
+        self.defaultTZ = defaultTimeZone
+    }
 
-    public convenience init(tokens: [EntryCompilerToken]) {
-        self.init(core: EntryCompilerParserCore(tokens: tokens))
+    public convenience init(tokens: [EntryCompilerToken], defaultTimeZone: TimeZone) {
+        self.init(core: EntryCompilerParserCore(tokens: tokens), defaultTimeZone: defaultTimeZone)
     }
 
     public func parseEntries() throws -> [Entry] {
@@ -21,9 +26,18 @@ public final class EntryCompilerEntriesParser: EntryCompilerParsing {
         try expect(.lBrace)
 
         var entry = Entry()
+        var tz = defaultTZ
 
         while current != .rBrace && current != .eof {
             switch current {
+            case .keyword("timezone"):
+                advance()
+                try expect(.lBrace)
+                // reuse the settings parser helper to parse an IANA tz ident
+                let parsed = try parseTimeZoneValue()
+                try expect(.rBrace)
+                tz = parsed
+
             case .keyword("date"):
                 advance()
                 if case .keyword("infer") = current {
@@ -40,13 +54,13 @@ public final class EntryCompilerEntriesParser: EntryCompilerParsing {
                     case let .number(n):
                         entry.date = .absolute(Date(timeIntervalSince1970: (n as NSDecimalNumber).doubleValue)); advance()
                     case let .dateLiteral(text):
-                        entry.date = .absolute(try text.date()); advance()
+                        entry.date = .absolute(try parseDateLiteral(text, in: tz)); advance()
                     default:
                         throw ParserError.unexpectedToken(current, expected: "number or dateLiteral", at: loc())
                     }
 
                 } else if current == .lBrace {
-                    entry.date = .absolute(try parseDateBlock())
+                    entry.date = .absolute(try parseDateBlock(tz: tz))
                 } else {
                     throw ParserError.unexpectedToken(current, expected: "infer, '=', or '{'", at: loc())
                 }
@@ -187,5 +201,48 @@ public final class EntryCompilerEntriesParser: EntryCompilerParsing {
             throw ParserError.unexpectedToken(current, expected: "entity, account, and amount", at: loc())
         }
         return Line(entity: e, account: a, direction: dir, amount: amt, adjustment: adjustment)
+    }
+
+    private func parseDateLiteral(_ s: String, in tz: TimeZone) throws -> Date {
+        let parts = try s.dateParts()                               // plate
+        let format: DateParserFormatting
+        if parts[0].count == 4 { format = .yyyyMMdd }               // 2025-01-20
+        else if parts[2].count == 4 { format = .ddMMyyyy }          // 20-01-2025
+        else { format = .yyyyMMdd }                                  // fallback
+        let comps = try format.components(from: parts)               // plate
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = tz
+        guard let d = cal.date(from: comps) else {
+            throw ParserError.unexpectedToken(.string(s), expected: "valid date literal", at: loc())
+        }
+        return d
+    }
+
+    private func parseDateBlock(tz: TimeZone) throws -> Date {
+        try expect(.lBrace)
+        var comps = DateComponents()
+        while current != .rBrace {
+            switch current {
+            case .keyword("year"):
+                try expect(.keyword("year")); try expect(.equals)
+                guard case let .number(n) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: loc()) }
+                comps.year = (n as NSDecimalNumber).intValue; advance()
+            case .keyword("month"):
+                try expect(.keyword("month")); try expect(.equals)
+                if case let .ident(s) = current { comps.month = monthIndex(from: s); advance() }
+                else if case let .number(n) = current { comps.month = (n as NSDecimalNumber).intValue; advance() }
+                else { throw ParserError.unexpectedToken(current, expected: "identifier or number", at: loc()) }
+            case .keyword("day"):
+                try expect(.keyword("day")); try expect(.equals)
+                guard case let .number(n) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: loc()) }
+                comps.day = (n as NSDecimalNumber).intValue; advance()
+            default:
+                throw ParserError.unexpectedToken(current, expected: "year, month, or day", at: loc())
+            }
+        }
+        try expect(.rBrace)
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = tz
+        return cal.date(from: comps) ?? Date()
     }
 }

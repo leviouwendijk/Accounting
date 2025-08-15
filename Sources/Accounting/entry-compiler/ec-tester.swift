@@ -6,30 +6,43 @@ public enum EntryCompilerTesterError: Error, Sendable {
 }
 
 public struct EntryCompilerTester: Sendable {
+    public let compiler: EntryCompiler
     public let ecString: String
     public let expected: [EntryCompilerToken]
-    
+    public let overrideTZ: TimeZone?
+
+    // Build compiler from a project root
     public init(
+        root: URL,
         ecString: String,
-        expected: [EntryCompilerToken]
-    ) {
+        expected: [EntryCompilerToken],
+        overrideTZ: TimeZone? = nil
+    ) throws {
+        self.compiler = try EntryCompiler(root: root)
         self.ecString = ecString
         self.expected = expected
+        self.overrideTZ = overrideTZ
     }
 
-    public func actual() -> [EntryCompilerToken] {
-        var lexer = EntryCompilerLexer(source: ecString)
-        var actual: [EntryCompilerToken] = []
-        while true {
-            let tok = lexer.nextToken()
-            actual.append(tok)
-            if tok == .eof { break }
-        }
-        return actual
+    // Or inject an existing compiler
+    public init(
+        compiler: EntryCompiler,
+        ecString: String,
+        expected: [EntryCompilerToken],
+        overrideTZ: TimeZone? = nil
+    ) {
+        self.compiler = compiler
+        self.ecString = ecString
+        self.expected = expected
+        self.overrideTZ = overrideTZ
+    }
+
+    public func actualTokens() -> [EntryCompilerToken] {
+        compiler.lex(ecString)
     }
 
     public func test() throws {
-        let actual = actual()
+        let actual = actualTokens()
 
         if actual == expected {
             print("Lexer test passed (\(actual.count) tokens)".ansi(.green, .bold))
@@ -40,12 +53,13 @@ public struct EntryCompilerTester: Sendable {
             throw EntryCompilerTesterError.mismatch
         }
 
-        let parser = EntryCompilerEntriesParser(tokens: actual)
+        // Parse with default TZ from settings, unless overridden
+        let tz = overrideTZ ?? compiler.settings.entry.defaultTimezone
+        let parser = compiler.parsers.makeEntries(actual, tz)
         let entries = try parser.parseEntries()
+
         print("Parsed entries:")
-        for e in entries {
-            print(e.viewableString)
-        }
+        for e in entries { print(e.viewableString) }
     }
 }
 

@@ -42,7 +42,7 @@ public extension EntryCompilerParsing {
         }
     }
 
-    // ---- TimeZone value: supports IANA ("Europe/Amsterdam") and "UTC±HH[:MM]"
+    // ---- TimeZone value: supports IANA ("Europe/Amsterdam")
     func parseTimeZoneValue() throws -> TimeZone {
         guard case let .ident(s) = current else {
             throw ParserError.unexpectedToken(current, expected: "timezone identifier", at: loc())
