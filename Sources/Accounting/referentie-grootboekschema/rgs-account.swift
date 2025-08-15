@@ -114,10 +114,20 @@ public struct RGSAccount: Codable {
                     zzp = \(applicability.zzp)
                 }
 
-                \(identifiersBlock)
+                \(identifiersBlock.indent())
             }
             
         """
+    }
+}
+
+extension Array where Element == RGSAccount {
+    public func ec() -> String {
+        var string = ""
+        for i in self {
+            string.append(i.writeAsEC())
+        }
+        return string
     }
 }
 
