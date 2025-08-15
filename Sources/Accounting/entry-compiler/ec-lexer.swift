@@ -27,6 +27,9 @@ public struct EntryCompilerLexer: Sendable {
     private enum DetailsState { case none, awaitingOpen, awaitingContent, awaitingClose }
     private var detailsState: DetailsState = .none
 
+    private var line: Int = 1
+    private var column: Int = 1
+
     public init(source: String) {
         self.scalars = Array(source.unicodeScalars)
     }
@@ -208,8 +211,19 @@ public struct EntryCompilerLexer: Sendable {
         let i = index + n
         return i < scalars.count ? scalars[i] : nil
     }
-    @inline(__always) private mutating func advance() { 
-        index += 1 
+
+    // @inline(__always) private mutating func advance() { 
+    //     index += 1 
+    // }
+
+    @inline(__always) private mutating func advance() {
+        if index < scalars.count {
+            let c = scalars[index]
+            index += 1
+            if c == "\n" { line += 1; column = 1 } else { column += 1 }
+        } else {
+            index += 1
+        }
     }
 
     public mutating func collectAllTokens() -> [EntryCompilerToken] {
@@ -220,5 +234,21 @@ public struct EntryCompilerLexer: Sendable {
             if t == .eof { break }
         }
         return tokens
+    }
+
+    public mutating func collectAllTokensWithLineMap() -> ([EntryCompilerToken], [Int]) {
+        var toks: [EntryCompilerToken] = []
+        var lines: [Int] = []
+        // reset indices if this lexer instance was used before
+        index = 0; line = 1; column = 1
+
+        while true {
+            let lineAtStart = line
+            let t = self.nextToken()
+            toks.append(t)
+            lines.append(lineAtStart)
+            if t == .eof { break }
+        }
+        return (toks, lines)
     }
 }

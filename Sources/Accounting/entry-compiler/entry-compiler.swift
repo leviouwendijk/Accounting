@@ -43,6 +43,11 @@ public struct EntryCompiler: Sendable {
         return out
     }
 
+    public func lexWithLineMap(_ source: String) -> ([EntryCompilerToken], [Int]) {
+        var lx = EntryCompilerLexer(source: source)
+        return lx.collectAllTokensWithLineMap()
+    }
+
     public func parseEntries(tokens: [EntryCompilerToken]) throws -> [Entry] {
         try parsers.makeEntries(tokens, settings.entry.defaultTimezone).parseEntries()
     }
