@@ -33,10 +33,10 @@ public final class EntryCompilerEntriesParser: EntryCompilerParsing {
             case .keyword("timezone"):
                 advance()
                 try expect(.lBrace)
-                // reuse the settings parser helper to parse an IANA tz ident
                 let parsed = try parseTimeZoneValue()
                 try expect(.rBrace)
                 tz = parsed
+                entry.timezone = parsed.identifier
 
             case .keyword("date"):
                 advance()
