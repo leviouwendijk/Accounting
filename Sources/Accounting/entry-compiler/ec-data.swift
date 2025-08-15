@@ -42,15 +42,18 @@ public struct Entry: Hashable, Codable, Sendable {
     public var date: DateSpecification
     public var lines: [Line]
     public var details: String? = nil
+    public var timezone: String? = nil
 
     public init(
         date: DateSpecification = .absolute(Date()),
         lines: [Line] = [],
-        details: String? = nil
+        details: String? = nil,
+        timezone: String? = nil
     ) {
         self.date = date
         self.lines = lines
         self.details = details
+        self.timezone = timezone
     }
 
     public var viewableString: String {
