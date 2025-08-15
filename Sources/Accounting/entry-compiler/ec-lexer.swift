@@ -110,7 +110,10 @@ public struct EntryCompilerLexer: Sendable {
                 "inventory",
                 "adding", "removing",
                 "addition", "reduction",
-                "add", "rm", "remove"
+                "add", "rm", "remove",
+
+                "settings", "aggregation",
+                "true", "false"
             ]
             if ident == "details" {
                 detailsState = .awaitingOpen

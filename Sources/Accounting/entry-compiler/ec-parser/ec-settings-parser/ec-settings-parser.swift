@@ -8,7 +8,8 @@ public final class EntryCompilerSettingsParser: EntryCompilerParsing {
     }
 
     public func parseSettingsBlock() throws -> EntryCompilerSettings {
-        try expectKeyword("settings"); try beginBlock()
+        try expectKeyword("settings")
+        try beginBlock()
 
         var entrySettings: EntrySettings?
         var aggregationSettings: AggregationSettings?

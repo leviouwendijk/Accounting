@@ -53,6 +53,6 @@ public extension EntryCompilerParsing {
             return tz
         }
 
-        throw ParserError.unexpectedToken(current, expected: "IANA tz or UTC±HH[:MM]", at: loc())
+        throw ParserError.unexpectedToken(current, expected: "IANA tz", at: loc())
     }
 }
