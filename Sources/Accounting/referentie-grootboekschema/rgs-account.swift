@@ -88,9 +88,9 @@ public struct RGSAccount: Codable {
 
         } else {
             identifiersBlock = """
-                identifiers {
-                    rgs = \(identifiers.rgs)
-                }
+            identifiers {
+                rgs = \(identifiers.rgs)
+            }
             """
         }
 
