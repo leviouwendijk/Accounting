@@ -102,3 +102,36 @@ public func encodeASTJSON(_ entries: [Entry]) throws -> Data {
     enc.dateEncodingStrategy = .iso8601
     return try enc.encode(entries)
 }
+
+public func normalizeASTDates(_ data: Data, in tz: TimeZone) -> Data {
+    func parse(_ d: Data) -> Any? {
+        try? JSONSerialization.jsonObject(with: d, options: [])
+    }
+    guard var root = parse(data) else { return data }
+
+    let iso = ISO8601DateFormatter()
+    var calLocal = Calendar(identifier: .gregorian); calLocal.timeZone = tz
+    var calUTC   = Calendar(identifier: .gregorian); calUTC.timeZone   = TimeZone(secondsFromGMT: 0)!
+
+    func norm(_ any: Any) -> Any {
+        switch any {
+        case let s as String:
+            if let d = iso.date(from: s) {
+                let comps = calLocal.dateComponents([.year, .month, .day], from: d)
+                let normalized = calUTC.date(from: DateComponents(year: comps.year, month: comps.month, day: comps.day))!
+                return iso.string(from: normalized)
+            }
+            return s
+        case let a as [Any]:
+            return a.map { norm($0) }
+        case var o as [String: Any]:
+            for (k, v) in o { o[k] = norm(v) }
+            return o
+        default:
+            return any
+        }
+    }
+
+    root = norm(root)
+    return try! JSONSerialization.data(withJSONObject: root, options: [.sortedKeys, .prettyPrinted])
+}

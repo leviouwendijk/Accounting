@@ -1,10 +1,5 @@
 import Foundation
 
-public enum DateSpecification: Hashable, Codable, Sendable, Equatable {
-    case absolute(Date)
-    case infer(day: Int)
-}
-
 public struct EntityPath: Hashable, Codable, Sendable {
     public let domain: String            // "people"
     public let aliasSegments: [String]   // ["levi", "ouwendijk"]
