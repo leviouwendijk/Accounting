@@ -114,7 +114,7 @@ public struct RGSAccount: Codable {
                 zzp = \(applicability.zzp)
             }
 
-            \(identifiersBlock.indent(times: 2))
+            \(identifiersBlock)
         }
             
         """
