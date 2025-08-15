@@ -75,6 +75,50 @@ public struct RGSAccount: Codable {
             branche: raw.Bra
         )
     }
+
+    public func writeAsEC() -> String {
+        let identifiersBlock: String
+        if let omslag = identifiers.omslag {
+            identifiersBlock = """
+                identifiers {
+                    rgs = \(identifiers.rgs)
+                    omslag = \(omslag)
+                }
+            """
+
+        } else {
+            identifiersBlock = """
+                identifiers {
+                    rgs = \(identifiers.rgs)
+                }
+            """
+        }
+
+        return """
+            account {
+                use code \(code)
+
+                label {
+                    \(label)
+                }
+
+                direction = \(direction)
+
+                level = \(level)
+
+                applicability {
+                    branche = \(applicability.branche)
+                    bv = \(applicability.bv)
+                    ez = \(applicability.ez)
+                    svc = \(applicability.svc)
+                    zzp = \(applicability.zzp)
+                }
+
+                \(identifiersBlock)
+            }
+            
+        """
+    }
 }
 
 public struct RGSIdentifiers: Codable {
