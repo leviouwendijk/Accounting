@@ -157,7 +157,8 @@ public struct EntryCompilerLexer: Sendable {
     private mutating func readIdent() -> String {
         var buffer = ""
         // let extra = CharacterSet(charactersIn: "_")
-        let extra = CharacterSet(charactersIn: "_/-")
+        // let extra = CharacterSet(charactersIn: "_/-")
+        let extra = CharacterSet(charactersIn: "_/")
         while let c = peek(), CharacterSet.alphanumerics.union(extra) .contains(c) {
             buffer.append(Character(c))
             advance()
