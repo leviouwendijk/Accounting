@@ -131,6 +131,39 @@ public struct RGSAccountAggregator: Sendable {
         guard let f = families[family] else { return [] }
         return f.subclasses.values.sorted { $0.key.value < $1.key.value }
     }
+
+    private func groupL4ByParent(in sub: SubclassNode) -> (pairs: [(parent: RGSAccount, children: [RGSAccount])], orphans: [RGSAccount]) {
+        // map L3 code -> L3 account (some subclasses can have multiple L3 headers)
+        let l3ByCode: [String: RGSAccount] = Dictionary(uniqueKeysWithValues: sub.headersL3.map { ($0.code, $0) })
+
+        // buckets for children
+        var children: [String: [RGSAccount]] = [:]
+        var orphans: [RGSAccount] = []
+
+        for leaf in sub.leavesL4 {
+            if let p = leaf.parentCode, l3ByCode[p] != nil {
+                children[p, default: []].append(leaf)
+            } else {
+                orphans.append(leaf) // no matching L3 header in this subclass
+            }
+        }
+
+        // sort deterministically
+        func numLess(_ a: RGSAccount, _ b: RGSAccount) -> Bool {
+            if let x = Int(a.code), let y = Int(b.code) { return x < y }
+            return a.code < b.code
+        }
+
+        // produce ordered (parent, children) pairs, sorted by parent code
+        let orderedParents = sub.headersL3.sorted(by: numLess)
+        let pairs: [(RGSAccount, [RGSAccount])] = orderedParents.map { l3 in
+            let kids = (children[l3.code] ?? []).sorted(by: numLess)
+            return (l3, kids)
+        }
+
+        orphans.sort(by: numLess)
+        return (pairs: pairs, orphans: orphans)
+    }
     
     public func printTree(maxLines: Int = 12) {
         for fam in sortedFamilies() {
@@ -157,17 +190,30 @@ public struct RGSAccountAggregator: Sendable {
                     print("  ## Subclass \(sub.key)")
                 }
 
-                for a in sub.headersL3.prefix(maxLines) {
-                    print("    L3  \(a.code)  \(a.label)")
+                // group L4 under their L3 parent
+                let grouped = groupL4ByParent(in: sub)
+
+                // print each L3 with its L4 children
+                for (parent, kids) in grouped.pairs {
+                    print("    L3  \(parent.code)  \(parent.label)")
+                    for a in kids.prefix(maxLines) {
+                        print("      L4  \(a.code)  \(a.label)")
+                    }
+                    if kids.count > maxLines {
+                        print("      … +\(kids.count - maxLines) more L4")
+                    }
                 }
-                if sub.headersL3.count > maxLines {
-                    print("    … +\(sub.headersL3.count - maxLines) more L3")
-                }
-                for a in sub.leavesL4.prefix(maxLines) {
-                    print("    L4  \(a.code)  \(a.label)")
-                }
-                if sub.leavesL4.count > maxLines {
-                    print("    … +\(sub.leavesL4.count - maxLines) more L4")
+
+                // any L3 that had no kids still appears above (with zero children)
+                // now print orphan L4s (no matching L3 header present)
+                if !grouped.orphans.isEmpty {
+                    print("    -- Orphan L4 (no L3 header) --")
+                    for a in grouped.orphans.prefix(maxLines) {
+                        print("      L4  \(a.code)  \(a.label)")
+                    }
+                    if grouped.orphans.count > maxLines {
+                        print("      … +\(grouped.orphans.count - maxLines) more L4")
+                    }
                 }
             }
         }
