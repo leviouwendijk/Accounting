@@ -15,7 +15,7 @@ public enum RGSParsingError: Error, CustomStringConvertible {
         case .cannotConvertCodeToInteger(let code):
             return "Cannot convert the code string to an integer ‘\(code)’"
         case .invalidCodeStringLength(let code):
-            return "Cannot conver this code into an account range ‘\(code)’, with length: \(code.count)"
+            return "Cannot convert this code into an account range ‘\(code)’, with length: \(code.count)"
         }
     }
 }
@@ -29,7 +29,6 @@ public enum RGSAccountRange: Codable, Sendable {
         guard !s.isEmpty, s.allSatisfy(\.isNumber) else {
             throw RGSParsingError.cannotConvertCodeToInteger(code)
         }
-
         switch s.count {
         case 5: return .tenThousands
         case 4: return .thousands
@@ -43,15 +42,18 @@ public enum RGSAccountRange: Codable, Sendable {
         guard !s.isEmpty, s.allSatisfy(\.isNumber) else {
             throw RGSParsingError.cannotConvertCodeToInteger(code)
         }
-
         let tz = s.reversed().prefix(while: { $0 == "0" }).count
-        let base = s.count - tz
+        let digits = s.count
+        let base = digits - tz
 
-        switch try range(from: s) {
-        case .tenThousands:
-            return max(2, base)
-        case .thousands:
-            return base + 1 
+        switch digits {
+        case 5:
+            let L = (tz <= 1) ? (base - 1) : base
+            return max(2, L)
+        case 4:
+            return base + 1
+        default:
+            throw RGSParsingError.invalidCodeStringLength(code)
         }
     }
 }
