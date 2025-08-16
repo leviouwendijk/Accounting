@@ -133,35 +133,63 @@ public struct RGSAccountAggregator: Sendable {
     }
 
     private func groupL4ByParent(in sub: SubclassNode) -> (pairs: [(parent: RGSAccount, children: [RGSAccount])], orphans: [RGSAccount]) {
-        // map L3 code -> L3 account (some subclasses can have multiple L3 headers)
-        let l3ByCode: [String: RGSAccount] = Dictionary(uniqueKeysWithValues: sub.headersL3.map { ($0.code, $0) })
+        // Build sorted L3 list (by numeric code)
+        func num(_ a: RGSAccount) -> Int { Int(a.code) ?? Int.max }
+        let l3Sorted = sub.headersL3.sorted { num($0) < num($1) }
 
-        // buckets for children
-        var children: [String: [RGSAccount]] = [:]
-        var orphans: [RGSAccount] = []
+        // Fast exit: no L3 headers → all leaves are orphans
+        guard !l3Sorted.isEmpty else {
+            let orphans = sub.leavesL4.sorted { num($0) < num($1) }
+            return (pairs: [], orphans: orphans)
+        }
 
+        // Map parent code -> accumulated children
+        var children: [String: [RGSAccount]] = Dictionary(uniqueKeysWithValues: l3Sorted.map { ($0.code, []) })
+
+        // Subclass numeric span (helps keep things clean, but not strictly required)
+        // We assume all codes in this SubclassNode share the same width (4 or 5).
+        // Use the key value as the subclass start, infer width from string lengths present.
+        let subclassStart = sub.key.value
+        let width = sub.headersL3.first?.code.count ?? sub.leavesL4.first?.code.count ?? 5
+        let subclassEnd = subclassStart + (width == 5 ? 99 : 9)
+
+        // For each leaf, find the right L3 parent: max(L3.code) where L3.code <= leaf.code
         for leaf in sub.leavesL4 {
-            if let p = leaf.parentCode, l3ByCode[p] != nil {
-                children[p, default: []].append(leaf)
+            guard let ln = Int(leaf.code) else { continue }
+            // (Optional) keep leaves within the subclass numeric window
+            guard ln >= subclassStart, ln <= subclassEnd else { continue }
+
+            // linear scan is fine (handful per subclass); switch to binary search if you want
+            var picked: RGSAccount? = nil
+            for p in l3Sorted {
+                if let pn = Int(p.code), pn <= ln {
+                    picked = p
+                } else {
+                    break
+                }
+            }
+
+            if let parent = picked {
+                children[parent.code, default: []].append(leaf)
             } else {
-                orphans.append(leaf) // no matching L3 header in this subclass
+                // no L3 <= leaf → orphan
+                children["__ORPHAN__", default: []].append(leaf)
             }
         }
 
-        // sort deterministically
         func numLess(_ a: RGSAccount, _ b: RGSAccount) -> Bool {
             if let x = Int(a.code), let y = Int(b.code) { return x < y }
             return a.code < b.code
         }
 
-        // produce ordered (parent, children) pairs, sorted by parent code
-        let orderedParents = sub.headersL3.sorted(by: numLess)
-        let pairs: [(RGSAccount, [RGSAccount])] = orderedParents.map { l3 in
-            let kids = (children[l3.code] ?? []).sorted(by: numLess)
-            return (l3, kids)
+        // Build ordered (parent, children) pairs
+        let pairs: [(RGSAccount, [RGSAccount])] = l3Sorted.map { p in
+            let kids = (children[p.code] ?? []).sorted(by: numLess)
+            return (p, kids)
         }
 
-        orphans.sort(by: numLess)
+        // Orphans that didn’t find a parent L3
+        let orphans = (children["__ORPHAN__"] ?? []).sorted(by: numLess)
         return (pairs: pairs, orphans: orphans)
     }
     
