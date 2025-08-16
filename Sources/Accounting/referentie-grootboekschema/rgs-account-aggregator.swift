@@ -21,12 +21,27 @@ public struct FamilyNode: Sendable {
     public let key: FamilyKey
     public var headersL2: [RGSAccount]      // level 2 accounts at this family
     public var subclasses: [SubclassKey: SubclassNode]
+
+    public var title: String? {
+        if let l2 = headersL2.first?.label { return l2 }
+        // optional fallback: first subclass L3 header
+        if let anySub = subclasses.values.sorted(by: { $0.key.value < $1.key.value }).first,
+           let l3 = anySub.headersL3.first?.label {
+            return l3
+        }
+        return nil
+    }
 }
 
 public struct SubclassNode: Sendable {
     public let key: SubclassKey
     public var headersL3: [RGSAccount]      // level 3 accounts at this subclass
     public var leavesL4: [RGSAccount]       // level 4 accounts under this subclass
+    public var title: String? {
+        if let l3 = headersL3.first?.label { return l3 }
+        if let l4 = leavesL4.first?.label { return l4 }
+        return nil
+    }
 }
 
 public struct RGSAccountAggregator: Sendable {
@@ -119,7 +134,12 @@ public struct RGSAccountAggregator: Sendable {
     
     public func printTree(maxLines: Int = 12) {
         for fam in sortedFamilies() {
-            print("# Family \(fam.key)")
+            if let t = fam.title {
+                print("# Family \(fam.key) — \(t)")
+            } else {
+                print("# Family \(fam.key)")
+            }
+
             if !fam.headersL2.isEmpty {
                 for a in fam.headersL2.prefix(maxLines) {
                     print("  L2  \(a.code)  \(a.label)")
@@ -128,9 +148,15 @@ public struct RGSAccountAggregator: Sendable {
                     print("  … +\(fam.headersL2.count - maxLines) more L2")
                 }
             }
+
             let subclasses = fam.subclasses.values.sorted { $0.key.value < $1.key.value }
             for sub in subclasses {
-                print("  ## Subclass \(sub.key)")
+                if let t = sub.title {
+                    print("  ## Subclass \(sub.key) — \(t)")
+                } else {
+                    print("  ## Subclass \(sub.key)")
+                }
+
                 for a in sub.headersL3.prefix(maxLines) {
                     print("    L3  \(a.code)  \(a.label)")
                 }
