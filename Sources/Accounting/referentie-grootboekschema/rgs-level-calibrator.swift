@@ -2,11 +2,10 @@ import Foundation
 
 public struct RGSLevelCalibrator: Sendable {
     public struct Key: Hashable, Sendable {
-        public let len: Int              // 4 or 5
-        public let tz: Int               // trailing zeros
+        public let len: Int          // 4 or 5
+        public let tz: Int           // trailing zeros
         public let hundredsIsZero: Bool
-        public let lastTwo: String       // "00","10","50","70","01",…
-        public let prefix2: Int          // first two digits as Int, e.g. 13, 70, 82
+        public let lastTwo: String   // e.g. "10","50","00","01"
     }
 
     public private(set) var table: [Key: Int] = [:]
@@ -24,14 +23,7 @@ public struct RGSLevelCalibrator: Sendable {
             let idxHundreds = s.index(s.endIndex, offsetBy: -3)
             let hundredsIsZero = s[idxHundreds] == "0"
 
-            let p2 = Int(s.prefix(2)) ?? -1
-
-            let k = Key(len: len,
-                        tz: tz,
-                        hundredsIsZero: hundredsIsZero,
-                        lastTwo: lastTwo,
-                        prefix2: p2)
-
+            let k = Key(len: len, tz: tz, hundredsIsZero: hundredsIsZero, lastTwo: lastTwo)
             var bucket = counts[k] ?? [:]
             bucket[a.level, default: 0] += 1
             counts[k] = bucket
@@ -40,14 +32,16 @@ public struct RGSLevelCalibrator: Sendable {
         var t: [Key: Int] = [:]
         for (k, freq) in counts {
             if let (lvl, _) = freq.max(by: { $0.value < $1.value }) {
-                t[k] = lvl
+                t[k] = min(4, max(2, lvl)) // clamp while recording
             }
         }
         self.table = t
     }
 
+    /// Static fallback (your current best rule).
     @inline(__always)
-    private func staticFallback(_ s: String) throws -> Int {
+    private func fallbackLevel(for code: String) throws -> Int {
+        let s = code
         let tz = s.reversed().prefix(while: { $0 == "0" }).count
         switch s.count {
         case 5:
@@ -57,6 +51,25 @@ public struct RGSLevelCalibrator: Sendable {
         case 4:
             let base = 4 - tz
             return base + 1
+        default:
+            throw RGSParsingError.invalidCodeStringLength(code)
+        }
+    }
+
+    @inline(__always)
+    private func pairedFallback(_ s: String) throws -> Int {
+        let tz = s.reversed().prefix(while: { $0 == "0" }).count
+        switch s.count {
+        case 5:
+            // Pair last two digits:
+            // tz:4→2, tz:3→3, tz:2→3, tz:1→4, tz:0→4
+            let map = [4: 2, 3: 3, 2: 3, 1: 4, 0: 4]
+            return map[tz].map { min(4, max(2, $0)) } ?? 4
+        case 4:
+            // Classic:
+            // tz:3→2, tz:2→3, tz:1→4, tz:0→4
+            let map = [3: 2, 2: 3, 1: 4, 0: 4]
+            return map[tz].map { min(4, max(2, $0)) } ?? 4
         default:
             throw RGSParsingError.invalidCodeStringLength(s)
         }
@@ -76,28 +89,24 @@ public struct RGSLevelCalibrator: Sendable {
         let lastTwo = String(s.suffix(2))
         let idxHundreds = s.index(s.endIndex, offsetBy: -3)
         let hundredsIsZero = s[idxHundreds] == "0"
-        let p2 = Int(s.prefix(2)) ?? -1
+        let k = Key(len: len, tz: tz, hundredsIsZero: hundredsIsZero, lastTwo: lastTwo)
 
-        // Lookup with progressive relaxation
-        let keys: [Key] = [
-            .init(len: len, tz: tz, hundredsIsZero: hundredsIsZero, lastTwo: lastTwo, prefix2: p2),
-            .init(len: len, tz: tz, hundredsIsZero: hundredsIsZero, lastTwo: lastTwo, prefix2: -1),
-            .init(len: len, tz: tz, hundredsIsZero: hundredsIsZero, lastTwo: "__",   prefix2: p2),
-            .init(len: len, tz: tz, hundredsIsZero: hundredsIsZero, lastTwo: "__",   prefix2: -1),
+        // Progressive relaxation: exact → ignore lastTwo
+        let keys = [
+            k,
+            Key(len: len, tz: tz, hundredsIsZero: hundredsIsZero, lastTwo: "__"),
         ]
 
-        var calibrated: Int? = nil
-        for k in keys {
-            if let v = table[k] { calibrated = v; break }
-        }
+        // Start from the *correct* paired fallback
+        var result = try pairedFallback(s)
 
-        let fallback = try staticFallback(s)
-
-        // Bias: never downgrade below fallback (fixes 14000-type cases).
-        if let cal = calibrated {
-            return max(fallback, cal)
-        } else {
-            return fallback
+        // If we have calibration, apply it (can raise or lower), then clamp.
+        for kk in keys {
+            if let v = table[kk] {
+                result = v
+                break
+            }
         }
+        return min(4, max(2, result))
     }
 }
