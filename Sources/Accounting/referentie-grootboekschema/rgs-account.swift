@@ -42,16 +42,26 @@ public enum RGSAccountRange: Codable, Sendable {
         guard !s.isEmpty, s.allSatisfy(\.isNumber) else {
             throw RGSParsingError.cannotConvertCodeToInteger(code)
         }
-        let tz = s.reversed().prefix(while: { $0 == "0" }).count
-        let digits = s.count
-        let base = digits - tz
 
-        switch digits {
+        let tz = s.reversed().prefix(while: { $0 == "0" }).count
+        switch s.count {
         case 5:
-            let L = (tz <= 1) ? (base - 1) : base
-            return max(2, L)
+            // 5-digit: pair the last two digits
+            switch tz {
+            case 4: return 2
+            case 3: return 3
+            case 2: return 3
+            case 1: return 4
+            default: /* tz == 0 */ return 4
+            }
         case 4:
-            return base + 1
+            // 4-digit: classic step, capped at 4
+            switch tz {
+            case 3: return 2
+            case 2: return 3
+            case 1: return 4
+            default: /* tz == 0 */ return 4
+            }
         default:
             throw RGSParsingError.invalidCodeStringLength(code)
         }
@@ -187,6 +197,7 @@ extension Array where Element == RGSAccount {
     }
 
     public func validateInferredLevels() {
+        var matches: [(code: String, provided: Int, inferred: Int)] = []
         var mismatches: [(code: String, provided: Int, inferred: Int)] = []
 
         for a in self {
@@ -194,6 +205,8 @@ extension Array where Element == RGSAccount {
                 let inferred = try a.inferLevelFromCodeString()
                 if inferred != a.level {
                     mismatches.append((a.code, a.level, inferred))
+                } else {
+                    matches.append((a.code, a.level, inferred))
                 }
             } catch {
                 fputs("skip \(a.code): \(error)\n", stderr)
@@ -203,7 +216,16 @@ extension Array where Element == RGSAccount {
         if mismatches.isEmpty {
             print("OK: inferred levels match for \(self.count) accounts.")
         } else {
-            print("MISMATCHES (\(mismatches.count)):")
+            print("MATCHES (\(matches.count)):".ansi(.green))
+
+            for m in matches.sorted(by: { $0.code < $1.code }).prefix(100) {
+                print("  \(m.code): provided=\(m.provided) inferred=\(m.inferred)")
+            }
+            if matches.count > 100 {
+                print("  … +\(matches.count - 100) more")
+            }
+
+            print("MISMATCHES (\(mismatches.count)):".ansi(.red))
             for m in mismatches.sorted(by: { $0.code < $1.code }).prefix(100) {
                 print("  \(m.code): provided=\(m.provided) inferred=\(m.inferred)")
             }
