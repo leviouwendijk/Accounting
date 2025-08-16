@@ -4,6 +4,7 @@ public enum RGSParsingError: Error, CustomStringConvertible {
     case invalidLevel(String)
     case invalidDirection(String)
     case cannotConvertCodeToInteger(String)
+    case invalidCodeStringLength(String)
 
     public var description: String {
         switch self {
@@ -12,7 +13,45 @@ public enum RGSParsingError: Error, CustomStringConvertible {
         case .invalidDirection(let dc):
             return "Couldn’t parse direction from ‘\(dc)’"
         case .cannotConvertCodeToInteger(let code):
-            return "Cannot conver the code string to an integer ‘\(code)’"
+            return "Cannot convert the code string to an integer ‘\(code)’"
+        case .invalidCodeStringLength(let code):
+            return "Cannot conver this code into an account range ‘\(code)’, with length: \(code.count)"
+        }
+    }
+}
+
+public enum RGSAccountRange: Codable, Sendable {
+    case thousands
+    case tenThousands
+
+    public static func range(from code: String) throws -> RGSAccountRange {
+        let s = code.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !s.isEmpty, s.allSatisfy(\.isNumber) else {
+            throw RGSParsingError.cannotConvertCodeToInteger(code)
+        }
+
+        switch s.count {
+        case 5: return .tenThousands
+        case 4: return .thousands
+        default:
+            throw RGSParsingError.invalidCodeStringLength(code)
+        }
+    }
+
+    public static func level(from code: String) throws -> Int {
+        let s = code.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !s.isEmpty, s.allSatisfy(\.isNumber) else {
+            throw RGSParsingError.cannotConvertCodeToInteger(code)
+        }
+
+        let tz = s.reversed().prefix(while: { $0 == "0" }).count
+        let base = s.count - tz
+
+        switch try range(from: s) {
+        case .tenThousands:
+            return max(2, base)
+        case .thousands:
+            return base + 1 
         }
     }
 }
@@ -132,13 +171,7 @@ public struct RGSAccount: Codable {
     }
 
     public func inferLevelFromCodeString() throws -> Int {
-        let s = code.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !s.isEmpty, s.allSatisfy(\.isNumber) else {
-            throw RGSParsingError.cannotConvertCodeToInteger(code)
-        }
-        let tz = s.reversed().prefix(while: { $0 == "0" }).count
-        let significant = s.count - tz
-        return max(1, significant - 1)
+        try RGSAccountRange.level(from: code)
     }
 }
 
