@@ -24,48 +24,48 @@ public enum RGSAccountRange: Codable, Sendable {
     case thousands
     case tenThousands
 
-    public static func range(from code: String) throws -> RGSAccountRange {
-        let s = code.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !s.isEmpty, s.allSatisfy(\.isNumber) else {
-            throw RGSParsingError.cannotConvertCodeToInteger(code)
-        }
-        switch s.count {
-        case 5: return .tenThousands
-        case 4: return .thousands
-        default:
-            throw RGSParsingError.invalidCodeStringLength(code)
-        }
-    }
+    // public static func range(from code: String) throws -> RGSAccountRange {
+    //     let s = code.trimmingCharacters(in: .whitespacesAndNewlines)
+    //     guard !s.isEmpty, s.allSatisfy(\.isNumber) else {
+    //         throw RGSParsingError.cannotConvertCodeToInteger(code)
+    //     }
+    //     switch s.count {
+    //     case 5: return .tenThousands
+    //     case 4: return .thousands
+    //     default:
+    //         throw RGSParsingError.invalidCodeStringLength(code)
+    //     }
+    // }
 
-    public static func level(from code: String) throws -> Int {
-        let s = code.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !s.isEmpty, s.allSatisfy(\.isNumber) else {
-            throw RGSParsingError.cannotConvertCodeToInteger(code)
-        }
+    // public static func level(from code: String) throws -> Int {
+    //     let s = code.trimmingCharacters(in: .whitespacesAndNewlines)
+    //     guard !s.isEmpty, s.allSatisfy(\.isNumber) else {
+    //         throw RGSParsingError.cannotConvertCodeToInteger(code)
+    //     }
 
-        let tz = s.reversed().prefix(while: { $0 == "0" }).count
-        switch s.count {
-        case 5:
-            // 5-digit: pair the last two digits
-            switch tz {
-            case 4: return 2
-            case 3: return 3
-            case 2: return 3
-            case 1: return 4
-            default: /* tz == 0 */ return 4
-            }
-        case 4:
-            // 4-digit: classic step, capped at 4
-            switch tz {
-            case 3: return 2
-            case 2: return 3
-            case 1: return 4
-            default: /* tz == 0 */ return 4
-            }
-        default:
-            throw RGSParsingError.invalidCodeStringLength(code)
-        }
-    }
+    //     let tz = s.reversed().prefix(while: { $0 == "0" }).count
+    //     switch s.count {
+    //     case 5:
+    //         // 5-digit: pair the last two digits
+    //         switch tz {
+    //         case 4: return 2
+    //         case 3: return 3
+    //         case 2: return 3
+    //         case 1: return 4
+    //         default: /* tz == 0 */ return 4
+    //         }
+    //     case 4:
+    //         // 4-digit: classic step, capped at 4
+    //         switch tz {
+    //         case 3: return 2
+    //         case 2: return 3
+    //         case 1: return 4
+    //         default: /* tz == 0 */ return 4
+    //         }
+    //     default:
+    //         throw RGSParsingError.invalidCodeStringLength(code)
+    //     }
+    // }
 }
 
 public struct RGSAccount: Codable {
@@ -182,9 +182,9 @@ public struct RGSAccount: Codable {
         return integer
     }
 
-    public func inferLevelFromCodeString() throws -> Int {
-        try RGSAccountRange.level(from: code)
-    }
+    // public func inferLevelFromCodeString() throws -> Int {
+    //     try RGSAccountRange.level(from: code)
+    // }
 }
 
 extension Array where Element == RGSAccount {
@@ -200,9 +200,12 @@ extension Array where Element == RGSAccount {
         var matches: [(code: String, provided: Int, inferred: Int)] = []
         var mismatches: [(code: String, provided: Int, inferred: Int)] = []
 
+        let calibrator = RGSLevelCalibrator(accounts: self)
+
         for a in self {
             do {
-                let inferred = try a.inferLevelFromCodeString()
+                // let inferred = try a.inferLevelFromCodeString()
+                let inferred = try calibrator.inferLevel(from: a.code)
                 if inferred != a.level {
                     mismatches.append((a.code, a.level, inferred))
                 } else {
