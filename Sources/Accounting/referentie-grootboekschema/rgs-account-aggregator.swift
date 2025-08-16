@@ -56,6 +56,22 @@ public struct RGSAccountAggregator: Sendable {
             return SubclassKey(family: family, value: v)
         }
 
+        @inline(__always)
+        func sortFamilyNode(_ f: FamilyNode) -> FamilyNode {
+            var f2 = f
+            f2.headersL2.sort(by: codeNumericLess)
+            // map to a *new* dictionary so we don't capture self
+            f2.subclasses = Dictionary(uniqueKeysWithValues:
+                f2.subclasses.map { (k, s) -> (SubclassKey, SubclassNode) in
+                    var s2 = s
+                    s2.headersL3.sort(by: codeNumericLess)
+                    s2.leavesL4.sort(by: codeNumericLess)
+                    return (k, s2)
+                }
+            )
+            return f2
+        }
+
         for a in accounts {
             // Validate numeric once
             guard let n = Int(a.code) else { continue }
@@ -87,21 +103,10 @@ public struct RGSAccountAggregator: Sendable {
             fams[fKey] = fNode
         }
 
-        // Sort deterministically (by code asc) inside nodes
-        self.families = fams.mapValues { f in
-            var f2 = f
-            f2.headersL2.sort { $0.code < $1.code }
-            f2.subclasses = f.subclasses.mapValues { s in
-                var s2 = s
-                s2.headersL3.sort { $0.code < $1.code }
-                s2.leavesL4.sort { $0.code < $1.code }
-                return s2
-            }
-            return f2
-        }
-    }
+        let sortedFamilies: [FamilyKey: FamilyNode] = Dictionary(uniqueKeysWithValues: fams.map { (k, v) in (k, sortFamilyNode(v)) })
 
-    // Convenience: sorted views
+        self.families = sortedFamilies
+    }
 
     public func sortedFamilies() -> [FamilyNode] {
         families.values.sorted { $0.key.value < $1.key.value }
@@ -141,6 +146,37 @@ public struct RGSAccountAggregator: Sendable {
             }
         }
     }
+
+    public func accounts(in family: FamilyKey) -> [RGSAccount] {
+        guard let f = families[family] else { return [] }
+        var result = f.headersL2
+        for sub in f.subclasses.values {
+            result.append(contentsOf: sub.headersL3)
+            result.append(contentsOf: sub.leavesL4)
+        }
+        return result.sorted(by: codeNumericLess)
+    }
+
+    /// All L3 + L4 under one subclass
+    public func accounts(in subclass: SubclassKey) -> [RGSAccount] {
+        guard let f = families[subclass.family],
+              let s = f.subclasses[subclass] else { return [] }
+        return (s.headersL3 + s.leavesL4).sorted(by: codeNumericLess)
+    }
+
+    /// All leaves (L4) across everything — useful for bottom-up aggregation
+    public var allLeaves: [RGSAccount] {
+        families.values
+            .flatMap { $0.subclasses.values }
+            .flatMap { $0.leavesL4 }
+            .sorted(by: codeNumericLess)
+    }
+}
+
+@inline(__always)
+private func codeNumericLess(_ lhs: RGSAccount, _ rhs: RGSAccount) -> Bool {
+    if let ln = Int(lhs.code), let rn = Int(rhs.code) { return ln < rn }
+    return lhs.code < rhs.code
 }
 
 public extension FamilyNode {
