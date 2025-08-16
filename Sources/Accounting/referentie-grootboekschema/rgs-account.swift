@@ -136,8 +136,9 @@ public struct RGSAccount: Codable {
         guard !s.isEmpty, s.allSatisfy(\.isNumber) else {
             throw RGSParsingError.cannotConvertCodeToInteger(code)
         }
-        let trailingZeros = s.reversed().prefix(while: { $0 == "0" }).count
-        return max(1, s.count - trailingZeros)
+        let tz = s.reversed().prefix(while: { $0 == "0" }).count
+        let significant = s.count - tz
+        return max(1, significant - 1)
     }
 }
 
