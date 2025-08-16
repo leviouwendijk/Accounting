@@ -2,37 +2,41 @@ import Foundation
 
 public struct RGSLevelCalibrator: Sendable {
     public struct Key: Hashable, Sendable {
-        public let len: Int          // 4 or 5
-        public let tz: Int           // trailing zeros
+        public let len: Int              // 4 or 5
+        public let tz: Int               // trailing zeros
         public let hundredsIsZero: Bool
-        public let lastTwo: String   // e.g. "10","50","00","01"
+        public let lastTwo: String       // "00","10","50","70","01",…
+        public let prefix2: Int          // first two digits as Int, e.g. 13, 70, 82
     }
 
     public private(set) var table: [Key: Int] = [:]
 
     public init(accounts: [RGSAccount]) {
-        // Build frequency counts of provided levels per key
-        var counts: [Key: [Int: Int]] = [:]  // Key -> (level -> freq)
+        var counts: [Key: [Int: Int]] = [:]
         for a in accounts {
             let s = a.code.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !s.isEmpty, s.allSatisfy(\.isNumber) else { continue }
-            let tz = s.reversed().prefix(while: { $0 == "0" }).count
             let len = s.count
             guard len == 4 || len == 5 else { continue }
-            let lastTwo = s.suffix(2)
+
+            let tz = s.reversed().prefix(while: { $0 == "0" }).count
+            let lastTwo = String(s.suffix(2))
             let idxHundreds = s.index(s.endIndex, offsetBy: -3)
             let hundredsIsZero = s[idxHundreds] == "0"
+
+            let p2 = Int(s.prefix(2)) ?? -1
 
             let k = Key(len: len,
                         tz: tz,
                         hundredsIsZero: hundredsIsZero,
-                        lastTwo: String(lastTwo))
+                        lastTwo: lastTwo,
+                        prefix2: p2)
+
             var bucket = counts[k] ?? [:]
             bucket[a.level, default: 0] += 1
             counts[k] = bucket
         }
 
-        // Majority vote → canonical level
         var t: [Key: Int] = [:]
         for (k, freq) in counts {
             if let (lvl, _) = freq.max(by: { $0.value < $1.value }) {
@@ -42,10 +46,8 @@ public struct RGSLevelCalibrator: Sendable {
         self.table = t
     }
 
-    /// Static fallback (your current best rule).
     @inline(__always)
-    private func fallbackLevel(for code: String) throws -> Int {
-        let s = code
+    private func staticFallback(_ s: String) throws -> Int {
         let tz = s.reversed().prefix(while: { $0 == "0" }).count
         switch s.count {
         case 5:
@@ -56,7 +58,7 @@ public struct RGSLevelCalibrator: Sendable {
             let base = 4 - tz
             return base + 1
         default:
-            throw RGSParsingError.invalidCodeStringLength(code)
+            throw RGSParsingError.invalidCodeStringLength(s)
         }
     }
 
@@ -69,17 +71,33 @@ public struct RGSLevelCalibrator: Sendable {
         guard len == 4 || len == 5 else {
             throw RGSParsingError.invalidCodeStringLength(code)
         }
+
         let tz = s.reversed().prefix(while: { $0 == "0" }).count
         let lastTwo = String(s.suffix(2))
         let idxHundreds = s.index(s.endIndex, offsetBy: -3)
         let hundredsIsZero = s[idxHundreds] == "0"
+        let p2 = Int(s.prefix(2)) ?? -1
 
-        let k = Key(len: len, tz: tz, hundredsIsZero: hundredsIsZero, lastTwo: lastTwo)
-        if let lvl = table[k] { return lvl }
-        // Try a looser key (ignore lastTwo) if exact not found
-        let loose = Key(len: len, tz: tz, hundredsIsZero: hundredsIsZero, lastTwo: "__")
-        if let lvl = table[loose] { return lvl }
+        // Lookup with progressive relaxation
+        let keys: [Key] = [
+            .init(len: len, tz: tz, hundredsIsZero: hundredsIsZero, lastTwo: lastTwo, prefix2: p2),
+            .init(len: len, tz: tz, hundredsIsZero: hundredsIsZero, lastTwo: lastTwo, prefix2: -1),
+            .init(len: len, tz: tz, hundredsIsZero: hundredsIsZero, lastTwo: "__",   prefix2: p2),
+            .init(len: len, tz: tz, hundredsIsZero: hundredsIsZero, lastTwo: "__",   prefix2: -1),
+        ]
 
-        return try fallbackLevel(for: s)
+        var calibrated: Int? = nil
+        for k in keys {
+            if let v = table[k] { calibrated = v; break }
+        }
+
+        let fallback = try staticFallback(s)
+
+        // Bias: never downgrade below fallback (fixes 14000-type cases).
+        if let cal = calibrated {
+            return max(fallback, cal)
+        } else {
+            return fallback
+        }
     }
 }
