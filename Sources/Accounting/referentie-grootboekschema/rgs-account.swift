@@ -3,6 +3,7 @@ import Foundation
 public enum RGSParsingError: Error, CustomStringConvertible {
     case invalidLevel(String)
     case invalidDirection(String)
+    case cannotConvertCodeToInteger(String)
 
     public var description: String {
         switch self {
@@ -10,6 +11,8 @@ public enum RGSParsingError: Error, CustomStringConvertible {
             return "Couldn’t parse level from ‘\(str)’"
         case .invalidDirection(let dc):
             return "Couldn’t parse direction from ‘\(dc)’"
+        case .cannotConvertCodeToInteger(let code):
+            return "Cannot conver the code string to an integer ‘\(code)’"
         }
     }
 }
@@ -119,6 +122,23 @@ public struct RGSAccount: Codable {
             
         """
     }
+
+    public func codeInteger() throws -> Int {
+        guard let integer = Int(code) else {
+            throw RGSParsingError.cannotConvertCodeToInteger(code)
+        }
+
+        return integer
+    }
+
+    public func inferLevelFromCodeString() throws -> Int {
+        let s = code.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !s.isEmpty, s.allSatisfy(\.isNumber) else {
+            throw RGSParsingError.cannotConvertCodeToInteger(code)
+        }
+        let trailingZeros = s.reversed().prefix(while: { $0 == "0" }).count
+        return max(1, s.count - trailingZeros)
+    }
 }
 
 extension Array where Element == RGSAccount {
@@ -128,6 +148,33 @@ extension Array where Element == RGSAccount {
             string.append(i.writeAsEC())
         }
         return string
+    }
+
+    public func validateInferredLevels() {
+        var mismatches: [(code: String, provided: Int, inferred: Int)] = []
+
+        for a in self {
+            do {
+                let inferred = try a.inferLevelFromCodeString()
+                if inferred != a.level {
+                    mismatches.append((a.code, a.level, inferred))
+                }
+            } catch {
+                fputs("skip \(a.code): \(error)\n", stderr)
+            }
+        }
+
+        if mismatches.isEmpty {
+            print("OK: inferred levels match for \(self.count) accounts.")
+        } else {
+            print("MISMATCHES (\(mismatches.count)):")
+            for m in mismatches.sorted(by: { $0.code < $1.code }).prefix(100) {
+                print("  \(m.code): provided=\(m.provided) inferred=\(m.inferred)")
+            }
+            if mismatches.count > 100 {
+                print("  … +\(mismatches.count - 100) more")
+            }
+        }
     }
 }
 
