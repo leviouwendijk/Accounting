@@ -68,7 +68,7 @@ public enum RGSAccountRange: Codable, Sendable {
     // }
 }
 
-public struct RGSAccount: Codable {
+public struct RGSAccount: Codable, Sendable {
     public let code: String
     public let label: String
     public let level: Int
@@ -187,6 +187,8 @@ public struct RGSAccount: Codable {
     // }
 }
 
+extension Array: Sendable where Element == RGSAccount {} 
+
 extension Array where Element == RGSAccount {
     public func ec() -> String {
         var string = ""
@@ -239,7 +241,7 @@ extension Array where Element == RGSAccount {
     }
 }
 
-public struct RGSIdentifiers: Codable {
+public struct RGSIdentifiers: Codable, Sendable {
     public let rgs: String           // the RGS-code column
     public let omslag: String?       // the Omslagcode column, to flip appearance account based on dr-cr balance
 
@@ -252,7 +254,7 @@ public struct RGSIdentifiers: Codable {
     }
 }
 
-public struct Applicability: Codable {
+public struct Applicability: Codable, Sendable {
     public let zzp: String
     public let ez: String
     public let bv: String
