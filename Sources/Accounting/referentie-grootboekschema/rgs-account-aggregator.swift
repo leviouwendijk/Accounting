@@ -111,6 +111,36 @@ public struct RGSAccountAggregator: Sendable {
         guard let f = families[family] else { return [] }
         return f.subclasses.values.sorted { $0.key.value < $1.key.value }
     }
+    
+    public func printTree(maxLines: Int = 12) {
+        for fam in sortedFamilies() {
+            print("# Family \(fam.key)")
+            if !fam.headersL2.isEmpty {
+                for a in fam.headersL2.prefix(maxLines) {
+                    print("  L2  \(a.code)  \(a.label)")
+                }
+                if fam.headersL2.count > maxLines {
+                    print("  … +\(fam.headersL2.count - maxLines) more L2")
+                }
+            }
+            let subclasses = fam.subclasses.values.sorted { $0.key.value < $1.key.value }
+            for sub in subclasses {
+                print("  ## Subclass \(sub.key)")
+                for a in sub.headersL3.prefix(maxLines) {
+                    print("    L3  \(a.code)  \(a.label)")
+                }
+                if sub.headersL3.count > maxLines {
+                    print("    … +\(sub.headersL3.count - maxLines) more L3")
+                }
+                for a in sub.leavesL4.prefix(maxLines) {
+                    print("    L4  \(a.code)  \(a.label)")
+                }
+                if sub.leavesL4.count > maxLines {
+                    print("    … +\(sub.leavesL4.count - maxLines) more L4")
+                }
+            }
+        }
+    }
 }
 
 public extension FamilyNode {
