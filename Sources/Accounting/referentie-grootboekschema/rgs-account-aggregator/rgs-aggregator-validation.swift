@@ -65,17 +65,14 @@ public extension RGSAccountAggregator {
 
         // 1) bucket helper
         func tryRoot(_ a: RGSAccount) -> RootNodeClass? {
-            // In strict mode, we want to catch “unknown family” instead of defaulting to .expense.
-            // We do this by recomputing the family and verifying it hits one of our explicit ranges.
-            if strictFamilies {
-                guard let n = Int(a.code) else { return nil }
+            // strict: we want to surface unknown families as errors (nil here → unclassifiedRoot)
+            do {
                 let w = a.code.count
-                guard w == 4 || w == 5 else { return nil }
+                guard let n = Int(a.code), (w == 4 || w == 5) else { return nil }
                 let famKey = _familyKey(for: n, width: w)
-                // Probe: call the family classifier and accept whatever it returns (since ranges are explicit).
-                return rootBucket(for: famKey)
-            } else {
-                return rootBucket(for: a, override: overrides)
+                return try rootBucket(for: famKey)
+            } catch {
+                return nil
             }
         }
 

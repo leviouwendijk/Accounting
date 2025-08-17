@@ -67,10 +67,10 @@ extension RGSAccountAggregator {
         return output
     }
     
-    public func printableFamiliesOnly(maxLines: Int = 12) -> String {
+    public func printableFamiliesOnly(maxLines: Int = 12) throws -> String {
         var output = ""
 
-        let grouped = familiesGroupedByRoot()
+        let grouped = try familiesGroupedByRoot()
 
         for root in RootNodeClass.allCases {
             guard let fams = grouped[root], !fams.isEmpty else { continue }
