@@ -102,4 +102,66 @@ extension RGSAccountAggregator {
         }
         return output
     }
+
+    public func printableFullTreeByRoot() throws -> String {
+        func indent(_ level: Int) -> String { String(repeating: " ", count: level * 4) }
+
+        var output = ""
+        let grouped = try familiesGroupedByRoot()
+
+        for root in RootNodeClass.allCases {
+            guard let fams = grouped[root], !fams.isEmpty else { continue }
+
+            // Root (no tree marker, level 0)
+            output.append("root \(root)\n")
+
+            // Families (level 1)
+            for fam in fams {
+                if let t = fam.title {
+                    output.append("\(indent(1))└── family \(fam.key) — \(t)\n")
+                } else {
+                    output.append("\(indent(1))└── family \(fam.key)\n")
+                }
+
+                // All L2 headers (level 2)
+                if !fam.headersL2.isEmpty {
+                    for a in fam.headersL2 {
+                        output.append("\(indent(2))└── L2  \(a.code)  \(a.label)\n")
+                    }
+                }
+
+                // Subclasses (level 2), then L3 (level 3), then L4 (level 4)
+                let subclasses = fam.subclasses.values.sorted { $0.key.value < $1.key.value }
+                for sub in subclasses {
+                    if let t = sub.title {
+                        output.append("\(indent(2))└── subclass \(sub.key) — \(t)\n")
+                    } else {
+                        output.append("\(indent(2))└── subclass \(sub.key)\n")
+                    }
+
+                    let grouped = groupL4ByParent(in: sub)
+
+                    // L3 parents and their L4 children
+                    for (parent, kids) in grouped.pairs {
+                        output.append("\(indent(3))└── L3  \(parent.code)  \(parent.label)\n")
+                        for a in kids {
+                            output.append("\(indent(4))└── L4  \(a.code)  \(a.label)\n")
+                        }
+                    }
+
+                    // Orphan L4s (no L3 header present)
+                    if !grouped.orphans.isEmpty {
+                        output.append("\(indent(3))└── -- Orphan L4 (no L3 header) --\n")
+                        for a in grouped.orphans {
+                            output.append("\(indent(4))└── L4  \(a.code)  \(a.label)\n")
+                        }
+                    }
+                }
+            }
+
+            output.append("\n")
+        }
+
+        return output
+    }
 }
