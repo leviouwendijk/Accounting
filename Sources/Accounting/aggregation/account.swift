@@ -26,6 +26,7 @@ public enum BalanceSide: String, CaseIterable, Sendable {
     case left, right, na
 }
 
+// Being replaced by RootNodeClass:
 public enum AccountClass: String, CaseIterable, Sendable {
     case dividend, expense, asset, liability, equity, revenue, unknown
 
