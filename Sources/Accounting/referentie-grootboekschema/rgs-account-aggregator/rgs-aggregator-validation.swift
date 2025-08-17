@@ -1,4 +1,5 @@
 import Foundation
+import plate
 
 public struct AggregatorValidationReport: Sendable {
     public var nonNumeric: [RGSAccount]          // code not numeric
@@ -14,6 +15,7 @@ public struct AggregatorValidationReport: Sendable {
 
     public func printable() -> String {
         var s = "Validation report\n"
+        s += hasErrors ? "ERROR\n".ansi(.red) : "SUCCESS\n".ansi(.green)
         func block(_ title: String, _ rows: [String]) {
             guard !rows.isEmpty else { return }
             s += "— \(title):\n"
