@@ -1,5 +1,9 @@
 import Foundation
 
+public enum RootNodeClass: String, CaseIterable, Sendable {
+    case asset, liability, equity, revenue, expense, dividend
+}
+
 public struct FamilyKey: Hashable, Sendable, CustomStringConvertible {
     public let value: Int          // canonical integer bucket (e.g. 10000 or 1000)
     public let width: Int          // code width (4 or 5)
@@ -247,13 +251,87 @@ public struct RGSAccountAggregator: Sendable {
         }
     }
 
-    public func printFamiliesOnly(maxLines: Int = 12) {
-        for fam in sortedFamilies() {
-            if let t = fam.title {
-                print("# Family \(fam.key) — \(t)")
-            } else {
-                print("# Family \(fam.key)")
+    @inlinable
+    public func rootBucket(for family: FamilyKey) -> RootNodeClass {
+        let n = family.value
+
+        // --- Balance Sheet buckets ---
+        switch n {
+        case 1000..<5000:    return .asset      // 1000 immaterieel, 2000 materieel, 3000 vastgoed, 4000 fin. vaste
+        case 5000..<7000:    return .equity     // 5000 eigen vermogen
+        case 7000..<8000:    return .liability  // 7000 voorzieningen
+        case 8000..<10000:   return .liability  // 8000 langlopende schulden
+
+        case 10000..<15000:  return .asset      // 10000 liquide, 11000 effecten, 13000 vorderingen, 14000 overlopend
+        case 15000..<18000:  return .liability  // 16000 kortlopend, 17000 overlopend
+
+        case 30000..<36000:  return .asset      // voorraden, emballage, onderhanden projecten (activa)
+
+        // --- P&L buckets (default) ---
+        case 80000..<90000:
+            // Topline, inventory changes, other income, interest income, financial results, etc.
+            // Treat as revenue by default, with finer handling below if you want.
+            switch n {
+            case 81000:            return .revenue   // wijziging voorraden (common in NL within topline block)
+            case 82000:            return .revenue   // overige bedrijfsopbrengsten
+            case 83000:            return .revenue   // opbrengst vorderingen/effecten (interest/dividend income)
+            case 84000:            return .expense   // financiële baten en lasten (net) -> place in expenses bucket
+            case 85000:            return .revenue   // aandeel in resultaat van deelnemingen
+            default:               return .revenue   // 80000 netto-omzet et al.
             }
+
+        case 90000..<92000:
+            // 91000 Belastingen: income tax expense (IS)
+            return .expense
+
+        case 97000..<98100:
+            // 97000 Aandeel derden; 98000 Mutatie FOR — treat as appropriations/dividend-esque bucket
+            return .dividend
+
+        case 40000..<80000:
+            // Costs: personnel, depreciation, other opex, valuation changes, COGS, sales costs, etc.
+            return .expense
+
+        default:
+            // Anything not matched falls back:
+            if n >= 40000 && n < 80000 { return .expense }
+            if n >= 80000 && n < 90000 { return .revenue }
+            return .expense
+        }
+    }
+
+    public func familiesGroupedByRoot() -> [RootNodeClass: [FamilyNode]] {
+        var out: [RootNodeClass: [FamilyNode]] = [:]
+        for fam in sortedFamilies() {
+            out[rootBucket(for: fam.key), default: []].append(fam)
+        }
+        return out.mapValues { $0.sorted { $0.key.value < $1.key.value } }
+    }
+
+    public func printFamiliesOnly(maxLines: Int = 12) {
+        let grouped = familiesGroupedByRoot()
+
+        for root in RootNodeClass.allCases {
+            guard let fams = grouped[root], !fams.isEmpty else { continue }
+            print("## \(root)")
+
+            for fam in fams {
+                if let t = fam.title {
+                    print("# Family \(fam.key) — \(t)")
+                } else {
+                    print("# Family \(fam.key)")
+                }
+
+                if maxLines > 0 && !fam.headersL2.isEmpty {
+                    for a in fam.headersL2.prefix(maxLines) {
+                        print("  L2  \(a.code)  \(a.label)")
+                    }
+                    if fam.headersL2.count > maxLines {
+                        print("  … +\(fam.headersL2.count - maxLines) more L2")
+                    }
+                }
+            }
+            print()
         }
     }
 
