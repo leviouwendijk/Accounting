@@ -6,8 +6,13 @@ public enum EntryCompilerSettingsLoaderError: Error, LocalizedError, Sendable {
 
     public var errorDescription: String? {
         switch self {
-        case .fileNotFound(let url): return "settings.ec not found at: \(url.path)"
-        case .fileEmpty(let url):    return "settings.ec is empty at: \(url.path)"
+        case .fileNotFound(let url): 
+            return """
+            settings.ec not found at: \(url.path)
+            note: ensure this is a valid accounting directory project
+            """
+        case .fileEmpty(let url):    
+            return "settings.ec is empty at: \(url.path)"
         }
     }
 }
