@@ -67,29 +67,38 @@ extension RGSAccountAggregator {
         return output
     }
     
-    public func printFamiliesOnly(maxLines: Int = 12, aggPolicy: AggregationPolicy = .init()) {
+    public func printableFamiliesOnly(maxLines: Int = 12) -> String {
+        var output = ""
+
         let grouped = familiesGroupedByRoot()
+
         for root in RootNodeClass.allCases {
             guard let fams = grouped[root], !fams.isEmpty else { continue }
-            print("## \(root.rawValue)")
+            output.append("## \(root)")
+            output.append("\n")
 
             for fam in fams {
-                if let t = fam.title { print("# Family \(fam.key) — \(t)") }
-                else { print("# Family \(fam.key)") }
+                if let t = fam.title {
+                    output.append("# Family \(fam.key) — \(t)")
+                    output.append("\n")
+                } else {
+                    output.append("# Family \(fam.key)")
+                    output.append("\n")
+                }
 
-                // Show L2s (mark aggregation lines)
                 if maxLines > 0 && !fam.headersL2.isEmpty {
                     for a in fam.headersL2.prefix(maxLines) {
-                        let role = a.aggregationRole(policy: aggPolicy)
-                        let tag = (role == .aggregation) ? " [agg]" : ""
-                        print("  L2  \(a.code)  \(a.label)\(tag)")
+                        output.append("  L2  \(a.code)  \(a.label)")
+                        output.append("\n")
                     }
                     if fam.headersL2.count > maxLines {
-                        print("  … +\(fam.headersL2.count - maxLines) more L2")
+                        output.append("  … +\(fam.headersL2.count - maxLines) more L2")
+                        output.append("\n")
                     }
                 }
             }
-            print()
+            output.append("\n")
         }
+        return output
     }
 }
