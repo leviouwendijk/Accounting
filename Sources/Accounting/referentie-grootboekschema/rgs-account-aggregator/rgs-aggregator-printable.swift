@@ -103,7 +103,7 @@ extension RGSAccountAggregator {
         return output
     }
 
-    public func printableFullTreeByRoot() throws -> String {
+    public func printableFullTree() throws -> String {
         func indent(_ level: Int) -> String { String(repeating: " ", count: level * 4) }
 
         var output = ""
