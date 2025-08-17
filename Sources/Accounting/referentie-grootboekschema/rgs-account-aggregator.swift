@@ -333,16 +333,20 @@ public struct RGSAccountAggregator: Sendable {
             for fam in fams {
                 if let t = fam.title {
                     output.append("# Family \(fam.key) — \(t)")
+                    output.append("\n")
                 } else {
                     output.append("# Family \(fam.key)")
+                    output.append("\n")
                 }
 
                 if maxLines > 0 && !fam.headersL2.isEmpty {
                     for a in fam.headersL2.prefix(maxLines) {
                         output.append("  L2  \(a.code)  \(a.label)")
+                        output.append("\n")
                     }
                     if fam.headersL2.count > maxLines {
                         output.append("  … +\(fam.headersL2.count - maxLines) more L2")
+                        output.append("\n")
                     }
                 }
             }
