@@ -5,7 +5,7 @@ public enum EntryCompilerAccountsECWriter {
     private static func filename(for root: RootNodeClass) -> String {
         switch root {
         case .asset:      return "assets.ec"
-        case .liability:  return "liilities.ec"
+        case .liability:  return "liabilities.ec"
         case .equity:     return "equity.ec"
         case .revenue:    return "revenue.ec"
         case .expense:    return "expenses.ec"
