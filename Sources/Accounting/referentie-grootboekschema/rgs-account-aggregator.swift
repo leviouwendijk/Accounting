@@ -247,6 +247,16 @@ public struct RGSAccountAggregator: Sendable {
         }
     }
 
+    public func printFamiliesOnly(maxLines: Int = 12) {
+        for fam in sortedFamilies() {
+            if let t = fam.title {
+                print("# Family \(fam.key) — \(t)")
+            } else {
+                print("# Family \(fam.key)")
+            }
+        }
+    }
+
     public func accounts(in family: FamilyKey) -> [RGSAccount] {
         guard let f = families[family] else { return [] }
         var result = f.headersL2
