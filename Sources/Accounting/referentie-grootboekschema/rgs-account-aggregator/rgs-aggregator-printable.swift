@@ -39,6 +39,7 @@ extension RGSAccountAggregator {
                 // output.append each L3 with its L4 children
                 for (parent, kids) in grouped.pairs {
                     output.append("    L3  \(parent.code)  \(parent.label)")
+                    output.append("\n")
                     for a in kids.prefix(maxLines) {
                         output.append("      L4  \(a.code)  \(a.label)")
                         output.append("\n")
