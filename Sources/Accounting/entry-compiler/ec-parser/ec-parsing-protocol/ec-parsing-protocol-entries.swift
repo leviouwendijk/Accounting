@@ -8,6 +8,18 @@ public extension EntryCompilerParsing {
     @inline(__always) func expect(_ t: EntryCompilerToken) throws { try core.expect(t) }
     @inline(__always) func loc() -> SourceLocation { core.currentLocation() }
 
+    /// Parse `id = <number>` into a provided slot.
+    @inlinable
+    func parseId(into slot: inout Int?, what: String = "global id") throws {
+        try expect(.keyword("id"))
+        try expect(.equals)
+        guard case let .number(n) = current else {
+            throw ParserError.unexpectedToken(current, expected: "number (\(what))", at: loc())
+        }
+        slot = (n as NSDecimalNumber).intValue
+        advance()
+    }
+
     // ---- Generic segment readers
     @inline(__always)
     func readFlatSegments() -> [String] {
@@ -233,5 +245,44 @@ public extension EntryCompilerParsing {
         let abbr = Calendar.current.shortMonthSymbols.map { $0.lowercased() }
         if let idx = abbr.firstIndex(of: lower) { return idx + 1 }
         return Int(lower) ?? 1
+    }
+
+    @inlinable
+    func parseTransactionsBlock() throws -> [Int] {
+        try expect(.keyword("transactions"))
+        try expect(.lBrace)
+
+        var out: [Int] = []
+        while current != .rBrace && current != .eof {
+            try expect(.keyword("ref"))
+            try parseRefList(into: &out)
+            // newline(s) are skipped by the lexer; nothing to do here
+        }
+        try expect(.rBrace)
+
+        var seen = Set<Int>()
+        return out.filter { seen.insert($0).inserted }
+    }
+
+    /// Parses: 1, 2, 3   (commas optional; trailing comma allowed)
+    @inlinable
+    func parseRefList(into out: inout [Int]) throws {
+        // first number required
+        guard case let .number(n0) = current else {
+            throw ParserError.unexpectedToken(current, expected: "number (transaction id)", at: loc())
+        }
+        out.append((n0 as NSDecimalNumber).intValue)
+        advance()
+
+        // subsequent ", <number>" pairs; allow trailing comma
+        while current == .comma {
+            advance()
+            guard case let .number(n) = current else {
+                // trailing comma before next token (e.g. next 'ref' or '}') – accept & stop
+                break
+            }
+            out.append((n as NSDecimalNumber).intValue)
+            advance()
+        }
     }
 }

@@ -30,6 +30,10 @@ public final class EntryCompilerEntriesParser: EntryCompilerParsing {
 
         while current != .rBrace && current != .eof {
             switch current {
+
+            case .keyword("id"), .ident("id"):
+                try parseId(into: &entry.id)
+
             case .keyword("timezone"):
                 advance()
                 try expect(.lBrace)
@@ -80,6 +84,10 @@ public final class EntryCompilerEntriesParser: EntryCompilerParsing {
 
             case .keyword("posting"), .keyword("line"):
                 entry.lines.append(try parsePostingBlock())
+
+            case .keyword("transactions"):
+                let refs = try parseTransactionsBlock()
+                entry.transactionReferences.append(contentsOf: refs)
 
             default:
                 throw ParserError.unexpectedToken(current, expected: "date, details, for, posting, or line", at: loc())

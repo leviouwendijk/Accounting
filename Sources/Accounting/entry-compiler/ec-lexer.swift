@@ -17,6 +17,8 @@ public enum EntryCompilerToken: Equatable, Sendable {
 
     case dateLiteral(String)   // e.g. "2025-02-03" or "03/02/2025"
 
+    case comma
+
     case eof
 }
 
@@ -92,33 +94,76 @@ public struct EntryCompilerLexer: Sendable {
         // 4) identifiers & keywords
         if CharacterSet.letters.union(CharacterSet(charactersIn: "_")).contains(c) {
             let ident = readIdent()
-            let kwSet: Set<String> = [
-                "entry", 
 
+            let global: Set<String> = [
+                "id",
                 "details",
+                "date",
+                "infer",
+                "timezone",
+                "true", "false",
+            ]
 
-                "date", "infer",
-                "year","month","day",
+            let date: Set<String> = [
+                "year",
+                "month",
+                "day"
+            ]
 
-                "for", "in",
-
-                "to","from",
-
-                "debit", "credit", 
-                "dr", "cr",
-
+            let entry: Set<String> = [
+                "entry",
+                "for", 
+                "in",
+                "debit", 
+                "credit", 
+                "dr", 
+                "cr",
                 "posting",
                 "line",
+                "transactions",
+                "ref"
+            ]
 
+            let transaction: Set<String> = [
+                "transaction",
+            ]
+
+            let inventory: Set<String> = [
                 "inventory",
+
+                "to",
+                "from",
+
                 "adding", "removing",
                 "addition", "reduction",
                 "add", "rm", "remove",
-
-                "settings", "aggregation",
-                "true", "false",
-                "timezone"
             ]
+
+            let settings: Set<String> = [
+                "settings", 
+            ]
+
+            let aggregation: Set<String> = [
+                "aggregation", 
+            ]
+
+            // let kwSet: Set<String> = {
+            //     var  s = Set<String>()
+            //     [ 
+            //         global, 
+            //         date,
+            //         entry,
+            //         transaction,
+            //         inventory,
+            //         settings,
+            //         aggregation 
+            //     ].forEach { s.formUnion($0) }
+            //     return s
+            // }()
+
+            let kwSet = [global, date, entry, transaction, inventory, settings, aggregation]
+                .reduce(into: Set<String>()) { $0.formUnion($1) }
+
             if ident == "details" {
                 detailsState = .awaitingOpen
                 return .keyword("details")

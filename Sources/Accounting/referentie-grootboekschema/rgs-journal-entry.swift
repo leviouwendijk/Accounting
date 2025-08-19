@@ -1,21 +1,26 @@
 import Foundation
 
+// in ec-models/ec-entry.swift
+
 public struct RGSJournalEntry {
-    public let id: String
+    public let id: Int
     public let date: Date
     public let description: String
     public var postings: [RGSPosting]
+    // public var transactionReferences: [EntryCompilerTransactionID]
 
     public init(
-        id: String, 
+        id: Int,
         date: Date, 
         description: String, 
-        postings: [RGSPosting]
+        postings: [RGSPosting],
+        // transactionReferences: [EntryCompilerTransactionID] = []
     ) {
         self.id = id
         self.date = date
         self.description = description
         self.postings = postings
+        // self.transactionReferences = transactionReferences
     }
 }
 

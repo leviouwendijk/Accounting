@@ -1,5 +1,9 @@
 import Foundation
 
+
+// (!): NOT USED BY ENTRY COMPILER
+// look at ec-transaction.swift
+
 public enum TransactionSource {
     case cash
     case bank
