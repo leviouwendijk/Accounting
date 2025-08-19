@@ -83,6 +83,7 @@ public struct EntryCompilerLexer: Sendable {
             }
         case ".": advance(); return .dot
         case "=": advance(); return .equals
+        case ",": advance(); return .comma
         default: break
         }
 
