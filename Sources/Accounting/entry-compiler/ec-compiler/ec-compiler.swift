@@ -4,11 +4,13 @@ public struct EntryCompiler: Sendable {
     public let project: EntryCompilerProject
     public let parsers: EntryCompilerParsers
     public let settings: EntryCompilerSettings
+    public let entities: EntityStore
 
     public init(root: URL, parsers: EntryCompilerParsers = .default) throws {
         self.project  = .init(root: root)
         self.parsers  = parsers
         self.settings = try parsers.makeSettings(root)
+        self.entities = try EntityStoreLoader.load(from: self.project)   // NEW
     }
 
     public func lex(_ source: String) -> [EntryCompilerToken] {
