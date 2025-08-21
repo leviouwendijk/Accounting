@@ -1,7 +1,7 @@
 import Foundation
 
 public extension EntryCompilerParsing {
-    func parseLineBody(entity: EntityPath, account: AccountPath) throws -> Line {
+    func parseLineBody(entity: EntityRef, account: AccountPath) throws -> Line {
         try expect(.lBrace)
 
         var direction: Direction?
@@ -53,7 +53,7 @@ public extension EntryCompilerParsing {
 
     func parseLine_for_in() throws -> Line {
         advance() // 'for ... in ...'
-        let entity = try parseEntityGroup(flexible: true)
+        let entity = try parseEntityRefFlexible()
         try expect(.keyword("in"))
         let account = try parseAccountGroup(flexible: true)
         return try parseLineBody(entity: entity, account: account)
@@ -63,7 +63,7 @@ public extension EntryCompilerParsing {
         advance() // 'in ... for ...'
         let account = try parseAccountGroup(flexible: true)
         try expect(.keyword("for"))
-        let entity = try parseEntityGroup(flexible: true)
+        let entity = try parseEntityRefFlexible()
         return try parseLineBody(entity: entity, account: account)
     }
 }
@@ -138,23 +138,13 @@ public extension EntryCompilerParsing {
     //   for (objects -> usable -> vehicle -> unit(honda_crv), objects -> … -> unit(tesla_y)) …
     //   for liquids.money.main …                        // single, bare
     //   for (liquids.money.main) …                      // single in parens
-    func parseEntityTargets() throws -> [EntityPath] {
-        // Single flexible form stays supported (legacy helpers) :contentReference[oaicite:3]{index=3}
-        if current != .lPar {
-            return [try parseEntityGroup(flexible: true)]
-        }
-
+    func parseEntityTargets() throws -> [EntityRef] {
+        if current != .lPar { return [try parseEntityRefFlexible()] }
         try expect(.lPar)
-        var out: [EntityPath] = []
+        var out: [EntityRef] = []
         while current != .rPar && current != .eof {
-            // Read one entity path (arrow/dot separated). Reuse flat segment reader. :contentReference[oaicite:4]{index=4}
             let segs = readFlatSegments()
-            guard segs.count >= 2 else {
-                throw ParserError.unexpectedToken(current, expected: "domain.alias.path", at: loc())
-            }
-            let domain = segs[0]
-            out.append(EntityPath(domain: domain, aliasSegments: Array(segs.dropFirst())))
-
+            out.append(try makeEntityRef(from: segs))
             if current == .comma { advance(); continue }
             break
         }
@@ -209,7 +199,7 @@ public extension EntryCompilerParsing {
     }
 
     func expandLines(
-        entities: [EntityPath],
+        entities: [EntityRef],
         accounts: [AccountPath],
         payload: (Direction, Decimal, InventoryAdjustment?)
     ) -> [Line] {

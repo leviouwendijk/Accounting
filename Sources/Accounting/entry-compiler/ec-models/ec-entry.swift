@@ -36,7 +36,7 @@ public struct Entry: Hashable, Codable, Sendable {
         }()
         var out = ["Entry on \(dateStr):"]
         for line in lines {
-            let ent = "\(line.entity.domain).\(line.entity.alias)"
+            let ent = line.entity.printable
             let acc = line.account.segments.joined(separator: ".")
             let dir = line.direction == .debit ? "DR" : "CR"
             var lineStr = "  - [\(dir)] \(ent) → \(acc): \(line.amount)"

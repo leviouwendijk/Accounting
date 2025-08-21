@@ -8,7 +8,7 @@ public extension EntryCompilerParsing {
         advance()
         try expect(.lBrace)
 
-        var entityPath: EntityPath?
+        var entityPath: EntityRef?
         var accountPath: AccountPath?
         var direction: Direction?
         var amount: Decimal?
@@ -22,8 +22,7 @@ public extension EntryCompilerParsing {
                 guard segs.count >= 2 else {
                     throw ParserError.unexpectedToken(current, expected: "domain.alias.path", at: loc())
                 }
-                let domain = segs.first!
-                entityPath = EntityPath(domain: domain, aliasSegments: Array(segs.dropFirst()))
+                entityPath = try makeEntityRef(from: segs)
 
             case .ident("account"):
                 advance(); try expect(.equals)

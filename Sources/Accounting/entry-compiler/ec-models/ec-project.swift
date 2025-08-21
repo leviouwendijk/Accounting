@@ -5,7 +5,7 @@ public struct EntryCompilerProject: Sendable {
     public init(root: URL) { self.root = root }
 
     public enum Base: String, Sendable {
-        case config, entries, statements, test
+        case config, entries, statements, transactions, test
     }
 
     public func url(_ base: Base) -> URL {
@@ -13,6 +13,7 @@ public struct EntryCompilerProject: Sendable {
         case .config:     return root.appendingPathComponent("config", isDirectory: true)
         case .entries:    return root.appendingPathComponent("entries", isDirectory: true)
         case .statements: return root.appendingPathComponent("statements", isDirectory: true)
+        case .transactions: return root.appendingPathComponent("transactions", isDirectory: true)
         case .test:       return root.appendingPathComponent("test", isDirectory: true)
         }
     }

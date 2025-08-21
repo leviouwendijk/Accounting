@@ -1,14 +1,14 @@
 import Foundation
 
 public struct Line: Hashable, Codable, Sendable {
-    public let entity: EntityPath
+    public let entity: EntityRef
     public let account: AccountPath
     public let direction: Direction
     public let amount: Decimal
     public let adjustment: InventoryAdjustment?
 
     public init(
-        entity: EntityPath,
+        entity: EntityRef,
         account: AccountPath,
         direction: Direction,
         amount: Decimal,
