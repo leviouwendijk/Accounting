@@ -1,6 +1,5 @@
 import Foundation
 
-// public class EntryCompilerParserCore: Sendable {
 public struct EntryCompilerParserCore: Sendable {
     internal var tokens: [EntryCompilerToken]
     internal var index = 0

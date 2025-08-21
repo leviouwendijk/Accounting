@@ -1,13 +1,20 @@
 import Foundation
 
-public final class EntryCompilerSettingsParser: EntryCompilerParsing {
-    public var core: EntryCompilerParserCore
-    public init(core: EntryCompilerParserCore) { self.core = core }
-    public convenience init(tokens: [EntryCompilerToken]) {
-        self.init(core: EntryCompilerParserCore(tokens: tokens))
+public extension EntryCompilerParsing {
+    func parseTimeZoneValue() throws -> TimeZone {
+        guard case let .ident(s) = current else {
+            throw ParserError.unexpectedToken(current, expected: "timezone identifier", at: loc())
+        }
+        // IANA
+        if let tz = TimeZone(identifier: s) {
+            advance()
+            return tz
+        }
+
+        throw ParserError.unexpectedToken(current, expected: "IANA tz", at: loc())
     }
 
-    public func parseSettingsBlock() throws -> EntryCompilerSettings {
+    func parseSettingsBlock() throws -> EntryCompilerSettings {
         try expectKeyword("settings")
         try beginBlock()
 
@@ -37,7 +44,7 @@ public final class EntryCompilerSettingsParser: EntryCompilerParsing {
         return EntryCompilerSettings(entry: es, aggregation: `as`)
     }
 
-    private func parseEntrySettings() throws -> EntrySettings {
+    func parseEntrySettings() throws -> EntrySettings {
         try expectKeyword("entry"); try beginBlock()
 
         var tz: TimeZone?
@@ -60,7 +67,7 @@ public final class EntryCompilerSettingsParser: EntryCompilerParsing {
         return EntrySettings(defaultTimezone: finalTZ)
     }
 
-    private func parseAggregationSettings() throws -> AggregationSettings {
+    func parseAggregationSettings() throws -> AggregationSettings {
         try expectKeyword("aggregation"); try beginBlock()
 
         var includePrev: Bool?

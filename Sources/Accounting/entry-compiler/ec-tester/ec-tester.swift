@@ -86,6 +86,7 @@ public func tokensToDTO(_ toks: [EntryCompilerToken]) -> [TokenDTO] {
         case .string(let s):    return .init(type: "string",  value: s)
         case .dateLiteral(let s): return .init(type: "date",  value: s)
         case .comma:            return .init(type: "punc",    value: ",")
+        case .hash:            return .init(type: "hash",    value: "#")
         case .eof:              return .init(type: "eof",     value: nil)
         }
     }

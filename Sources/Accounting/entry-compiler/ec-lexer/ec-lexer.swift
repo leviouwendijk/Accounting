@@ -1,27 +1,5 @@
 import Foundation
 
-public enum EntryCompilerToken: Equatable, Sendable {
-    case keyword(String)          // entry, for, debit, credit, rm, date, details …
-    case ident(String)            // entity, account, people, levi_ouwendijk …
-    case number(Decimal)          // 200.00
-    // punctuation
-    case lBrace                   // {
-    case rBrace                   // }
-    case lPar                     // (
-    case rPar                     // )
-    case arrow                    // ->
-    case dot                      // .
-    case equals                   // =
-
-    case string(String)           // details { … }
-
-    case dateLiteral(String)   // e.g. "2025-02-03" or "03/02/2025"
-
-    case comma
-
-    case eof
-}
-
 public struct EntryCompilerLexer: Sendable {
     private let scalars: [UnicodeScalar]
     private var index: Int = 0
@@ -84,6 +62,7 @@ public struct EntryCompilerLexer: Sendable {
         case ".": advance(); return .dot
         case "=": advance(); return .equals
         case ",": advance(); return .comma
+        case "#": advance(); return .hash
         default: break
         }
 
@@ -96,74 +75,7 @@ public struct EntryCompilerLexer: Sendable {
         if CharacterSet.letters.union(CharacterSet(charactersIn: "_")).contains(c) {
             let ident = readIdent()
 
-            let global: Set<String> = [
-                "id",
-                "details",
-                "date",
-                "infer",
-                "timezone",
-                "true", "false",
-            ]
-
-            let date: Set<String> = [
-                "year",
-                "month",
-                "day"
-            ]
-
-            let entry: Set<String> = [
-                "entry",
-                "for", 
-                "in",
-                "debit", 
-                "credit", 
-                "dr", 
-                "cr",
-                "posting",
-                "line",
-                "transactions",
-                "ref"
-            ]
-
-            let transaction: Set<String> = [
-                "transaction",
-            ]
-
-            let inventory: Set<String> = [
-                "inventory",
-
-                "to",
-                "from",
-
-                "adding", "removing",
-                "addition", "reduction",
-                "add", "rm", "remove",
-            ]
-
-            let settings: Set<String> = [
-                "settings", 
-            ]
-
-            let aggregation: Set<String> = [
-                "aggregation", 
-            ]
-
-            // let kwSet: Set<String> = {
-            //     var  s = Set<String>()
-            //     [ 
-            //         global, 
-            //         date,
-            //         entry,
-            //         transaction,
-            //         inventory,
-            //         settings,
-            //         aggregation 
-            //     ].forEach { s.formUnion($0) }
-            //     return s
-            // }()
-
-            let kwSet = [global, date, entry, transaction, inventory, settings, aggregation]
-                .reduce(into: Set<String>()) { $0.formUnion($1) }
+            let kwSet = entryCompilerKeywordSet()
 
             if ident == "details" {
                 detailsState = .awaitingOpen
@@ -257,10 +169,6 @@ public struct EntryCompilerLexer: Sendable {
         let i = index + n
         return i < scalars.count ? scalars[i] : nil
     }
-
-    // @inline(__always) private mutating func advance() { 
-    //     index += 1 
-    // }
 
     @inline(__always) private mutating func advance() {
         if index < scalars.count {

@@ -1,8 +1,16 @@
 import Foundation
 
-// Parser funcs for Settings
 public extension EntryCompilerParsing {
-    // @discardableResult
+    @inline(__always) var current: EntryCompilerToken { core.current }
+    @inline(__always) func advance() { core.advance() }
+    @inline(__always) func expect(_ t: EntryCompilerToken) throws { try core.expect(t) }
+    @inline(__always) func loc() -> SourceLocation { core.currentLocation() }
+
+    func beginBlock() throws { try expect(.lBrace) }
+    func endBlock()   throws { try expect(.rBrace)  }
+}
+
+public extension EntryCompilerParsing {
     func expectKeyword(_ kw: String) throws -> Void {
         guard case .keyword(kw) = current else {
             throw ParserError.unexpectedToken(current, expected: "keyword(\(kw))", at: loc())
@@ -19,11 +27,6 @@ public extension EntryCompilerParsing {
         return s
     }
 
-    // ---- Blocks
-    func beginBlock() throws { try expect(.lBrace) }
-    func endBlock()   throws { try expect(.rBrace)  }
-
-    // @discardableResult
     func expectFieldEquals(_ name: String) throws -> Void {
         guard case .ident(name) = current else {
             throw ParserError.unexpectedToken(current, expected: name, at: loc())
@@ -32,7 +35,6 @@ public extension EntryCompilerParsing {
         try expect(.equals)
     }
 
-    // ---- Booleans: accepts true/false as ident or keyword
     func parseBoolValue() throws -> Bool {
         switch current {
         case .ident("true"), .keyword("true"):  advance(); return true
@@ -40,19 +42,5 @@ public extension EntryCompilerParsing {
         default:
             throw ParserError.unexpectedToken(current, expected: "true|false", at: loc())
         }
-    }
-
-    // ---- TimeZone value: supports IANA ("Europe/Amsterdam")
-    func parseTimeZoneValue() throws -> TimeZone {
-        guard case let .ident(s) = current else {
-            throw ParserError.unexpectedToken(current, expected: "timezone identifier", at: loc())
-        }
-        // Try IANA first
-        if let tz = TimeZone(identifier: s) {
-            advance()
-            return tz
-        }
-
-        throw ParserError.unexpectedToken(current, expected: "IANA tz", at: loc())
     }
 }
