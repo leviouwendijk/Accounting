@@ -31,6 +31,13 @@ public extension EntryCompilerParsing {
         //     advance()
         //     return "inventory"
 
+        case .keyword("inventory"):
+            throw ParserError.deprecatedPathSegment(
+                segment: "inventory",
+                suggestion: "objects.storable",
+                at: loc()
+            )
+
         case .ident:
             // Try: ident[#...]
             let name = try readNameWithVariantChain()
@@ -72,6 +79,13 @@ public extension EntryCompilerParsing {
             switch current {
             // case .keyword("inventory"):
             //     segs.append(try readAtomSegment())
+
+            case .keyword("inventory"):
+                throw ParserError.deprecatedPathSegment(
+                    segment: "inventory",
+                    suggestion: "objects.storable",
+                    at: loc()
+                )
 
             case .ident, .number:
                 segs.append(try readAtomSegment())
