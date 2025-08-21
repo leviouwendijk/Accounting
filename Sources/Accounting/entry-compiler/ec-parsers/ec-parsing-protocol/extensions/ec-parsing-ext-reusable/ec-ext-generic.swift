@@ -43,4 +43,18 @@ public extension EntryCompilerParsing {
             throw ParserError.unexpectedToken(current, expected: "true|false", at: loc())
         }
     }
+
+}
+
+
+public extension EntryCompilerParsing {
+    // lookahead helper
+    func peekTokenIsLPar() -> Bool {
+        let saved = core.index
+        defer { core.index = saved }
+        if saved < core.tokens.count - 1 {
+            return core.tokens[saved + 1] == .lPar
+        }
+        return false
+    }
 }

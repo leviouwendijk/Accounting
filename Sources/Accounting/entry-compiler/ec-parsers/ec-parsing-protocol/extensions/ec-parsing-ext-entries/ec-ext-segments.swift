@@ -1,0 +1,185 @@
+import Foundation
+
+public extension EntryCompilerParsing {
+    // Variants on a single name:  ident ('#' ident)*
+    @inline(__always)
+    func readNameWithVariantChain() throws -> String {
+        guard case let .ident(base0) = current else {
+            throw ParserError.unexpectedToken(current, expected: "identifier", at: loc())
+        }
+        var s = base0
+        advance()
+        while current == .hash {
+            advance()
+            guard case let .ident(v) = current else {
+                throw ParserError.unexpectedToken(current, expected: "identifier (after '#')", at: loc())
+            }
+            s.append("#"); s.append(v)
+            advance()
+        }
+        return s
+    }
+
+    // Atom: ident[#…] | number | unit(<id|number>)
+    // deprecating: use of keyword("inventory") in a segment (ident)
+    // - Accepts: vehicle#honda_crv
+    // - Accepts: unit(honda_crv)  (returned as "unit(honda_crv)" for normalization later)
+    @inline(__always)
+    func readAtomSegment() throws -> String {
+        switch current {
+        // case .keyword("inventory"):
+        //     advance()
+        //     return "inventory"
+
+        case .ident:
+            // Try: ident[#...]
+            let name = try readNameWithVariantChain()
+            // Special-case unit(<id|number>)
+            if name == "unit", current == .lPar {
+                try expect(.lPar)
+                let inner: String
+                switch current {
+                case .ident:
+                    inner = try readNameWithVariantChain()
+                case let .number(n):
+                    inner = "\(n)"; advance()
+                default:
+                    throw ParserError.unexpectedToken(current, expected: "identifier or number", at: loc())
+                }
+                try expect(.rPar)
+                return "unit(\(inner))"
+            }
+            return name
+
+        case let .number(n):
+            advance()
+            return "\(n)"
+
+        default:
+            throw ParserError.unexpectedToken(current, expected: "segment", at: loc())
+        }
+    }
+
+    // Core: read segmented path (arrow/dot separated)
+    @inline(__always)
+    func readSegmentsCore(stopAtRPar: Bool) throws -> [String] {
+        var segs: [String] = []
+
+        while true {
+            // Stop for the caller to handle ')'
+            if stopAtRPar, current == .rPar { break }
+
+            switch current {
+            // case .keyword("inventory"):
+            //     segs.append(try readAtomSegment())
+
+            case .ident, .number:
+                segs.append(try readAtomSegment())
+
+            default:
+                // Not a segment start → stop
+                return segs
+            }
+
+            // Segment separators
+            if current == .dot || current == .arrow {
+                advance()
+                continue
+            }
+
+            // If not stopping inside parens, we’re done when no separator
+            if !stopAtRPar { return segs }
+        }
+
+        return segs
+    }
+
+    // Normalization: unit(x) → merge into previous as "#x"
+    // Example: ["objects","usable","vehicle","unit(honda_crv)"] → ["objects","usable","vehicle#honda_crv"]
+    @inline(__always)
+    func normalizeUnitVariant(_ segs: [String]) -> [String] {
+        guard !segs.isEmpty else { return segs }
+        var out: [String] = []
+        for s in segs {
+            if s.hasPrefix("unit("), s.hasSuffix(")"),
+               let inner = s.split(separator: "(").last?.dropLast(), !inner.isEmpty
+            {
+                if let last = out.popLast() {
+                    out.append(last + "#" + inner)
+                } else {
+                    // Edge case: unit(...) as first segment — keep as "unit#id"
+                    out.append("unit#" + inner)
+                }
+            } else {
+                out.append(s)
+            }
+        }
+        return out
+    }
+
+    // ---- Public readers (maintaining old API names, now variant + unit aware)
+    /// old: readFlatSegments() → now variant- & unit-aware and normalized.
+    @inline(__always)
+    func readFlatSegments() -> [String] {
+        // Convert throwing core into best-effort (as you had)
+        guard let segs = try? readSegmentsCore(stopAtRPar: false) else { return [] }
+        return normalizeUnitVariant(segs)
+    }
+
+    /// old: readSegmentsUntilRPar(...) → now variant- & unit-aware and normalized.
+    func readSegmentsUntilRPar(allowAllAsAlias: Bool = false) throws -> (String, [String]) {
+        try expect(.lPar)
+        let rawSegs = try readSegmentsCore(stopAtRPar: true)
+        try expect(.rPar)
+
+        let segs = normalizeUnitVariant(rawSegs)
+        guard !segs.isEmpty else {
+            throw ParserError.unexpectedToken(current, expected: "non-empty path", at: loc())
+        }
+
+        if allowAllAsAlias { return (segs.first ?? "", segs) }
+        var copy = segs
+        let domain = copy.removeFirst()
+        return (domain, copy)
+    }
+}
+
+// previous
+// public extension EntryCompilerParsing {
+//     // ---- Generic segment readers
+//     @inline(__always)
+//     func readFlatSegments() -> [String] {
+//         var segs: [String] = []
+//         while true {
+//             switch current {
+//             case let .ident(s): segs.append(s); advance()
+//             case let .number(n): segs.append("\(n)"); advance()
+//             case let .keyword(k) where k == "inventory": segs.append(k); advance()
+//             default: return segs
+//             }
+//             if current == .dot || current == .arrow { advance(); continue }
+//             return segs
+//         }
+//     }
+
+//     func readSegmentsUntilRPar(allowAllAsAlias: Bool = false) throws -> (String, [String]) {
+//         var segs: [String] = []
+//         while current != .rPar && current != .eof {
+//             switch current {
+//             case let .ident(s): segs.append(s); advance()
+//             case let .number(n): segs.append("\(n)"); advance()
+//             case .keyword("inventory"): segs.append("inventory"); advance()
+//             default:
+//                 // don’t swallow unknown tokens; exit so the caller can fail cleanly
+//                 break
+//             }
+//             if current == .arrow || current == .dot { advance(); continue }
+//             // stop if we hit something that isn’t a segment or separator
+//             if current != .ident(""), current != .number(0), current != .keyword("inventory") { break }
+//         }
+//         try expect(.rPar)
+//         guard !segs.isEmpty else { throw ParserError.unexpectedToken(current, expected: "non-empty path", at: loc()) }
+//         if allowAllAsAlias { return (segs.first ?? "", segs) }
+//         var copy = segs; let domain = copy.removeFirst(); return (domain, copy)
+//     }
+// }

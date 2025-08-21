@@ -60,10 +60,14 @@ public extension EntryCompilerParsing {
                 try expect(.rBrace)
 
             case .keyword("for"), .keyword("in"):
-                entry.lines.append(try parseLineOrSwap())
+                entry.lines.append(
+                    contentsOf: try parseMultiLinesOrSwap()
+                )
 
             case .keyword("posting"), .keyword("line"):
-                entry.lines.append(try parsePostingBlock())
+                entry.lines.append(
+                    try parsePostingBlock()
+                )
 
             case .keyword("transactions"):
                 let refs = try parseTransactionsBlock()

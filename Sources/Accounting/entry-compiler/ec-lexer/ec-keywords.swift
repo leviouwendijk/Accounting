@@ -20,6 +20,8 @@ public func entryCompilerKeywordSet() -> Set<String> {
         "metadata",
         "amount",
         "currency",
+        // "increase",
+        // "decrease"
     ]
 
     let date: Set<String> = [
@@ -72,12 +74,15 @@ public func entryCompilerKeywordSet() -> Set<String> {
         "acquisition_cost",
         "direct",
         "indirect",
+
         "commission_date",
         "method",
         "useful_life", 
         "useful_life_months",
         "residual_value",
-        "linked_entry"
+        "linked_entry",
+        // "book_value"
+        "capex"
     ]
 
     let transaction: Set<String> = [
