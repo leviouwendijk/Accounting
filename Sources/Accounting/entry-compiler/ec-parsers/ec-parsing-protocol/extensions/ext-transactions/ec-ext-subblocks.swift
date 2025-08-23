@@ -15,7 +15,8 @@ public extension EntryCompilerParsing {
 
     @inlinable
     func parseTransactionIdentifiersBlock() throws -> TransactionIdentifiers {
-        try expect(.ident("identifiers")); try beginBlock()
+        try expect(.keyword("identifiers"))
+        try beginBlock()
         var out = TransactionIdentifiers()
         while current != .rBrace && current != .eof {
             switch current {
@@ -41,7 +42,8 @@ public extension EntryCompilerParsing {
 
     @inlinable
     func parseTransactionAmountBlock() throws -> TransactionAmount {
-        try expect(.ident("amount")); try beginBlock()
+        try expect(.keyword("amount")) 
+        try beginBlock()
         var currency: String?
         var gross: Decimal?
         var fee: Decimal?
@@ -49,23 +51,23 @@ public extension EntryCompilerParsing {
 
         while current != .rBrace && current != .eof {
             switch current {
-            case .ident("currency"):
+            case .keyword("currency"):
                 try expectFieldEquals("currency")
-                if case let .ident(s) = current { currency = s; advance() }
+                if case let .keyword(s) = current { currency = s; advance() }
                 else if case let .string(s) = current { currency = s; advance() }
                 else { throw ParserError.unexpectedToken(current, expected: "identifier|string", at: loc()) }
 
-            case .ident("gross"):
+            case .keyword("gross"):
                 try expectFieldEquals("gross")
                 guard case let .number(n) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: loc()) }
                 gross = n; advance()
 
-            case .ident("fee"):
+            case .keyword("fee"):
                 try expectFieldEquals("fee")
                 guard case let .number(n) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: loc()) }
                 fee = n; advance()
 
-            case .ident("net"):
+            case .keyword("net"):
                 try expectFieldEquals("net")
                 guard case let .number(n) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: loc()) }
                 net = n; advance()
@@ -84,29 +86,29 @@ public extension EntryCompilerParsing {
 
     @inlinable
     func parseTransactionCounterpartyBlock() throws -> TransactionCounterparty {
-        try expect(.ident("counterparty")); try beginBlock()
+        try expect(.keyword("counterparty")); try beginBlock()
         var name: String?
         var iban: String?
         var bic: String?
 
         while current != .rBrace && current != .eof {
             switch current {
-            case .ident("name"):
+            case .keyword("name"):
                 try expectFieldEquals("name")
                 if case let .string(s) = current { name = s; advance() }
-                else if case let .ident(s) = current { name = s; advance() }
+                else if case let .keyword(s) = current { name = s; advance() }
                 else { throw ParserError.unexpectedToken(current, expected: "string|identifier", at: loc()) }
 
-            case .ident("iban"):
+            case .keyword("iban"):
                 try expectFieldEquals("iban")
                 if case let .string(s) = current { iban = s; advance() }
-                else if case let .ident(s) = current { iban = s; advance() }
+                else if case let .keyword(s) = current { iban = s; advance() }
                 else { throw ParserError.unexpectedToken(current, expected: "string|identifier", at: loc()) }
 
-            case .ident("bic"):
+            case .keyword("bic"):
                 try expectFieldEquals("bic")
                 if case let .string(s) = current { bic = s; advance() }
-                else if case let .ident(s) = current { bic = s; advance() }
+                else if case let .keyword(s) = current { bic = s; advance() }
                 else { throw ParserError.unexpectedToken(current, expected: "string|identifier", at: loc()) }
 
             default:
