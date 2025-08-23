@@ -8,7 +8,12 @@ public enum ParserError: Error, CustomStringConvertible {
     public var description: String {
         switch self {
         case let .unexpectedToken(tok, expected, loc):
-            return "Unexpected token \(tok) at \(loc). Expected \(expected)."
+            return """
+            unexpected token
+                token: \(tok) 
+                at: \(loc) 
+                expected: \(expected).
+            """
         case let .unterminatedBlock(loc):
             return "Unterminated block starting at \(loc)."
         case let .deprecatedPathSegment(segment, suggestion, loc):
