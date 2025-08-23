@@ -3,12 +3,12 @@ import Foundation
 public extension EntryCompilerParsing {
     /// Attach lightweight readers inside your existing parseDepreciationBlock() switch.
     @inlinable
-    func parseDepreciationRollforward(into meta: inout [String:String], tz: TimeZone = .current) -> Bool {
+    func parseDepreciationRollforward(into meta: inout [String:String], tz: TimeZone = .current) throws -> Bool {
         guard current == .ident("rollforward") else { return false }
         advance(); try? beginBlock()
         var idx = 0
 
-        func parseEvent(kind: String) {
+        func parseEvent(kind: String) throws {
             advance(); try? beginBlock()
             var dateStr: String?
             var amount: String?
@@ -37,7 +37,11 @@ public extension EntryCompilerParsing {
                 case .keyword("details"), .keyword("reason"):
                     reason = (try? parseFreeTextBlock(named: "details")) ?? reason
                 default:
-                    break
+                    throw ParserError.unexpectedToken(
+                        current,
+                        expected: "effective_date/amount|value/linked_entry(s)/details|reason or '}'",
+                        at: loc()
+                    )
                 }
             }
             _ = try? endBlock()
@@ -53,9 +57,9 @@ public extension EntryCompilerParsing {
         while current != .rBrace && current != .eof {
             switch current {
             case .keyword("capex"):
-                parseEvent(kind: "capex")
+                try parseEvent(kind: "capex")
             case .keyword("revision"):
-                parseEvent(kind: "revision")
+                try parseEvent(kind: "revision")
             default:
                 break
             }
@@ -66,7 +70,7 @@ public extension EntryCompilerParsing {
 
     /// Optional readers you referenced in your keywords list:
     @inlinable
-    func parseDepreciationValuation(into meta: inout [String:String]) -> Bool {
+    func parseDepreciationValuation(into meta: inout [String:String]) throws -> Bool {
         guard current == .keyword("valuation") else { return false }
         advance(); try? beginBlock()
         while current != .rBrace && current != .eof {
@@ -80,7 +84,8 @@ public extension EntryCompilerParsing {
                 case .keyword("indirect"):
                     advance(); try? expect(.equals)
                     if case let .number(n) = current { meta["dep.valuation.acquisition.indirect"] = "\(n)"; advance() }
-                default: break
+                default:
+                    throw ParserError.unexpectedToken(current, expected: "direct|indirect or '}'", at: loc())
                 }
             }
             _ = try? endBlock()

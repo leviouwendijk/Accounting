@@ -15,9 +15,9 @@ public extension EntryCompilerParsing {
         try expect(.lBrace)
 
         while current != .rBrace && current != .eof {
-            if parseDepreciationValuation(into: &meta) { continue }
+            if try parseDepreciationValuation(into: &meta) { continue }
             if parseUsefulLifeMonths(into: &meta) { continue }
-            if parseDepreciationRollforward(into: &meta) { continue }
+            if try parseDepreciationRollforward(into: &meta) { continue }
 
             switch current {
             case .ident("method"), .keyword("method"):
