@@ -32,6 +32,9 @@ public struct TransactionStore: Codable, Sendable {
             return TransactionKey(i)
         }
     }
+
+    var all: [Transaction] { Array(byID.values) }
+    var count: Int { byID.count }
 }
 
 public struct TransactionStoreBuilder {
@@ -51,3 +54,4 @@ public struct TransactionStoreBuilder {
 
     public func freeze() throws -> TransactionStore { try TransactionStore(Array(map.values)) }
 }
+

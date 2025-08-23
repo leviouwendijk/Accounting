@@ -34,6 +34,9 @@ public struct AccountStore: Codable, Sendable {
             throw AccountStoreError.invalidReference(path: segs, at: loc)
         }
     }
+
+    var all: [RGSAccount] { Array(byCode.values) }
+    var count: Int { byCode.count }
 }
 
 // public struct AccountStoreBuilder {

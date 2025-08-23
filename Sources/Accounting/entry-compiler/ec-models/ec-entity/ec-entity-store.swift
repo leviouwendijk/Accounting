@@ -34,6 +34,9 @@ public struct EntityStore: Sendable, Codable {
             at: loc
         )
     }
+
+    var all: [EntityDef] { Array(byFull.values) }
+    var count: Int { byFull.count }
 }
 
 public struct EntityStoreBuilder {
