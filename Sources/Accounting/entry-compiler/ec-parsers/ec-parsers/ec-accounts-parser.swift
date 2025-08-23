@@ -67,9 +67,9 @@ public extension EntryCompilerParsing {
                 code = String((n as NSDecimalNumber).intValue); advance()
 
             case .keyword("label"), .ident("label"):
-                // support both: label { Free text }  and  label = "Free text"
+                advance()
                 if current == .lBrace {
-                    label = try parseFreeTextBlock(named: "label")      // reads { … } → .string
+                    label = try parseFreeTextBlock(named: "label")
                 } else {
                     try expect(.equals)
                     guard case let .string(s) = current else {
