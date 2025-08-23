@@ -10,9 +10,9 @@ public enum ParserError: Error, CustomStringConvertible {
         case let .unexpectedToken(tok, expected, loc):
             return """
             unexpected token
-                token: \(tok) 
-                at: \(loc) 
+                token: \(tok)
                 expected: \(expected).
+                at: \(loc) 
             """
         case let .unterminatedBlock(loc):
             return "Unterminated block starting at \(loc)."
