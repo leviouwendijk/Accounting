@@ -1,4 +1,5 @@
 import Foundation
+import Extensions
 
 public extension EntryCompilerParsing {
     // transaction { ... }
@@ -30,15 +31,29 @@ public extension EntryCompilerParsing {
             case .keyword("date"):
                 dateSpec = try parseTransactionDateDirective()
 
-            case .keyword("source"):
+            case .ident("source"), .keyword("source"):
                 try expectFieldEquals("source")
-                guard case let .keyword(s) = current else {
-                    throw ParserError.unexpectedToken(current, expected: "identifier", at: loc())
+                // accept ident | keyword | "string"
+                let raw: String
+                switch current {
+                case let .ident(s), let .keyword(s), let .string(s):
+                    raw = s; advance()
+                default:
+                    throw ParserError.unexpectedToken(current, expected: "identifier|string", at: loc())
                 }
-                guard let src = TransactionSource(rawValue: s) else {
-                    throw ParserError.unexpectedToken(current, expected: "bunq|cash|bank|card|manual|import|private", at: loc())
+                if let s = try? TransactionSource.parse(from: raw) {
+                    source = s
+                } else {
+                    let src = try TransactionSource.parse(from: raw.lowercased())
+                    source = src
                 }
-                source = src; advance()
+                // } else {
+                //     throw ParserError.unexpectedToken(
+                //         current,
+                //         expected: "bunq|cash|bank|card|manual|import|private",
+                //         at: loc()
+                //     )
+                // }
 
             case .keyword("identifiers"):
                 identifiers = try parseTransactionIdentifiersBlock()

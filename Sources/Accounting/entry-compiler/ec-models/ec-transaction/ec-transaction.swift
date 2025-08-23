@@ -1,6 +1,7 @@
 import Foundation
+import Extensions
 
-public enum TransactionSource: String, Codable, Sendable {
+public enum TransactionSource: String, Codable, Sendable, StringParsableEnum {
     case bunq, cash, bank, card, manual, `import`, `private`
 }
 
