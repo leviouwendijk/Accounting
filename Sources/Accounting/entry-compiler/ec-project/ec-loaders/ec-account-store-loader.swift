@@ -6,4 +6,10 @@ public enum AccountStoreLoader {
         try builder.addBase(base)
         return try builder.freeze()
     }
+
+    public static func load(fromBase base: [RGSAccount]) throws -> AccountStore {
+        var b = AccountStoreBuilder()
+        try b.addBase(base)
+        return try b.freeze()
+    }
 }
