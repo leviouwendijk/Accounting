@@ -2,21 +2,14 @@ import Foundation
 import plate
 
 public extension EntryCompilerParsing {
-    /// New convenience that infers from fileURL and forwards a path hint
     @inlinable
-    func parseEntityBlock(fileURL: URL?) throws -> EntityDef {
+    func parseEntityBlock(fileURL: URL?) throws -> [EntityDef] {   // RETURN ARRAY
         let (ic, ifa) = fileURL.map(inferClassFamily) ?? (nil, nil)
         return try parseEntityBlock(inferredClass: ic, inferredFamily: ifa)
     }
 
-    /// Provide inferredClass/family from file path; if nil after parsing → error.
-    /// Supports:
-    ///   use alias (objects.storable.macbook)
-    ///   use alias (macbook)                  // requires both inferred
-    ///   use alias (objects.macbook)          // requires inferred family
-
     @inlinable
-    func parseEntityBlock(inferredClass: String?, inferredFamily: String?) throws -> EntityDef {
+    func parseEntityBlock(inferredClass: String?, inferredFamily: String?) throws -> [EntityDef] { // RETURN ARRAY
         try expect(.keyword("entity"))
         try expect(.lBrace)
 
@@ -24,16 +17,21 @@ public extension EntryCompilerParsing {
         var displayName: String?
         var metadata: [String:String] = [:]
         var dep: DepreciationConfig?
+        var extraDefs: [EntityDef] = []              // collect unit/variant outputs
 
         let hint = _entityPathHint(fileURL: nil, inferredClass: inferredClass, inferredFamily: inferredFamily)
 
         while current != .rBrace && current != .eof {
+            if parseTypeDirective(into: &metadata) { continue }
+            if parseDomainDirective(into: &metadata) { continue }
+            if parseContentBlock(into: &metadata) { continue }
+            if parseOwnershipBlock(into: &metadata) { continue }
+
             switch current {
             case .keyword("use"):
                 advance()
                 try expect(.keyword("alias"))
 
-                // Accept "(...)" OR bare path/alias
                 let segs: [String]
                 if current == .lPar {
                     let (_, s) = try readSegmentsUntilRPar(allowAllAsAlias: true)
@@ -72,14 +70,32 @@ public extension EntryCompilerParsing {
                 }
                 displayName = s; advance()
 
-            case .ident("meta"), .keyword("metadata"):
+            case .ident("metadata"), .keyword("metadata"):
                 metadata = try parseStringMapBlock(named: "metadata")
 
             case .ident("depreciation"):
-                dep = try parseDepreciationBlock()
+                // IMPORTANT: pass metadata sink so rollforward/valuation are captured
+                dep = try parseDepreciationBlock(meta: &metadata)
+
+            // Nested blocks that produce additional concrete aliases
+            case .keyword("variant"), .ident("variant"):
+                guard let k = key else {
+                    throw ParserError.unexpectedToken(current, expected: "use alias before variant", at: loc())
+                }
+                extraDefs.append(contentsOf: try parseVariantBlocks(baseKey: k))
+
+            case .keyword("unit"), .ident("unit"):
+                guard let k = key else {
+                    throw ParserError.unexpectedToken(current, expected: "use alias before unit", at: loc())
+                }
+                extraDefs.append(contentsOf: try parseUnitBlocks(baseKey: k))
 
             default:
-                throw ParserError.unexpectedToken(current, expected: "use alias / display_name / metadata / depreciation", at: loc())
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "use alias / display_name / metadata / depreciation / type / domain / content / ownership / variant / unit",
+                    at: loc()
+                )
             }
         }
 
@@ -87,95 +103,10 @@ public extension EntryCompilerParsing {
         guard let k = key else {
             throw ParserError.unexpectedToken(current, expected: "use alias (<class[.family].alias>)", at: loc())
         }
-        return EntityDef(key: k, displayName: displayName, metadata: metadata, depreciation: dep)
-    }
 
-    @inlinable
-    func parseDepreciationBlock() throws -> DepreciationConfig {
-        var out = DepreciationConfig(
-            method: nil,
-            usefulLifeYears: nil,
-            residualValuePercent: 0,
-            residualValueAmount: nil,
-            effectiveDate: nil
-        )
-
-        advance() // 'depreciation'
-        try expect(.lBrace)
-
-        while current != .rBrace && current != .eof {
-            switch current {
-
-            case .ident("method"):
-                advance(); try expect(.equals)
-                guard case let .ident(m) = current else {
-                    throw ParserError.unexpectedToken(current, expected: "dep method", at: loc())
-                }
-                guard let mm = DepreciationMethod(rawValue: m) else {
-                    throw ParserError.unexpectedToken(current, expected: "straight_line|sl|ddb|syd|uop", at: loc())
-                }
-                out.method = mm
-                advance()
-
-            case .ident("useful_life_years"), .ident("useful_life"):
-                advance(); try expect(.equals)
-                guard case let .number(n) = current else {
-                    throw ParserError.unexpectedToken(current, expected: "number", at: loc())
-                }
-                out.usefulLifeYears = n
-                advance()
-
-            case .ident("residual_value"):
-                advance(); try expect(.lBrace)
-                while current != .rBrace && current != .eof {
-                    switch current {
-                    case .ident("keep_percentage"):
-                        advance()
-                        out.residualValuePercent = Decimal(-1) // sentinel
-
-                    case .ident("percentage"):
-                        advance(); try expect(.equals)
-                        guard case let .number(n) = current else {
-                            throw ParserError.unexpectedToken(current, expected: "number", at: loc())
-                        }
-                        out.residualValuePercent = n; advance()
-
-                    case .ident("amount"), .ident("value"):
-                        advance(); try expect(.equals)
-                        guard case let .number(n) = current else {
-                            throw ParserError.unexpectedToken(current, expected: "number", at: loc())
-                        }
-                        out.residualValueAmount = n; advance()
-
-                    default:
-                        // tolerate unknowns? otherwise:
-                        break
-                    }
-                }
-                try expect(.rBrace)
-
-            case .ident("effective_date"), .ident("commission_date"):
-                advance(); try expect(.equals)
-                switch current {
-                case let .dateLiteral(text):
-                    // reuse your literal parser (uses plate); pick a neutral tz
-                    out.effectiveDate = try parseDateLiteral(text, in: .current); advance()
-                case .lBrace:
-                    out.effectiveDate = try parseDateBlock(tz: .current)
-                default:
-                    throw ParserError.unexpectedToken(current, expected: "date literal or { … }", at: loc())
-                }
-
-            default:
-                throw ParserError.unexpectedToken(
-                    current,
-                    expected: "method/useful_life(_years)/residual_value/effective_date",
-                    at: loc()
-                )
-            }
-        }
-
-        try expect(.rBrace)
-        return out
+        var defs: [EntityDef] = []
+        defs.append(EntityDef(key: k, displayName: displayName, metadata: metadata, depreciation: dep))
+        defs.append(contentsOf: extraDefs)
+        return defs
     }
 }

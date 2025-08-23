@@ -31,7 +31,7 @@ public final class EntryCompilerEntitiesFileParser: EntryCompilerParsing {
         var out: [EntityDef] = []
         while current != .eof {
             if current == .keyword("entity") {
-                out.append(try parseEntityBlock(fileURL: fileURL)) // uses inferClassFamily(fileURL)
+                out.append(contentsOf: try parseEntityBlock(fileURL: fileURL))
             } else {
                 advance()
             }
