@@ -16,15 +16,19 @@ public struct TransactionStore: Codable, Sendable {
     }
 
     @inlinable
-    public func resolve(id: Int) throws -> Transaction {
-        guard let t = byID[TransactionKey(id)] else { throw TransactionStoreError.notFound(id: id) }
+    public func resolve(id: Int, at loc: SourceLocation?) throws -> Transaction {
+        guard let t = byID[TransactionKey(id)] else {
+            throw TransactionStoreError.notFound(id: id, at: loc)
+        }
         return t
     }
 
     @inlinable
-    public func resolveAll(ids: [Int]) throws -> [TransactionKey] {
+    public func resolveAll(ids: [Int], at loc: SourceLocation?) throws -> [TransactionKey] {
         try ids.map { i in
-            guard byID[TransactionKey(i)] != nil else { throw TransactionStoreError.notFound(id: i) }
+            guard byID[TransactionKey(i)] != nil else {
+                throw TransactionStoreError.notFound(id: i, at: loc)
+            }
             return TransactionKey(i)
         }
     }

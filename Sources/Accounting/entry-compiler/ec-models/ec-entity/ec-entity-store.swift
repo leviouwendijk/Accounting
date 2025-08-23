@@ -11,33 +11,27 @@ public struct EntityStore: Sendable, Codable {
         self.byAlias = idx
     }
 
-    public func resolve(_ ref: EntityRef) throws -> EntityDef {
+    public func resolve(_ ref: EntityRef, at loc: SourceLocation?) throws -> EntityDef {
         if let c = ref.`class`, let f = ref.family {
             let key = EntityKey(class: c, family: f, alias: ref.alias)
-
-            if let d = byFull[key] {
-                return d 
-            }
-
-            throw EntityStoreError.notFound(ref: ref.printable)
+            if let d = byFull[key] { return d }
+            throw EntityStoreError.notFound(ref: ref.printable, at: loc)
         }
 
         let cands = byAlias[ref.alias.name] ?? []
-        if cands.isEmpty { 
-            throw EntityStoreError.notFound(ref: ref.printable)
+        guard !cands.isEmpty else {
+            throw EntityStoreError.notFound(ref: ref.printable, at: loc)
         }
-
         if let c = ref.`class`, let hit = cands.first(where: { $0.`class` == c }) {
             return byFull[hit]!
         }
-
         if cands.count == 1, let only = cands.first {
             return byFull[only]!
         }
-
         throw EntityStoreError.ambiguousAlias(
             alias: ref.alias.string,
-            candidates: cands.map { $0.identifier(displaying: .fullchain) }
+            candidates: cands.map { $0.identifier(displaying: .fullchain) },
+            at: loc
         )
     }
 }

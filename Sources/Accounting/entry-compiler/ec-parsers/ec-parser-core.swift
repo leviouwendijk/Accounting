@@ -5,8 +5,12 @@ public struct EntryCompilerParserCore: Sendable {
     internal var index = 0
     internal var line = 1, column = 1
 
-    public init(tokens: [EntryCompilerToken]) {
+    internal var filePath: String?
+    internal var callSiteStack: [InvocationCallSite] = []
+
+    public init(tokens: [EntryCompilerToken], filePath: String? = nil) {
         self.tokens = tokens
+        self.filePath = filePath
     }
 
     public var current: EntryCompilerToken { 
@@ -29,7 +33,14 @@ public struct EntryCompilerParserCore: Sendable {
     }
 
     public func currentLocation() -> SourceLocation {
-        SourceLocation(line: line, column: column)
+        SourceLocation(file: filePath, line: line, column: column, invocation: callSiteStack.last)
+    }
+
+    public mutating func pushCallSite(_ site: InvocationCallSite) {
+        callSiteStack.append(site)
+    }
+    public mutating func popCallSite() {
+        _ = callSiteStack.popLast()
     }
 }
 

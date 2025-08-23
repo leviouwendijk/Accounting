@@ -1,7 +1,23 @@
 import Foundation
 
 public struct SourceLocation: CustomStringConvertible, Sendable {
+    public let file: String?
     public let line: Int
     public let column: Int
-    public var description: String { "\(line):\(column)" }
+    public let invocation: InvocationCallSite?
+
+    public init(file: String? = nil, line: Int, column: Int, invocation: InvocationCallSite? = nil) {
+        self.file = file
+        self.line = line
+        self.column = column
+        self.invocation = invocation
+    }
+
+    public var description: String {
+        let base = (file != nil) ? "\(file!):\(line):\(column)" : "\(line):\(column)"
+        if let inv = invocation, !inv.description.isEmpty {
+            return base + " " + inv.description
+        }
+        return base
+    }
 }

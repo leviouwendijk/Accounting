@@ -36,12 +36,12 @@ public extension EntryCompilerParsing {
     @inline(__always)
     func parseAndResolveEntityRefFlexible(using store: EntityStore) throws -> EntityDef {
         let ref = try parseEntityRefFlexible()
-        return try store.resolve(ref)
+        return try store.resolve(ref, at: loc())
     }
 
     @inline(__always)
     func parseAndResolveEntityRefInParens(using store: EntityStore) throws -> EntityDef {
         let ref = try parseEntityRefInParens()
-        return try store.resolve(ref)
+        return try store.resolve(ref, at: loc())
     }
 }
