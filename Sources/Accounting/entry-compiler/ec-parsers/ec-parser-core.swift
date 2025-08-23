@@ -1,4 +1,4 @@
-// import Foundation
+import Foundation
 
 // public struct EntryCompilerParserCore: Sendable {
 //     internal var tokens: [EntryCompilerToken]
@@ -51,11 +51,19 @@ public struct EntryCompilerParserCore: Sendable {
     internal var filePath: String?
     internal var lineMap: [Int]?          // token index -> source line
     internal var callSiteStack: [InvocationCallSite] = []
+        
+    public var verbose: Bool
 
-    public init(tokens: [EntryCompilerToken], filePath: String? = nil, lineMap: [Int]? = nil) {
+    public init(
+        tokens: [EntryCompilerToken],
+        filePath: String? = nil,
+        lineMap: [Int]? = nil,
+        verbose: Bool = false
+    ) {
         self.tokens = tokens
         self.filePath = filePath
         self.lineMap = lineMap
+        self.verbose = verbose
     }
 
     public var current: EntryCompilerToken {
@@ -81,4 +89,12 @@ public struct EntryCompilerParserCore: Sendable {
 
     public mutating func pushCallSite(_ site: InvocationCallSite) { callSiteStack.append(site) }
     public mutating func popCallSite() { _ = callSiteStack.popLast() }
+
+    @inline(__always)
+    public func trace(_ msg: String) {
+        guard verbose else { return }
+        if let data = ("    \(msg)\n").data(using: .utf8) {
+            FileHandle.standardError.write(data)
+        }
+    }
 }
