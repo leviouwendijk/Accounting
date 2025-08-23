@@ -2,7 +2,8 @@ import Foundation
 
 public enum EntryCompilerTransactionsLoader {
     public static func load(
-        from project: EntryCompilerProject
+        from project: EntryCompilerProject,
+        verbose: Bool = false
     ) throws -> TransactionStore {
         let root = project.url(.transactions)
         var txs: [Transaction] = []
@@ -15,6 +16,10 @@ public enum EntryCompilerTransactionsLoader {
                 let toks = lx.collectAllTokens()
                 let parsed = try EntryCompilerTransactionsFileParser(tokens: toks).parseTransactionsFile()
                 txs.append(contentsOf: parsed)
+
+                if verbose {
+                    fputs("  ✓ \(url.lastPathComponent): \(txs.count) txn(s)\n", stderr)
+                }
             }
         }
         return try TransactionStore(txs)

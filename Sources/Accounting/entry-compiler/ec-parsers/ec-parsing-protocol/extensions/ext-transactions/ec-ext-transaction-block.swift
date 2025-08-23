@@ -4,7 +4,8 @@ public extension EntryCompilerParsing {
     // transaction { ... }
     @inlinable
     func parseTransactionBlock() throws -> Transaction {
-        try expectKeyword("transaction"); try beginBlock()
+        try expectKeyword("transaction")
+        try beginBlock()
 
         var id: Int?
         var dateSpec: DateSpecification?
@@ -18,8 +19,7 @@ public extension EntryCompilerParsing {
 
         while current != .rBrace && current != .eof {
             switch current {
-
-            case .ident("id"):
+            case .keyword("id"):
                 try expectFieldEquals("id")
                 guard case let .number(n) = current else {
                     throw ParserError.unexpectedToken(current, expected: "number", at: loc())
@@ -27,12 +27,12 @@ public extension EntryCompilerParsing {
                 id = (n as NSDecimalNumber).intValue
                 advance()
 
-            case .ident("date"):
+            case .keyword("date"):
                 dateSpec = try parseTransactionDateDirective()
 
-            case .ident("source"):
+            case .keyword("source"):
                 try expectFieldEquals("source")
-                guard case let .ident(s) = current else {
+                guard case let .keyword(s) = current else {
                     throw ParserError.unexpectedToken(current, expected: "identifier", at: loc())
                 }
                 guard let src = TransactionSource(rawValue: s) else {
@@ -40,24 +40,24 @@ public extension EntryCompilerParsing {
                 }
                 source = src; advance()
 
-            case .ident("identifiers"):
+            case .keyword("identifiers"):
                 identifiers = try parseTransactionIdentifiersBlock()
 
-            case .ident("amount"):
+            case .keyword("amount"):
                 amount = try parseTransactionAmountBlock()
 
-            case .ident("details"):     
+            case .keyword("details"):     
                 details = try parseFreeTextBlock(named: "details")
 
-            case .ident("counterparty"):
+            case .keyword("counterparty"):
                 counterparty = try parseTransactionCounterpartyBlock()
 
-            case .ident("metadata"):    
+            case .keyword("metadata"):    
                 metadata = try parseStringMapBlock(named: "metadata")
 
-            case .ident("status"):
+            case .keyword("status"):
                 try expectFieldEquals("status")
-                guard case let .ident(s) = current else {
+                guard case let .keyword(s) = current else {
                     throw ParserError.unexpectedToken(current, expected: "pending|cleared|reconciled|voided", at: loc())
                 }
                 guard let st = TransactionStatus(rawValue: s) else {

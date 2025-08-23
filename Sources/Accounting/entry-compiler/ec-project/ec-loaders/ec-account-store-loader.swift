@@ -4,7 +4,7 @@ public enum AccountStoreLoader {
     public static func load(
         from project: EntryCompilerProject,
         defaultTZ: TimeZone,
-        verbose: Bool = false // verbose vprint() not yet implemented
+        verbose: Bool = false
     ) throws -> AccountStore {
         let dir = project.url(.config).appendingPathComponent("accounts", isDirectory: true)
         let fm = FileManager.default
@@ -14,16 +14,20 @@ public enum AccountStoreLoader {
             for case let url as URL in e where url.pathExtension == "ec" {
                 let src = try String(contentsOf: url, encoding: .utf8)
                 var lx = EntryCompilerLexer(source: src)
-                let (toks, lines) = lx.collectAllTokensWithLineMap()
+                let (toks, _) = lx.collectAllTokensWithLineMap()
 
-                let core = EntryCompilerParserCore(tokens: toks, filePath: url.path, lineMap: lines)
-                let parsed = try EntryCompilerAccountsFileParser(core: core).parseAccountsFile()
+                let parser = EntryCompilerAccountsFileParser(tokens: toks, fileURL: url, verbose: verbose)
+                let parsed = try parser.parseAccountsFile()
                 defs.append(contentsOf: parsed)
+
+                if verbose {
+                    fputs("  ✓ \(url.lastPathComponent): \(parsed.count) def(s)\n", stderr)
+                }
             }
         }
 
         var b = AccountStoreBuilder()
-        try b.addOverrides(defs)  // project config can fully define/override accounts
+        try b.addOverrides(defs)
         return try b.freeze()
     }
 
