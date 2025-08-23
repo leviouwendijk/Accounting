@@ -6,6 +6,41 @@ func vprint(_ verbose: Bool, _ s: String) {
     FileHandle.standardError.write(Data((s + "\n").utf8))
 }
 
+public enum CompileDriverError: Error, CustomStringConvertible {
+    case invalidSettings(String)
+    public var description: String {
+        switch self {
+        case .invalidSettings(let s): return s
+        }
+    }
+}
+
+public struct CompileDriveSetting {
+    public let entities: Bool
+    public let accounts: Bool
+    public let transactions: Bool
+    public let entries: Bool
+    public let assertion: Bool
+    
+    public init(
+        entities: Bool = true,
+        accounts: Bool = true,
+        transactions: Bool = true,
+        entries: Bool = true,
+        assertion: Bool = true
+    ) {
+        self.entities = entities
+        self.accounts = accounts
+        self.transactions = transactions
+        self.entries = entries
+        self.assertion = assertion
+    }
+    
+    public var precondition: Bool {
+        return (entities && accounts && transactions && entries)
+    }
+}
+
 public struct EntryCompileDriver {
     public struct Result {
         public let entities: EntityStore
@@ -55,31 +90,69 @@ public struct EntryCompileDriver {
     //     return .init(entities: entities, accounts: accounts, transactions: transactions, entries: entries, resolved: resolved)
     // }
 
-    public static func compile(projectRoot: URL, verbose: Bool = false) throws -> Result {
+    public static func compile(
+        projectRoot: URL,
+        setting: CompileDriveSetting = CompileDriveSetting(),
+        verbose: Bool = false
+    ) throws -> Result {
         vprint(verbose, "▶ Settings …")
         let project   = EntryCompilerProject(root: projectRoot)
         let settings  = try EntryCompilerSettingsLoader.load(from: projectRoot)
         let defaultTZ = settings.entry.defaultTimezone
         vprint(verbose, "  ✓ default timezone = \(defaultTZ.identifier)")
 
-        vprint(verbose, "▶ Entities …")
-        let entities = try EntityStoreLoader.load(from: project, defaultTZ: defaultTZ, verbose: verbose)
+        var entities: EntityStore       = EntityStore([:])
+        var accounts: AccountStore      = try AccountStore([])
+        var transactions: TransactionStore = try TransactionStore([])
+        var entries: [Entry]            = []
+        var resolved: [ResolvedEntry]   = []
 
-        vprint(verbose, "▶ Accounts …")
-        let accounts = try AccountStoreLoader.load(from: project, defaultTZ: defaultTZ, verbose: verbose)
+        if setting.entities {
+            vprint(verbose, "▶ Entities …")
+            entities = try EntityStoreLoader.load(from: project, defaultTZ: defaultTZ, verbose: verbose)
+            vprint(verbose, "  ✓ \(entities.byFull.count) entities")
+        }
 
-        vprint(verbose, "▶ Transactions …")
-        let transactions = try EntryCompilerTransactionsLoader.load(from: project)
+        if setting.accounts {
+            vprint(verbose, "▶ Accounts …")
+            accounts = try AccountStoreLoader.load(from: project, defaultTZ: defaultTZ, verbose: verbose)
+            vprint(verbose, "  ✓ \(accounts.count) accounts")
+        }
 
-        vprint(verbose, "▶ Entries …")
-        let entries = try EntryCompilerEntriesLoader.load(from: project, defaultTZ: defaultTZ)
+        if setting.transactions {
+            vprint(verbose, "▶ Transactions …")
+            transactions = try EntryCompilerTransactionsLoader.load(from: project)
+            vprint(verbose, "  ✓ \(transactions.count) transactions")
+        }
 
-        vprint(verbose, "▶ Resolve & assert …")
-        let resolved = try entries.resolved(using: entities, accounts: accounts, transactions: transactions)
-        try assertBalanced(resolved)
-        vprint(verbose, "  ✓ balanced")
+        if setting.entries {
+            vprint(verbose, "▶ Entries …")
+            entries = try EntryCompilerEntriesLoader.load(from: project, defaultTZ: defaultTZ)
+            vprint(verbose, "  ✓ \(entries.count) entries")
+        }
 
-        return .init(entities: entities, accounts: accounts, transactions: transactions, entries: entries, resolved: resolved)
+        if setting.precondition {
+            vprint(verbose, "▶ Resolving …")
+            resolved = try entries.resolved(using: entities, accounts: accounts, transactions: transactions) // :contentReference[oaicite:7]{index=7}
+            vprint(verbose, "  ✓ \(resolved.count) resolved entries")
+        }
+
+        if setting.assertion {
+            guard setting.precondition else {
+                throw CompileDriverError.invalidSettings("`assertion` requires entities+accounts+transactions+entries to be enabled")
+            }
+            vprint(verbose, "▶ Trial balance …")
+            try assertBalanced(resolved)
+            vprint(verbose, "  ✓ balanced")
+        }
+
+        return .init(
+            entities: entities,
+            accounts: accounts,
+            transactions: transactions,
+            entries: entries,
+            resolved: resolved
+        )
     }
 
     @inline(__always)
