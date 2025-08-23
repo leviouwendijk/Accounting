@@ -26,14 +26,14 @@ public struct RGSJournalEntry {
 
 public struct RGSPosting {
     public let account: RGSAccount
-    public let entity: Entity
+    public let entity: EntityDef
     public let amount: Double
     public let mutation: Direction
     public let adjustments: [InventoryAdjustment]?
 
     public init(
         account: RGSAccount, 
-        entity: Entity,
+        entity: EntityDef,
         amount: Double, 
         mutation: Direction,
         adjustments: [InventoryAdjustment]? = nil

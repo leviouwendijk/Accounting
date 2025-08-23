@@ -7,13 +7,13 @@ public enum MovementType: String {
 }
 
 public struct Movement {
-    public let entity: Entity
+    public let entity: GenericEntity
     public let account: Account
     public let amount: Double
     public let type: MovementType
 
     public init(
-        entity: Entity, 
+        entity: GenericEntity, 
         account: Account,
         amount: Double,
         type: MovementType

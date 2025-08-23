@@ -3,7 +3,7 @@ import Foundation
 // (!): FILE NOT USED BY NEW ENTRY COMPILER
 
 // BACKWARDS COMPAT
-public struct Entity {
+public struct GenericEntity {
     public let id: String
     public let name: String
     public let category: EntityType
@@ -21,7 +21,7 @@ public enum EntityType: String {
 
 
 // NEW VERSION:
-public enum EntityIdentifier: Codable, Sendable {
+public enum GenericEntityIdentifier: Codable, Sendable {
     case liquids(Liquids)
     case people(People)
     case objects(Objects)

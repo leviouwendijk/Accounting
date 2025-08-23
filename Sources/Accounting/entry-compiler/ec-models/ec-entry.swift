@@ -6,7 +6,7 @@ public struct Entry: Hashable, Codable, Sendable {
     public var lines: [Line]
     public var details: String? = nil
     public var timezone: String? = nil
-    public var transactionReferences: [EntryCompilerTransactionID]
+    public var transactionReferences: [Int]
 
     public init(
         id: Int? = nil,
@@ -14,7 +14,7 @@ public struct Entry: Hashable, Codable, Sendable {
         lines: [Line] = [],
         details: String? = nil,
         timezone: String? = nil,
-        transactionReferences: [EntryCompilerTransactionID] = []
+        transactionReferences: [Int] = []
     ) {
         self.id = id
         self.date = date

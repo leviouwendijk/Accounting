@@ -2,7 +2,7 @@ import Foundation
 
 // (!): FILE NOT USED BY NEW ENTRY COMPILER
 
-public struct JournalEntry {
+public struct GenericJournalEntry {
     public let id: String
     public let date: Date
     public let description: String
@@ -23,13 +23,13 @@ public struct JournalEntry {
 
 public struct Posting {
     public let account: Account
-    public let entity: Entity?
+    public let entity: GenericEntity?
     public let amount: Double
     public let mutation: Direction
 
     public init(
         account: Account, 
-        entity: Entity?, 
+        entity: GenericEntity?,
         amount: Double, 
         mutation: Direction
     ) {
@@ -39,4 +39,3 @@ public struct Posting {
         self.mutation = mutation
     }
 }
-
