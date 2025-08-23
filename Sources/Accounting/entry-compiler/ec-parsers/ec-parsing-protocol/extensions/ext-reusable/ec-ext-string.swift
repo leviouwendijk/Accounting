@@ -30,36 +30,32 @@ public extension EntryCompilerParsing {
 
     @inlinable
     func parseStringMapBlock(named kw: String = "metadata") throws -> [String:String] {
-        // optionally consume leading keyword
-        if case let .ident(s) = current, s == kw { advance() }
-        else if case let .keyword(s) = current, s == kw { advance() }
-
+        // optionally consume leading keyword/ident: metadata
+        switch current {
+        case .ident(let s) where s == kw, .keyword(let s) where s == kw:
+            advance()
+        default:
+            break
+        }
         try beginBlock()
+
         var out: [String:String] = [:]
-
         while current != .rBrace && current != .eof {
-            // tolerate separators/noise
-            if current == .comma { advance(); continue }
-
-            // key can be ident or keyword; otherwise skip token defensively
-            let key: String
-            switch current {
-            case let .ident(k):   key = k
-            case let .keyword(k): key = k
-            default:
-                advance(); continue
-            }
+            // key
+            guard case let .ident(k) = current else { break }
             advance()
             try expect(.equals)
 
-            // value: string literal OR free-form until ',' or '}'
-            if case let .string(s) = current {
-                out[key] = s; advance()
-            } else {
-                out[key] = readUnquotedMapValue()
+            // value: string literal OR multi-token unquoted
+            switch current {
+            case let .string(s):
+                out[k] = s; advance()
+            default:
+                out[k] = readUnquotedValueForMap()
             }
 
-            if current == .comma { advance() } // optional comma between pairs
+            // optional comma between pairs
+            if current == .comma { advance() }
         }
 
         try endBlock()
@@ -67,16 +63,14 @@ public extension EntryCompilerParsing {
     }
 
     @inline(__always)
-    func readUnquotedMapValue() -> String {
+    func readUnquotedValueForMap() -> String {
         var parts: [String] = []
         while current != .comma && current != .rBrace && current != .eof {
             switch current {
             case let .ident(s):   parts.append(s); advance()
-            case let .keyword(s): parts.append(s); advance()
             case let .number(n):  parts.append("\(n)"); advance()
-            default:
-                // stop on anything else (don’t consume terminator)
-                return parts.joined(separator: " ")
+            case let .keyword(s): parts.append(s); advance()
+            default: return parts.joined(separator: " ")
             }
         }
         return parts.joined(separator: " ")
