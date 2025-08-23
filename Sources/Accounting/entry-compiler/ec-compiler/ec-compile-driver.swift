@@ -41,21 +41,14 @@ public struct EntryCompileDriver {
 
     @inline(__always)
     static func assertBalanced(_ entries: [ResolvedEntry]) throws {
-        enum BalErr: Error, CustomStringConvertible {
-            case unbalanced(id: Int?, delta: Decimal)
-            var description: String {
-                switch self {
-                case .unbalanced(let id, let d): return "Entry \(id.map(String.init) ?? "<?>") not balanced (Δ=\(d))."
-                }
-            }
-        }
-
         for e in entries {
             var sum: Decimal = 0
             for l in e.lines {
                 sum += (l.direction == .debit ? +l.amount : -l.amount)
             }
-            if sum != 0 { throw BalErr.unbalanced(id: e.id, delta: sum) }
+            if sum != 0 {
+                throw CompilingAssertionError.unbalanced(id: e.id, delta: sum)
+            }
         }
     }
 }
