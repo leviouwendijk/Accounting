@@ -69,6 +69,11 @@ public extension EntryCompilerParsing {
                 key = EntityKey(class: c!, family: f!, alias: ref.alias)
                 core.trace("  use alias \(ref.alias.string) → \(key!.identifier(displaying: .fullchain))")
 
+            case .ident("details"), .keyword("details"):
+                let txt = try parseFreeTextBlock(named: "details")
+                metadata["details"] = txt
+                core.trace("  details { … }")
+
             case .ident("display_name"):
                 advance(); try expect(.equals)
                 guard case let .string(s) = current else {
