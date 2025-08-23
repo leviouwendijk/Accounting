@@ -2,7 +2,10 @@ import Foundation
 
 public extension EntryCompilerParsing {
     @inlinable
-    func parseDepreciationRollforward(into meta: inout [String:String], tz: TimeZone = .current) throws -> Bool {
+    func parseDepreciationRollforward(
+        into meta: inout [String:String],
+        tz: TimeZone
+    ) throws -> Bool {
         guard current == .ident("rollforward") || current == .keyword("rollforward") else { return false }
         advance(); try expect(.lBrace)
         var idx = 0

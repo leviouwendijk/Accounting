@@ -37,10 +37,11 @@ public extension EntryCompilerParsing {
             if parseTypeDirective(into: &metadata) { core.trace("  type → \(metadata["type"] ?? "")"); continue }
             if parseDomainDirective(into: &metadata) { core.trace("  domain.* set"); continue }
             if parseContentBlock(into: &metadata) { core.trace("  content.* set"); continue }
-            if parseOwnershipBlock(into: &metadata) { core.trace("  ownership.* set"); continue }
+            if parseOwnershipBlock(into: &metadata, tz: defaultTZ) {
+                core.trace("  ownership.* set"); continue
+            }
             if try parseOwnershipRollforward(into: &metadata, tz: defaultTZ) {
-                core.trace("  ownership.rollforward { … }")
-                continue
+                core.trace("  ownership.rollforward { … }"); continue
             }
 
             switch current {
@@ -98,8 +99,7 @@ public extension EntryCompilerParsing {
                 core.trace("  metadata { ... } (\(metadata.count) keys)")
 
             case .ident("depreciation"), .keyword("depreciation"):
-                // IMPORTANT: pass metadata sink so rollforward/valuation are captured
-                dep = try parseDepreciationBlock(meta: &metadata)
+                dep = try parseDepreciationBlock(meta: &metadata, tz: defaultTZ)   // ← pass tz
                 core.trace("  depreciation { … }")
 
             // Nested blocks that produce additional concrete aliases
@@ -115,7 +115,7 @@ public extension EntryCompilerParsing {
                 guard let k = key else {
                     throw ParserError.unexpectedToken(current, expected: "use alias before unit", at: loc())
                 }
-                let defs = try parseUnitBlocks(baseKey: k)
+                let defs = try parseUnitBlocks(baseKey: k, defaultTZ: defaultTZ)
                 core.trace("  unit → +\(defs.count) def(s)")
                 extraDefs.append(contentsOf: defs)
 

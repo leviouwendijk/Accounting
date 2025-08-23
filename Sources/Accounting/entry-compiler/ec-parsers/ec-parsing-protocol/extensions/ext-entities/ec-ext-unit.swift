@@ -3,7 +3,10 @@ import Foundation
 public extension EntryCompilerParsing {
     // allow: unit { use alias levi_air_m2 }  OR  unit levi_air_m2 { … }
     @inlinable
-    func parseUnitBlocks(baseKey: EntityKey) throws -> [EntityDef] {
+    func parseUnitBlocks(
+        baseKey: EntityKey,
+        defaultTZ: TimeZone
+    ) throws -> [EntityDef] {
         var out: [EntityDef] = []
 
         while current == .keyword("unit") || current == .ident("unit") {
@@ -43,7 +46,7 @@ public extension EntryCompilerParsing {
                     details = try parseFreeTextBlock(named: "details")
 
                 case .ident("depreciation"), .keyword("depreciation"):
-                    dep = try parseDepreciationBlock(meta: &metadata)
+                    dep = try parseDepreciationBlock(meta: &metadata, tz: defaultTZ)
 
                 default:
                     throw ParserError.unexpectedToken(current, expected: "use alias / metadata / details / depreciation", at: loc())

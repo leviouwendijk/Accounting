@@ -2,7 +2,10 @@ import Foundation
 
 public extension EntryCompilerParsing {
     @inlinable
-    func parseDepreciationBlock(meta: inout [String:String]) throws -> DepreciationConfig {
+    func parseDepreciationBlock(
+        meta: inout [String:String],
+        tz: TimeZone
+    ) throws -> DepreciationConfig {
         var out = DepreciationConfig(
             method: nil,
             usefulLifeYears: nil,
@@ -17,7 +20,7 @@ public extension EntryCompilerParsing {
         while current != .rBrace && current != .eof {
             if try parseDepreciationValuation(into: &meta) { continue }
             if try parseUsefulLifeMonths(into: &meta) { continue }
-            if try parseDepreciationRollforward(into: &meta) { continue }
+            if try parseDepreciationRollforward(into: &meta, tz: tz) { continue }
 
             switch current {
             case .ident("method"), .keyword("method"):
@@ -68,7 +71,7 @@ public extension EntryCompilerParsing {
                  .ident("commission_date"), .keyword("commission_date"):
                 let (_, spec) = try parseNamedDateOrInferExpecting(
                     names: ["effective_date","commission_date"],
-                    tz: .current,
+                    tz: tz,
                     allowInfer: false
                 )
                 out.effectiveDate = try spec.asAbsolute(loc: loc())
