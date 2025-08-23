@@ -44,7 +44,7 @@ public extension EntryCompilerParsing {
                 }
                 code = String((n as NSDecimalNumber).intValue); advance()
 
-            case .ident("label"):
+            case .keyword("label"):
                 advance()
                 if current == .lBrace {
                     try beginBlock()
@@ -61,24 +61,24 @@ public extension EntryCompilerParsing {
                     label = s; advance()
                 }
 
-            case .ident("direction"):
+            case .keyword("direction"):
                 advance(); try expect(.equals)
-                guard case let .ident(dc) = current else {
+                guard case let .keyword(dc) = current else {
                     throw ParserError.unexpectedToken(current, expected: "debit|credit|dr|cr", at: loc())
                 }
                 direction = try Direction(raw: dc); advance()
 
-            case .ident("level"):
+            case .keyword("level"):
                 advance(); try expect(.equals)
                 guard case let .number(n) = current else {
                     throw ParserError.unexpectedToken(current, expected: "number", at: loc())
                 }
                 level = (n as NSDecimalNumber).intValue; advance()
 
-            case .ident("identifiers"):
+            case .keyword("identifiers"):
                 identifiers = try parseAccountIdentifiersBlock()
 
-            case .ident("applicability"):
+            case .keyword("applicability"):
                 applicability = try parseApplicabilityBlock()
 
             default:
@@ -100,16 +100,16 @@ public extension EntryCompilerParsing {
         var oms: String?
 
         while current != .rBrace && current != .eof {
-            if case .ident("rgs") = current {
+            if case .keyword("rgs") = current {
                 advance(); try expect(.equals)
-                if case let .ident(s) = current { rgs = s; advance() }
+                if case let .keyword(s) = current { rgs = s; advance() }
                 else if case let .string(x) = current { rgs = x; advance() }
                 else {
                     throw ParserError.unexpectedToken(current, expected: "identifier|string", at: loc())
                 }
-            } else if case .ident("omslag") = current {
+            } else if case .keyword("omslag") = current {
                 advance(); try expect(.equals)
-                if case let .ident(s) = current { oms = s; advance() }
+                if case let .keyword(s) = current { oms = s; advance() }
                 else if case let .string(s) = current { oms = s; advance() }
                 else { throw ParserError.unexpectedToken(current, expected: "identifier|string", at: loc()) }
             } else {
@@ -127,11 +127,11 @@ public extension EntryCompilerParsing {
 
         while current != .rBrace && current != .eof {
             switch current {
-            case .ident("zzp"):     try expectFieldEquals("zzp");     zzp = try expectIdentValue()
-            case .ident("ez"):      try expectFieldEquals("ez");      ez = try expectIdentValue()
-            case .ident("bv"):      try expectFieldEquals("bv");      bv = try expectIdentValue()
-            case .ident("svc"):     try expectFieldEquals("svc");     svc = try expectIdentValue()
-            case .ident("branche"): try expectFieldEquals("branche"); branche = try expectIdentValue()
+            case .keyword("zzp"):     try expectFieldEquals("zzp");     zzp = try expectIdentValue()
+            case .keyword("ez"):      try expectFieldEquals("ez");      ez = try expectIdentValue()
+            case .keyword("bv"):      try expectFieldEquals("bv");      bv = try expectIdentValue()
+            case .keyword("svc"):     try expectFieldEquals("svc");     svc = try expectIdentValue()
+            case .keyword("branche"): try expectFieldEquals("branche"); branche = try expectIdentValue()
             default:
                 throw ParserError.unexpectedToken(current, expected: "zzp/ez/bv/svc/branche", at: loc())
             }

@@ -21,19 +21,14 @@ public extension EntryCompilerParsing {
 
             while current != .rBrace && current != .eof {
                 switch current {
-
                 case .keyword("effective_date"), .ident("effective_date"):
-                    advance(); try expect(.equals)
-                    if case let .dateLiteral(text) = current {
-                        let d = try parseDateLiteral(text, in: tz)
-                        dateStr = ISO8601DateFormatter().string(from: d)
-                        advance()
-                    } else if current == .lBrace {
-                        let d = try parseDateBlock(tz: tz)
-                        dateStr = ISO8601DateFormatter().string(from: d)
-                    } else {
-                        throw ParserError.unexpectedToken(current, expected: "date literal or {…} date block", at: loc())
-                    }
+                    let (_, spec) = try parseNamedDateOrInferExpecting(
+                        names: ["effective_date"],
+                        tz: tz,
+                        allowInfer: false
+                    )
+                    let d = try spec.asAbsolute(loc: loc())
+                    dateStr = ISO8601DateFormatter().string(from: d)
 
                 case .keyword("amount"), .ident("amount"), .keyword("value"), .ident("value"):
                     advance(); try expect(.equals)
