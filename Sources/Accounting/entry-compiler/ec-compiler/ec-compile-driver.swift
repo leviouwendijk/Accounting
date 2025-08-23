@@ -63,10 +63,10 @@ public struct EntryCompileDriver {
         vprint(verbose, "  ✓ default timezone = \(defaultTZ.identifier)")
 
         vprint(verbose, "▶ Entities …")
-        let entities = try EntityStoreLoader.load(from: project, verbose: verbose)
+        let entities = try EntityStoreLoader.load(from: project, defaultTZ: defaultTZ, verbose: verbose)
 
         vprint(verbose, "▶ Accounts …")
-        let accounts = try AccountStoreLoader.load(from: project)
+        let accounts = try AccountStoreLoader.load(from: project, defaultTZ: defaultTZ, verbose: verbose)
 
         vprint(verbose, "▶ Transactions …")
         let transactions = try EntryCompilerTransactionsLoader.load(from: project)

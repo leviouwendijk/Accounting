@@ -17,16 +17,34 @@ import Foundation
 
 public final class EntryCompilerEntitiesFileParser: EntryCompilerParsing {
     public var core: EntryCompilerParserCore
+    public let defaultTZ: TimeZone
     private let fileURL: URL?
 
-
-    public init(core: EntryCompilerParserCore, fileURL: URL? = nil) {
+    public init(
+        core: EntryCompilerParserCore,
+        fileURL: URL? = nil,
+        defaultTZ: TimeZone
+    ) {
         self.core = core
         self.fileURL = fileURL
+        self.defaultTZ = defaultTZ
     }
 
-    public convenience init(tokens: [EntryCompilerToken], fileURL: URL? = nil, verbose: Bool = false) {
-        self.init(core: .init(tokens: tokens, filePath: fileURL?.path, verbose: verbose), fileURL: fileURL)
+    public convenience init(
+        tokens: [EntryCompilerToken],
+        fileURL: URL? = nil,
+        defaultTZ: TimeZone,
+        verbose: Bool = false
+    ) {
+        self.init(
+            core: .init(
+                tokens: tokens,
+                filePath: fileURL?.path,
+                verbose: verbose
+            ), 
+            fileURL: fileURL,
+            defaultTZ: defaultTZ
+        )
     }
 
     // public func parseEntitiesFile() throws -> [EntityDef] {
@@ -48,7 +66,7 @@ public final class EntryCompilerEntitiesFileParser: EntryCompilerParsing {
             let before = core.index
             if current == .keyword("entity") {
                 core.trace("• entity block @ \(loc())")
-                let defs = try parseEntityBlock(fileURL: fileURL)   // returns [EntityDef]
+                let defs = try parseEntityBlock(fileURL: fileURL, defaultTZ: defaultTZ)   // returns [EntityDef]
                 if let last = defs.last {
                     core.trace("  → produced \(defs.count) def(s), last=\(last.key.identifier(displaying: .fullchain))")
                 } else {

@@ -10,7 +10,11 @@ public struct EntryCompiler: Sendable {
         self.project  = .init(root: root)
         self.parsers  = parsers
         self.settings = try parsers.makeSettings(root)
-        self.entities = try EntityStoreLoader.load(from: self.project)   // NEW
+        self.entities = try EntityStoreLoader.load(
+            from: self.project,
+            defaultTZ: settings.entry.defaultTimezone,
+            verbose: false
+        )
     }
 
     public func lex(_ source: String) -> [EntryCompilerToken] {

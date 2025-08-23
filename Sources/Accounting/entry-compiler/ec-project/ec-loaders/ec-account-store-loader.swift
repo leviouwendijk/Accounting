@@ -1,7 +1,11 @@
 import Foundation
 
 public enum AccountStoreLoader {
-    public static func load(from project: EntryCompilerProject) throws -> AccountStore {
+    public static func load(
+        from project: EntryCompilerProject,
+        defaultTZ: TimeZone,
+        verbose: Bool = false // verbose vprint() not yet implemented
+    ) throws -> AccountStore {
         let dir = project.url(.config).appendingPathComponent("accounts", isDirectory: true)
         let fm = FileManager.default
         var defs: [AccountDef] = []

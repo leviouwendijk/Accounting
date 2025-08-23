@@ -3,13 +3,20 @@ import plate
 
 public extension EntryCompilerParsing {
     @inlinable
-    func parseEntityBlock(fileURL: URL?) throws -> [EntityDef] {   // RETURN ARRAY
+    func parseEntityBlock(
+        fileURL: URL?,
+        defaultTZ: TimeZone
+    ) throws -> [EntityDef] {   // RETURN ARRAY
         let (ic, ifa) = fileURL.map(inferClassFamily) ?? (nil, nil)
-        return try parseEntityBlock(inferredClass: ic, inferredFamily: ifa)
+        return try parseEntityBlock(inferredClass: ic, inferredFamily: ifa, defaultTZ: defaultTZ)
     }
 
     @inlinable
-    func parseEntityBlock(inferredClass: String?, inferredFamily: String?) throws -> [EntityDef] { // RETURN ARRAY
+    func parseEntityBlock(
+        inferredClass: String?,
+        inferredFamily: String?,
+        defaultTZ: TimeZone
+    ) throws -> [EntityDef] { // RETURN ARRAY
         try expect(.keyword("entity"))
         try expect(.lBrace)
 
@@ -31,6 +38,10 @@ public extension EntryCompilerParsing {
             if parseDomainDirective(into: &metadata) { core.trace("  domain.* set"); continue }
             if parseContentBlock(into: &metadata) { core.trace("  content.* set"); continue }
             if parseOwnershipBlock(into: &metadata) { core.trace("  ownership.* set"); continue }
+            if try parseOwnershipRollforward(into: &metadata, tz: defaultTZ) {
+                core.trace("  ownership.rollforward { … }")
+                continue
+            }
 
             switch current {
             case .keyword("use"):
@@ -111,7 +122,7 @@ public extension EntryCompilerParsing {
             default:
                 throw ParserError.unexpectedToken(
                     current,
-                    expected: "use alias / display_name / metadata / depreciation / type / domain / content / ownership / variant / unit",
+                    expected: "use alias / display_name / metadata / depreciation / type / domain / content / ownership / rollforward / variant / unit",
                     at: loc()
                 )
             }
