@@ -6,7 +6,9 @@ public struct TransactionStore: Codable, Sendable {
     public init(_ txs: [Transaction]) throws {
         var m: [TransactionKey: Transaction] = [:]
         for t in txs {
-            guard let id = t.id else { continue } // ignore id-less imports if any
+            guard let id = t.id else { 
+                continue 
+            }
             let k = TransactionKey(id)
             if m.updateValue(t, forKey: k) != nil { throw TransactionStoreError.duplicateID(id) }
         }
