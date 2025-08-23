@@ -25,7 +25,12 @@ public extension EntryCompilerParsing {
                         advance()
                     case .lBrace:
                         if let d = try? parseDateBlock(tz: tz) { dateStr = ISO8601DateFormatter().string(from: d) }
-                    default: break
+                    default:
+                        throw ParserError.unexpectedToken(
+                            current,
+                            expected: "effective_date/amount|value/linked_entry(s)/details|reason",
+                            at: loc()
+                        )
                     }
                 case .keyword("amount"), .keyword("value"):
                     advance(); try? expect(.equals)
@@ -61,7 +66,11 @@ public extension EntryCompilerParsing {
             case .keyword("revision"):
                 try parseEvent(kind: "revision")
             default:
-                break
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "capex || revision || ...",
+                    at: loc()
+                )
             }
         }
         _ = try? endBlock()
