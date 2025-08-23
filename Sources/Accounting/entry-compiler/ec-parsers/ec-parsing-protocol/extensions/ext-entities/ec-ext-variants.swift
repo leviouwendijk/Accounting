@@ -10,27 +10,31 @@ public extension EntityAlias {
 }
 
 public extension EntryCompilerParsing {
-    /// variant { use alias <v>; [metadata {…}] [details {…}] [subvariant { … }]* }
+    // allow: variant { use alias 20x4mm }  OR  variant 20x4mm { … }
     @inlinable
     func parseVariantBlocks(baseKey: EntityKey) throws -> [EntityDef] {
         var defs: [EntityDef] = []
         while current == .keyword("variant") || current == .ident("variant") {
-            advance(); try expect(.lBrace)
-            var vName: String?
+            advance()
+
+            // optional inline alias
+            var vName: String? = nil
+            if current != .lBrace {
+                vName = try readSingleAliasFlexible()
+            }
+
+            try expect(.lBrace)
             var vMeta: [String:String] = [:]
             var vDetails: String?
 
             while current != .rBrace && current != .eof {
                 switch current {
                 case .keyword("use"), .ident("use"):
-                    advance(); try expect(.keyword("alias"))
-                    let segs = (current == .lPar)
-                        ? (try readSegmentsUntilRPar(allowAllAsAlias: true).1)
-                        : readFlatSegments()
-                    guard let only = segs.last, segs.count == 1 else {
-                        throw ParserError.unexpectedToken(current, expected: "single alias", at: loc())
+                    guard vName == nil else {
+                        throw ParserError.unexpectedToken(current, expected: "metadata/details/subvariant", at: loc())
                     }
-                    vName = only
+                    advance(); try expect(.keyword("alias"))
+                    vName = try readSingleAliasFlexible()
 
                 case .keyword("metadata"), .ident("metadata"):
                     vMeta = try parseStringMapBlock(named: "metadata")
@@ -42,8 +46,9 @@ public extension EntryCompilerParsing {
                     guard let v = vName else {
                         throw ParserError.unexpectedToken(current, expected: "variant alias before subvariant", at: loc())
                     }
-                    let tmpKey = EntityKey(class: baseKey.class, family: baseKey.family, alias: baseKey.alias.appendingVariant(v))
-                    defs.append(contentsOf: try parseSubvariantBlocks(parentKey: tmpKey))
+                    let parent = EntityKey(class: baseKey.class, family: baseKey.family,
+                                           alias: baseKey.alias.appendingVariant(v))
+                    defs.append(contentsOf: try parseSubvariantBlocks(parentKey: parent))
 
                 default:
                     throw ParserError.unexpectedToken(current, expected: "use alias / metadata / details / subvariant", at: loc())
@@ -52,49 +57,54 @@ public extension EntryCompilerParsing {
             try expect(.rBrace)
 
             if let v = vName {
-                let vKey = EntityKey(class: baseKey.class, family: baseKey.family, alias: baseKey.alias.appendingVariant(v))
-                defs.append(EntityDef(key: vKey, displayName: vDetails, metadata: vMeta, depreciation: nil))
+                let k = EntityKey(class: baseKey.class, family: baseKey.family,
+                                  alias: baseKey.alias.appendingVariant(v))
+                defs.append(EntityDef(key: k, displayName: vDetails, metadata: vMeta, depreciation: nil))
             }
         }
         return defs
     }
 
-    /// subvariant { use alias <sv>; [metadata {…}] [details {…}] }
+    // Allow: subvariant { use alias stainless_steel }  OR  subvariant stainless_steel { … }
     @inlinable
     func parseSubvariantBlocks(parentKey: EntityKey) throws -> [EntityDef] {
         var defs: [EntityDef] = []
-        guard current == .keyword("subvariant") || current == .ident("subvariant") else { return defs }
         while current == .keyword("subvariant") || current == .ident("subvariant") {
-            advance(); try expect(.lBrace)
-            var name: String?
+            advance()
+
+            var name: String? = nil
+            if current != .lBrace {
+                name = try readSingleAliasFlexible()
+            }
+
+            try expect(.lBrace)
             var meta: [String:String] = [:]
             var details: String?
 
             while current != .rBrace && current != .eof {
                 switch current {
                 case .keyword("use"), .ident("use"):
-                    advance(); try expect(.keyword("alias"))
-                    let segs = (current == .lPar)
-                        ? (try readSegmentsUntilRPar(allowAllAsAlias: true).1)
-                        : readFlatSegments()
-                    guard let only = segs.last, segs.count == 1 else {
-                        throw ParserError.unexpectedToken(current, expected: "single alias", at: loc())
+                    guard name == nil else {
+                        throw ParserError.unexpectedToken(current, expected: "metadata/details", at: loc())
                     }
-                    name = only
+                    advance(); try expect(.keyword("alias"))
+                    name = try readSingleAliasFlexible()
+
                 case .keyword("metadata"), .ident("metadata"):
                     meta = try parseStringMapBlock(named: "metadata")
+
                 case .ident("details"), .keyword("details"):
                     details = try parseFreeTextBlock(named: "details")
+
                 default:
                     throw ParserError.unexpectedToken(current, expected: "use alias / metadata / details", at: loc())
                 }
             }
             try expect(.rBrace)
+
             if let sv = name {
-                let k = EntityKey(
-                    class: parentKey.class, family: parentKey.family,
-                    alias: parentKey.alias.appendingVariant(sv)
-                )
+                let k = EntityKey(class: parentKey.class, family: parentKey.family,
+                                  alias: parentKey.alias.appendingVariant(sv))
                 defs.append(EntityDef(key: k, displayName: details, metadata: meta, depreciation: nil))
             }
         }

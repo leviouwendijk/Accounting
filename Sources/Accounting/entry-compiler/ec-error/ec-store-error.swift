@@ -43,8 +43,10 @@ public enum TransactionStoreError: Error, CustomStringConvertible, Sendable {
 
     public var description: String {
         switch self {
-        case .duplicateID(let id): return "Duplicate transaction id: \(id). IDs must be unique."
-        case .notFound(let id):    return "Unknown transaction id: \(id). Import or define it before referencing."
+        case .duplicateID(let id): 
+            return "Duplicate transaction id: \(id). IDs must be unique."
+        case .notFound(let id):    
+            return "Unknown transaction id: \(id). Import or define it before referencing."
         }
     }
 }
