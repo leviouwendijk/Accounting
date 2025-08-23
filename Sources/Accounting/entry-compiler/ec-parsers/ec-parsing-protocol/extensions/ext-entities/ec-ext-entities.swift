@@ -2,11 +2,19 @@ import Foundation
 import plate
 
 public extension EntryCompilerParsing {
+    /// New convenience that infers from fileURL and forwards a path hint
+    @inlinable
+    func parseEntityBlock(fileURL: URL?) throws -> EntityDef {
+        let (ic, ifa) = fileURL.map(inferClassFamily) ?? (nil, nil)
+        return try parseEntityBlock(inferredClass: ic, inferredFamily: ifa)
+    }
+
     /// Provide inferredClass/family from file path; if nil after parsing → error.
     /// Supports:
     ///   use alias (objects.storable.macbook)
     ///   use alias (macbook)                  // requires both inferred
     ///   use alias (objects.macbook)          // requires inferred family
+
     @inlinable
     func parseEntityBlock(inferredClass: String?, inferredFamily: String?) throws -> EntityDef {
         try expect(.keyword("entity"))
@@ -17,22 +25,45 @@ public extension EntryCompilerParsing {
         var metadata: [String:String] = [:]
         var dep: DepreciationConfig?
 
+        let hint = _entityPathHint(fileURL: nil, inferredClass: inferredClass, inferredFamily: inferredFamily)
+
         while current != .rBrace && current != .eof {
             switch current {
             case .keyword("use"):
                 advance()
                 try expect(.keyword("alias"))
-                // Accept 1..3 segments; normalize unit(...) → "#..."
-                let (_, segs) = try readSegmentsUntilRPar(allowAllAsAlias: true)
+
+                // Accept "(...)" OR bare path/alias
+                let segs: [String]
+                if current == .lPar {
+                    let (_, s) = try readSegmentsUntilRPar(allowAllAsAlias: true)
+                    segs = s
+                } else {
+                    segs = readFlatSegments()
+                    guard !segs.isEmpty else {
+                        throw ParserError.unexpectedToken(current, expected: "(<path>) or <alias>", at: loc())
+                    }
+                }
 
                 let ref = try makeEntityRef(from: segs)
-                // Coalesce with inferred pieces
                 let c = ref.`class` ?? inferredClass
                 let f = ref.family ?? inferredFamily
-                guard let cls = c, let fam = f else {
-                    throw ParserError.unexpectedToken(current, expected: "class/family must be present or inferrable from path", at: loc())
+
+                if c == nil {
+                    throw InferenceError.missingEntityClass(
+                        alias: ref.alias.string,
+                        filePathHint: hint.replacingOccurrences(of: "<family>", with: f ?? "<family>"),
+                        location: loc()
+                    )
                 }
-                key = EntityKey(class: cls, family: fam, alias: ref.alias)
+                if f == nil {
+                    throw InferenceError.missingEntityFamily(
+                        alias: ref.alias.string,
+                        filePathHint: hint.replacingOccurrences(of: "<class>", with: c ?? "<class>"),
+                        location: loc()
+                    )
+                }
+                key = EntityKey(class: c!, family: f!, alias: ref.alias)
 
             case .ident("display_name"):
                 advance(); try expect(.equals)
