@@ -9,8 +9,8 @@ public enum EntryResolutionPass {
     ) throws -> [ResolvedEntry] {
         try entries.map { e in
             let lines = try e.lines.map { l in
-                let eDef = try entities.resolve(l.entity, at: nil)
-                let aDef = try accounts.resolve(l.account)
+                let eDef = try entities.resolve(l.entity, at: l.location)
+                let aDef = try accounts.resolve(l.account, at: l.location)
                 return ResolvedLine(
                     entity: eDef.key,
                     account: AccountKey(aDef.code),
@@ -20,7 +20,7 @@ public enum EntryResolutionPass {
                 )
             }
 
-            let txKeys: [TransactionKey] = try transactions.resolveAll(ids: e.transactionReferences, at: nil)
+            let txKeys: [TransactionKey] = try transactions.resolveAll(ids: e.transactionReferences, at: e.location)
 
             return ResolvedEntry(
                 id: e.id,

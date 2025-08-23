@@ -1,7 +1,7 @@
 import Foundation
 
 public extension EntryCompilerParsing {
-    func parseLineBody(entity: EntityRef, account: AccountRef) throws -> Line {
+    func parseLineBody(entity: EntityRef, account: AccountRef, at lineLoc: SourceLocation?) throws -> Line {
         try expect(.lBrace)
 
         var direction: Direction?
@@ -38,7 +38,7 @@ public extension EntryCompilerParsing {
         guard let dir = direction, let amt = amount else {
             throw ParserError.unexpectedToken(current, expected: "posting amount (debit/credit = …)", at: loc())
         }
-        return Line(entity: entity, account: account, direction: dir, amount: amt, adjustment: adjustment)
+        return Line(entity: entity, account: account, direction: dir, amount: amt, adjustment: adjustment, location: lineLoc)
     }
 
     // legacy, singulars:
@@ -52,19 +52,21 @@ public extension EntryCompilerParsing {
     }
 
     func parseLine_for_in() throws -> Line {
+        let lineLoc = loc()
         advance() // 'for ... in ...'
         let entity = try parseEntityRefFlexible()
         try expect(.keyword("in"))
         let account = try parseAccountRefFlexible()
-        return try parseLineBody(entity: entity, account: account)
+        return try parseLineBody(entity: entity, account: account, at: lineLoc)
     }
 
     func parseLine_in_for() throws -> Line {
+        let lineLoc = loc()
         advance() // 'in ... for ...'
         let account = try parseAccountRefFlexible()
         try expect(.keyword("for"))
         let entity = try parseEntityRefFlexible()
-        return try parseLineBody(entity: entity, account: account)
+        return try parseLineBody(entity: entity, account: account, at: lineLoc)
     }
 }
 

@@ -1,12 +1,12 @@
 import Foundation
 
-public enum InvocationCallSiteType: Sendable {
+public enum InvocationCallSiteType: String, Codable, Sendable, Hashable {
     case structure
     case function
     case enumeration
 }
 
-public struct InvocationCallSite: CustomStringConvertible, Sendable {
+public struct InvocationCallSite: CustomStringConvertible, Codable, Sendable, Hashable {
     public let file: String?
     public let type: InvocationCallSiteType?
     public let scope: String?

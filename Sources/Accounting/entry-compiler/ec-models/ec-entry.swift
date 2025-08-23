@@ -7,6 +7,7 @@ public struct Entry: Hashable, Codable, Sendable {
     public var details: String? = nil
     public var timezone: String? = nil
     public var transactionReferences: [Int]
+    public let location: SourceLocation?
 
     public init(
         id: Int? = nil,
@@ -14,7 +15,8 @@ public struct Entry: Hashable, Codable, Sendable {
         lines: [Line] = [],
         details: String? = nil,
         timezone: String? = nil,
-        transactionReferences: [Int] = []
+        transactionReferences: [Int] = [],
+        location: SourceLocation? = nil
     ) {
         self.id = id
         self.date = date
@@ -22,6 +24,7 @@ public struct Entry: Hashable, Codable, Sendable {
         self.details = details
         self.timezone = timezone
         self.transactionReferences = transactionReferences
+        self.location = location
     }
 
     public var viewableString: String {

@@ -24,23 +24,21 @@ public enum EntityStoreError: Error, CustomStringConvertible, Sendable {
 }
 
 public enum AccountStoreError: Error, CustomStringConvertible, Sendable {
-    case duplicateCode(String)
-    case notFound(code: String)
-    case invalidReference(path: [String], at: SourceLocation? = nil)
-    case missingRequiredForNewAccount(code: String, missing: String)
+    case duplicateCode(String, at: SourceLocation?)
+    case notFound(code: String, at: SourceLocation?)
+    case invalidReference(path: [String], at: SourceLocation?)
+    case missingRequiredForNewAccount(code: String, missing: String, at: SourceLocation?)
 
     public var description: String {
         switch self {
-        case let .duplicateCode(code):
-            return "Duplicate account code: \(code). Codes must be unique."
-        case let .notFound(code):
-            return "Unknown account code: \(code). Define it in config/accounts/… (or base RGS set)."
-        case let .invalidReference(path, loc):
-            var s = "Invalid account reference: \(path.joined(separator: ".")). Use a numeric code (e.g., 10201)."
-            if let loc { s += " @ \(loc)" }
-            return s
-        case .missingRequiredForNewAccount(let code, let missing):
-            return "Cannot create new account \(code): missing required \(missing)."
+        case let .duplicateCode(code, at):
+            return "Duplicate account code '\(code)'\(at.describeSuffix)"
+        case let .notFound(code, at):
+            return "Unknown account code '\(code)'\(at.describeSuffix)"
+        case let .invalidReference(path, at):
+            return "Invalid account reference '\(path.joined(separator: "."))'\(at.describeSuffix)"
+        case let .missingRequiredForNewAccount(code, missing, at):
+            return "Cannot create new account '\(code)': missing \(missing)\(at.describeSuffix)"
         }
     }
 }

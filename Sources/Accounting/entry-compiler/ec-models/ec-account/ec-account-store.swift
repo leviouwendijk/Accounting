@@ -5,29 +5,33 @@ public struct AccountStore: Codable, Sendable {
     public init(_ accounts: [RGSAccount]) throws {
         var m: [String:RGSAccount] = [:]
         for a in accounts {
-            if m.updateValue(a, forKey: a.code) != nil { throw AccountStoreError.duplicateCode(a.code) }
+            if m.updateValue(a, forKey: a.code) != nil {
+                throw AccountStoreError.duplicateCode(a.code, at: nil) // ← add at: nil
+            }
         }
         self.byCode = m
     }
 
     @inlinable
-    public func resolve(_ ref: AccountRef) throws -> RGSAccount {
+    public func resolve(_ ref: AccountRef, at loc: SourceLocation?) throws -> RGSAccount {
         switch ref {
         case .code(let s):
-            if let acc = byCode[s] {
-                return acc 
-            }
-            throw AccountStoreError.notFound(code: s)
+            if let acc = byCode[s] { return acc }
+            throw AccountStoreError.notFound(code: s, at: loc)
 
         case .path(let segs):
-            if let first = segs.first, let acc = byCode[first], first.allSatisfy(\.isNumber) {
+            // numeric first segment → code
+            if let first = segs.first, first.allSatisfy(\.isNumber), let acc = byCode[first] {
                 return acc
             }
-            if segs.first == "account", let code = segs.dropFirst().first,
-                code.allSatisfy(\.isNumber), let acc = byCode[code] {
-                    return acc
+            // legacy: account 10201
+            if segs.first == "account",
+               let code = segs.dropFirst().first,
+               code.allSatisfy(\.isNumber),
+               let acc = byCode[code] {
+                return acc
             }
-            throw AccountStoreError.invalidReference(path: segs)
+            throw AccountStoreError.invalidReference(path: segs, at: loc)
         }
     }
 }
@@ -79,7 +83,7 @@ public struct AccountStoreBuilder {
     public mutating func addBase(_ accounts: [RGSAccount]) throws {
         for a in accounts {
             if base.updateValue(a, forKey: a.code) != nil {
-                throw AccountStoreError.duplicateCode(a.code)
+                throw AccountStoreError.duplicateCode(a.code, at: nil)
             }
         }
     }
@@ -112,7 +116,9 @@ public struct AccountStoreBuilder {
                     throw AccountStoreError.missingRequiredForNewAccount(
                         code: code,
                         missing: ["label": ov.label == nil, "direction": ov.direction == nil, "level": ov.level == nil]
-                        .compactMap { $0.value ? $0.key : nil }.joined(separator: ", ")
+                            .compactMap { $0.value ? $0.key : nil }
+                            .joined(separator: ", "),
+                        at: nil
                     )
                 }
                 let ids = ov.identifiers ?? RGSIdentifiers(rgs: code, omslag: nil)

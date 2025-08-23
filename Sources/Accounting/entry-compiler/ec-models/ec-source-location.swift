@@ -1,6 +1,6 @@
 import Foundation
 
-public struct SourceLocation: CustomStringConvertible, Sendable {
+public struct SourceLocation: CustomStringConvertible, Codable, Sendable, Hashable {
     public let file: String?
     public let line: Int
     public let column: Int
@@ -19,5 +19,14 @@ public struct SourceLocation: CustomStringConvertible, Sendable {
             return base + " " + inv.description
         }
         return base
+    }
+}
+
+public extension Optional where Wrapped == SourceLocation {
+    var describeSuffix: String {
+        switch self {
+        case .some(let loc): return " at \(loc)"
+        case .none: return ""
+        }
     }
 }
