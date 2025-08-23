@@ -42,7 +42,10 @@ public extension EntryCompilerParsing {
 
     @inlinable
     func parseTransactionAmountBlock() throws -> TransactionAmount {
-        try expect(.keyword("amount")) 
+        if case .keyword("amount") = current { advance() }
+        else if case .ident("amount") = current { advance() }
+        else { try expect(.keyword("amount")) } // nice error if truly wrong
+
         try beginBlock()
         var currency: String?
         var gross: Decimal?
@@ -51,25 +54,34 @@ public extension EntryCompilerParsing {
 
         while current != .rBrace && current != .eof {
             switch current {
-            case .keyword("currency"):
+            case .keyword("currency"), .ident("currency"):
                 try expectFieldEquals("currency")
-                if case let .keyword(s) = current { currency = s; advance() }
-                else if case let .string(s) = current { currency = s; advance() }
-                else { throw ParserError.unexpectedToken(current, expected: "identifier|string", at: loc()) }
+                switch current {
+                case let .ident(s), let .keyword(s), let .string(s):
+                    currency = s; advance()
+                default:
+                    throw ParserError.unexpectedToken(current, expected: "identifier|string", at: loc())
+                }
 
-            case .keyword("gross"):
+            case .keyword("gross"), .ident("gross"):
                 try expectFieldEquals("gross")
-                guard case let .number(n) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: loc()) }
+                guard case let .number(n) = current else {
+                    throw ParserError.unexpectedToken(current, expected: "number", at: loc())
+                }
                 gross = n; advance()
 
-            case .keyword("fee"):
+            case .keyword("fee"), .ident("fee"):
                 try expectFieldEquals("fee")
-                guard case let .number(n) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: loc()) }
+                guard case let .number(n) = current else {
+                    throw ParserError.unexpectedToken(current, expected: "number", at: loc())
+                }
                 fee = n; advance()
 
-            case .keyword("net"):
+            case .keyword("net"), .ident("net"):
                 try expectFieldEquals("net")
-                guard case let .number(n) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: loc()) }
+                guard case let .number(n) = current else {
+                    throw ParserError.unexpectedToken(current, expected: "number", at: loc())
+                }
                 net = n; advance()
 
             default:
