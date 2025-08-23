@@ -12,6 +12,7 @@ public enum TransactionStatus: String, Codable, Sendable {
 public struct TransactionIdentifiers: Codable, Sendable {
     public var platformAccountID: Int?
     public var platformTransactionID: Int?
+
     public init(platformAccountID: Int? = nil, platformTransactionID: Int? = nil) {
         self.platformAccountID = platformAccountID
         self.platformTransactionID = platformTransactionID

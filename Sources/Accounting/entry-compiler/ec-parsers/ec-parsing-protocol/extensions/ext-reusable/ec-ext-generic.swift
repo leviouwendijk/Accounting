@@ -56,6 +56,51 @@ public extension EntryCompilerParsing {
             throw ParserError.unexpectedToken(current, expected: "identifier|number", at: loc())
         }
     }
+
+    @discardableResult
+    func expectNameNumberOrStringValue() throws -> String {
+        switch current {
+        case let .ident(s), let .keyword(s):
+            advance(); return s
+        case let .string(s):
+            advance(); return s
+        case let .number(n):
+            advance(); return "\(n)"
+        default:
+            throw ParserError.unexpectedToken(current, expected: "identifier|string|number", at: loc())
+        }
+    }
+
+    @discardableResult
+    func expectInteger() throws -> Int {
+        switch current {
+
+        // number literal (Decimal/NSDecimalNumber) – verify it's integral
+        case let .number(n):
+            let dn = n as NSDecimalNumber
+            var dec = dn.decimalValue
+            var rounded = Decimal()
+            NSDecimalRound(&rounded, &dec, 0, .plain)
+            guard rounded == dn.decimalValue else {
+                throw ParserError.unexpectedToken(current, expected: "integer", at: loc())
+            }
+            // NOTE: bounds/truncation are caller's responsibility if it doesn't fit in Int
+            let value = NSDecimalNumber(decimal: rounded).intValue
+            advance()
+            return value
+
+        // ident/keyword/string that look like an integer (e.g., bunq won't match)
+        case let .ident(s), let .keyword(s), let .string(s):
+            if let v = Int(s.trimmingCharacters(in: .whitespacesAndNewlines)) {
+                advance()
+                return v
+            }
+            throw ParserError.unexpectedToken(current, expected: "integer", at: loc())
+
+        default:
+            throw ParserError.unexpectedToken(current, expected: "integer", at: loc())
+        }
+    }
 }
 
 

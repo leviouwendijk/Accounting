@@ -20,20 +20,20 @@ public extension EntryCompilerParsing {
         var out = TransactionIdentifiers()
         while current != .rBrace && current != .eof {
             switch current {
-            case .ident("platform_account_id"):
-                try expectFieldEquals("platform_account_id")
-                guard case let .number(n) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: loc()) }
-                out.platformAccountID = (n as NSDecimalNumber).intValue
-                advance()
+            case .ident("platform_account_id"), .keyword("platform_account_id"):
+                advance(); try expect(.equals)
+                out.platformAccountID = try expectInteger()
 
-            case .ident("platform_transaction_id"):
-                try expectFieldEquals("platform_transaction_id")
-                guard case let .number(n) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: loc()) }
-                out.platformTransactionID = (n as NSDecimalNumber).intValue
-                advance()
+            case .ident("platform_transaction_id"), .keyword("platform_transaction_id"):
+                advance(); try expect(.equals)
+                out.platformTransactionID = try expectInteger()
 
             default:
-                throw ParserError.unexpectedToken(current, expected: "platform_account_id/platform_transaction_id", at: loc())
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "platform_account_id/platform_transaction_id",
+                    at: loc()
+                )
             }
         }
         try endBlock()
