@@ -112,28 +112,41 @@ public extension EntryCompilerParsing {
 
     @inlinable
     func parseAccountIdentifiersBlock() throws -> RGSIdentifiers {
-        try expect(.keyword("identifiers"))
+        if case .keyword("identifiers") = current { advance() }
+        else if case .ident("identifiers") = current { advance() }
+        else {
+            throw ParserError.unexpectedToken(current, expected: "identifiers", at: loc())
+        }
         try beginBlock()
+
         var rgs: String?
         var oms: String?
 
         while current != .rBrace && current != .eof {
-            if case .keyword("rgs") = current {
+            switch current {
+            case .keyword("rgs"), .ident("rgs"):
                 advance(); try expect(.equals)
-                if case let .keyword(s) = current { rgs = s; advance() }
-                else if case let .string(x) = current { rgs = x; advance() }
-                else {
+                switch current {
+                case let .ident(s), let .keyword(s), let .string(s):
+                    rgs = s; advance()
+                default:
                     throw ParserError.unexpectedToken(current, expected: "identifier|string", at: loc())
                 }
-            } else if case .keyword("omslag") = current {
+
+            case .keyword("omslag"), .ident("omslag"):
                 advance(); try expect(.equals)
-                if case let .keyword(s) = current { oms = s; advance() }
-                else if case let .string(s) = current { oms = s; advance() }
-                else { throw ParserError.unexpectedToken(current, expected: "identifier|string", at: loc()) }
-            } else {
+                switch current {
+                case let .ident(s), let .keyword(s), let .string(s):
+                    oms = s; advance()
+                default:
+                    throw ParserError.unexpectedToken(current, expected: "identifier|string", at: loc())
+                }
+
+            default:
                 throw ParserError.unexpectedToken(current, expected: "rgs or omslag", at: loc())
             }
         }
+
         try endBlock()
         return RGSIdentifiers(rgs: rgs ?? "", omslag: oms)
     }
