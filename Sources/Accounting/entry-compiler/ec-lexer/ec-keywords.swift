@@ -1,5 +1,14 @@
 import Foundation
 
+public func entryCompilerStringBlockKeywordSet() -> Set<String> {
+    return [
+        "details",
+        "label",
+        "reason",
+        "name"
+    ]
+}
+
 public func entryCompilerKeywordSet() -> Set<String> {
     let global: Set<String> = [
         "id",

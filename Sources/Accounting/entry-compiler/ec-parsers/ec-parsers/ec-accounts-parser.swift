@@ -4,15 +4,37 @@ import Foundation
 // account { use code 10201 ... }
 public final class EntryCompilerAccountsFileParser: EntryCompilerParsing {
     public var core: EntryCompilerParserCore
-    public init(core: EntryCompilerParserCore) { self.core = core }
-    public convenience init(tokens: [EntryCompilerToken]) { self.init(core: .init(tokens: tokens)) }
+    private let fileURL: URL?
+
+    public init(core: EntryCompilerParserCore, fileURL: URL? = nil) {
+        self.core = core
+        self.fileURL = fileURL
+    }
+    public convenience init(
+        tokens: [EntryCompilerToken],
+        fileURL: URL? = nil,
+        verbose: Bool = false
+    ) {
+        self.init(
+            core: .init(
+                tokens: tokens,
+                filePath: fileURL?.path,
+                verbose: verbose
+            ),
+            fileURL: fileURL
+        )
+    }
 
     public func parseAccountsFile() throws -> [AccountDef] {
+        core.trace("parsing accounts file: \(fileURL?.lastPathComponent ?? "<memory>")")
         var out: [AccountDef] = []
         while current != .eof {
             switch current {
-            case .keyword("account"):
-                out.append(try parseAccountOverrideBlock())
+            case .keyword("account"), .ident("account"):
+                core.trace("• account override block @ \(loc())")
+                let def = try parseAccountOverrideBlock()
+                out.append(def)
+                core.trace("  → \(def.code) \(def.label.map { "“\($0)”" } ?? "")")
             default:
                 throw ParserError.unexpectedToken(current, expected: "account { … }", at: loc())
             }
@@ -44,15 +66,10 @@ public extension EntryCompilerParsing {
                 }
                 code = String((n as NSDecimalNumber).intValue); advance()
 
-            case .keyword("label"):
-                advance()
+            case .keyword("label"), .ident("label"):
+                // support both: label { Free text }  and  label = "Free text"
                 if current == .lBrace {
-                    try beginBlock()
-                    guard case let .string(s) = current else {
-                        throw ParserError.unexpectedToken(current, expected: "string", at: loc())
-                    }
-                    label = s; advance()
-                    try endBlock()
+                    label = try parseFreeTextBlock(named: "label")      // reads { … } → .string
                 } else {
                     try expect(.equals)
                     guard case let .string(s) = current else {

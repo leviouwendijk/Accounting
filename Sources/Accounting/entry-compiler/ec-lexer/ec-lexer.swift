@@ -76,10 +76,11 @@ public struct EntryCompilerLexer: Sendable {
             let ident = readIdent()
 
             let kwSet = entryCompilerKeywordSet()
+            let kwStringBlocks = entryCompilerStringBlockKeywordSet()
 
-            if ident == "details" {
+            if kwStringBlocks.contains(ident) {
                 detailsState = .awaitingOpen
-                return .keyword("details")
+                return .keyword(ident)
             } else if kwSet.contains(ident) {
                 return .keyword(ident)
             } else {

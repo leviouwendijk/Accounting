@@ -3,12 +3,32 @@ import Foundation
 // Parse a file of one or more `transaction { ... }` blocks.
 public final class EntryCompilerTransactionsFileParser: EntryCompilerParsing {
     public var core: EntryCompilerParserCore
-    public init(core: EntryCompilerParserCore) { self.core = core }
-    public convenience init(tokens: [EntryCompilerToken]) { self.init(core: .init(tokens: tokens)) }
+    private let fileURL: URL?
+
+    public init(core: EntryCompilerParserCore, fileURL: URL? = nil) {
+        self.core = core
+        self.fileURL = fileURL
+    }
+    public convenience init(
+        tokens: [EntryCompilerToken],
+        fileURL: URL? = nil,
+        verbose: Bool = false
+    ) {
+        self.init(
+            core: .init(
+                tokens: tokens,
+                filePath: fileURL?.path,
+                verbose: verbose
+            ),
+            fileURL: fileURL
+        )
+    }
 
     public func parseTransactionsFile() throws -> [Transaction] {
+        core.trace("parsing transactions file: \(fileURL?.lastPathComponent ?? "<memory>")")
         var out: [Transaction] = []
         while current != .eof {
+            core.trace("• transaction block @ \(loc())")
             out.append(try parseTransactionBlock())
         }
         return out
