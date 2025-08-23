@@ -78,24 +78,24 @@ public extension EntryCompilerParsing {
                     label = s; advance()
                 }
 
-            case .keyword("direction"):
+            case .keyword("direction"), .ident("direction"):
                 advance(); try expect(.equals)
                 guard case let .keyword(dc) = current else {
                     throw ParserError.unexpectedToken(current, expected: "debit|credit|dr|cr", at: loc())
                 }
                 direction = try Direction(raw: dc); advance()
 
-            case .keyword("level"):
+            case .keyword("level"), .ident("level"):
                 advance(); try expect(.equals)
                 guard case let .number(n) = current else {
                     throw ParserError.unexpectedToken(current, expected: "number", at: loc())
                 }
                 level = (n as NSDecimalNumber).intValue; advance()
 
-            case .keyword("identifiers"):
+            case .keyword("identifiers"), .ident("identifiers"):
                 identifiers = try parseAccountIdentifiersBlock()
 
-            case .keyword("applicability"):
+            case .keyword("applicability"), .ident("applicability"):
                 applicability = try parseApplicabilityBlock()
 
             default:
@@ -139,7 +139,8 @@ public extension EntryCompilerParsing {
 
     @inlinable
     func parseApplicabilityBlock() throws -> Applicability {
-        try expect(.ident("applicability")); try beginBlock()
+        try expect(.keyword("applicability"))
+        try beginBlock()
         var zzp = "", ez = "", bv = "", svc = "", branche = ""
 
         while current != .rBrace && current != .eof {
