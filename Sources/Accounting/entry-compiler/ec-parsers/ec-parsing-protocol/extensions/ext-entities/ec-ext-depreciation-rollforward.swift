@@ -4,7 +4,7 @@ public extension EntryCompilerParsing {
     /// Attach lightweight readers inside your existing parseDepreciationBlock() switch.
     @inlinable
     func parseDepreciationRollforward(into meta: inout [String:String], tz: TimeZone = .current) throws -> Bool {
-        guard current == .ident("rollforward") else { return false }
+        guard current == .ident("rollforward") || current == .keyword("rollforward") else { return false }
         advance(); try? beginBlock()
         var idx = 0
 
