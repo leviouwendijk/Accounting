@@ -42,16 +42,7 @@ public extension EntryCompilerParsing {
                 displayName = s; advance()
 
             case .ident("meta"), .keyword("metadata"):
-                advance(); try expect(.lBrace)
-                while current != .rBrace && current != .eof {
-                    guard case let .ident(k) = current else { break }
-                    advance(); try expect(.equals)
-                    guard case let .string(v) = current else {
-                        throw ParserError.unexpectedToken(current, expected: "string", at: loc())
-                    }
-                    metadata[k] = v; advance()
-                }
-                try expect(.rBrace)
+                metadata = try parseStringMapBlock(named: "metadata")
 
             case .ident("depreciation"):
                 dep = try parseDepreciationBlock()

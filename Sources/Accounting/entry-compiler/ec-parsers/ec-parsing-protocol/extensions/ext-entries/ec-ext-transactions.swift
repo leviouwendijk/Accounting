@@ -18,7 +18,6 @@ public extension EntryCompilerParsing {
         return out.filter { seen.insert($0).inserted }
     }
 
-    /// Parses: 1, 2, 3   (commas optional; trailing comma allowed)
     @inlinable
     func parseRefList(into out: inout [Int]) throws {
         // first number required

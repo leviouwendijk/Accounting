@@ -43,7 +43,7 @@ public struct TransactionCounterparty: Codable, Sendable {
 
 public struct Transaction: Codable, Sendable {
     public var id: Int?
-    public var date: DateSpecification           // same type used in Entry
+    public var date: DateSpecification
     public var source: TransactionSource
     public var identifiers: TransactionIdentifiers
     public var amount: TransactionAmount
