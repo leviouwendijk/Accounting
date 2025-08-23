@@ -16,7 +16,7 @@ public extension EntryCompilerParsing {
 
         while current != .rBrace && current != .eof {
             if try parseDepreciationValuation(into: &meta) { continue }
-            if parseUsefulLifeMonths(into: &meta) { continue }
+            if try parseUsefulLifeMonths(into: &meta) { continue }
             if try parseDepreciationRollforward(into: &meta) { continue }
 
             switch current {
