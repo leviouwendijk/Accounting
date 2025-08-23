@@ -65,15 +65,29 @@ public extension EntryCompilerParsing {
                 try expect(.rBrace)
 
             case .ident("effective_date"), .keyword("effective_date"),
-                .ident("commission_date"), .keyword("commission_date"):
-                advance(); try expect(.equals)
-                switch current {
-                case let .dateLiteral(text):
-                    out.effectiveDate = try parseDateLiteral(text, in: .current); advance()
-                case .lBrace:
+                 .ident("commission_date"), .keyword("commission_date"):
+                advance()
+                if current == .equals {
+                    // literal: commission_date = 2025-08-07
+                    advance()
+                    guard case let .dateLiteral(text) = current else {
+                        throw ParserError.unexpectedToken(current, expected: "date literal", at: loc())
+                    }
+                    out.effectiveDate = try parseDateLiteral(text, in: .current)
+                    advance()
+                } else if current == .lBrace {
+                    // block: commission_date { year=… month=… day=… }
                     out.effectiveDate = try parseDateBlock(tz: .current)
-                default:
-                    throw ParserError.unexpectedToken(current, expected: "date literal or { … }", at: loc())
+                } else if case let .dateLiteral(text) = current {
+                    // (optional nicety) allow implicit literal without '='
+                    out.effectiveDate = try parseDateLiteral(text, in: .current)
+                    advance()
+                } else {
+                    throw ParserError.unexpectedToken(
+                        current,
+                        expected: "= <date literal> or { year/month/day }",
+                        at: loc()
+                    )
                 }
 
             default:
