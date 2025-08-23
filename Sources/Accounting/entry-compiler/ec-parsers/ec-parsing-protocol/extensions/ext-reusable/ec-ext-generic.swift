@@ -27,11 +27,13 @@ public extension EntryCompilerParsing {
         return s
     }
 
-    func expectFieldEquals(_ name: String) throws -> Void {
-        guard case .ident(name) = current else {
+    func expectFieldEquals(_ name: String) throws {
+        switch current {
+        case .ident(name), .keyword(name):
+            advance()
+        default:
             throw ParserError.unexpectedToken(current, expected: name, at: loc())
         }
-        advance()
         try expect(.equals)
     }
 
@@ -44,6 +46,16 @@ public extension EntryCompilerParsing {
         }
     }
 
+    @discardableResult
+    func expectNameOrNumberValue() throws -> String {
+        switch current {
+        case let .ident(s):   advance(); return s
+        case let .keyword(s): advance(); return s
+        case let .number(n):  advance(); return "\(n)"
+        default:
+            throw ParserError.unexpectedToken(current, expected: "identifier|number", at: loc())
+        }
+    }
 }
 
 

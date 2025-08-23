@@ -139,21 +139,30 @@ public extension EntryCompilerParsing {
 
     @inlinable
     func parseApplicabilityBlock() throws -> Applicability {
-        try expect(.keyword("applicability"))
+        if case .ident("applicability") = current { advance() }
+        else if case .keyword("applicability") = current { advance() }
+        else { try expect(.ident("applicability")) } // fallback; will error nicely
         try beginBlock()
+
         var zzp = "", ez = "", bv = "", svc = "", branche = ""
 
         while current != .rBrace && current != .eof {
             switch current {
-            case .keyword("zzp"):     try expectFieldEquals("zzp");     zzp = try expectIdentValue()
-            case .keyword("ez"):      try expectFieldEquals("ez");      ez = try expectIdentValue()
-            case .keyword("bv"):      try expectFieldEquals("bv");      bv = try expectIdentValue()
-            case .keyword("svc"):     try expectFieldEquals("svc");     svc = try expectIdentValue()
-            case .keyword("branche"): try expectFieldEquals("branche"); branche = try expectIdentValue()
+            case .ident("zzp"), .keyword("zzp"):
+                try expectFieldEquals("zzp"); zzp = try expectNameOrNumberValue()
+            case .ident("ez"), .keyword("ez"):
+                try expectFieldEquals("ez");  ez  = try expectNameOrNumberValue()
+            case .ident("bv"), .keyword("bv"):
+                try expectFieldEquals("bv");  bv  = try expectNameOrNumberValue()
+            case .ident("svc"), .keyword("svc"):
+                try expectFieldEquals("svc"); svc = try expectNameOrNumberValue()
+            case .ident("branche"), .keyword("branche"):
+                try expectFieldEquals("branche"); branche = try expectNameOrNumberValue()
             default:
                 throw ParserError.unexpectedToken(current, expected: "zzp/ez/bv/svc/branche", at: loc())
             }
         }
+
         try endBlock()
         return Applicability(zzp: zzp, ez: ez, bv: bv, svc: svc, branche: branche)
     }
