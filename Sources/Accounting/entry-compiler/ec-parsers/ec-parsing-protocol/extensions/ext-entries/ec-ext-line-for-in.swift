@@ -23,7 +23,7 @@ public extension EntryCompilerParsing {
                 }
                 adjustment = try parseSingleInventoryAdjustment()
 
-            case .keyword("inventory"):
+            case .keyword("inventory"), .ident("inventory"):
                 if adjustment != nil { 
                     throw ParserError.unexpectedToken(current, expected: "single inventory adjustment", at: loc()) 
                 }
@@ -95,9 +95,24 @@ public extension EntryCompilerParsing {
     func parseMultiLines_in_for() throws -> [Line] {
         advance() // 'in'
         let accounts = try parseAccountTargets()
+
+        // NEW: support block after 'in (...)'
+        if current == .lBrace {
+            try expect(.lBrace)
+            var out: [Line] = []
+            while current != .rBrace && current != .eof {
+                try expect(.keyword("for"))
+                let entities = try parseEntityTargets()
+                let payload = try parseLineBodyPayload()
+                out.append(contentsOf: expandLines(entities: entities, accounts: accounts, payload: payload))
+            }
+            try expect(.rBrace)
+            return out
+        }
+
+        // Existing inline form: in (…) for (…) { … }
         try expect(.keyword("for"))
         let entities = try parseEntityTargets()
-
         let payload = try parseLineBodyPayload()
         return expandLines(entities: entities, accounts: accounts, payload: payload)
     }
@@ -113,15 +128,25 @@ public extension EntryCompilerParsing {
         while current != .rBrace && current != .eof {
             switch current {
             case .keyword("debit"), .keyword("credit"), .keyword("dr"), .keyword("cr"):
-                if direction != nil { throw ParserError.unexpectedToken(current, expected: "only one of debit/credit", at: loc()) }
-                (direction, amount) = try parseAmountDirective()        // existing helper
+                if direction != nil { 
+                    throw ParserError.unexpectedToken(current, expected: "only one of debit/credit", at: loc()) 
+                }
+                (direction, amount) = try parseAmountDirective()
+
             case .keyword("adding"), .keyword("addition"), .keyword("add"),
-                 .keyword("removing"), .keyword("reduction"), .keyword("remove"), .keyword("rm"):
-                if adjustment != nil { throw ParserError.unexpectedToken(current, expected: "single inventory adjustment", at: loc()) }
-                adjustment = try parseSingleInventoryAdjustment()       // existing helper
-            case .keyword("inventory"):
-                if adjustment != nil { throw ParserError.unexpectedToken(current, expected: "single inventory adjustment", at: loc()) }
-                adjustment = try parseInventoryBlock()                  // existing helper
+                .keyword("removing"), .keyword("reduction"), .keyword("remove"), .keyword("rm"):
+                if adjustment != nil { 
+                    throw ParserError.unexpectedToken(current, expected: "single inventory adjustment", at: loc()) 
+                }
+                adjustment = try parseSingleInventoryAdjustment()
+
+            case .keyword("inventory"),
+                .ident("adjustment"):
+                if adjustment != nil { 
+                    throw ParserError.unexpectedToken(current, expected: "single inventory adjustment", at: loc())
+                }
+                adjustment = try parseInventoryBlock()
+
             default:
                 throw ParserError.unexpectedToken(current, expected: "debit/credit or adding/removing", at: loc())
             }
