@@ -1,5 +1,11 @@
 import Foundation
 
+@inline(__always)
+func vprint(_ verbose: Bool, _ s: String) {
+    guard verbose else { return }
+    FileHandle.standardError.write(Data((s + "\n").utf8))
+}
+
 public struct EntryCompileDriver {
     public struct Result {
         public let entities: EntityStore
@@ -9,42 +15,69 @@ public struct EntryCompileDriver {
         public let resolved: [ResolvedEntry]
     }
 
-    public static func compile(
-        projectRoot: URL,
-        verbose: Bool = false,
-        log: (String) -> Void = { _ in }     // pass { print($0) } from CLI
-    ) throws -> Result {
-        @inline(__always) func L(_ s: String) { if verbose { log(s) } }
+    // public static func compile(
+    //     projectRoot: URL,
+    //     verbose: Bool = false,
+    //     log: (String) -> Void = { _ in }     // pass { print($0) } from CLI
+    // ) throws -> Result {
+    //     @inline(__always) func L(_ s: String) { if verbose { log(s) } }
 
-        L("▶ Settings …")
+    //     L("▶ Settings …")
+    //     let project   = EntryCompilerProject(root: projectRoot)
+    //     let settings  = try EntryCompilerSettingsLoader.load(from: projectRoot)
+    //     let defaultTZ = settings.entry.defaultTimezone
+    //     L("  ✓ default timezone = \(defaultTZ.identifier)")
+
+    //     L("▶ Entities …")
+    //     let entities     = try EntityStoreLoader.load(from: project)
+    //     L("  ✓ \(entities.count) entities")
+
+    //     L("▶ Accounts …")
+    //     let accounts     = try AccountStoreLoader.load(from: project)
+    //     L("  ✓ \(accounts.count) accounts")
+
+    //     L("▶ Transactions …")
+    //     let transactions = try EntryCompilerTransactionsLoader.load(from: project)
+    //     L("  ✓ \(transactions.count) transactions")
+
+    //     L("▶ Entries …")
+    //     let entries      = try EntryCompilerEntriesLoader.load(from: project, defaultTZ: defaultTZ)
+    //     L("  ✓ \(entries.count) entries")
+
+    //     L("▶ Resolving …")
+    //     let resolved = try entries.resolved(using: entities, accounts: accounts, transactions: transactions)
+    //     L("  ✓ \(resolved.count) resolved entries")
+
+    //     L("▶ Trial balance …")
+    //     try assertBalanced(resolved)
+    //     L("  ✓ balanced")
+
+    //     return .init(entities: entities, accounts: accounts, transactions: transactions, entries: entries, resolved: resolved)
+    // }
+
+    public static func compile(projectRoot: URL, verbose: Bool = false) throws -> Result {
+        vprint(verbose, "▶ Settings …")
         let project   = EntryCompilerProject(root: projectRoot)
         let settings  = try EntryCompilerSettingsLoader.load(from: projectRoot)
         let defaultTZ = settings.entry.defaultTimezone
-        L("  ✓ default timezone = \(defaultTZ.identifier)")
+        vprint(verbose, "  ✓ default timezone = \(defaultTZ.identifier)")
 
-        L("▶ Entities …")
-        let entities     = try EntityStoreLoader.load(from: project)
-        L("  ✓ \(entities.count) entities")
+        vprint(verbose, "▶ Entities …")
+        let entities = try EntityStoreLoader.load(from: project, verbose: verbose)
 
-        L("▶ Accounts …")
-        let accounts     = try AccountStoreLoader.load(from: project)
-        L("  ✓ \(accounts.count) accounts")
+        vprint(verbose, "▶ Accounts …")
+        let accounts = try AccountStoreLoader.load(from: project)
 
-        L("▶ Transactions …")
+        vprint(verbose, "▶ Transactions …")
         let transactions = try EntryCompilerTransactionsLoader.load(from: project)
-        L("  ✓ \(transactions.count) transactions")
 
-        L("▶ Entries …")
-        let entries      = try EntryCompilerEntriesLoader.load(from: project, defaultTZ: defaultTZ)
-        L("  ✓ \(entries.count) entries")
+        vprint(verbose, "▶ Entries …")
+        let entries = try EntryCompilerEntriesLoader.load(from: project, defaultTZ: defaultTZ)
 
-        L("▶ Resolving …")
+        vprint(verbose, "▶ Resolve & assert …")
         let resolved = try entries.resolved(using: entities, accounts: accounts, transactions: transactions)
-        L("  ✓ \(resolved.count) resolved entries")
-
-        L("▶ Trial balance …")
         try assertBalanced(resolved)
-        L("  ✓ balanced")
+        vprint(verbose, "  ✓ balanced")
 
         return .init(entities: entities, accounts: accounts, transactions: transactions, entries: entries, resolved: resolved)
     }

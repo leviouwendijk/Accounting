@@ -22,10 +22,15 @@ public extension EntryCompilerParsing {
         let hint = _entityPathHint(fileURL: nil, inferredClass: inferredClass, inferredFamily: inferredFamily)
 
         while current != .rBrace && current != .eof {
-            if parseTypeDirective(into: &metadata) { continue }
-            if parseDomainDirective(into: &metadata) { continue }
-            if parseContentBlock(into: &metadata) { continue }
-            if parseOwnershipBlock(into: &metadata) { continue }
+            // if parseTypeDirective(into: &metadata) { continue }
+            // if parseDomainDirective(into: &metadata) { continue }
+            // if parseContentBlock(into: &metadata) { continue }
+            // if parseOwnershipBlock(into: &metadata) { continue }
+
+            if parseTypeDirective(into: &metadata) { core.trace("  type → \(metadata["type"] ?? "")"); continue }
+            if parseDomainDirective(into: &metadata) { core.trace("  domain.* set"); continue }
+            if parseContentBlock(into: &metadata) { core.trace("  content.* set"); continue }
+            if parseOwnershipBlock(into: &metadata) { core.trace("  ownership.* set"); continue }
 
             switch current {
             case .keyword("use"):
@@ -62,6 +67,7 @@ public extension EntryCompilerParsing {
                     )
                 }
                 key = EntityKey(class: c!, family: f!, alias: ref.alias)
+                core.trace("  use alias \(ref.alias.string) → \(key!.identifier(displaying: .fullchain))")
 
             case .ident("display_name"):
                 advance(); try expect(.equals)
@@ -69,26 +75,33 @@ public extension EntryCompilerParsing {
                     throw ParserError.unexpectedToken(current, expected: "string", at: loc())
                 }
                 displayName = s; advance()
+                core.trace("  display_name = \(s)")
 
             case .ident("metadata"), .keyword("metadata"):
                 metadata = try parseStringMapBlock(named: "metadata")
+                core.trace("  metadata { ... } (\(metadata.count) keys)")
 
             case .ident("depreciation"), .keyword("depreciation"):
                 // IMPORTANT: pass metadata sink so rollforward/valuation are captured
                 dep = try parseDepreciationBlock(meta: &metadata)
+                core.trace("  depreciation { … }")
 
             // Nested blocks that produce additional concrete aliases
             case .keyword("variant"), .ident("variant"):
                 guard let k = key else {
                     throw ParserError.unexpectedToken(current, expected: "use alias before variant", at: loc())
                 }
-                extraDefs.append(contentsOf: try parseVariantBlocks(baseKey: k))
+                let defs = try parseVariantBlocks(baseKey: k)
+                core.trace("  variant → +\(defs.count) def(s)")
+                extraDefs.append(contentsOf: defs)
 
             case .keyword("unit"), .ident("unit"):
                 guard let k = key else {
                     throw ParserError.unexpectedToken(current, expected: "use alias before unit", at: loc())
                 }
-                extraDefs.append(contentsOf: try parseUnitBlocks(baseKey: k))
+                let defs = try parseUnitBlocks(baseKey: k)
+                core.trace("  unit → +\(defs.count) def(s)")
+                extraDefs.append(contentsOf: defs)
 
             default:
                 throw ParserError.unexpectedToken(
@@ -105,8 +118,10 @@ public extension EntryCompilerParsing {
         }
 
         var defs: [EntityDef] = []
-        defs.append(EntityDef(key: k, displayName: displayName, metadata: metadata, depreciation: dep))
+        let base = EntityDef(key: k, displayName: displayName, metadata: metadata, depreciation: dep)
+        defs.append(base)
         defs.append(contentsOf: extraDefs)
+        core.trace("  end entity → total \(defs.count) def(s)")
         return defs
     }
 }
