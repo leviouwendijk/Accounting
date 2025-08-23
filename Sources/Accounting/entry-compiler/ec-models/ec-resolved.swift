@@ -2,14 +2,14 @@ import Foundation
 
 public struct ResolvedLine: Hashable, Codable, Sendable {
     public let entity: EntityKey
-    public let account: AccountPath
+    public let account: AccountKey
     public let direction: Direction
     public let amount: Decimal
     public let adjustment: InventoryAdjustment?
     
     public init(
         entity: EntityKey,
-        account: AccountPath,
+        account: AccountKey,
         direction: Direction,
         amount: Decimal,
         adjustment: InventoryAdjustment?

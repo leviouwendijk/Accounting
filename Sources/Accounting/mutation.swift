@@ -1,5 +1,7 @@
 import Foundation
 
+// (!): FILE NOT USED BY NEW ENTRY COMPILER
+
 public enum MovementType: String {
     case add, remove, rm, subtract
 }

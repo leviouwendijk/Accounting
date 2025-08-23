@@ -1,5 +1,7 @@
 import Foundation
 
+// (!): FILE NOT USED BY NEW ENTRY COMPILER
+
 // BACKWARDS COMPAT
 public struct Entity {
     public let id: String

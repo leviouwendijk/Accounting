@@ -23,49 +23,6 @@ public enum RGSParsingError: Error, CustomStringConvertible {
 public enum RGSAccountRange: Codable, Sendable {
     case thousands
     case tenThousands
-
-    // public static func range(from code: String) throws -> RGSAccountRange {
-    //     let s = code.trimmingCharacters(in: .whitespacesAndNewlines)
-    //     guard !s.isEmpty, s.allSatisfy(\.isNumber) else {
-    //         throw RGSParsingError.cannotConvertCodeToInteger(code)
-    //     }
-    //     switch s.count {
-    //     case 5: return .tenThousands
-    //     case 4: return .thousands
-    //     default:
-    //         throw RGSParsingError.invalidCodeStringLength(code)
-    //     }
-    // }
-
-    // public static func level(from code: String) throws -> Int {
-    //     let s = code.trimmingCharacters(in: .whitespacesAndNewlines)
-    //     guard !s.isEmpty, s.allSatisfy(\.isNumber) else {
-    //         throw RGSParsingError.cannotConvertCodeToInteger(code)
-    //     }
-
-    //     let tz = s.reversed().prefix(while: { $0 == "0" }).count
-    //     switch s.count {
-    //     case 5:
-    //         // 5-digit: pair the last two digits
-    //         switch tz {
-    //         case 4: return 2
-    //         case 3: return 3
-    //         case 2: return 3
-    //         case 1: return 4
-    //         default: /* tz == 0 */ return 4
-    //         }
-    //     case 4:
-    //         // 4-digit: classic step, capped at 4
-    //         switch tz {
-    //         case 3: return 2
-    //         case 2: return 3
-    //         case 1: return 4
-    //         default: /* tz == 0 */ return 4
-    //         }
-    //     default:
-    //         throw RGSParsingError.invalidCodeStringLength(code)
-    //     }
-    // }
 }
 
 public struct RGSAccount: Codable, Sendable {
@@ -90,11 +47,6 @@ public struct RGSAccount: Codable, Sendable {
         self.direction = direction
         self.identifiers = identifiers
         self.applicability = applicability
-    }
-
-    public var accountClass: AccountClass {
-        // placeholder
-        AccountClass.asset
     }
 
     public var parentCode: String? {
@@ -181,10 +133,6 @@ public struct RGSAccount: Codable, Sendable {
 
         return integer
     }
-
-    // public func inferLevelFromCodeString() throws -> Int {
-    //     try RGSAccountRange.level(from: code)
-    // }
 }
 
 extension Array: Sendable where Element == RGSAccount {} 

@@ -8,8 +8,8 @@ public extension EntryCompilerParsing {
         advance()
         try expect(.lBrace)
 
-        var entityPath: EntityRef?
-        var accountPath: AccountPath?
+        var entityRef: EntityRef?
+        var accountRef: AccountRef?
         var direction: Direction?
         var amount: Decimal?
         var adjustment: InventoryAdjustment?
@@ -22,18 +22,12 @@ public extension EntryCompilerParsing {
                 guard segs.count >= 2 else {
                     throw ParserError.unexpectedToken(current, expected: "domain.alias.path", at: loc())
                 }
-                entityPath = try makeEntityRef(from: segs)
+                entityRef = try makeEntityRef(from: segs)
 
             case .ident("account"):
-                advance(); try expect(.equals)
-                if case let .number(n) = current { accountPath = AccountPath(segments: ["\(n)"]); advance() }
-                else {
-                    let segs = readFlatSegments()
-                    guard !segs.isEmpty else {
-                        throw ParserError.unexpectedToken(current, expected: "number or path", at: loc())
-                    }
-                    accountPath = AccountPath(segments: segs)
-                }
+                advance()
+                try expect(.equals)
+                accountRef = try parseAccountRefFlexible()
 
             case .keyword("debit"), .keyword("credit"), .keyword("dr"), .keyword("cr"):
                 let (dir, amt) = try parseAmountDirective()
@@ -48,7 +42,7 @@ public extension EntryCompilerParsing {
         }
 
         try expect(.rBrace)
-        guard let e = entityPath, let a = accountPath, let dir = direction, let amt = amount else {
+        guard let e = entityRef, let a = accountRef, let dir = direction, let amt = amount else {
             throw ParserError.unexpectedToken(current, expected: "entity, account, and amount", at: loc())
         }
         return Line(entity: e, account: a, direction: dir, amount: amt, adjustment: adjustment)

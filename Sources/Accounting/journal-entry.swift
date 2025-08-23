@@ -1,5 +1,7 @@
 import Foundation
 
+// (!): FILE NOT USED BY NEW ENTRY COMPILER
+
 public struct JournalEntry {
     public let id: String
     public let date: Date

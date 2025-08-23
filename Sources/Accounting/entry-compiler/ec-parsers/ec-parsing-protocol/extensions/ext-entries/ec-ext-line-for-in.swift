@@ -1,7 +1,7 @@
 import Foundation
 
 public extension EntryCompilerParsing {
-    func parseLineBody(entity: EntityRef, account: AccountPath) throws -> Line {
+    func parseLineBody(entity: EntityRef, account: AccountRef) throws -> Line {
         try expect(.lBrace)
 
         var direction: Direction?
@@ -55,13 +55,13 @@ public extension EntryCompilerParsing {
         advance() // 'for ... in ...'
         let entity = try parseEntityRefFlexible()
         try expect(.keyword("in"))
-        let account = try parseAccountGroup(flexible: true)
+        let account = try parseAccountRefFlexible()
         return try parseLineBody(entity: entity, account: account)
     }
 
     func parseLine_in_for() throws -> Line {
         advance() // 'in ... for ...'
-        let account = try parseAccountGroup(flexible: true)
+        let account = try parseAccountRefFlexible()
         try expect(.keyword("for"))
         let entity = try parseEntityRefFlexible()
         return try parseLineBody(entity: entity, account: account)
@@ -156,51 +156,16 @@ public extension EntryCompilerParsing {
     //   in (account 2301, 10201, assets.bank.main)
     //   in 10201
     //   in (10201)
-    func parseAccountTargets() throws -> [AccountPath] {
-        // Single flexible form stays supported (legacy helpers) :contentReference[oaicite:5]{index=5}
-        if current != .lPar && current != .number(0) && !(current == .ident("account")) && !(current == .ident("")) {
-            return [try parseAccountGroup(flexible: true)]
+    func parseAccountTargets() throws -> [AccountRef] {
+        if current == .lPar {
+            return try parseAccountRefListInParens()
         }
-
-        // Single number without parens
-        if case let .number(n) = current {
-            advance()
-            return [AccountPath(segments: ["\(n)"])]
-        }
-
-        // Single "account(...)" legacy
-        if case .ident("account") = current, peekTokenIsLPar() {
-            return [try parseAccountGroup(flexible: true)]
-        }
-
-        // List in parens
-        try expect(.lPar)
-        var out: [AccountPath] = []
-        while current != .rPar && current != .eof {
-            // Optional "account" prefix in lists: "(account 2301, 10201, …)"
-            if case .ident("account") = current { advance() }
-
-            if case let .number(n) = current {
-                out.append(AccountPath(segments: ["\(n)"])); advance()
-            } else {
-                // dotted/arrow path
-                let segs = readFlatSegments()
-                guard !segs.isEmpty else {
-                    throw ParserError.unexpectedToken(current, expected: "account number or path", at: loc())
-                }
-                out.append(AccountPath(segments: segs))
-            }
-
-            if current == .comma { advance(); continue }
-            break
-        }
-        try expect(.rPar)
-        return out
+        return [try parseAccountRefFlexible()]
     }
 
     func expandLines(
         entities: [EntityRef],
-        accounts: [AccountPath],
+        accounts: [AccountRef],
         payload: (Direction, Decimal, InventoryAdjustment?)
     ) -> [Line] {
         let (dir, amt, adj) = payload

@@ -1,6 +1,5 @@
 import Foundation
 
-
 // (!): NOT USED BY ENTRY COMPILER
 // look at ec-transaction.swift
 

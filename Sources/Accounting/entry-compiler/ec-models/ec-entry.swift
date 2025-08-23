@@ -37,20 +37,21 @@ public struct Entry: Hashable, Codable, Sendable {
         var out = ["Entry on \(dateStr):"]
         for line in lines {
             let ent = line.entity.printable
-            let acc = line.account.segments.joined(separator: ".")
+            let acc: String = {
+                switch line.account {
+                case .code(let s): return s
+                case .path(let segs): return segs.joined(separator: ".")
+                }
+            }()
             let dir = line.direction == .debit ? "DR" : "CR"
             var lineStr = "  - [\(dir)] \(ent) → \(acc): \(line.amount)"
             if let adj = line.adjustment {
                 let tag = (adj.mutation == .addition || adj.mutation == .add) ? "ADD" : "REM"
                 lineStr += "  (\(tag) \(adj.count))"
             }
-            // transactionRefs somewhere here
             out.append(lineStr)
         }
-        if let d = details {
-            out.append("Details: \(d)")
-        }
+        if let d = details { out.append("Details: \(d)") }
         return out.joined(separator: "\n")
     }
 }
-
