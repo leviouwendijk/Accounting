@@ -73,7 +73,7 @@ public extension EntryCompilerParsing {
             case .ident("metadata"), .keyword("metadata"):
                 metadata = try parseStringMapBlock(named: "metadata")
 
-            case .ident("depreciation"):
+            case .ident("depreciation"), .keyword("depreciation"):
                 // IMPORTANT: pass metadata sink so rollforward/valuation are captured
                 dep = try parseDepreciationBlock(meta: &metadata)
 

@@ -17,7 +17,7 @@ public extension EntryCompilerParsing {
 
             while current != .rBrace && current != .eof {
                 switch current {
-                case .ident("effective_date"):
+                case .keyword("effective_date"):
                     advance(); try? expect(.equals)
                     switch current {
                     case let .dateLiteral(text):
@@ -27,14 +27,14 @@ public extension EntryCompilerParsing {
                         if let d = try? parseDateBlock(tz: tz) { dateStr = ISO8601DateFormatter().string(from: d) }
                     default: break
                     }
-                case .ident("amount"), .ident("value"):
+                case .keyword("amount"), .keyword("value"):
                     advance(); try? expect(.equals)
                     if case let .number(n) = current { amount = "\(n)"; advance() }
-                case .ident("linked_entry"), .ident("linked_entries"):
+                case .keyword("linked_entry"), .keyword("linked_entries"):
                     advance(); try? expect(.equals)
                     var tmp: [Int] = []; try? parseIntList(into: &tmp)
                     linked = tmp
-                case .ident("details"), .ident("reason"):
+                case .keyword("details"), .keyword("reason"):
                     reason = (try? parseFreeTextBlock(named: "details")) ?? reason
                 default:
                     break
@@ -52,9 +52,9 @@ public extension EntryCompilerParsing {
 
         while current != .rBrace && current != .eof {
             switch current {
-            case .ident("capex"):
+            case .keyword("capex"):
                 parseEvent(kind: "capex")
-            case .ident("revision"):
+            case .keyword("revision"):
                 parseEvent(kind: "revision")
             default:
                 break
@@ -67,17 +67,17 @@ public extension EntryCompilerParsing {
     /// Optional readers you referenced in your keywords list:
     @inlinable
     func parseDepreciationValuation(into meta: inout [String:String]) -> Bool {
-        guard current == .ident("valuation") else { return false }
+        guard current == .keyword("valuation") else { return false }
         advance(); try? beginBlock()
         while current != .rBrace && current != .eof {
-            guard current == .ident("acquisition_cost") else { break }
+            guard current == .keyword("acquisition_cost") else { break }
             advance(); try? beginBlock()
             while current != .rBrace && current != .eof {
                 switch current {
-                case .ident("direct"):
+                case .keyword("direct"):
                     advance(); try? expect(.equals)
                     if case let .number(n) = current { meta["dep.valuation.acquisition.direct"] = "\(n)"; advance() }
-                case .ident("indirect"):
+                case .keyword("indirect"):
                     advance(); try? expect(.equals)
                     if case let .number(n) = current { meta["dep.valuation.acquisition.indirect"] = "\(n)"; advance() }
                 default: break
@@ -91,7 +91,7 @@ public extension EntryCompilerParsing {
 
     @inlinable
     func parseUsefulLifeMonths(into meta: inout [String:String]) -> Bool {
-        guard current == .ident("useful_life_months") else { return false }
+        guard current == .keyword("useful_life_months") else { return false }
         advance(); try? expect(.equals)
         if case let .number(n) = current { meta["dep.useful_life_months"] = "\(n)"; advance(); return true }
         return false

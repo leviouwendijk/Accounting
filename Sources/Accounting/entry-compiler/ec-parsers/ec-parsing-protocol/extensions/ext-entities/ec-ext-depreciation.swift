@@ -20,7 +20,7 @@ public extension EntryCompilerParsing {
             if parseDepreciationRollforward(into: &meta) { continue }
 
             switch current {
-            case .ident("method"):
+            case .ident("method"), .keyword("method"):
                 advance(); try expect(.equals)
                 guard case let .ident(m) = current else {
                     throw ParserError.unexpectedToken(current, expected: "dep method", at: loc())
@@ -31,7 +31,8 @@ public extension EntryCompilerParsing {
                 out.method = mm
                 advance()
 
-            case .ident("useful_life_years"), .ident("useful_life"):
+            case .ident("useful_life_years"), .keyword("useful_life_years"),
+                .ident("useful_life"),        .keyword("useful_life"):
                 advance(); try expect(.equals)
                 guard case let .number(n) = current else {
                     throw ParserError.unexpectedToken(current, expected: "number", at: loc())
@@ -39,19 +40,19 @@ public extension EntryCompilerParsing {
                 out.usefulLifeYears = n
                 advance()
 
-            case .ident("residual_value"):
+            case .ident("residual_value"), .keyword("residual_value"):
                 advance(); try expect(.lBrace)
                 while current != .rBrace && current != .eof {
                     switch current {
-                    case .ident("keep_percentage"):
+                    case .ident("keep_percentage"), .keyword("keep_percentage"):
                         advance(); out.residualValuePercent = Decimal(-1)
-                    case .ident("percentage"):
+                    case .ident("percentage"), .keyword("percentage"):
                         advance(); try expect(.equals)
                         guard case let .number(n) = current else {
                             throw ParserError.unexpectedToken(current, expected: "number", at: loc())
                         }
                         out.residualValuePercent = n; advance()
-                    case .ident("amount"), .ident("value"):
+                    case .ident("amount"), .keyword("amount"), .ident("value"), .keyword("value"):
                         advance(); try expect(.equals)
                         guard case let .number(n) = current else {
                             throw ParserError.unexpectedToken(current, expected: "number", at: loc())
@@ -63,7 +64,8 @@ public extension EntryCompilerParsing {
                 }
                 try expect(.rBrace)
 
-            case .ident("effective_date"), .ident("commission_date"):
+            case .ident("effective_date"), .keyword("effective_date"),
+                .ident("commission_date"), .keyword("commission_date"):
                 advance(); try expect(.equals)
                 switch current {
                 case let .dateLiteral(text):

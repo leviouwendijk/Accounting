@@ -42,7 +42,7 @@ public extension EntryCompilerParsing {
                 case .ident("details"), .keyword("details"):
                     details = try parseFreeTextBlock(named: "details")
 
-                case .ident("depreciation"):
+                case .ident("depreciation"), .keyword("depreciation"):
                     dep = try parseDepreciationBlock(meta: &metadata)
 
                 default:
