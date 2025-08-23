@@ -28,7 +28,7 @@ public struct ResolvedEntry: Hashable, Codable, Sendable {
     public var lines: [ResolvedLine]
     public var details: String?
     public var timezone: String?
-    public var transactionReferences: [Int]
+    public var transactionReferences: [TransactionKey]
     
     public init(
         id: Int?,
@@ -36,7 +36,7 @@ public struct ResolvedEntry: Hashable, Codable, Sendable {
         lines: [ResolvedLine],
         details: String?,
         timezone: String?,
-        transactionReferences: [Int]
+        transactionReferences: [TransactionKey]
     ) {
         self.id = id
         self.date = date
