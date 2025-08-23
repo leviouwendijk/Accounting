@@ -21,6 +21,7 @@ public enum AccountStoreError: Error, CustomStringConvertible, Sendable {
     case duplicateCode(String)                          // when building the store
     case notFound(code: String)                         // strict code-based resolution
     case invalidReference(path: [String])               // non-code / unsupported path
+    case missingRequiredForNewAccount(code: String, missing: String)
 
     public var description: String {
         switch self {
@@ -30,6 +31,8 @@ public enum AccountStoreError: Error, CustomStringConvertible, Sendable {
             return "Unknown account code: \(code). Define it in config/accounts/… (or base RGS set)."
         case let .invalidReference(path):
             return "Invalid account reference: \(path.joined(separator: ".")). Use a numeric code (e.g., 10201)."
+        case .missingRequiredForNewAccount(let code, let missing):
+            return "Cannot create new account \(code): missing required \(missing)."
         }
     }
 }

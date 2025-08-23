@@ -50,11 +50,10 @@ public func trialBalance(_ entries: [ResolvedEntry]) -> [TrialBalanceRow] {
 /// Uses the new store shapes (byFull/byCode/byID) and TransactionKey in resolved entries.
 public func ecTestCompile(
     projectRoot: URL,
-    rgsBase: [RGSAccount],
     snapshotsDirName: String = "_snapshots"
 ) throws {
     // Compile the project (this also asserts balanced entries)
-    let result = try EntryCompileDriver.compile(projectRoot: projectRoot, rgsBase: rgsBase)
+    let result = try EntryCompileDriver.compile(projectRoot: projectRoot)
 
     // Where to write snapshots
     let outDir = projectRoot.appendingPathComponent("test", isDirectory: true)

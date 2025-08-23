@@ -9,34 +9,19 @@ public struct EntryCompileDriver {
         public let resolved: [ResolvedEntry]
     }
 
-    public static func compile(projectRoot: URL,
-                               rgsBase: [RGSAccount]) throws -> Result {
-        let project = EntryCompilerProject(root: projectRoot)
-
-        // 1) Settings → default timezone
-        let settings = try EntryCompilerSettingsLoader.load(from: projectRoot)  // tz, etc.
+    public static func compile(projectRoot: URL) throws -> Result {
+        let project   = EntryCompilerProject(root: projectRoot)
+        let settings  = try EntryCompilerSettingsLoader.load(from: projectRoot)
         let defaultTZ = settings.entry.defaultTimezone
 
-        // 2) Entities (already implemented)
-        let entities = try EntityStoreLoader.load(from: project)
-
-        // 3) Accounts (base in; overrides later)
-        let accounts = try AccountStoreLoader.load(fromBase: rgsBase)
-
-        // 4) Transactions (walk /transactions and parse)
+        let entities     = try EntityStoreLoader.load(from: project)
+        let accounts     = try AccountStoreLoader.load(from: project)
         let transactions = try EntryCompilerTransactionsLoader.load(from: project)
+        let entries      = try EntryCompilerEntriesLoader.load(from: project, defaultTZ: defaultTZ)
 
-        // 5) Entries (walk /entries and parse)
-        let entries = try EntryCompilerEntriesLoader.load(from: project, defaultTZ: defaultTZ)
-
-        // 6) Resolve entries → keys + tx refs
         let resolved = try entries.resolved(using: entities, accounts: accounts, transactions: transactions)
-
-        // 7) Optional: basic DR/CR balance check
         try assertBalanced(resolved)
-
-        return .init(entities: entities, accounts: accounts, transactions: transactions,
-                     entries: entries, resolved: resolved)
+        return .init(entities: entities, accounts: accounts, transactions: transactions, entries: entries, resolved: resolved)
     }
 
     @inline(__always)
