@@ -112,7 +112,8 @@ public extension EntryCompilerParsing {
 
     @inlinable
     func parseAccountIdentifiersBlock() throws -> RGSIdentifiers {
-        try expect(.ident("identifiers")); try beginBlock()
+        try expect(.keyword("identifiers"))
+        try beginBlock()
         var rgs: String?
         var oms: String?
 
