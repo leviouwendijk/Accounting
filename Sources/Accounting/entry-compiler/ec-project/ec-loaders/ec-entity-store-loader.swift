@@ -34,15 +34,15 @@ public enum EntityStoreLoader {
             for case let url as URL in e where url.pathExtension == "ec" {
                 let src = try String(contentsOf: url, encoding: .utf8)
                 var lx = EntryCompilerLexer(source: src)
-                let toks = lx.collectAllTokens()
+                let (toks, lines) = lx.collectAllTokensWithLineMap()
 
-                let defs = try EntryCompilerEntitiesFileParser(tokens: toks, fileURL: url)
+                let parserCore = EntryCompilerParserCore(tokens: toks, filePath: url.path, lineMap: lines)
+                let defs = try EntryCompilerEntitiesFileParser(core: parserCore, fileURL: url)
                     .parseEntitiesFile()
 
                 for d in defs { try builder.add(d) }
             }
         }
-
         return builder.freeze()
     }
 }
