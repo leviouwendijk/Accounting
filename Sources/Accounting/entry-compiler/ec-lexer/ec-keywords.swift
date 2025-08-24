@@ -1,5 +1,12 @@
 import Foundation
 
+public func entryCompilerIdentSet() -> Set<String> {
+    return [
+        "account",
+        "entity",
+    ]
+}
+
 public func entryCompilerStringBlockKeywordSet() -> Set<String> {
     return [
         "details",
@@ -54,7 +61,7 @@ public func entryCompilerKeywordSet() -> Set<String> {
     ]
 
     let account: Set<String> = [
-        "account",
+        // "account", // place as ident
         "label",
         "direction",
         "level",
@@ -63,7 +70,7 @@ public func entryCompilerKeywordSet() -> Set<String> {
     ]
 
     let entity: Set<String> = [
-        "entity",
+        // "entity", // place as ident
         "domain",
         "content",
         "variant", "subvariant",
