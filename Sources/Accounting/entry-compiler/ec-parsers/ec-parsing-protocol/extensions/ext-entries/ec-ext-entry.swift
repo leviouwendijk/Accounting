@@ -23,31 +23,6 @@ public extension EntryCompilerParsing {
                 entry.timezone = parsed.identifier
 
             case .keyword("date"):
-                advance()
-                // if case .keyword("infer") = current {
-                //     advance()
-                //     guard case let .number(n) = current else {
-                //         throw ParserError.unexpectedToken(current, expected: "number (day of month)", at: loc())
-                //     }
-                //     entry.date = .infer(day: (n as NSDecimalNumber).intValue)
-                //     advance()
-
-                // } else if current == .equals {
-                //     advance()
-                //     switch current {
-                //     case let .number(n):
-                //         entry.date = .absolute(Date(timeIntervalSince1970: (n as NSDecimalNumber).doubleValue)); advance()
-                //     case let .dateLiteral(text):
-                //         entry.date = .absolute(try parseDateLiteral(text, in: tz)); advance()
-                //     default:
-                //         throw ParserError.unexpectedToken(current, expected: "number or dateLiteral", at: loc())
-                //     }
-
-                // } else if current == .lBrace {
-                //     entry.date = .absolute(try parseDateBlock(tz: tz))
-                // } else {
-                //     throw ParserError.unexpectedToken(current, expected: "infer, '=', or '{'", at: loc())
-                // }
                 entry.date = try parseDateOrInfer(tz: tz, allowUnixEpoch: true)
 
             case .keyword("details"):
