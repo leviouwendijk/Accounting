@@ -21,7 +21,6 @@ public extension EntryCompilerParsing {
 
     @inlinable
     func parseStringMapBlock(named kw: String = "metadata") throws -> [String:String] {
-        // optional leading "metadata"
         switch current {
         case .ident(let s) where s == kw, .keyword(let s) where s == kw:
             advance()
@@ -32,34 +31,35 @@ public extension EntryCompilerParsing {
         var out: [String:String] = [:]
 
         while current != .rBrace && current != .eof {
-            // tolerate stray '=' at start of a line (defensive)
-            if current == .equals { advance(); continue }
-
-            // stop if block ends
+            if current == .equals { advance(); continue }  // tolerate stray '='
             if current == .rBrace { break }
 
-            // key
-            guard case let .ident(key) = current else {
-                // allow blank lines / trailing commas; otherwise bail
+            // key (ident OR keyword)
+            let key: String
+            switch current {
+            case let .ident(k), let .keyword(k):
+                key = k; advance()
+            default:
                 if current == .comma { advance(); continue }
                 throw ParserError.unexpectedToken(current, expected: "identifier (key)", at: loc())
             }
-            advance()
+
             try expect(.equals)
 
-            // value
             let value: String
             switch current {
             case let .string(s):
                 value = s; advance()
+
+            case .lBrace:
+                value = try readVerbatimBlockBody()
+
             default:
                 value = readUnquotedValueUntilPairOrBlockEnd()
             }
 
             out[key] = value
-
-            // optional comma after the pair
-            if current == .comma { advance() }
+            if current == .comma { advance() } // optional trailing comma
         }
 
         try endBlock()
