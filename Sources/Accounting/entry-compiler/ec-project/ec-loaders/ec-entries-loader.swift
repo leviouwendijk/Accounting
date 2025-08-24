@@ -13,8 +13,13 @@ public enum EntryCompilerEntriesLoader {
             for case let url as URL in e where url.pathExtension == "ec" {
                 let src = try String(contentsOf: url, encoding: .utf8)
                 var lx = EntryCompilerLexer(source: src)
-                let toks = lx.collectAllTokens()
-                let parser = EntryCompilerEntriesParser(tokens: toks, defaultTimeZone: defaultTZ)
+                let (toks, lineMap) = lx.collectAllTokensWithLineMap()
+                let parser = EntryCompilerEntriesParser(
+                    tokens: toks,
+                    defaultTimeZone: defaultTZ,
+                    fileURL: url,
+                    lineMap: lineMap
+                )
                 let entries = try parser.parseEntries()
                 out.append(contentsOf: entries)
             }

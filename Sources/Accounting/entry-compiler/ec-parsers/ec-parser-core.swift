@@ -64,6 +64,11 @@ public struct EntryCompilerParserCore: Sendable {
         self.filePath = filePath
         self.lineMap = lineMap
         self.verbose = verbose
+        if verbose && filePath == nil {
+            if let data = "[warn] parser created without filePath; errors may lack filenames\n".data(using: .utf8) {
+                FileHandle.standardError.write(data)
+            }
+        }
     }
 
     public var current: EntryCompilerToken {

@@ -1,6 +1,5 @@
 import Foundation
 
-// Parse a file of one or more `transaction { ... }` blocks.
 public final class EntryCompilerTransactionsFileParser: EntryCompilerParsing {
     public var core: EntryCompilerParserCore
     private let fileURL: URL?
@@ -12,12 +11,14 @@ public final class EntryCompilerTransactionsFileParser: EntryCompilerParsing {
     public convenience init(
         tokens: [EntryCompilerToken],
         fileURL: URL? = nil,
+        lineMap: [Int]? = nil,
         verbose: Bool = false
     ) {
         self.init(
             core: .init(
                 tokens: tokens,
                 filePath: fileURL?.path,
+                lineMap: lineMap,
                 verbose: verbose
             ),
             fileURL: fileURL

@@ -9,8 +9,17 @@ public final class EntryCompilerEntriesParser: EntryCompilerParsing {
         self.defaultTZ = defaultTimeZone
     }
 
-    public convenience init(tokens: [EntryCompilerToken], defaultTimeZone: TimeZone) {
-        self.init(core: EntryCompilerParserCore(tokens: tokens), defaultTimeZone: defaultTimeZone)
+    public convenience init(
+        tokens: [EntryCompilerToken],
+        defaultTimeZone: TimeZone,
+        fileURL: URL? = nil,
+        lineMap: [Int]? = nil,
+        verbose: Bool = false
+    ) {
+        self.init(
+            core: .init(tokens: tokens, filePath: fileURL?.path, lineMap: lineMap, verbose: verbose),
+            defaultTimeZone: defaultTimeZone
+        )
     }
 
     public func parseEntries() throws -> [Entry] {

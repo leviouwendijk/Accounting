@@ -13,8 +13,19 @@ public enum EntryCompilerTransactionsLoader {
             for case let url as URL in e where url.pathExtension == "ec" {
                 let src = try String(contentsOf: url, encoding: .utf8)
                 var lx = EntryCompilerLexer(source: src)
-                let toks = lx.collectAllTokens()
-                let parsed = try EntryCompilerTransactionsFileParser(tokens: toks).parseTransactionsFile()
+                let (toks, lineMap) = lx.collectAllTokensWithLineMap()
+
+                let parser = EntryCompilerTransactionsFileParser(
+                    core: .init(
+                        tokens: toks,
+                        filePath: url.path,
+                        lineMap: lineMap,
+                        verbose: verbose
+                    ),
+                    fileURL: url
+                )
+
+                let parsed = try parser.parseTransactionsFile()
                 txs.append(contentsOf: parsed)
 
                 if verbose {
