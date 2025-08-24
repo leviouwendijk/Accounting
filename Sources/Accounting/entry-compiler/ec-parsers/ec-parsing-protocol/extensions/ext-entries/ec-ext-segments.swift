@@ -1,7 +1,6 @@
 import Foundation
 
 public extension EntryCompilerParsing {
-    // Variants on a single name:  ident ('#' ident)*
     @inline(__always)
     func readNameWithVariantChain() throws -> String {
         guard case let .ident(base0) = current else {
@@ -9,14 +8,38 @@ public extension EntryCompilerParsing {
         }
         var s = base0
         advance()
+
         while current == .hash {
-            advance()
-            guard case let .ident(v) = current else {
-                throw ParserError.unexpectedToken(current, expected: "identifier (after '#')", at: loc())
+            advance() // eat '#'
+
+            var variant = ""
+            var sawAny = false
+
+            variantLoop: while true {
+                switch current {
+                case let .ident(v):
+                    variant += v
+                    sawAny = true
+                    advance()
+                case let .number(n):
+                    variant += String(describing: n) // supports Int/Decimal
+                    sawAny = true
+                    advance()
+                default:
+                    break variantLoop
+                }
             }
-            s.append("#"); s.append(v)
-            advance()
+
+            guard sawAny else {
+                throw ParserError.unexpectedToken(
+                    current, expected: "identifier or number after '#'", at: loc()
+                )
+            }
+
+            s.append("#")
+            s.append(variant)
         }
+
         return s
     }
 
@@ -157,43 +180,3 @@ public extension EntryCompilerParsing {
         return (domain, copy)
     }
 }
-
-// previous
-// public extension EntryCompilerParsing {
-//     // ---- Generic segment readers
-//     @inline(__always)
-//     func readFlatSegments() -> [String] {
-//         var segs: [String] = []
-//         while true {
-//             switch current {
-//             case let .ident(s): segs.append(s); advance()
-//             case let .number(n): segs.append("\(n)"); advance()
-//             case let .keyword(k) where k == "inventory": segs.append(k); advance()
-//             default: return segs
-//             }
-//             if current == .dot || current == .arrow { advance(); continue }
-//             return segs
-//         }
-//     }
-
-//     func readSegmentsUntilRPar(allowAllAsAlias: Bool = false) throws -> (String, [String]) {
-//         var segs: [String] = []
-//         while current != .rPar && current != .eof {
-//             switch current {
-//             case let .ident(s): segs.append(s); advance()
-//             case let .number(n): segs.append("\(n)"); advance()
-//             case .keyword("inventory"): segs.append("inventory"); advance()
-//             default:
-//                 // don’t swallow unknown tokens; exit so the caller can fail cleanly
-//                 break
-//             }
-//             if current == .arrow || current == .dot { advance(); continue }
-//             // stop if we hit something that isn’t a segment or separator
-//             if current != .ident(""), current != .number(0), current != .keyword("inventory") { break }
-//         }
-//         try expect(.rPar)
-//         guard !segs.isEmpty else { throw ParserError.unexpectedToken(current, expected: "non-empty path", at: loc()) }
-//         if allowAllAsAlias { return (segs.first ?? "", segs) }
-//         var copy = segs; let domain = copy.removeFirst(); return (domain, copy)
-//     }
-// }

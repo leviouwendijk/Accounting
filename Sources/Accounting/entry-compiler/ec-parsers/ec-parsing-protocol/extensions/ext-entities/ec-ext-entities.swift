@@ -29,19 +29,29 @@ public extension EntryCompilerParsing {
         let hint = _entityPathHint(fileURL: nil, inferredClass: inferredClass, inferredFamily: inferredFamily)
 
         while current != .rBrace && current != .eof {
-            // if parseTypeDirective(into: &metadata) { continue }
-            // if parseDomainDirective(into: &metadata) { continue }
-            // if parseContentBlock(into: &metadata) { continue }
-            // if parseOwnershipBlock(into: &metadata) { continue }
-
-            if parseTypeDirective(into: &metadata) { core.trace("  type → \(metadata["type"] ?? "")"); continue }
-            if parseDomainDirective(into: &metadata) { core.trace("  domain.* set"); continue }
-            if parseContentBlock(into: &metadata) { core.trace("  content.* set"); continue }
-            if parseOwnershipBlock(into: &metadata, tz: defaultTZ) {
-                core.trace("  ownership.* set"); continue
+            if parseTypeDirective(into: &metadata) { 
+                core.trace("  type → \(metadata["type"] ?? "")")
+                continue 
             }
+
+            if parseDomainDirective(into: &metadata) {
+                core.trace("  domain.* set")
+                continue 
+            }
+
+            if parseContentBlock(into: &metadata) {
+                core.trace("  content.* set")
+                continue 
+            }
+
+            if parseOwnershipBlock(into: &metadata, tz: defaultTZ) {
+                core.trace("  ownership.* set")
+                continue
+            }
+
             if try parseOwnershipRollforward(into: &metadata, tz: defaultTZ) {
-                core.trace("  ownership.rollforward { … }"); continue
+                core.trace("  ownership.rollforward { … }")
+                continue
             }
 
             switch current {
