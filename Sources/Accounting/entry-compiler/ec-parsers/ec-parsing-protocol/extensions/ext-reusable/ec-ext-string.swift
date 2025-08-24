@@ -11,6 +11,7 @@ public extension EntryCompilerParsing {
             case let .ident(s):   parts.append(s); advance()
             case let .keyword(s): parts.append(s); advance()
             case let .number(n):  parts.append("\(n)"); advance()
+            case .dot:            parts.append("."); advance()
             default:
                 throw ParserError.unexpectedToken(current, expected: "verbatim block type case", at: loc())
             }
