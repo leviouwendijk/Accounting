@@ -1,45 +1,6 @@
 import Foundation
 
-public struct EntryCompilerLexingSets: Sendable, Codable {
-    public let keywords: Set<String>
-    public let idents: Set<String>
-    
-    public init(
-        keywords: Set<String>,
-        idents: Set<String>
-    ) {
-        self.keywords = keywords
-        self.idents = idents
-    }
-}
-
-public enum EntryCompilerLexingFlavor: Sendable {
-    case settings
-    case accounts
-    case entities
-    case entries
-    case transactions
-    case string
-    case fallback
-}
-
-// public func entryCompilerIdentSet() -> Set<String> {
-//     return [
-//         "account",
-//         "entity",
-//     ]
-// }
-
-// public func entryCompilerStringBlockKeywordSet() -> Set<String> {
-//     return [
-//         "details",
-//         "label",
-//         "reason",
-//         // "name"
-//     ]
-// }
-
-public func entryCompilerLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompilerLexingSets {
+public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompilerLexingSets {
     let baseIdents: Set<String> = [
         "account",
         "entity"

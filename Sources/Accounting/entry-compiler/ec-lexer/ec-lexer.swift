@@ -16,7 +16,7 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
         flavor: EntryCompilerLexingFlavor
     ) {
         self.scalars = Array(source.unicodeScalars)
-        self.lexingSets = entryCompilerLexingSets(flavor: flavor)
+        self.lexingSets = aggregateLexingSets(flavor: flavor)
     }
 
     public mutating func nextToken() -> EntryCompilerToken {
@@ -86,7 +86,7 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
         if CharacterSet.letters.union(CharacterSet(charactersIn: "_")).contains(c) {
             let ident = readIdent()
 
-            let stringSet = entryCompilerLexingSets(flavor: .string).keywords
+            let stringSet = aggregateLexingSets(flavor: .string).keywords
 
             if stringSet.contains(ident) {
                 detailsState = .awaitingOpen
