@@ -33,7 +33,7 @@ public final class EntryCompilerAccountsFileParser: EntryCompilerParsing {
         var out: [AccountDef] = []
         while current != .eof {
             switch current {
-            case .keyword("account"), .ident("account"):
+            case .keyword("account"):
                 core.trace("• account override block @ \(loc())")
                 let def = try parseAccountOverrideBlock()
                 out.append(def)
@@ -69,7 +69,7 @@ public extension EntryCompilerParsing {
                 }
                 code = String((n as NSDecimalNumber).intValue); advance()
 
-            case .keyword("label"), .ident("label"):
+            case .keyword("label"):
                 advance()
                 if current == .lBrace {
                     label = try parseFreeTextBlock(named: "label")
@@ -81,24 +81,24 @@ public extension EntryCompilerParsing {
                     label = s; advance()
                 }
 
-            case .keyword("direction"), .ident("direction"):
+            case .keyword("direction"):
                 advance(); try expect(.equals)
                 guard case let .keyword(dc) = current else {
                     throw ParserError.unexpectedToken(current, expected: "debit|credit|dr|cr", at: loc())
                 }
                 direction = try Direction(raw: dc); advance()
 
-            case .keyword("level"), .ident("level"):
+            case .keyword("level"):
                 advance(); try expect(.equals)
                 guard case let .number(n) = current else {
                     throw ParserError.unexpectedToken(current, expected: "number", at: loc())
                 }
                 level = (n as NSDecimalNumber).intValue; advance()
 
-            case .keyword("identifiers"), .ident("identifiers"):
+            case .keyword("identifiers"):
                 identifiers = try parseAccountIdentifiersBlock()
 
-            case .keyword("applicability"), .ident("applicability"):
+            case .keyword("applicability"):
                 applicability = try parseApplicabilityBlock()
 
             default:

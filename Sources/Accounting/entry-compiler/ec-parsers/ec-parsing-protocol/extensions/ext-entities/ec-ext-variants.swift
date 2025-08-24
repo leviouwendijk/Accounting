@@ -29,20 +29,20 @@ public extension EntryCompilerParsing {
 
             while current != .rBrace && current != .eof {
                 switch current {
-                case .keyword("use"), .ident("use"):
+                case .keyword("use"):
                     guard vName == nil else {
                         throw ParserError.unexpectedToken(current, expected: "metadata/details/subvariant", at: loc())
                     }
                     advance(); try expect(.keyword("alias"))
                     vName = try readSingleAliasFlexible()
 
-                case .keyword("metadata"), .ident("metadata"):
+                case .keyword("metadata"):
                     vMeta = try parseStringMapBlock(named: "metadata")
 
-                case .ident("details"), .keyword("details"):
+                case .ident("details"):
                     vDetails = try parseFreeTextBlock(named: "details")
 
-                case .keyword("subvariant"), .ident("subvariant"):
+                case .keyword("subvariant"), .keyword("subvariant"):
                     guard let v = vName else {
                         throw ParserError.unexpectedToken(current, expected: "variant alias before subvariant", at: loc())
                     }
@@ -69,7 +69,7 @@ public extension EntryCompilerParsing {
     @inlinable
     func parseSubvariantBlocks(parentKey: EntityKey) throws -> [EntityDef] {
         var defs: [EntityDef] = []
-        while current == .keyword("subvariant") || current == .ident("subvariant") {
+        while current == .keyword("subvariant") {
             advance()
 
             var name: String? = nil
@@ -83,17 +83,17 @@ public extension EntryCompilerParsing {
 
             while current != .rBrace && current != .eof {
                 switch current {
-                case .keyword("use"), .ident("use"):
+                case .keyword("use"):
                     guard name == nil else {
                         throw ParserError.unexpectedToken(current, expected: "metadata/details", at: loc())
                     }
                     advance(); try expect(.keyword("alias"))
                     name = try readSingleAliasFlexible()
 
-                case .keyword("metadata"), .ident("metadata"):
+                case .keyword("metadata"):
                     meta = try parseStringMapBlock(named: "metadata")
 
-                case .ident("details"), .keyword("details"):
+                case .ident("details"):
                     details = try parseFreeTextBlock(named: "details")
 
                 default:

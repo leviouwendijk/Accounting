@@ -23,7 +23,7 @@ public extension EntryCompilerParsing {
                 }
                 adjustment = try parseSingleInventoryAdjustment()
 
-            case .keyword("inventory"), .ident("inventory"):
+            case .keyword("inventory"):
                 if adjustment != nil { 
                     throw ParserError.unexpectedToken(current, expected: "single inventory adjustment", at: loc()) 
                 }

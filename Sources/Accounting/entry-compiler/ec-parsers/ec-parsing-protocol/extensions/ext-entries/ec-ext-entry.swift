@@ -11,7 +11,7 @@ public extension EntryCompilerParsing {
         while current != .rBrace && current != .eof {
             switch current {
 
-            case .keyword("id"), .ident("id"):
+            case .keyword("id"):
                 try parseId(into: &entry.id)
 
             case .keyword("timezone"):
