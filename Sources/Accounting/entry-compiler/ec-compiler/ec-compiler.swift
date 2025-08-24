@@ -18,7 +18,7 @@ public struct EntryCompiler: Sendable {
     }
 
     public func lex(_ source: String) -> [EntryCompilerToken] {
-        var lx = EntryCompilerLexer(source: source)
+        var lx = EntryCompilerLexer(source: source, flavor: .fallback)
         var out: [EntryCompilerToken] = []
         while true {
             let t = lx.nextToken()
@@ -29,7 +29,7 @@ public struct EntryCompiler: Sendable {
     }
 
     public func lexWithLineMap(_ source: String) -> ([EntryCompilerToken], [Int]) {
-        var lx = EntryCompilerLexer(source: source)
+        var lx = EntryCompilerLexer(source: source, flavor: .fallback)
         return lx.collectAllTokensWithLineMap()
     }
 

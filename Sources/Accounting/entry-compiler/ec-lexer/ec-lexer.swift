@@ -9,8 +9,14 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
     public var line: Int = 1
     public var column: Int = 1
 
-    public init(source: String) {
+    public let lexingSets: EntryCompilerLexingSets
+
+    public init(
+        source: String,
+        flavor: EntryCompilerLexingFlavor
+    ) {
         self.scalars = Array(source.unicodeScalars)
+        self.lexingSets = entryCompilerLexingSets(flavor: flavor)
     }
 
     public mutating func nextToken() -> EntryCompilerToken {
@@ -80,13 +86,12 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
         if CharacterSet.letters.union(CharacterSet(charactersIn: "_")).contains(c) {
             let ident = readIdent()
 
-            let kwSet = entryCompilerKeywordSet()
-            let kwStringBlocks = entryCompilerStringBlockKeywordSet()
+            let stringSet = entryCompilerLexingSets(flavor: .string).keywords
 
-            if kwStringBlocks.contains(ident) {
+            if stringSet.contains(ident) {
                 detailsState = .awaitingOpen
                 return .keyword(ident)
-            } else if kwSet.contains(ident) {
+            } else if lexingSets.keywords.contains(ident) {
                 return .keyword(ident)
             } else {
                 return .ident(ident)

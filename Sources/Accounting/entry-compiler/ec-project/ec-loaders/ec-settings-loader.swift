@@ -28,7 +28,7 @@ public enum EntryCompilerSettingsLoader {
             throw EntryCompilerSettingsLoaderError.fileEmpty(url)
         }
 
-        var lexer = EntryCompilerLexer(source: src)
+        var lexer = EntryCompilerLexer(source: src, flavor: .settings)
         let toks = lexer.collectAllTokens() 
 
         return try EntryCompilerSettingsParser(tokens: toks).parseSettingsBlock()

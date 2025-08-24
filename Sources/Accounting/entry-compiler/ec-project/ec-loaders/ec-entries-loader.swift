@@ -12,7 +12,7 @@ public enum EntryCompilerEntriesLoader {
         if let e = fm.enumerator(at: root, includingPropertiesForKeys: nil) {
             for case let url as URL in e where url.pathExtension == "ec" {
                 let src = try String(contentsOf: url, encoding: .utf8)
-                var lx = EntryCompilerLexer(source: src)
+                var lx = EntryCompilerLexer(source: src, flavor: .entries)
                 let (toks, lineMap) = lx.collectAllTokensWithLineMap()
                 let parser = EntryCompilerEntriesParser(
                     tokens: toks,
