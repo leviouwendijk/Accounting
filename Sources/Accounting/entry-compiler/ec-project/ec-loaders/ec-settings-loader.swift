@@ -18,7 +18,9 @@ public enum EntryCompilerSettingsLoaderError: Error, LocalizedError, Sendable {
 }
 
 public enum EntryCompilerSettingsLoader {
-    public static func load(from projectRoot: URL) throws -> EntryCompilerSettings {
+    public static func load(
+        from projectRoot: URL
+    ) throws -> EntryCompilerSettings {
         let url = projectRoot.appendingPathComponent("config/settings.ec")
         guard FileManager.default.fileExists(atPath: url.path) else {
             throw EntryCompilerSettingsLoaderError.fileNotFound(url)
@@ -27,10 +29,14 @@ public enum EntryCompilerSettingsLoader {
         guard src.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false else {
             throw EntryCompilerSettingsLoaderError.fileEmpty(url)
         }
-
         var lexer = EntryCompilerLexer(source: src, flavor: .settings)
-        let toks = lexer.collectAllTokens() 
+        let (toks, lineMap) = lexer.collectAllTokensWithLineMap()
 
-        return try EntryCompilerSettingsParser(tokens: toks).parseSettingsBlock()
+        let parser = EntryCompilerSettingsParser(
+            tokens: toks,
+            fileURL: url,
+            lineMap: lineMap
+        )
+        return try parser.parseSettingsBlock()
     }
 }

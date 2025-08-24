@@ -2,8 +2,63 @@ import Foundation
 
 public final class EntryCompilerSettingsParser: EntryCompilerParsing {
     public var core: EntryCompilerParserCore
-    public init(core: EntryCompilerParserCore) { self.core = core }
-    public convenience init(tokens: [EntryCompilerToken]) {
-        self.init(core: EntryCompilerParserCore(tokens: tokens))
+    private let fileURL: URL?
+
+    public init(core: EntryCompilerParserCore, fileURL: URL? = nil) {
+        self.core = core
+        self.fileURL = fileURL
+    }
+
+    public convenience init(
+        tokens: [EntryCompilerToken],
+        fileURL: URL? = nil,
+        lineMap: [Int]? = nil,
+        verbose: Bool = false
+    ) {
+        self.init(
+            core: .init(
+                tokens: tokens,
+                filePath: fileURL?.path,
+                lineMap: lineMap,
+                verbose: verbose
+            ),
+            fileURL: fileURL
+        )
+    }
+
+    public func parseSettingsBlock() throws -> EntryCompilerSettings {
+        core.trace("parsing settings file: \(fileURL?.lastPathComponent ?? "<memory>")")
+        try expectKeyword("settings")
+        try beginBlock()
+
+        var entrySettings: EntrySettings?
+        var aggregationSettings: AggregationSettings?
+
+        while current != .rBrace && current != .eof {
+            switch current {
+            case .keyword("entry"):
+                core.trace("• settings entry block @ \(loc())")
+                entrySettings = try parseEntrySettings()
+            case .keyword("aggregation"):
+                core.trace("• settings aggregation block @ \(loc())")
+                aggregationSettings = try parseAggregationSettings()
+            default:
+                throw ParserError.unexpectedToken(current, expected: "entry or aggregation", at: loc())
+            }
+        }
+
+        try endBlock()
+
+        guard let es = entrySettings else {
+            throw ParserError.unexpectedToken(current, expected: "entry { default_timezone = … }", at: loc())
+        }
+        core.trace("  → \(es.defaultTimezone)")
+
+        guard let `as` = aggregationSettings else {
+            throw ParserError.unexpectedToken(current, expected: "aggregation { include_previous_periods = … }", at: loc())
+        }
+        core.trace("  → \(`as`.includePreviousPeriods)")
+
+        return EntryCompilerSettings(entry: es, aggregation: `as`)
     }
 }

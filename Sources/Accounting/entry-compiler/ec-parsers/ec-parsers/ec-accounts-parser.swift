@@ -10,6 +10,7 @@ public final class EntryCompilerAccountsFileParser: EntryCompilerParsing {
         self.core = core
         self.fileURL = fileURL
     }
+
     public convenience init(
         tokens: [EntryCompilerToken],
         fileURL: URL? = nil,
