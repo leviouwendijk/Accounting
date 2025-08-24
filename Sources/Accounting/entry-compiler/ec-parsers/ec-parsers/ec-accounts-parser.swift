@@ -13,12 +13,14 @@ public final class EntryCompilerAccountsFileParser: EntryCompilerParsing {
     public convenience init(
         tokens: [EntryCompilerToken],
         fileURL: URL? = nil,
+        lineMap: [Int]? = nil,
         verbose: Bool = false
     ) {
         self.init(
             core: .init(
                 tokens: tokens,
                 filePath: fileURL?.path,
+                lineMap: lineMap,
                 verbose: verbose
             ),
             fileURL: fileURL

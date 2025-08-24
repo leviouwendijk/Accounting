@@ -14,9 +14,14 @@ public enum AccountStoreLoader {
             for case let url as URL in e where url.pathExtension == "ec" {
                 let src = try String(contentsOf: url, encoding: .utf8)
                 var lx = EntryCompilerLexer(source: src)
-                let (toks, _) = lx.collectAllTokensWithLineMap()
+                let (toks, lineMap) = lx.collectAllTokensWithLineMap()
 
-                let parser = EntryCompilerAccountsFileParser(tokens: toks, fileURL: url, verbose: verbose)
+                let parser = EntryCompilerAccountsFileParser(
+                    tokens: toks,
+                    fileURL: url,
+                    lineMap: lineMap,
+                    verbose: verbose
+                )
                 let parsed = try parser.parseAccountsFile()
                 defs.append(contentsOf: parsed)
 
