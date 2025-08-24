@@ -208,8 +208,7 @@ public func entryCompilerLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryC
     switch flavor {
     case .settings:
         let keywords = union(global, date, settings, aggregation)
-        let idents   = baseIdents
-        return .init(keywords: keywords, idents: idents)
+        return .init(keywords: keywords, idents: [])
 
     case .accounts:
         // promote “account” only here
