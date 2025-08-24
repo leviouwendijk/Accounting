@@ -2,7 +2,6 @@ import Foundation
 import Extensions
 
 public extension EntryCompilerParsing {
-    // transaction { ... }
     @inlinable
     func parseTransactionBlock() throws -> Transaction {
         try expectKeyword("transaction")
@@ -20,7 +19,8 @@ public extension EntryCompilerParsing {
 
         while current != .rBrace && current != .eof {
             switch current {
-            case .keyword("id"):
+
+            case .ident("id"), .keyword("id"):
                 try expectFieldEquals("id")
                 guard case let .number(n) = current else {
                     throw ParserError.unexpectedToken(current, expected: "number", at: loc())
@@ -28,7 +28,7 @@ public extension EntryCompilerParsing {
                 id = (n as NSDecimalNumber).intValue
                 advance()
 
-            case .keyword("date"):
+            case .ident("date"), .keyword("date"):
                 dateSpec = try parseTransactionDateDirective()
 
             case .ident("source"), .keyword("source"):
@@ -44,41 +44,36 @@ public extension EntryCompilerParsing {
                 if let s = try? TransactionSource.parse(from: raw) {
                     source = s
                 } else {
-                    let src = try TransactionSource.parse(from: raw.lowercased())
-                    source = src
+                    source = try TransactionSource.parse(from: raw.lowercased())
                 }
-                // } else {
-                //     throw ParserError.unexpectedToken(
-                //         current,
-                //         expected: "bunq|cash|bank|card|manual|import|private",
-                //         at: loc()
-                //     )
-                // }
 
-            case .keyword("identifiers"):
+            case .ident("identifiers"), .keyword("identifiers"):
                 identifiers = try parseTransactionIdentifiersBlock()
 
-            case .keyword("amount"):
+            case .ident("amount"), .keyword("amount"):
                 amount = try parseTransactionAmountBlock()
 
-            case .keyword("details"):     
+            case .ident("details"), .keyword("details"):
+                // details { … } (string-block handled by lexer) OR free-text fallback
                 details = try parseFreeTextBlock(named: "details")
 
-            case .keyword("counterparty"):
+            case .ident("counterparty"), .keyword("counterparty"):
                 counterparty = try parseTransactionCounterpartyBlock()
 
-            case .keyword("metadata"):    
+            case .ident("metadata"), .keyword("metadata"):
                 metadata = try parseStringMapBlock(named: "metadata")
 
-            case .keyword("status"):
+            case .ident("status"), .keyword("status"):
                 try expectFieldEquals("status")
-                guard case let .keyword(s) = current else {
+                let raw: String
+                switch current {
+                case let .ident(s), let .keyword(s), let .string(s): raw = s; advance()
+                default: throw ParserError.unexpectedToken(current, expected: "pending|cleared|reconciled|voided", at: loc())
+                }
+                guard let st = TransactionStatus(rawValue: raw) else {
                     throw ParserError.unexpectedToken(current, expected: "pending|cleared|reconciled|voided", at: loc())
                 }
-                guard let st = TransactionStatus(rawValue: s) else {
-                    throw ParserError.unexpectedToken(current, expected: "pending|cleared|reconciled|voided", at: loc())
-                }
-                status = st; advance()
+                status = st
 
             default:
                 throw ParserError.unexpectedToken(
