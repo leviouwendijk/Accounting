@@ -5,7 +5,7 @@ public func entryCompilerStringBlockKeywordSet() -> Set<String> {
         "details",
         "label",
         "reason",
-        "name"
+        // "name"
     ]
 }
 
