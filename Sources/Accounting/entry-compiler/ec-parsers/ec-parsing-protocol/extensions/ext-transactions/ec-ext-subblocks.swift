@@ -131,42 +131,4 @@ public extension EntryCompilerParsing {
         try endBlock()
         return TransactionCounterparty(name: name, iban: iban, bic: bic)
     }
-
-    // /// details { "quoted ok" } OR details { free tokens until '}' }
-    // @inlinable
-    // func parseFreeTextBlock() throws -> String {
-    //     try expect(.ident("details")); try beginBlock()
-    //     var parts: [String] = []
-    //     while current != .rBrace && current != .eof {
-    //         switch current {
-    //         case let .string(s): parts.append(s); advance()
-    //         case let .ident(s):  parts.append(s); advance()
-    //         case let .number(n): parts.append("\(n)"); advance()
-    //         default: break
-    //         }
-    //     }
-    //     try endBlock()
-    //     return parts.joined(separator: " ")
-    // }
-
-    // /// metadata { key = "value"  other=foo }
-    // @inlinable
-    // func parseStringMapBlock() throws -> [String:String] {
-    //     try expect(.ident("metadata")); try beginBlock()
-    //     var out: [String:String] = [:]
-    //     while current != .rBrace && current != .eof {
-    //         guard case let .ident(k) = current else {
-    //             throw ParserError.unexpectedToken(current, expected: "identifier (key)", at: loc())
-    //         }
-    //         advance(); try expect(.equals)
-    //         if case let .string(v) = current { out[k] = v; advance() }
-    //         else if case let .ident(v) = current { out[k] = v; advance() }
-    //         else if case let .number(n) = current { out[k] = "\(n)"; advance() }
-    //         else {
-    //             throw ParserError.unexpectedToken(current, expected: "string|identifier|number", at: loc())
-    //         }
-    //     }
-    //     try endBlock()
-    //     return out
-    // }
 }

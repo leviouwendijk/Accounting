@@ -1,32 +1,23 @@
 import Foundation
 
 public extension EntryCompilerParsing {
-    // @inlinable
-    // func parseStringMapBlock(named kw: String = "metadata") throws -> [String:String] {
-    //     // optionally consume leading keyword/ident
-    //     if case .ident(let s) = current, s == kw {
-    //         advance()
-    //     } else if case .keyword(let s) = current, s == kw {
-    //         advance()
-    //     }
-    //     try beginBlock()
-    //     var out: [String:String] = [:]
-    //     while current != .rBrace && current != .eof {
-    //         guard case let .ident(k) = current else {
-    //             throw ParserError.unexpectedToken(current, expected: "identifier (key)", at: loc())
-    //         }
-    //         advance(); try expect(.equals)
-    //         switch current {
-    //         case let .string(v): out[k] = v; advance()
-    //         case let .ident(v):  out[k] = v; advance()
-    //         case let .number(n): out[k] = "\(n)"; advance()
-    //         default:
-    //             throw ParserError.unexpectedToken(current, expected: "string|identifier|number", at: loc())
-    //         }
-    //     }
-    //     try endBlock()
-    //     return out
-    // }
+    @inlinable
+    func readVerbatimBlockBody() throws -> String {
+        try expect(.lBrace)
+        var parts: [String] = []
+        while current != .rBrace && current != .eof {
+            switch current {
+            case let .string(s):  parts.append(s); advance()
+            case let .ident(s):   parts.append(s); advance()
+            case let .keyword(s): parts.append(s); advance()
+            case let .number(n):  parts.append("\(n)"); advance()
+            default:
+                throw ParserError.unexpectedToken(current, expected: "verbatim block type case", at: loc())
+            }
+        }
+        try expect(.rBrace)
+        return parts.joined(separator: " ") // manual re-stringing
+    }
 
     @inlinable
     func parseStringMapBlock(named kw: String = "metadata") throws -> [String:String] {

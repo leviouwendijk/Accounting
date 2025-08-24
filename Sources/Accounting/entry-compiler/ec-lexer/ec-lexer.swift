@@ -1,20 +1,25 @@
 import Foundation
 
-public struct EntryCompilerLexer: Sendable {
-    private let scalars: [UnicodeScalar]
-    private var index: Int = 0
+public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
+    public let scalars: [UnicodeScalar]
+    public var index: Int = 0
 
-    private enum DetailsState { case none, awaitingOpen, awaitingContent, awaitingClose }
-    private var detailsState: DetailsState = .none
+    public var detailsState: EntryCompilerDetailsState = .none
 
-    private var line: Int = 1
-    private var column: Int = 1
+    public var line: Int = 1
+    public var column: Int = 1
 
     public init(source: String) {
         self.scalars = Array(source.unicodeScalars)
     }
 
     public mutating func nextToken() -> EntryCompilerToken {
+        if detailsState == .awaitingContent {
+            let text = readUntilClosingBraceVerbatim()
+            detailsState = .awaitingClose
+            return .string(text)
+        }
+
         skipWhitespaceAndComments()
 
         switch detailsState {
@@ -90,120 +95,5 @@ public struct EntryCompilerLexer: Sendable {
 
         advance()
         return nextToken()
-    }
-
-    private mutating func skipWhitespaceAndComments() {
-        while let c = peek() {
-            if CharacterSet.whitespacesAndNewlines.contains(c) {
-                advance(); continue
-            }
-            // single‑line comment `// ...`
-            if c == "/" && peek(aheadBy: 1) == "/" {
-                advance(); advance() // consume '//'
-                while let c2 = peek(), c2 != "\n" { advance() }
-                continue
-            }
-            break
-        }
-    }
-
-    private mutating func readNumber() -> Decimal {
-        var buffer = ""
-        while let c = peek(), CharacterSet(charactersIn: "0123456789.").contains(c) {
-            buffer.append(Character(c))
-            advance()
-        }
-        return Decimal(string: buffer) ?? 0
-    }
-
-    private mutating func readIdent() -> String {
-        var buffer = ""
-        // let extra = CharacterSet(charactersIn: "_")
-        // let extra = CharacterSet(charactersIn: "_/-")
-        let extra = CharacterSet(charactersIn: "_/")
-        while let c = peek(), CharacterSet.alphanumerics.union(extra) .contains(c) {
-            buffer.append(Character(c))
-            advance()
-        }
-        return buffer
-    }
-
-    private mutating func readPattern(_ pattern: String) throws -> String {
-        let regex = try NSRegularExpression(pattern: "^\(pattern)")
-        let remaining = String(scalars[index...].map { Character($0) })
-        let nsrange = NSRange(location: 0, length: remaining.utf16.count)
-        if let m = regex.firstMatch(in: remaining, options: [], range: nsrange),
-           let range = Range(m.range, in: remaining) {
-            let lit = String(remaining[range])
-            index += lit.utf16.count  // consume matched chars
-            return lit
-        }
-        throw NSError(domain: "NoPattern", code: 1)
-    }
-
-    private mutating func readUntilClosingBrace() -> String {
-        var depth = 1
-        var buffer = ""
-        while let c = peek() {
-            if c == "{" {
-                advance()
-                depth += 1
-                buffer.append("{")
-                continue
-            }
-            if c == "}" {
-                depth -= 1
-                if depth == 0 {
-                    break
-                }
-                advance()
-                buffer.append("}")
-                continue
-            }
-            advance()
-            buffer.append(Character(c))
-        }
-        return buffer.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    @inline(__always) private func peek(aheadBy n: Int = 0) -> UnicodeScalar? {
-        let i = index + n
-        return i < scalars.count ? scalars[i] : nil
-    }
-
-    @inline(__always) private mutating func advance() {
-        if index < scalars.count {
-            let c = scalars[index]
-            index += 1
-            if c == "\n" { line += 1; column = 1 } else { column += 1 }
-        } else {
-            index += 1
-        }
-    }
-
-    public mutating func collectAllTokens() -> [EntryCompilerToken] {
-        var tokens: [EntryCompilerToken] = []
-        while true {
-            let t = self.nextToken()
-            tokens.append(t)
-            if t == .eof { break }
-        }
-        return tokens
-    }
-
-    public mutating func collectAllTokensWithLineMap() -> ([EntryCompilerToken], [Int]) {
-        var toks: [EntryCompilerToken] = []
-        var lines: [Int] = []
-        // reset indices if this lexer instance was used before
-        index = 0; line = 1; column = 1
-
-        while true {
-            let lineAtStart = line
-            let t = self.nextToken()
-            toks.append(t)
-            lines.append(lineAtStart)
-            if t == .eof { break }
-        }
-        return (toks, lines)
     }
 }
