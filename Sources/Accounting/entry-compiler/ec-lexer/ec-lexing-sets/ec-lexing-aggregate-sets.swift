@@ -35,12 +35,17 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
         "day"
     ]
 
+    let directions: Set<String> = [
+        "debit", 
+        "credit", 
+    ]
+
     let entry: Set<String> = [
         "entry",
         "for", 
         "in",
-        "debit", 
-        "credit", 
+        // "debit", 
+        // "credit", 
         "dr", 
         "cr",
         "posting",
@@ -174,7 +179,7 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
 
     case .accounts:
         // promote “account” only here
-        var keywords = union(global, shared, date, account, ownership, asset, aggregation)
+        var keywords = union(global, shared, date, account, ownership, asset, aggregation, directions)
         keywords.formUnion(["account"])
         // keep “entity” explicitly in idents (it will be ident by default, this just documents intent)
         let idents: Set<String> = ["entity"]
@@ -190,7 +195,7 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
 
     case .entries:
         // no “account” or “entity” as keywords here
-        let keywords = union(global, shared, date, entry, inventory, aggregation)
+        let keywords = union(global, shared, date, entry, inventory, aggregation, directions)
         let idents: Set<String> = baseIdents
         return .init(keywords: keywords, idents: idents)
 
