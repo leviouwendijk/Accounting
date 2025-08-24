@@ -1,6 +1,5 @@
 import Foundation
 
-// @usableFromInline 
 public enum EntryCompilerFreeTextMode {
     case strict(expected: String)   // throw on unexpected token
     case lenient                    // stop + return on unexpected
@@ -20,8 +19,12 @@ public extension EntryCompilerParsing {
         let i = core.index
         let toks = core.tokens
         guard i < toks.count - 1 else { return false }
-        if case .ident = toks[i], toks[i + 1] == .equals { return true }
-        return false
+        switch toks[i] {
+        case .ident, .keyword:
+            return toks[i + 1] == .equals
+        default:
+            return false
+        }
     }
 
     @inline(__always) func nextIsOneOfKeysStart(_ keys: Set<String>) -> Bool {
@@ -45,7 +48,9 @@ public extension EntryCompilerParsing {
             case let .ident(s):   appendWord(&out, s); advance()
             case let .keyword(s): appendWord(&out, s); advance()
             case let .number(n):  appendWord(&out, "\(n)"); advance()
+            case let .dateLiteral(s): appendWord(&out, s); advance()
             case .dot:            appendDot(&out); advance()
+            case .hash:           out.append("#"); advance() 
             default:
                 switch mode {
                 case .lenient: return out
