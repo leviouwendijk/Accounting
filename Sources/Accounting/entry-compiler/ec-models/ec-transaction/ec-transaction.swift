@@ -5,7 +5,7 @@ public enum TransactionSource: String, Codable, Sendable, StringParsableEnum {
     case bunq, cash, bank, card, manual, `import`, `private`
 }
 
-public enum TransactionStatus: String, Codable, Sendable {
+public enum TransactionStatus: String, Codable, Sendable, StringParsableEnum {
     case pending, cleared, reconciled, voided
 }
 

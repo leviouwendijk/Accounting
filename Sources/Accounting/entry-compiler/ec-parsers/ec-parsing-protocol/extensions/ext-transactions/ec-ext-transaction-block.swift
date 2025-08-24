@@ -68,12 +68,13 @@ public extension EntryCompilerParsing {
                 let raw: String
                 switch current {
                 case let .ident(s), let .keyword(s), let .string(s): raw = s; advance()
-                default: throw ParserError.unexpectedToken(current, expected: "pending|cleared|reconciled|voided", at: loc())
-                }
-                guard let st = TransactionStatus(rawValue: raw) else {
+                default: 
                     throw ParserError.unexpectedToken(current, expected: "pending|cleared|reconciled|voided", at: loc())
                 }
-                status = st
+                // guard let st = TransactionStatus(rawValue: raw) else {
+                //     throw ParserError.unexpectedToken(current, expected: "pending|cleared|reconciled|voided", at: loc())
+                // }
+                status = try TransactionStatus.parse(from: raw)
 
             default:
                 throw ParserError.unexpectedToken(
