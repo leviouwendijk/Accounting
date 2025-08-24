@@ -14,36 +14,6 @@ public extension EntryCompilerParsing {
         throw ParserError.unexpectedToken(current, expected: "IANA tz", at: loc())
     }
 
-    func parseSettingsBlock() throws -> EntryCompilerSettings {
-        try expectKeyword("settings")
-        try beginBlock()
-
-        var entrySettings: EntrySettings?
-        var aggregationSettings: AggregationSettings?
-
-        while current != .rBrace && current != .eof {
-            switch current {
-            case .keyword("entry"):
-                entrySettings = try parseEntrySettings()
-            case .keyword("aggregation"):
-                aggregationSettings = try parseAggregationSettings()
-            default:
-                throw ParserError.unexpectedToken(current, expected: "entry or aggregation", at: loc())
-            }
-        }
-
-        try endBlock()
-
-        guard let es = entrySettings else {
-            throw ParserError.unexpectedToken(current, expected: "entry { default_timezone = … }", at: loc())
-        }
-        guard let `as` = aggregationSettings else {
-            throw ParserError.unexpectedToken(current, expected: "aggregation { include_previous_periods = … }", at: loc())
-        }
-
-        return EntryCompilerSettings(entry: es, aggregation: `as`)
-    }
-
     func parseEntrySettings() throws -> EntrySettings {
         try expectKeyword("entry"); try beginBlock()
 
