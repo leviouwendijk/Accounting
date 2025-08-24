@@ -93,6 +93,40 @@ public extension EntryCompilerParsing {
         return parts.joined(separator: " ")
     }
 
+    @inline(__always)
+    func readUnquotedValue(untilNextKeys nextKeys: Set<String>) -> String {
+        var out = ""
+        func nextIsKeyStart() -> Bool {
+            let i = core.index
+            let toks = core.tokens
+            guard i < toks.count - 1 else { return false }
+            switch toks[i] {
+            case let .ident(k), let .keyword(k):
+                return nextKeys.contains(k) && toks[i + 1] == .equals
+            default:
+                return false
+            }
+        }
+
+        while current != .comma && current != .rBrace && current != .eof && !nextIsKeyStart() {
+            switch current {
+            case let .ident(s), let .keyword(s):
+                if !out.isEmpty { out.append(" ") }
+                out.append(s); advance()
+            case let .number(n):
+                if !out.isEmpty { out.append(" ") }
+                out.append("\(n)"); advance()
+            case .dot:
+                out.append("."); advance()            // <- allow “B.V.” etc.
+            default:
+                break
+            }
+            // stop if next token starts a new key
+            if nextIsKeyStart() { break }
+        }
+        return out.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     @inlinable
     func parseStringBlock(named kw: String = "details") throws -> String {
         if case .ident(let s) = current, s == kw {

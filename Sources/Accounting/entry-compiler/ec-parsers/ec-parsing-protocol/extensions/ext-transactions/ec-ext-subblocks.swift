@@ -98,30 +98,45 @@ public extension EntryCompilerParsing {
 
     @inlinable
     func parseTransactionCounterpartyBlock() throws -> TransactionCounterparty {
-        try expect(.keyword("counterparty")); try beginBlock()
+        if case .keyword("counterparty") = current { advance() }
+        else if case .ident("counterparty") = current { advance() }
+        else { try expect(.keyword("counterparty")) }
+
+        try beginBlock()
         var name: String?
         var iban: String?
-        var bic: String?
+        var bic:  String?
 
         while current != .rBrace && current != .eof {
             switch current {
-            case .keyword("name"):
-                try expectFieldEquals("name")
-                if case let .string(s) = current { name = s; advance() }
-                else if case let .keyword(s) = current { name = s; advance() }
-                else { throw ParserError.unexpectedToken(current, expected: "string|identifier", at: loc()) }
+            case .keyword("name"), .ident("name"):
+                advance()
+                if current == .lBrace {
+                    // name { ACME B.V. }  — lexer now gives one .string token
+                    name = try parseStringBlock(named: "")   // header already consumed
+                } else {
+                    try expect(.equals)
+                    if current == .lBrace {
+                        name = try readVerbatimBlockBody()   // also supports brace-wrapped
+                    } else {
+                        // name = ACME B.V.  — eat until next known key in this block
+                        name = readUnquotedValue(untilNextKeys: ["iban","bic"])
+                    }
+                }
 
-            case .keyword("iban"):
+            case .keyword("iban"), .ident("iban"):
                 try expectFieldEquals("iban")
-                if case let .string(s) = current { iban = s; advance() }
-                else if case let .keyword(s) = current { iban = s; advance() }
-                else { throw ParserError.unexpectedToken(current, expected: "string|identifier", at: loc()) }
+                switch current {
+                case let .string(s), let .ident(s), let .keyword(s): iban = s; advance()
+                default: throw ParserError.unexpectedToken(current, expected: "string|identifier", at: loc())
+                }
 
-            case .keyword("bic"):
+            case .keyword("bic"), .ident("bic"):
                 try expectFieldEquals("bic")
-                if case let .string(s) = current { bic = s; advance() }
-                else if case let .keyword(s) = current { bic = s; advance() }
-                else { throw ParserError.unexpectedToken(current, expected: "string|identifier", at: loc()) }
+                switch current {
+                case let .string(s), let .ident(s), let .keyword(s): bic = s; advance()
+                default: throw ParserError.unexpectedToken(current, expected: "string|identifier", at: loc())
+                }
 
             default:
                 throw ParserError.unexpectedToken(current, expected: "name/iban/bic", at: loc())
