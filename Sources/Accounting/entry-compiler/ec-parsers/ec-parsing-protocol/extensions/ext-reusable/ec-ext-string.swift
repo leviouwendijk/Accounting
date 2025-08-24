@@ -86,6 +86,7 @@ public extension EntryCompilerParsing {
             case let .ident(s):   parts.append(s); advance()
             case let .number(n):  parts.append("\(n)"); advance()
             case let .keyword(s): parts.append(s); advance()
+            case .dot:            parts.append("."); advance()
             default:
                 // stop on anything else (keeps parser in a safe state)
                 return parts.joined(separator: " ")
@@ -118,7 +119,7 @@ public extension EntryCompilerParsing {
                 if !out.isEmpty { out.append(" ") }
                 out.append("\(n)"); advance()
             case .dot:
-                out.append("."); advance()            // <- allow “B.V.” etc.
+                out.append("."); advance()
             default:
                 break
             }
@@ -157,6 +158,7 @@ public extension EntryCompilerParsing {
             case let .string(s): parts.append(s); advance()
             case let .ident(s):  parts.append(s); advance()
             case let .number(n): parts.append("\(n)"); advance()
+            case .dot:           parts.append("."); advance()
             default: break
             }
         }
