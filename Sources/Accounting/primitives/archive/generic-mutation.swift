@@ -1,0 +1,26 @@
+// import Foundation
+
+// // (!): FILE NOT USED BY NEW ENTRY COMPILER
+
+// public enum MovementType: String {
+//     case add, remove, rm, subtract
+// }
+
+// public struct Movement {
+//     public let entity: GenericEntity
+//     public let account: Account
+//     public let amount: Double
+//     public let type: MovementType
+
+//     public init(
+//         entity: GenericEntity, 
+//         account: Account,
+//         amount: Double,
+//         type: MovementType
+//     ) {
+//         self.entity = entity
+//         self.account = account
+//         self.amount = amount
+//         self.type = type
+//     }
+// }
