@@ -25,6 +25,12 @@ public extension EntryCompilerParsing {
             case .keyword("date"):
                 entry.date = try parseDateOrInfer(tz: tz, allowUnixEpoch: true)
 
+            case .keyword("sort"):
+                if entry.sort != nil {
+                    throw ParserError.unexpectedToken(current, expected: "single sort directive", at: loc())
+                }
+                entry.sort = try parseEntrySort()
+
             case .keyword("details"):
                 advance()
                 try expect(.lBrace)

@@ -1,8 +1,15 @@
 import Foundation
+import Extensions
+
+public enum EntrySort: String, RawRepresentable, Hashable, Codable, Sendable, StringParsableEnum {
+    case regular
+    case adjusting
+}
 
 public struct Entry: Hashable, Codable, Sendable {
     public var id: Int?
     public var date: DateSpecification
+    public var sort: EntrySort?
     public var lines: [Line]
     public var details: String? = nil
     public var timezone: String? = nil
@@ -12,6 +19,7 @@ public struct Entry: Hashable, Codable, Sendable {
     public init(
         id: Int? = nil,
         date: DateSpecification = .absolute(Date()),
+        sort: EntrySort? = nil,
         lines: [Line] = [],
         details: String? = nil,
         timezone: String? = nil,
@@ -20,6 +28,7 @@ public struct Entry: Hashable, Codable, Sendable {
     ) {
         self.id = id
         self.date = date
+        self.sort = sort
         self.lines = lines
         self.details = details
         self.timezone = timezone

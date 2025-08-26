@@ -46,6 +46,7 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
         "in",
         // "debit", 
         // "credit", 
+        "sort",
         "dr", 
         "cr",
         "posting",
