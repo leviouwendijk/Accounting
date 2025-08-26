@@ -136,4 +136,62 @@ public func ecTestCompile(
 
     // ---------- Resolved entries snapshot (optional, helpful) ----------
     try writeJSON(result.resolved, to: outDir.appendingPathComponent("resolved-entries.json"))
+
+    // ---------- Statements snapshots ----------
+    do {
+        // 3a) choose plans (tweak partition/materiality/previous as you like)
+        let planBS = AggregationPlan(
+            statement: StatementLibrary.balanceIFRS(materiality: 1000),
+            partition: .init(keys: [.entity], requireBalanced: true),
+            filters: [],
+            includePreviousPeriods: true
+        )
+        let planIS = AggregationPlan(
+            statement: StatementLibrary.incomeStatementIFRS(materiality: 0),
+            partition: nil,
+            filters: [],
+            includePreviousPeriods: true
+        )
+        let planCF = AggregationPlan(
+            statement: StatementLibrary.cashSimple(materiality: 0),
+            partition: nil,
+            filters: [],
+            includePreviousPeriods: false
+        )
+        let planEQ = AggregationPlan(
+            statement: StatementLibrary.equityView(materiality: 0),
+            partition: .init(keys: [.entityClass], requireBalanced: false),
+            filters: [],
+            includePreviousPeriods: false
+        )
+
+        // 3b) run the aggregator for each plan
+        let aggr = Aggregator(accounts: result.accounts, plan: planBS)
+        let cubeBS = try aggr.buildCube(entries: result.resolved, previousEntries: [])
+        try writeJSON(snapshotDTO(cube: cubeBS, statement: planBS.statement),
+                      to: outDir.appendingPathComponent("statement.balance.json"))
+
+        do {
+            let cubeIS = try Aggregator(accounts: result.accounts, plan: planIS)
+                .buildCube(entries: result.resolved, previousEntries: [])
+            try writeJSON(snapshotDTO(cube: cubeIS, statement: planIS.statement),
+                          to: outDir.appendingPathComponent("statement.income.json"))
+        }
+
+        do {
+            let cubeCF = try Aggregator(accounts: result.accounts, plan: planCF)
+                .buildCube(entries: result.resolved)
+            try writeJSON(snapshotDTO(cube: cubeCF, statement: planCF.statement),
+                          to: outDir.appendingPathComponent("statement.cash.json"))
+        }
+
+        do {
+            let cubeEQ = try Aggregator(accounts: result.accounts, plan: planEQ)
+                .buildCube(entries: result.resolved)
+            try writeJSON(snapshotDTO(cube: cubeEQ, statement: planEQ.statement),
+                          to: outDir.appendingPathComponent("statement.equity.json"))
+        }
+
+        vprint(true, "  ✓ statements (balance/income/cash/equity)")
+    }
 }

@@ -1,10 +1,11 @@
 import Foundation
 import Extensions
 
-public enum StatementType: String, RawRepresentable, Codable, Sendable, StringParsableEnum {
+public enum StatementKind: String, RawRepresentable, Codable, Sendable, StringParsableEnum {
     case income 
     case balance
     case cash
+    case equity
 
     public var conventional: String {
         switch self {
@@ -14,19 +15,23 @@ public enum StatementType: String, RawRepresentable, Codable, Sendable, StringPa
             return "balance_sheet"
         case .cash: 
             return "cash_flow_statement"
+        case .equity: 
+            return "equity_view"
         }
     }
 
     public func from(conventional: String) throws -> Self {
         switch conventional {
-        case "income_statement":
+        case Self.income.conventional:
             return .income
-        case "balance_sheet":
+        case Self.balance.conventional:
             return .balance
-        case "cash_flow_statement":
+        case Self.cash.conventional:
             return .cash
+        case Self.equity.conventional:
+            return .equity
         default:
-            throw TypeInferenceError.invalidString(string: conventional, type: "StatementType")
+            throw TypeInferenceError.invalidString(string: conventional, type: "StatementKind")
         }
     }
 }
