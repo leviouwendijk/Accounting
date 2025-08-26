@@ -1,40 +1,37 @@
 import Foundation
 
 public enum StatementLibrary {
-    public static func balanceIFRS(materiality: Decimal = 0) -> StatementDef {
+    // Balance Sheet using explicit codes you showed
+    static func balanceIFRS(materiality: Decimal = 0) -> StatementDef {
         StatementDef(
             name: "IFRS – Balance Sheet",
             kind: .balance,
             rows: [
-                .init(id: .init(raw: "assets"),     label: "Assets",     kind: .balance,
+                .init(id: .init(raw: "assets"), label: "Assets", kind: .balance,
                       materialityThreshold: materiality,
-                      rgs: [.init(includeCodes: nil, includePrefixes: ["10","11","12"], includeLevel: nil, filterDirection: nil)]),
-                .init(id: .init(raw: "equity"),     label: "Equity",     kind: .balance,
+                      rgs: [.init(includeCodes: ["BLimBanRba", "BVrdGehVoo"], includePrefixes: nil, includeLevel: nil, filterDirection: nil)]),
+                .init(id: .init(raw: "equity"), label: "Equity", kind: .balance,
                       materialityThreshold: 0,
-                      rgs: [.init(includeCodes: nil, includePrefixes: ["30"], includeLevel: nil, filterDirection: nil)]),
-                .init(id: .init(raw: "liabilities"),label: "Liabilities",kind: .balance,
+                      rgs: [.init(includeCodes: [/* put one equity RGS code you have */], includePrefixes: nil, includeLevel: nil, filterDirection: nil)]),
+                .init(id: .init(raw: "liabilities"), label: "Liabilities", kind: .balance,
                       materialityThreshold: 0,
-                      rgs: [.init(includeCodes: nil, includePrefixes: ["20","21","22"], includeLevel: nil, filterDirection: nil)])
+                      rgs: [.init(includeCodes: [/* one liability code */], includePrefixes: nil, includeLevel: nil, filterDirection: nil)])
             ]
         )
     }
 
-    public static func incomeStatementIFRS(materiality: Decimal = 0) -> StatementDef {
-        // Adjust prefixes to your RGS catalog for revenue/COGS/Opex/Other income/finance costs, etc.
+    // Income Statement using explicit codes you showed
+    static func incomeStatementIFRS(materiality: Decimal = 0) -> StatementDef {
         StatementDef(
             name: "IFRS – Income Statement",
             kind: .income,
             rows: [
                 .init(id: .init(raw: "revenue"), label: "Revenue", kind: .income,
-                      materialityThreshold: materiality, rgs: [.init(includePrefixes: ["40","41"], includeLevel: nil, filterDirection: nil)]),
-                .init(id: .init(raw: "cogs"),    label: "Cost of Sales", kind: .income,
-                      materialityThreshold: materiality, rgs: [.init(includePrefixes: ["50"], includeLevel: nil, filterDirection: nil)]),
-                .init(id: .init(raw: "opex"),    label: "Operating Expenses", kind: .income,
-                      materialityThreshold: materiality, rgs: [.init(includePrefixes: ["60","61","62"], includeLevel: nil, filterDirection: nil)]),
-                .init(id: .init(raw: "other"),   label: "Other Income/Expense", kind: .income,
-                      materialityThreshold: materiality, rgs: [.init(includePrefixes: ["70"], includeLevel: nil, filterDirection: nil)]),
-                .init(id: .init(raw: "finance"), label: "Finance Income/Costs", kind: .income,
-                      materialityThreshold: materiality, rgs: [.init(includePrefixes: ["71","72"], includeLevel: nil, filterDirection: nil)])
+                      materialityThreshold: materiality,
+                      rgs: [.init(includeCodes: ["WOmzNodOdh","WOmzNohOlh"], includePrefixes: nil, includeLevel: nil, filterDirection: nil)]),
+                .init(id: .init(raw: "cogs_expenses"), label: "COGS/Expenses", kind: .income,
+                      materialityThreshold: materiality,
+                      rgs: [.init(includeCodes: ["WKprKvgKvg"], includePrefixes: nil, includeLevel: nil, filterDirection: nil)])
             ]
         )
     }
