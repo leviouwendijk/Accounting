@@ -4,13 +4,6 @@ public struct StatementRowId: Hashable, Codable, Sendable {
     public let raw: String
 }
 
-public struct RGSMappingRule: Codable, Sendable {
-    public var includeCodes: [String]?       // exact
-    public var includePrefixes: [String]?    // hierarchy family
-    public var includeLevel: Int?            // optional level constraint
-    public var filterDirection: Direction?   // optional: match account natural side
-}
-
 public struct StatementRowDef: Codable, Sendable {
     public let id: StatementRowId
     public let label: String

@@ -30,4 +30,3 @@ public struct NormalizedPosting: Sendable {
         self.dims = dims
     }
 }
-// amount: signed (DR+ / CR−) or keep (amount, direction)
