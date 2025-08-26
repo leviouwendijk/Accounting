@@ -26,22 +26,26 @@ public func compileMatchers(for statement: StatementDef) throws -> [RowMatcher] 
 
 @inline(__always)
 public func matches(rule r: RGSMappingRule, posting p: NormalizedPosting) -> Bool {
-    // Include codes
-    if let codes = r.includeCodes, !codes.isEmpty {
-        if codes.contains(p.rgsCode) == false { return false }
+    // consider whether any selector is actually set & non-empty
+    let hasCodes   = (r.includeCodes?.isEmpty == false)
+    let hasPrefs   = (r.includePrefixes?.isEmpty == false)
+    let hasLevel   = (r.includeLevel != nil)
+    let hasDir     = (r.filterDirection != nil)
+
+    guard hasCodes || hasPrefs || hasLevel || hasDir else {
+        // No selectors → rule is inert, don’t match everything accidentally
+        return false
     }
-    // Include prefixes
-    if let prefs = r.includePrefixes, !prefs.isEmpty {
-        var ok = false
-        for pre in prefs { if p.rgsCode.hasPrefix(pre) { ok = true; break } }
+
+    if hasCodes, let codes = r.includeCodes, !codes.contains(p.rgsCode) { return false }
+    if hasPrefs, let prefs = r.includePrefixes {
+        var ok = false; for pre in prefs where p.rgsCode.hasPrefix(pre) { ok = true; break }
         if !ok { return false }
     }
-    // Level constraint
-    if let lvl = r.includeLevel {
+    if hasLevel, let lvl = r.includeLevel {
         guard let pl = p.rgsLevel, pl == lvl else { return false }
     }
-    // Natural direction (account’s inherent DR/CR side)
-    if let dir = r.filterDirection {
+    if hasDir, let dir = r.filterDirection {
         guard p.naturalSide == dir else { return false }
     }
     return true

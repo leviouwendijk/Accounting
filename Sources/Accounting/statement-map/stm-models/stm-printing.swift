@@ -30,10 +30,11 @@ public func printStatement(_ title: String, cube: StatementCube, statement: Stat
     FileHandle.standardError.write(Data(("\n\(title)\n" + String(repeating: "—", count: title.count) + "\n").utf8))
 
     var grandTotal: Decimal = 0
+    var printedRows = Set<StatementRowId>()
 
     // iterate rows in the order defined by the statement
     for row in statement.rows {
-        // gather all partitions for this row/period
+        printedRows.insert(row.id)
         let rowCells = cube.filter { $0.key.row == row.id && $0.key.periodIndex == periodIndex }
         guard !rowCells.isEmpty else { continue }
 
@@ -57,5 +58,39 @@ public func printStatement(_ title: String, cube: StatementCube, statement: Stat
         FileHandle.standardError.write(Data(totalLine.utf8))
     }
 
+    // 2) print balancing row if present
+    let balCells = cube.filter { $0.key.row == BALANCING_ROW_ID && $0.key.periodIndex == periodIndex }
+    if !balCells.isEmpty {
+        FileHandle.standardError.write(Data(("\nBalancing:\n").utf8))
+        var rowTotal: Decimal = 0
+        for (k, amt) in balCells.sorted(by: { label(for: $0.key.partition) < label(for: $1.key.partition) }) {
+            let line = "  • \(label(for: k.partition))  \(fmt(amt))\n"
+            FileHandle.standardError.write(Data(line.utf8))
+            rowTotal += amt
+        }
+        grandTotal += rowTotal
+        FileHandle.standardError.write(Data(("  = Balancing total: \(fmt(rowTotal))\n").utf8))
+    }
+
+    // 3) footer
     FileHandle.standardError.write(Data(("—\nGrand total: \(fmt(grandTotal))\n\n").utf8))
+}
+
+public func totalsForBalance(cube: StatementCube, statement: StatementDef, periodIndex: Int) -> (assets: Decimal, liab: Decimal, eq: Decimal) {
+    func sumRow(_ idRaw: String) -> Decimal {
+        let id = StatementRowId(raw: idRaw)
+        return cube.reduce(0) { partial, kv in
+            kv.key.periodIndex == periodIndex && kv.key.row == id ? partial + kv.value : partial
+        }
+    }
+    let assets = sumRow("assets")
+    let liab   = sumRow("liabilities")
+    let eq     = sumRow("equity")
+    return (assets, liab, eq)
+}
+
+public func printBalanceCheck(cube: StatementCube, statement: StatementDef, periodIndex: Int = 0) {
+    let t = totalsForBalance(cube: cube, statement: statement, periodIndex: periodIndex)
+    let diff = t.assets - (t.liab + t.eq)
+    FileHandle.standardError.write(Data(("Check: Assets (\(fmt(t.assets))) vs Liab+Equity (\(fmt(t.liab + t.eq))) → Diff \(fmt(diff))\n").utf8))
 }
