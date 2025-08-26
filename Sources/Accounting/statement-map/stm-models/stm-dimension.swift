@@ -16,14 +16,34 @@ public enum DimensionValue: Codable, Sendable, Hashable {
 public typealias DimensionSlice = [DimensionKey: DimensionValue]
 
 public struct DimensionFilter: Codable, Sendable {
-    public enum Op: String, Codable, Sendable { case equals, `in`, notEquals, notIn }
+    public enum Op: String, Codable, Sendable { 
+        case equals, `in`, notEquals, notIn 
+    }
+
     public let key: DimensionKey
     public let op: Op
     public let values: [DimensionValue]
+    
+    public init(
+        key: DimensionKey,
+        op: Op,
+        values: [DimensionValue]
+    ) {
+        self.key = key
+        self.op = op
+        self.values = values
+    }
 }
 
 public struct PartitionSpec: Codable, Sendable {
     public let keys: [DimensionKey]          // e.g., [.entity] or [.entityClass]
     public let requireBalanced: Bool         // for B/S: enforce doc-splitting-like balance
+    
+    public init(
+        keys: [DimensionKey],
+        requireBalanced: Bool         // for B/S: enforce doc-splitting-like balance
+    ) {
+        self.keys = keys
+        self.requireBalanced = requireBalanced
+    }
 }
-
