@@ -1,8 +1,8 @@
 import Foundation
 
-public struct StatementRowId: Hashable, Codable, Sendable { public let raw: String }
-
-// public enum StatementKind: String, Codable, Sendable { case balanceSheet, profitLoss, cashFlow, equity }
+public struct StatementRowId: Hashable, Codable, Sendable { 
+    public let raw: String
+}
 
 public struct RGSMappingRule: Codable, Sendable {
     public var includeCodes: [String]?       // exact

@@ -1,30 +1,11 @@
 import Foundation
 
-public struct AggregationPlan: Codable, Sendable {
-    public let statement: StatementDef
-    public let partition: PartitionSpec?          // e.g., keys:[.entity], requireBalanced:true for B/S
-    public let filters: [DimensionFilter]         // e.g., entityClass IN ["objects"]
-    public let includePreviousPeriods: Bool       // you already keep this in settings :contentReference[oaicite:7]{index=7}
-    
-    public init(
-        statement: StatementDef,
-        partition: PartitionSpec?,          // e.g., keys:[.entity], requireBalanced:true for B/S,
-        filters: [DimensionFilter],         // e.g., entityClass IN ["objects"],
-        includePreviousPeriods: Bool       // you already keep this in settings :contentReference[oaicite:7]{index=7}
-    ) {
-        self.statement = statement
-        self.partition = partition
-        self.filters = filters
-        self.includePreviousPeriods = includePreviousPeriods
-    }
-}
-
-public struct Aggregator {
+public struct Aggregator: StatementAggregating {
     public let accounts: AccountStore
     public let plan: AggregationPlan
-    public var onTrace: ((String, StatementCube) -> Void)? = nil   // <— new
+    public var onTrace: TraceHook? = nil   // was: ((String, StatementCube) -> Void)?
 
-    public init(accounts: AccountStore, plan: AggregationPlan, onTrace: ((String, StatementCube) -> Void)? = nil) {
+    public init(accounts: AccountStore, plan: AggregationPlan, onTrace: TraceHook? = nil) {
         self.accounts = accounts
         self.plan = plan
         self.onTrace = onTrace

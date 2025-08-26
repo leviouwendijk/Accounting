@@ -1,23 +1,5 @@
 import Foundation
 
-@inline(__always)
-public func makeEncoder() -> JSONEncoder {
-    let enc = JSONEncoder()
-    enc.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
-    return enc
-}
-
-@inline(__always)
-public func ensureDir(_ url: URL) throws {
-    try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-}
-
-@inline(__always)
-public func writeJSON<T: Encodable>(_ value: T, to url: URL) throws {
-    let data = try makeEncoder().encode(value)
-    try data.write(to: url, options: .atomic)
-}
-
 public struct TrialBalanceRow: Codable, Sendable {
     public let accountCode: String
     public let debit: Decimal
@@ -165,30 +147,29 @@ public func ecTestCompile(
             includePreviousPeriods: false
         )
 
-        // 3b) run the aggregator for each plan
         let aggr = Aggregator(accounts: result.accounts, plan: planBS)
         let cubeBS = try aggr.buildCube(entries: result.resolved, previousEntries: [])
-        try writeJSON(snapshotDTO(cube: cubeBS, statement: planBS.statement),
+        try writeJSON(aggr.snapshotDTO(cube: cubeBS, statement: planBS.statement),
                       to: outDir.appendingPathComponent("statement.balance.json"))
 
-        do {
-            let cubeIS = try Aggregator(accounts: result.accounts, plan: planIS)
-                .buildCube(entries: result.resolved, previousEntries: [])
-            try writeJSON(snapshotDTO(cube: cubeIS, statement: planIS.statement),
+        if true {
+            let aggrIS = Aggregator(accounts: result.accounts, plan: planIS)
+            let cubeIS = try aggrIS.buildCube(entries: result.resolved, previousEntries: [])
+            try writeJSON(aggrIS.snapshotDTO(cube: cubeIS, statement: planIS.statement),
                           to: outDir.appendingPathComponent("statement.income.json"))
         }
 
-        do {
-            let cubeCF = try Aggregator(accounts: result.accounts, plan: planCF)
-                .buildCube(entries: result.resolved)
-            try writeJSON(snapshotDTO(cube: cubeCF, statement: planCF.statement),
+        if true {
+            let aggrCF = Aggregator(accounts: result.accounts, plan: planCF)
+            let cubeCF = try aggrCF.buildCube(entries: result.resolved)
+            try writeJSON(aggrCF.snapshotDTO(cube: cubeCF, statement: planCF.statement),
                           to: outDir.appendingPathComponent("statement.cash.json"))
         }
 
-        do {
-            let cubeEQ = try Aggregator(accounts: result.accounts, plan: planEQ)
-                .buildCube(entries: result.resolved)
-            try writeJSON(snapshotDTO(cube: cubeEQ, statement: planEQ.statement),
+        if true {
+            let aggrEQ = Aggregator(accounts: result.accounts, plan: planEQ)
+            let cubeEQ = try aggrEQ.buildCube(entries: result.resolved)
+            try writeJSON(aggrEQ.snapshotDTO(cube: cubeEQ, statement: planEQ.statement),
                           to: outDir.appendingPathComponent("statement.equity.json"))
         }
 
