@@ -2,7 +2,7 @@ import Foundation
 
 public enum StatementLibrary {
     // Balance Sheet using explicit codes you showed
-    static func balanceIFRS(materiality: Decimal = 0) -> StatementDef {
+    public static func balanceIFRS(materiality: Decimal = 0) -> StatementDef {
         StatementDef(
             name: "IFRS – Balance Sheet",
             kind: .balance,
@@ -21,7 +21,7 @@ public enum StatementLibrary {
     }
 
     // Income Statement using explicit codes you showed
-    static func incomeStatementIFRS(materiality: Decimal = 0) -> StatementDef {
+    public static func incomeStatementIFRS(materiality: Decimal = 0) -> StatementDef {
         StatementDef(
             name: "IFRS – Income Statement",
             kind: .income,
