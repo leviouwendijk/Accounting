@@ -94,3 +94,12 @@ public func printBalanceCheck(cube: StatementCube, statement: StatementDef, peri
     let diff = t.assets - (t.liab + t.eq)
     FileHandle.standardError.write(Data(("Check: Assets (\(fmt(t.assets))) vs Liab+Equity (\(fmt(t.liab + t.eq))) → Diff \(fmt(diff))\n").utf8))
 }
+
+public func dumpCube(_ tag: String, _ cube: StatementCube) {
+    FileHandle.standardError.write(Data(("\n[TRACE] \(tag)\n").utf8))
+    for (k, v) in cube.sorted(by: { $0.key.row.raw < $1.key.row.raw }) {
+        let part = k.partition.map { "\($0.key.rawValue)=\($0.value)" }.sorted().joined(separator: ",")
+        let line = "  \(k.row.raw){p\(k.periodIndex)} [\(part)]: \(v)\n"
+        FileHandle.standardError.write(Data(line.utf8))
+    }
+}
