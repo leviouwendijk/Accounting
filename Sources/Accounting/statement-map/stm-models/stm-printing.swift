@@ -90,9 +90,17 @@ public func totalsForBalance(cube: StatementCube, statement: StatementDef, perio
 }
 
 public func printBalanceCheck(cube: StatementCube, statement: StatementDef, periodIndex: Int = 0) {
-    let t = totalsForBalance(cube: cube, statement: statement, periodIndex: periodIndex)
-    let diff = t.assets - (t.liab + t.eq)
-    FileHandle.standardError.write(Data(("Check: Assets (\(fmt(t.assets))) vs Liab+Equity (\(fmt(t.liab + t.eq))) → Diff \(fmt(diff))\n").utf8))
+    // Assets (debit-natured) shown as +; Liab & Equity (credit-natured) shown as +
+    let assets =  sumRow(cube, "assets", periodIndex)                  // debit -> show as-is
+    let liab   = -sumRow(cube, "liabilities", periodIndex)             // credit -> flip sign
+    let equity = -sumRow(cube, "equity", periodIndex)                  // credit -> flip sign
+
+    let rhs  = liab + equity
+    let diff = assets - rhs
+
+    FileHandle.standardError.write(Data(
+        ("Check: Assets (\(fmt(assets))) vs Liab+Equity (\(fmt(rhs))) → Diff \(fmt(diff))\n").utf8
+    ))
 }
 
 public func dumpCube(_ tag: String, _ cube: StatementCube) {
