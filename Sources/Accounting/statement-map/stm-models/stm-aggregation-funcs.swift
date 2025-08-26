@@ -191,3 +191,47 @@ public func balancePartitions(
         }
     }
 }
+
+@inline(__always)
+public func sumRow(_ cube: StatementCube, _ rowIdRaw: String, _ periodIndex: Int) -> Decimal {
+    let rowId = StatementRowId(raw: rowIdRaw)
+    return cube.reduce(0) { acc, kv in
+        (kv.key.row == rowId && kv.key.periodIndex == periodIndex) ? acc + kv.value : acc
+    }
+}
+
+public func netIncome(from incomeCube: StatementCube, periodIndex: Int = 0) -> Decimal {
+    incomeCube.reduce(0) { acc, kv in
+        (kv.key.periodIndex == periodIndex) ? acc + kv.value : acc
+    }
+}
+
+public func netIncomeByPartition(from incomeCube: StatementCube, periodIndex: Int = 0)
+-> [ [DimensionKey: DimensionValue] : Decimal ] {
+    var byPart: [ [DimensionKey: DimensionValue] : Decimal ] = [:]
+    for (k, amt) in incomeCube where k.periodIndex == periodIndex {
+        byPart[k.partition, default: 0] += amt
+    }
+    return byPart
+}
+
+public func injectCurrentPeriodResultIntoEquity(
+    balanceCube: inout StatementCube,
+    periodIndex: Int = 0,
+    incomeCube: StatementCube
+) {
+    let equityRowId = StatementRowId(raw: "equity")
+    let niByPart = netIncomeByPartition(from: incomeCube, periodIndex: periodIndex)
+
+    if niByPart.isEmpty {
+        // total-only
+        let key = StatementCellKey(row: equityRowId, partition: [:], periodIndex: periodIndex)
+        balanceCube[key, default: 0] += netIncome(from: incomeCube, periodIndex: periodIndex)
+        return
+    }
+
+    for (part, ni) in niByPart {
+        let key = StatementCellKey(row: equityRowId, partition: part, periodIndex: periodIndex)
+        balanceCube[key, default: 0] += ni
+    }
+}
