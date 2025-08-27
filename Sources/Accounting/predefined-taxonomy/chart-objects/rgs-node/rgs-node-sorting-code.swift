@@ -25,51 +25,22 @@ public struct RGSNodeSortingCode: Sendable, Codable, Hashable {
         xlsxImpliedLevel == Int(level)
     }
 
-    /// Excel mapping — calibrated to observed sheet:
-    /// - Base = min(segments.count, 3) + 1
-    /// - If there are exactly 2 segments and the 2nd is LETTERS + ≥2 digits (e.g. "A010"),
-    ///   bump to level 4.
-    /// - If there are ≥3 segments:
-    ///     * Consider ONLY the 3rd segment for bumping.
-    ///     * Bump to level 5 iff the 3rd segment is LETTERS + ≥2 digits
-    ///       AND its letter prefix equals the 1st OR 2nd segment (family match).
-    ///     * Digits-only (e.g. "010") never bumps.
     @inlinable
     public var xlsxImpliedLevel: Int {
         let segs = segments
-        let segCount = segs.count
-        let hierDepth = min(segCount, 3)
+        let hierDepth = min(segs.count, 3)
         var implied = hierDepth + 1
 
-        // 2-segment compression like "I.A010" should be level 4
-        if segCount == 2 {
-            let second = segs[1]
-            if second.range(of: #"^[A-Z]+[0-9]{2,}$"#, options: .regularExpression) != nil {
-                implied = 4
-            }
-            return implied
-        }
-
-        // 3+ segments: optional bump to 5 based on the 3rd token
+        // Beyond the level-3 layer:
+        // - single trailing digit on the 3rd token keeps it at level 4 (no bump)
+        // - multi-digit trailing number on the 3rd token bumps to level 5
         if hierDepth == 3 {
-            let third = segs[2]
-
-            // digits-only never bumps
-            guard third.range(of: #"^[0-9]+$"#, options: .regularExpression) == nil else {
-                return implied // stay at 4
+            let last = segs[2]
+            let hasLeadingLetters = last.range(of: #"^[A-Z]+"#, options: .regularExpression) != nil
+            if hasLeadingLetters, let r = last.range(of: #"[0-9]+$"#, options: .regularExpression) {
+                let digitsCount = last[r].count
+                if digitsCount > 1 { implied += 1 } // 5
             }
-
-            // letters + >=2 digits?
-            guard third.range(of: #"^[A-Z]+[0-9]{2,}$"#, options: .regularExpression) != nil else {
-                return implied // stay at 4
-            }
-
-            // Extract the letter prefix of the third token (e.g. "A" from "A010", "AA" from "AA10")
-            let letterPrefix = String(third.prefix { ($0 >= "A" && $0 <= "Z") })
-
-            // Bump only if that prefix equals the 1st or 2nd segment (family match)
-            if segs.indices.contains(0), letterPrefix == segs[0] { implied = 5 }
-            else if segs.indices.contains(1), letterPrefix == segs[1] { implied = 5 }
         }
 
         return implied
