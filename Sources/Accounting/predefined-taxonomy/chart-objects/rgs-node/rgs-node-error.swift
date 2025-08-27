@@ -44,3 +44,15 @@ public enum RGSNodeInvariantError: Error, LocalizedError, Sendable {
         }
     }
 }
+
+public enum RGSNodeResolutionError: Error, CustomStringConvertible {
+    case unresolvedOmslag(references: [(code: String, omslag: String)])
+
+    public var description: String {
+        switch self {
+        case .unresolvedOmslag(let refs):
+            let lines = refs.map { "• code=\($0.code) → omslag=\($0.omslag)" }.joined(separator: "\n")
+            return "Failed to resolve omslag identifiers:\n\(lines)"
+        }
+    }
+}

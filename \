@@ -1,14 +1,13 @@
 import Foundation
 
-public struct RGSIndex: Hashable, Sendable {
+public struct RGSIndex: Sendable {
     public let byIdentifier: [String:Int]     // "BLimBanRba" -> node.id
     public let bySortKey: [String:Int]        // "A.F.0104000" -> node.id
     public let labelByGroupKey: [String:String] // groupKey (any level) -> labelShort
     public let byReference: [String:Int]    // in rare cases of referentienummer use
 }
 
-// mock version of a new structured account key
-public struct LocalAccountKey: Hashable, Sendable, Codable {
+public struct LocalAccountKey: Sendable, Codable {
     public let section: String // level 1 : BALANS
     public let set: String // level 2 : Immateriele Vaste Activa
     public let group: String // level 3 : categorical
