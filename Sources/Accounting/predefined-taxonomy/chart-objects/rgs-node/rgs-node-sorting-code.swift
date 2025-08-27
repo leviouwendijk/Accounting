@@ -35,7 +35,9 @@ public struct RGSNodeSortingCode: Sendable, Codable, Hashable {
         var implied = segs + 1
         if segs >= 3 {
             let last = segments.last ?? ""
-            if last.range(of: #"^[A-Z]+[0-9]{3}$"#, options: .regularExpression) != nil {
+            // bump to level 5 if the last segment ends with 2+ digits (e.g., A10, AA10, A010)
+            if let r = last.range(of: #"[0-9]+$"#, options: .regularExpression),
+               last[r].count >= 2 {
                 implied += 1
             }
         }
