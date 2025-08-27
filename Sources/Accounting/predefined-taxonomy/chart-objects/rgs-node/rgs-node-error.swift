@@ -16,7 +16,10 @@ public enum RGSNodeInvariantError: Error, LocalizedError, Sendable {
         case let .sortingKeyMismatch(exp, got, code):
             return "RGSNode invariant failed for \(code): sortingKey must mirror sorting.key (expected \(exp), got \(got))."
         case let .levelMismatch(level, segments, code):
-            return "RGSNode invariant failed for \(code): level \(level) does not equal sorting.segments.count \(segments.count).\n    Segments: \(segments)."
+            return """
+            RGSNode invariant failed for \(code): Excel level \(level) is inconsistent with Sortering \(segments.joined(separator: ".")).
+                Segments=\(segments) (count=\(segments.count)).
+            """
         case let .sideMismatch(exp, prefix, code):
             return "RGSNode invariant failed for \(code): side \(exp) does not match code prefix '\(prefix)'."
         case let .missingParentKey(level, code):
@@ -37,7 +40,7 @@ public enum RGSNodeInvariantError: Error, LocalizedError, Sendable {
     public var failureReason: String? {
         switch self {
         case .sortingKeyMismatch: return "Derived sortingKey must equal the joined segments from Sortering."
-        case .levelMismatch:      return "RGS defines level as the number of Sortering path segments."
+        case .levelMismatch:      return "Excel level must match the implied level from Sortering (segments +1, +1 if ≥3 segments and any digit)."
         case .sideMismatch:       return "‘B…’ codes are balance; ‘W…’ codes are profit/loss."
         case .missingParentKey:   return "Non-root nodes require a parent group key for roll-ups."
         case .emptyL2Key:         return "L2 group key is required for standard grouping."
