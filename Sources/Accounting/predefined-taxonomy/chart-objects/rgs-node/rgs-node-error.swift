@@ -2,7 +2,7 @@ import Foundation
 
 public enum RGSNodeInvariantError: Error, LocalizedError, Sendable {
     case sortingKeyMismatch(expected: String, got: String, code: String)
-    case levelMismatch(level: UInt8, segments: Int, code: String)
+    case levelMismatch(level: UInt8, segments: [String], code: String)
     case sideMismatch(expected: RGSNodeSide, gotPrefix: String, code: String)
     case missingParentKey(level: UInt8, code: String)
     case emptyL2Key(code: String)
@@ -15,8 +15,8 @@ public enum RGSNodeInvariantError: Error, LocalizedError, Sendable {
         switch self {
         case let .sortingKeyMismatch(exp, got, code):
             return "RGSNode invariant failed for \(code): sortingKey must mirror sorting.key (expected \(exp), got \(got))."
-        case let .levelMismatch(level, segs, code):
-            return "RGSNode invariant failed for \(code): level \(level) does not equal sorting.segments.count \(segs)."
+        case let .levelMismatch(level, segments, code):
+            return "RGSNode invariant failed for \(code): level \(level) does not equal sorting.segments.count \(segments.count).\n    Segments: \(segments)."
         case let .sideMismatch(exp, prefix, code):
             return "RGSNode invariant failed for \(code): side \(exp) does not match code prefix '\(prefix)'."
         case let .missingParentKey(level, code):

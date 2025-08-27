@@ -88,7 +88,7 @@ public struct RGSNode: Sendable, Codable {
             guard xl.sorting.isConsistent(withExcelLevel: level) else {
                 throw RGSNodeInvariantError.levelMismatch(
                     level: level,
-                    segments: xl.sorting.segments.count,
+                    segments: xl.sorting.segments,
                     code: codes.code
                 )
             }
