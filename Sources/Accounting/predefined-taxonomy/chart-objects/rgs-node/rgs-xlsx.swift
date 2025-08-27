@@ -8,14 +8,26 @@ public struct RGSNodeXLSXConcept: Sendable, Codable {
     public let reference: String?                   
     
     public init(
-        sorting: RGSNodeSortingCode,
-        cachedSortingKey: String,
+        sortingKey: String,
         links: RGSNodeLinksXLSXSortingKey,
         filters: RGSNodeFilters?,
         reference: String?
     ) {
-        self.sorting = sorting
-        self.cachedSortingKey = cachedSortingKey
+        self.sorting = RGSNodeSortingCode(key: sortingKey)
+        self.cachedSortingKey = sorting.key
+        self.links = links
+        self.filters = filters
+        self.reference = reference
+    }
+
+    public init(
+        sortingCode: RGSNodeSortingCode,
+        links: RGSNodeLinksXLSXSortingKey,
+        filters: RGSNodeFilters?,
+        reference: String?
+    ) {
+        self.sorting = sortingCode
+        self.cachedSortingKey = sorting.key
         self.links = links
         self.filters = filters
         self.reference = reference
