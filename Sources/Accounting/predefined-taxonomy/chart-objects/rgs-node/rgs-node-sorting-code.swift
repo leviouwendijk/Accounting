@@ -25,17 +25,26 @@ public struct RGSNodeSortingCode: Sendable, Codable, Hashable {
         xlsxImpliedLevel == Int(level)
     }
 
+    /// Excel mapping:
+    /// - Take at most the first 3 dot-segments for hierarchy depth.
+    /// - implied = hierDepth + 1
+    /// - If hierDepth == 3 and the 3rd segment is LETTERS followed by >=2 digits, bump to 5.
+    ///   Examples: A10, AA10, A010 → bump; A1 → no bump; 010 (digits only) → no bump.
+    /// - A 4th, digits-only segment (e.g. ".020") is ignored for level purposes.
     @inlinable
     public var xlsxImpliedLevel: Int {
-        let segs = segments.count
-        var implied = segs + 1
-        if segs >= 3 {
-            let last = segments.last ?? ""
-            // bump only if last token is LETTERS followed by 2+ digits (e.g. A10, AA10, A010)
-            if last.range(of: #"^[A-Z]+[0-9]{2,}$"#, options: .regularExpression) != nil {
-                implied += 1
+        let segs = segments
+        let hierDepth = min(segs.count, 3)
+        var implied = hierDepth + 1
+
+        if hierDepth == 3 {
+            let third = segs[2]
+            // letters + 2+ digits (no bump for digits-only like "010", or letters+1 digit like "A1")
+            if third.range(of: #"^[A-Z]+[0-9]{2,}$"#, options: .regularExpression) != nil {
+                implied = 5
             }
         }
+
         return implied
     }
 
