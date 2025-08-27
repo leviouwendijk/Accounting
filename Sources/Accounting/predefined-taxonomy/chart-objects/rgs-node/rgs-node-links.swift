@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RGSNodeLinks: Sendable, Codable, Hashable {
+public struct RGSNodeLinksXLSXSortingKey: Sendable, Codable, Hashable {
     /// Truncated sortKey at (level - 1). Nil for level == 1.
     public let parentKey: String?
     /// Truncated sortKey at level 2 (hoofdrubriek) – always present beyond L1.
@@ -15,5 +15,24 @@ public struct RGSNodeLinks: Sendable, Codable, Hashable {
         self.l2Key = l2Key
         self.parentId = parentId
         self.l2Id = l2Id
+    }
+}
+
+public struct RGSNodeLinksPresentationBase: Sendable, Codable, Hashable {
+    public let parentId: Int
+    public let presentationRole: String
+    public let order: Decimal
+    public let preferredLabel: String?
+    
+    public init(
+        parentId: Int,
+        presentationRole: String,
+        order: Decimal,
+        preferredLabel: String?
+    ) {
+        self.parentId = parentId
+        self.presentationRole = presentationRole
+        self.order = order
+        self.preferredLabel = preferredLabel
     }
 }

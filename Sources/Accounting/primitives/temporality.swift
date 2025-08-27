@@ -1,4 +1,5 @@
 import Foundation
+import Extensions
 
 public enum TemporalityError: Error, CustomStringConvertible, Sendable {
     case invalidCode(String)
@@ -14,7 +15,7 @@ public enum TemporalityError: Error, CustomStringConvertible, Sendable {
     }
 }
 
-public enum Temporality: String, Codable, Sendable {
+public enum Temporality: String, Codable, Sendable, StringParsableEnum {
     case instant
     case duration 
 

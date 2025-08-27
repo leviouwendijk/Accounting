@@ -8,7 +8,8 @@ public enum RGSNodeInvariantError: Error, LocalizedError, Sendable {
     case emptyL2Key(code: String)
     case unresolvedOmslagIdentifier(omslag: String, code: String)
     case omslagIdMismatch(omslag: String, resolvedId: Int, providedId: Int, code: String)
-    case invalidDirectionSign(sign: Int8, code: String)
+    case invalidDirectionSign(sign: Int8?, code: String)
+    case missingDirectionForPostable(code: String)
 
     public var errorDescription: String? {
         switch self {
@@ -27,7 +28,9 @@ public enum RGSNodeInvariantError: Error, LocalizedError, Sendable {
         case let .omslagIdMismatch(omslag, resolvedId, providedId, code):
             return "RGSNode invariant failed for \(code): omslag '\(omslag)' resolved id \(resolvedId) ≠ provided \(providedId)."
         case let .invalidDirectionSign(sign, code):
-            return "RGSNode invariant failed for \(code): direction sign must be 1 or -1, got \(sign)."
+            return "RGSNode invariant failed for \(code): direction sign must be 1 or -1, got \(sign ?? 0)."
+        case let .missingDirectionForPostable(code):
+            return "RGSNode invariant failed for \(code): postable RGSNode must be provided a balance direction."
         }
     }
 
@@ -41,6 +44,7 @@ public enum RGSNodeInvariantError: Error, LocalizedError, Sendable {
         case .unresolvedOmslagIdentifier: return "All omslag targets must be resolvable in the compiled index."
         case .omslagIdMismatch:   return "If an omslagId is provided, it must match the identifier lookup."
         case .invalidDirectionSign: return "Hot-path sign cache must be +1 (debit) or −1 (credit)."
+        case .missingDirectionForPostable: return "Balance directions are required for correct aggregation"
         }
     }
 }

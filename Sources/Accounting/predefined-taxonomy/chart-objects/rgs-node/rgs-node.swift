@@ -1,96 +1,132 @@
 import Foundation
 
 public struct RGSNode: Sendable, Codable {
+    // COMMON
     public let id: Int
     public let codes: RGSNodeCodes
-    public let links: RGSNodeLinks
-    public let sorting: RGSNodeSortingCode
-    public let reference: String
-    public let labels: RGSNodeLabels
-    public let direction: Direction
-    public let level: UInt8
-    public let filters: RGSNodeFilters?
+    public let omslagId: Int?
 
-    public let side: RGSNodeSide      // codes.code.hasPrefix("B")
-    public let sortingKey: String          // e.g. sorting.key
-    public let omslagId: Int?             // pre-resolve to codes.id
-    public let directionSign: Int8
+    public let labels: RGSNodeLabels
+    public let direction: Direction?          // natural DR/CR if known
+    public let level: UInt8
+    public let temporality: Temporality       // .instant / .duration cache
+
+    public let side: RGSNodeSide              // inferred from codes.code prefix (B*/W*)
+    public let directionSign: Int8?           // ±1 for postables, otherwise nil
+
+    // SOURCE BUNDLES
+    public let xlsx: RGSNodeXLSXConcept?      // nil for XBRL-built nodes
+    public let xbrl: RGSNodeXBRLConcept?      // nil for XLSX-built nodes
+
+    // Postable: XBRL is authoritative; XLSX fallback = has a direction
+    public var postable: Bool {
+        if let xb = xbrl { return xb.postable }
+        return direction != nil
+    }
 
     public init(
         id: Int,
         codes: RGSNodeCodes,
-        links: RGSNodeLinks,
-        sorting: RGSNodeSortingCode,
-        reference: String,
+
         labels: RGSNodeLabels,
-        direction: Direction,
+        direction: Direction? = nil,
         level: UInt8,
-        filters: RGSNodeFilters?,
+        temporality: Temporality,
 
         side: RGSNodeSide,
-        sortingKey: String,
-        omslagId: Int?,
+        omslagId: Int? = nil,
         directionSign: Int8? = nil,
+
+        xlsx: RGSNodeXLSXConcept? = nil,
+        xbrl: RGSNodeXBRLConcept? = nil
     ) throws {
-        // 1) sortingKey sanity
-        let expectedKey = sorting.key
-        guard expectedKey == sortingKey else {
-            throw RGSNodeInvariantError.sortingKeyMismatch(expected: expectedKey, got: sortingKey, code: codes.code)
-        }
-
-        // 2) level vs segments
-        let segs = sorting.segments.count
-        guard Int(level) == segs else {
-            throw RGSNodeInvariantError.levelMismatch(level: level, segments: segs, code: codes.code)
-        }
-
-        // 3) side matches identifier prefix
-        let prefix = codes.code.first.map(String.init) ?? ""
-        let expSide: RGSNodeSide = (prefix == "B") ? .balance : .profitLoss
-        guard side == expSide else {
-            throw RGSNodeInvariantError.sideMismatch(expected: expSide, gotPrefix: prefix, code: codes.code)
-        }
-
-        // 4) parentKey & l2Key presence
-        if level > 1 {
-            guard links.parentKey != nil else {
-                throw RGSNodeInvariantError.missingParentKey(level: level, code: codes.code)
-            }
-        }
-        guard !links.l2Key.isEmpty else {
-            throw RGSNodeInvariantError.emptyL2Key(code: codes.code)
-        }
-
-        // 5) directionSign validity (if provided)
-        let sign = directionSign ?? direction.int
-        guard sign == 1 || sign == -1 else {
-            throw RGSNodeInvariantError.invalidDirectionSign(sign: sign, code: codes.code)
-        }
-
-        // // 6) omslag resolution (if any)
-        // if let omslagIdent = codes.omslag {
-        //     guard let resolved = index.byIdentifier[omslagIdent] else {
-        //         throw RGSNodeInvariantError.unresolvedOmslagIdentifier(omslag: omslagIdent, code: codes.code)
-        //     }
-        //     if let provided = omslagId, provided != resolved {
-        //         throw RGSNodeInvariantError.omslagIdMismatch(omslag: omslagIdent, resolvedId: resolved, providedId: provided, code: codes.code)
-        //     }
-        // }
-        // save for RGSBuilder or somewhere later
-
         self.id = id
         self.codes = codes
-        self.links = links
-        self.sorting = sorting
-        self.reference = reference
+
         self.labels = labels
         self.direction = direction
         self.level = level
-        self.filters = filters
+        self.temporality = temporality
 
         self.side = side
-        self.sortingKey = sortingKey
         self.omslagId = omslagId
-        self.directionSign = directionSign ?? direction.int
+
+        // Auto-derive sign from direction if not provided
+        if let d = direction {
+            self.directionSign = directionSign ?? d.int
+        } else {
+            self.directionSign = directionSign  // may be nil for headers/non-postables
+        }
+
+        self.xlsx = xlsx
+        self.xbrl = xbrl
+
+        // -------- Invariants --------
+
+        // (A) Side must match code prefix (always)
+        let expSide: RGSNodeSide = (codes.code.first == "B") ? .balance : .profitLoss
+        guard side == expSide else {
+            throw RGSNodeInvariantError.sideMismatch(
+                expected: expSide,
+                gotPrefix: String(codes.code.prefix(1)),
+                code: codes.code
+            )
+        }
+
+        // (B) Excel-only invariants
+        if let xl = xlsx {
+            // sortingKey sanity
+            guard xl.sorting.key == xl.cachedSortingKey else {
+                throw RGSNodeInvariantError.sortingKeyMismatch(
+                    expected: xl.sorting.key,
+                    got: xl.cachedSortingKey,
+                    code: codes.code
+                )
+            }
+            // level vs segments
+            let segs = xl.sorting.segments.count
+            guard Int(level) == segs else {
+                throw RGSNodeInvariantError.levelMismatch(
+                    level: level,
+                    segments: segs,
+                    code: codes.code
+                )
+            }
+            // parentKey & l2Key presence
+            if level > 1 {
+                guard xl.links.parentKey != nil else {
+                    throw RGSNodeInvariantError.missingParentKey(level: level, code: codes.code)
+                }
+            }
+            guard !xl.links.l2Key.isEmpty else {
+                throw RGSNodeInvariantError.emptyL2Key(code: codes.code)
+            }
+        }
+
+        // (C) XBRL-only invariants (only for postable concepts)
+        if let xb = xbrl, xb.postable {
+            guard direction != nil else {
+                throw RGSNodeInvariantError.missingDirectionForPostable(code: codes.code)
+            }
+            guard let s = directionSign, (s == 1 || s == -1) else {
+                throw RGSNodeInvariantError.invalidDirectionSign(sign: directionSign, code: codes.code)
+            }
+        }
+
+        // (D) Optional consistency: if both are present, they must agree
+        if let d = direction, let s = directionSign {
+            precondition(s == d.int, "directionSign mismatch for \(codes.code)")
+        }
+    }
+
+    public func with(omslagId newValue: Int?) throws -> RGSNode {
+        try RGSNode(
+            id: id, codes: codes,
+            labels: labels, direction: direction,
+            level: level, temporality: temporality,
+            side: side, omslagId: newValue,
+            directionSign: directionSign,
+            xlsx: xlsx, xbrl: xbrl
+        )
     }
 }
