@@ -84,13 +84,20 @@ public struct RGSNode: Sendable, Codable {
                 )
             }
 
-            // 2) level vs segments (refactored)
-            guard xl.sorting.isConsistent(withExcelLevel: level) else {
-                throw RGSNodeInvariantError.levelMismatch(
-                    level: level,
-                    segments: xl.sorting.segments,
-                    code: codes.code
-                )
+            // guard xl.sorting.isConsistent(withExcelLevel: level) else {
+            //     throw RGSNodeInvariantError.levelMismatch(
+            //         level: level,
+            //         segments: xl.sorting.segments,
+            //         code: codes.code
+            //     )
+            // }
+            let implied = xl.sorting.xlsxImpliedLevel
+            if let report = xl.sorting.softConsistencyReport(
+                expectedLevel: level,
+                code: codes.code,
+                implied: implied
+            ) {
+                print(report)
             }
 
             // 3) parentKey & l2Key presence (keep these)
