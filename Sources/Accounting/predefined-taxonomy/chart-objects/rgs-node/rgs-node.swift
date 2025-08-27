@@ -140,3 +140,5 @@ public struct RGSNode: Sendable, Codable, JSONWritable {
         )
     }
 }
+
+extension Array: @retroactive JSONWritable where Element == RGSNode {}
