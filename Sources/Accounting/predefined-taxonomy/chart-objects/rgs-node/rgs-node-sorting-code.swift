@@ -20,15 +20,19 @@ public struct RGSNodeSortingCode: Sendable, Codable, Hashable {
         .filter { !$0.isEmpty }
     }
 
-    /// Excel quirk: levels 4–5 keep only three dot-segments and put detail inside the last token (e.g. `A010`).
-    /// - Returns: `true` iff the sorting code shape is consistent with the provided RGS level.
     @inlinable
     public func isConsistent(withExcelLevel level: UInt8) -> Bool {
+        xlsxImpliedLevel == Int(level)
+    }
+
+    @inlinable
+    public var xlsxImpliedLevel: Int {
         let segs = segments.count
-        if level <= 3 {
-            return segs == Int(level)
-        } else {
-            return segs >= 3
+        let hasDigits = segments.contains { $0.rangeOfCharacter(from: .decimalDigits) != nil }
+        var implied = segs + 1
+        if segs >= 3 && hasDigits {
+            implied += 1
         }
+        return implied
     }
 }
