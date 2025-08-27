@@ -1,6 +1,7 @@
 import Foundation
+import plate
 
-public struct RGSNode: Sendable, Codable {
+public struct RGSNode: Sendable, Codable, JSONWritable {
     // COMMON
     public let id: Int
     public let codes: RGSNodeCodes
@@ -137,12 +138,5 @@ public struct RGSNode: Sendable, Codable {
             directionSign: directionSign,
             xlsx: xlsx, xbrl: xbrl
         )
-    }
-
-    public func write(to url: URL) throws {
-        let enc = JSONEncoder()
-        enc.outputFormatting = [.prettyPrinted, .sortedKeys]
-        try enc.encode(self)
-        .write(to: url, options: .atomic)
     }
 }
