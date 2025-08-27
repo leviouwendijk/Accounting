@@ -28,15 +28,17 @@ public struct RGSNodeSortingCode: Sendable, Codable, Hashable {
     @inlinable
     public var xlsxImpliedLevel: Int {
         let segs = segments.count
-
-        // L1 special-cases: empty or ["B"]/["W"] ⇒ implied = 1
+        // L1: empty or side-only
         if segs == 0 { return 1 }
         if segs == 1, let s0 = segments.first, (s0 == "B" || s0 == "W") { return 1 }
 
         var implied = segs + 1
         if segs >= 3 {
-            let hasDigits = segments.joined().rangeOfCharacter(from: .decimalDigits) != nil
-            if hasDigits { implied += 1 }
+            let last = segments.last ?? ""
+            // match letters + exactly 3 digits at the end, e.g. "A010"
+            if last.range(of: #"^[A-Z]+[0-9]{3}$"#, options: .regularExpression) != nil {
+                implied += 1
+            }
         }
         return implied
     }
