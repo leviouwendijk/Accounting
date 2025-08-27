@@ -25,21 +25,53 @@ public struct RGSNodeSortingCode: Sendable, Codable, Hashable {
         xlsxImpliedLevel == Int(level)
     }
 
+    // @inlinable
+    // public var xlsxImpliedLevel: Int {
+    //     let segs = segments
+    //     let hierDepth = min(segs.count, 3)
+    //     var implied = hierDepth + 1
+
+    //     if hierDepth == 3 {
+    //         let last = segs[2]
+    //         let hasLeadingLetters = last.range(of: #"^[A-Z]+"#, options: .regularExpression) != nil
+    //         if hasLeadingLetters, let r = last.range(of: #"[0-9]+$"#, options: .regularExpression) {
+    //             let digitsCount = last[r].count
+    //             if digitsCount > 1 { implied += 1 } // 5
+    //         }
+    //     }
+
+    //     return implied
+    // }
+
     @inlinable
     public var xlsxImpliedLevel: Int {
         let segs = segments
-        let hierDepth = min(segs.count, 3)
-        var implied = hierDepth + 1
+        let n = segs.count
+        var implied = min(n, 3) + 1
 
-        // Beyond the level-3 layer:
-        // - single trailing digit on the 3rd token keeps it at level 4 (no bump)
-        // - multi-digit trailing number on the 3rd token bumps to level 5
-        if hierDepth == 3 {
-            let last = segs[2]
-            let hasLeadingLetters = last.range(of: #"^[A-Z]+"#, options: .regularExpression) != nil
-            if hasLeadingLetters, let r = last.range(of: #"[0-9]+$"#, options: .regularExpression) {
-                let digitsCount = last[r].count
-                if digitsCount > 1 { implied += 1 } // 5
+        // 2-segment compression cases
+        if n == 2 {
+            let s2 = segs[1]
+            if s2.range(of: #"^[0-9]+$"#, options: .regularExpression) != nil {
+                // e.g. "Z.02" should stay level 2
+                return 2
+            }
+            if s2.range(of: #"^[A-Z]+[0-9]+$"#, options: .regularExpression) != nil {
+                // e.g. "I.A010" should be level 4
+                return 4
+            }
+            return implied // normal 2-seg: 3
+        }
+
+        // 3+ segments: single digit suffix ⇒ stay 4; multi-digit ⇒ 5
+        if n >= 3 {
+            let s3 = segs[2]
+            // ignore pure digits (e.g. "010") → remain 4
+            if s3.range(of: #"^[0-9]+$"#, options: .regularExpression) == nil,
+               s3.range(of: #"^[A-Z]+"#, options: .regularExpression) != nil,
+               let r = s3.range(of: #"[0-9]+$"#, options: .regularExpression) {
+                let digitsCount = s3[r].count
+                if digitsCount > 1 { implied = 5 } // multi-digit bump
             }
         }
 
