@@ -75,7 +75,7 @@ public struct RGSNode: Sendable, Codable {
 
         // (B) Excel-only invariants
         if let xl = xlsx {
-            // sortingKey sanity
+            // 1) sortingKey sanity (unchanged)
             guard xl.sorting.key == xl.cachedSortingKey else {
                 throw RGSNodeInvariantError.sortingKeyMismatch(
                     expected: xl.sorting.key,
@@ -83,17 +83,19 @@ public struct RGSNode: Sendable, Codable {
                     code: codes.code
                 )
             }
-            // level vs segments
-            let segs = xl.sorting.segments.count
-            guard Int(level) == segs else {
+
+            // 2) level vs segments (refactored)
+            guard xl.sorting.isConsistent(withExcelLevel: level) else {
                 throw RGSNodeInvariantError.levelMismatch(
                     level: level,
-                    segments: segs,
+                    segments: xl.sorting.segments.count,
                     code: codes.code
                 )
             }
-            // parentKey & l2Key presence
-            if level > 1 {
+
+            // 3) parentKey & l2Key presence (keep these)
+            let segsCount = xl.sorting.segments.count
+            if level > 1 && segsCount > 1 {
                 guard xl.links.parentKey != nil else {
                     throw RGSNodeInvariantError.missingParentKey(level: level, code: codes.code)
                 }
