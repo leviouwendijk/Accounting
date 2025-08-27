@@ -2,11 +2,14 @@ import Foundation
 
 public enum DirectionError: Error, CustomStringConvertible, Sendable {
     case invalidCode(String)
+    case invalidInt8(Int8)
 
     public var description: String {
         switch self {
         case .invalidCode(let raw):
             return "Invalid Direction code: '\(raw)'"
+        case .invalidInt8(let int):
+            return "Direction sign must be 1 or -1, not: \(int)"
         }
     }
 }
@@ -35,5 +38,31 @@ public enum Direction: String, Codable, Sendable {
     public func encode(to encoder: Encoder) throws {
         var c = encoder.singleValueContainer()
         try c.encode(self.rawValue)
+    }
+
+    @inlinable 
+    public init(sign: Int8) throws {
+        // precondition(sign == 1 || sign == -1, "Direction sign must be 1 or -1")
+        // guard sign == 1 || sign == -1 else {
+        //     throw DirectionError.invalidInt8(sign)
+        // }
+        switch sign {
+            case 1:
+                self = .debit
+            case -1:
+                self = .credit
+            default:
+                throw DirectionError.invalidInt8(sign)
+        }
+    }
+
+    @inlinable
+    public var int: Int8 {
+        switch self {
+            case .debit:
+                return 1
+            case .credit:
+                return -1
+        }
     }
 }
