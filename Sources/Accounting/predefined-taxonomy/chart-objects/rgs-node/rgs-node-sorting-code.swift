@@ -28,16 +28,11 @@ public struct RGSNodeSortingCode: Sendable, Codable, Hashable {
     @inlinable
     public var xlsxImpliedLevel: Int {
         let segs = segments.count
-
-        // if segs == 0 { return 1 }
-        // if segs == 1, let s0 = segments.first, (s0 == "B" || s0 == "W") { return 1 }
-
         var implied = segs + 1
         if segs >= 3 {
             let last = segments.last ?? ""
-            // bump to level 5 if the last segment ends with 2+ digits (e.g., A10, AA10, A010)
-            if let r = last.range(of: #"[0-9]+$"#, options: .regularExpression),
-               last[r].count >= 2 {
+            // bump only if last token is LETTERS followed by 2+ digits (e.g. A10, AA10, A010)
+            if last.range(of: #"^[A-Z]+[0-9]{2,}$"#, options: .regularExpression) != nil {
                 implied += 1
             }
         }
