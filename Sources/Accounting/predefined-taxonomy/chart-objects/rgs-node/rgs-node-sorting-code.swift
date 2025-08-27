@@ -41,4 +41,18 @@ public struct RGSNodeSortingCode: Sendable, Codable, Hashable {
         }
         return implied
     }
+
+    @inlinable var parentKeyString: String? {
+        guard segments.count > 1 else { return nil }
+        return segments.dropLast().joined(separator: ".")
+    }
+
+    /// l2Key for links: use first two segments if present,
+    /// else the single segment if present,
+    /// else fall back to side ("B"/"W") derived from the code.
+    @inlinable func l2Key(fallbackSide: String) -> String {
+        if segments.count >= 2 { return segments.prefix(2).joined(separator: ".") }
+        if segments.count == 1 { return segments[0] }
+        return fallbackSide
+    }
 }
