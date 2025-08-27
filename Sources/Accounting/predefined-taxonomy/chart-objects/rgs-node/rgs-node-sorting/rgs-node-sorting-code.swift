@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RGSNodeSortingCode: Sendable, Codable, Hashable {
+public struct RGSNodeSortingCode: Sendable, Codable, Hashable, SortingKeyProviding, Comparable {
     public let segments: [String]
 
     public var key: String { 
@@ -20,6 +20,21 @@ public struct RGSNodeSortingCode: Sendable, Codable, Hashable {
         .filter { !$0.isEmpty }
     }
 
+    // extended custom protocol
+    @inlinable 
+    public var sorteringSegments: [String] { 
+        segments 
+    }
+
+    // comparable
+    @inlinable 
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        sorteringLessThan(lhs, rhs)
+    }
+}
+
+// validation of level by sorting segments ( partially faulty )
+extension RGSNodeSortingCode {
     @inlinable
     public func isConsistent(withExcelLevel level: UInt8) -> Bool {
         xlsxImpliedLevel == Int(level)
