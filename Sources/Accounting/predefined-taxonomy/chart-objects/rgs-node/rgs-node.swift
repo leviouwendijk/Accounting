@@ -139,6 +139,24 @@ public struct RGSNode: Sendable, Codable, JSONWritable {
             xlsx: xlsx, xbrl: xbrl
         )
     }
+
+    /// Return a new RGSNode with the provided xlsx concept replaced.
+    /// This mirrors your existing `with(omslagId:)` pattern.
+    public func with(xlsx newXLSX: RGSNodeXLSXConcept?) throws -> RGSNode {
+        try RGSNode(
+            id: self.id,
+            codes: self.codes,
+            labels: self.labels,
+            direction: self.direction,
+            level: self.level,
+            temporality: self.temporality,
+            side: self.side,
+            omslagId: self.omslagId,
+            directionSign: self.directionSign,
+            xlsx: newXLSX,
+            xbrl: self.xbrl
+        )
+    }
 }
 
 extension Array: @retroactive JSONWritable where Element == RGSNode {}

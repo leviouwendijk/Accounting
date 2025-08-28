@@ -67,7 +67,8 @@ public enum AccountStoreLoader {
 
         if fm.fileExists(atPath: compiledChartURL.path) {
             let data = try Data(contentsOf: compiledChartURL)
-            let chart = try JSONDecoder().decode(CompiledChart.self, from: data)
+            let decoded = try JSONDecoder().decode(CompiledChart.self, from: data)
+            let chart = try decoded.ensuringIndex(enrichNodes: true, strict: false)
             if verbose { fputs("  ✓ loaded compiled RGS chart (\(chart.nodes.count) nodes)\n", stderr) }
 
             // Build node-backed store (no project .ec parsing / override prints)
