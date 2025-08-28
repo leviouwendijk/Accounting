@@ -12,11 +12,11 @@ public extension EntryCompilerParsing {
         while current != .rBrace && current != .eof {
             switch current {
 
-            case .ident("find"):
+            case .keyword("find"):
                 advance()
                 findStr = try expectIdentValue()
 
-            case .ident("version"):
+            case .keyword("version"):
                 let parsed = try parseChartVersionBlock()
                 major = parsed.major
                 minor = parsed.minor
@@ -33,7 +33,7 @@ public extension EntryCompilerParsing {
         try endBlock()
 
         guard let f = findStr else {
-            throw ParserError.unexpectedToken(current, expected: "find <ident>", at: loc())
+            throw ParserError.unexpectedToken(current, expected: "find <keyword>", at: loc())
         }
         guard let ma = major, let mi = minor else {
             throw ParserError.unexpectedToken(current, expected: "version { major minor }", at: loc())
@@ -51,10 +51,10 @@ public extension EntryCompilerParsing {
 
         while current != .rBrace && current != .eof {
             switch current {
-            case .ident("major"):
+            case .keyword("major"):
                 advance(); try expect(.equals)
                 major = try expectInteger()
-            case .ident("minor"):
+            case .keyword("minor"):
                 advance(); try expect(.equals)
                 minor = try expectInteger()
             default:
