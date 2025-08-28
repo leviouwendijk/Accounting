@@ -63,37 +63,23 @@ public enum RGSAssembler {
         try assertSeedSumsToZero(seed)
 
 
-        // --- Auto-close overlay ---
+        // --- auto-close overlay (you already have this) ---
         let ni = seed.reduce(into: Decimal(0)) { acc, kv in
-            if maps.kindById[kv.key] == .income { acc += kv.value }   // debit - credit
+            if maps.kindById[kv.key] == .income { acc += kv.value }    // debit - credit
         }
-
         let manualAtNi     = seed[resolved.ni.id] ?? 0
         let manualAtEquity = seed[resolved.equity.id] ?? 0
         let hasManual = (manualAtNi != 0 || manualAtEquity != 0)
 
-        // Keep an audit (thread through your return type later if you like)
-        let _ = AutoCloseAudit(
-            ni: ni,
-            niNode: (resolved.ni.code, resolved.ni.id),
-            equityNode: (resolved.equity.code, resolved.equity.id),
-            adjustedForManual: 0,
-            suppressed: hasManual
-        )
-
         var seedWithAC = seed
         if !hasManual && ni != 0 {
-            // close P&L to zero, push NI into equity
-            seedWithAC[resolved.ni.id,     default: 0] += (-ni)
-            seedWithAC[resolved.equity.id, default: 0] += ( ni)
+            seedWithAC[resolved.ni.id,     default: 0] += (-ni) // zero P&L node
+            seedWithAC[resolved.equity.id, default: 0] += ( ni) // push into equity
         }
 
-        // now roll-up WITH the overlayed seed
-        let totals = RGSAssembler.rollupBySortingKey(
-            seedWithAC,
-            idToKey: maps.sortKeyById,
-            keyToId: maps.keyToId
-        )
+        // --- two rollups: NO overlay for IS, overlay for BS ---
+        let totalsIncome  = RGSAssembler.rollupBySortingKey(seed,        idToKey: maps.sortKeyById, keyToId: maps.keyToId)
+        let totalsBalance = RGSAssembler.rollupBySortingKey(seedWithAC,  idToKey: maps.sortKeyById, keyToId: maps.keyToId)
         // --- end auto-close overlay ---
 
 
@@ -116,7 +102,7 @@ public enum RGSAssembler {
         let bs = linesFor(
             .balance,
             roll: maps,
-            totals: totals,
+            totals: totalsBalance,
             labels: labels,
             cut: localCut,
             forcedIds: forcedIds,
@@ -127,7 +113,7 @@ public enum RGSAssembler {
         let is_ = linesFor(
             .income,
             roll: maps,
-            totals: totals,
+            totals: totalsIncome,
             labels: labels,
             cut: localCut,
             forcedIds: forcedIds,
@@ -135,7 +121,8 @@ public enum RGSAssembler {
             omslag: omslag
         )
 
-        return StatementBundle(balance: bs, income: is_, totalsById: totals)
+        // return StatementBundle(balance: bs, income: is_, totalsById: totals)
+        return StatementBundle(balance: bs, income: is_, totalsById: totalsBalance)
     }
 
 
