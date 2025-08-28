@@ -102,8 +102,8 @@ extension RGSAssembler {
         dumpParentCandidates(ch)
         guard let index = ch.index else { throw NSError(domain: "RGSAssembler", code: 1, userInfo: [NSLocalizedDescriptionKey:"Missing index"]) }
 
-        // let maps = try RGSAssembler.makeMaps(from: ch)
         let maps = try RGSAssembler.makeMapsDebug(from: ch, verbose: verbose)
+        assertEdgesMatchKeys(maps)
 
         // seed
         let seed = RGSAssembler.seedLeafs(from: trialRows, using: index)
@@ -263,5 +263,6 @@ extension RGSAssembler {
         }
         FileHandle.standardError.write(Data(("CHAIN for \(idOrCode):\n" + out.joined(separator: "  ->  ") + "\n").utf8))
     }
+
 
 }
