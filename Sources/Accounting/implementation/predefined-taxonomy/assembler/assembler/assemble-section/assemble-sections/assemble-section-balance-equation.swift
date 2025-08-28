@@ -1,5 +1,19 @@
 import Foundation
 
+public enum BalanceEquationError: LocalizedError, Sendable {
+    // case sectionRootNotFound(letter: String)
+    case unbalanced(diff: Decimal, assets: Decimal, equity: Decimal, liabilities: Decimal, eps: Decimal)
+
+    public var errorDescription: String? {
+        switch self {
+        // case .sectionRootNotFound(let letter):
+        //     return "Balance equation: No section root for letter '\(letter)'."
+        case let .unbalanced(diff, a, e, l, eps):
+            return "Balance equation failed: A(\(a)) + J(\(e)) + K(\(l)) = \(diff) (eps=\(eps))."
+        }
+    }
+}
+
 public struct BalanceEquation: Sendable {
     public let assets:      (key: String, id: Int, raw: Decimal)
     public let equity:      (key: String, id: Int, raw: Decimal)
@@ -19,18 +33,6 @@ public struct BalanceEquation: Sendable {
 }
 
 extension RGSAssembler {
-    /// Resolve a section root by letter, trying "B.<L>" then "<L>".
-    private static func resolveSectionRoot(
-        _ letter: String,
-        maps: RGSAssemblerResult
-    ) throws -> (key: String, id: Int) {
-        let candidates = ["B.\(letter)", letter]
-        for k in candidates {
-            if let id = maps.keyToId[k] { return (k, id) }
-        }
-        throw BalanceEquationError.sectionRootNotFound(letter: letter)
-    }
-
     /// Compute A/J/K subtotals from an already rolled-up totals table.
     public static func balanceEquation(
         totals: [Int: Decimal],
