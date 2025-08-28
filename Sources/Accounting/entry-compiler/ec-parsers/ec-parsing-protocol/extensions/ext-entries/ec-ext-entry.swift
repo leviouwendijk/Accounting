@@ -7,6 +7,7 @@ public extension EntryCompilerParsing {
 
         var entry = Entry()
         var tz = defaultTimeZone
+        entry.location = loc()
 
         while current != .rBrace && current != .eof {
             switch current {

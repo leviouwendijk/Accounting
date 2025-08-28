@@ -39,7 +39,8 @@ public enum EntryResolutionPass {
         _ entries: [Entry],
         entities: EntityStore,
         accounts: AccountStore,        // node-backed
-        transactions: TransactionStore
+        transactions: TransactionStore,
+        settings: EntryCompilerSettings
     ) throws -> [ResolvedEntry] {
         try entries.map { e in
             let lines = try e.lines.map { l in
@@ -63,9 +64,12 @@ public enum EntryResolutionPass {
                 at: e.location
             )
 
+            let tz = (e.timezone.flatMap(TimeZone.init(identifier:))) ?? settings.entry.defaultTimezone
+            let resolved = try resolveDate(e.date, filePath: e.location?.file, tz: tz)
+
             return ResolvedEntry(
                 id: e.id,
-                date: e.date,
+                date: .absolute(resolved),
                 lines: lines,
                 details: e.details,
                 timezone: e.timezone,
@@ -79,13 +83,15 @@ public extension Array where Element == Entry {
     func resolved(
         using entities: EntityStore,
         accounts: AccountStore,        // node-backed
-        transactions: TransactionStore
+        transactions: TransactionStore,
+        settings: EntryCompilerSettings
     ) throws -> [ResolvedEntry] {
         try EntryResolutionPass.resolve(
             self,
             entities: entities,
             accounts: accounts,
-            transactions: transactions
+            transactions: transactions,
+            settings: settings
         )
     }
 }

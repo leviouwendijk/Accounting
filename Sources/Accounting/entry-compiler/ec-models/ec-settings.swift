@@ -36,10 +36,16 @@ public struct EntrySettings: Codable, Sendable {
 
 public struct AggregationSettings: Codable, Sendable {
     public var includePreviousPeriods: Bool
+    public var chartFind: String            // e.g. "rgs"
+    public var chartVersion: ChartVersion
     
     public init(
-        includePreviousPeriods: Bool
+        includePreviousPeriods: Bool,
+        chartFind: String,            // e.g. "rgs"
+        chartVersion: ChartVersion
     ) {
         self.includePreviousPeriods = includePreviousPeriods
+        self.chartFind = chartFind
+        self.chartVersion = chartVersion
     }
 }

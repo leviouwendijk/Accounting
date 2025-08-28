@@ -3,7 +3,8 @@ import Foundation
 public enum EntryCompilerEntriesLoader {
     public static func load(
         from project: EntryCompilerProject,
-        defaultTZ: TimeZone
+        // defaultTZ: TimeZone
+        settings: EntryCompilerSettings
     ) throws -> [Entry] {
         let root = project.url(.entries)
         var out: [Entry] = []
@@ -16,7 +17,7 @@ public enum EntryCompilerEntriesLoader {
                 let (toks, lineMap) = lx.collectAllTokensWithLineMap()
                 let parser = EntryCompilerEntriesParser(
                     tokens: toks,
-                    defaultTimeZone: defaultTZ,
+                    defaultTimeZone: settings.entry.defaultTimezone,
                     fileURL: url,
                     lineMap: lineMap
                 )

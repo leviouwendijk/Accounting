@@ -49,8 +49,9 @@ public struct EntryCompilerProject: Sendable {
         return dir
     }
 
-    public func rgs(version: ChartVersion) -> URL {
-        let dir = url(.config, .resources)
+    public func resource(finding component: String, version: ChartVersion) -> URL {
+        var dir = url(.config, .resources)
+        dir = dir.appendingPathComponent(component, isDirectory: true)
 
         let filename = version.filename(
             version: true,

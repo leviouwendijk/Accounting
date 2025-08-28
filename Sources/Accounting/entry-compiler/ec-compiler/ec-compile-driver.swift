@@ -78,13 +78,13 @@ public struct EntryCompileDriver {
 
         if setting.entities {
             vprint(verbose, "▶ Entities …")
-            entities = try EntityStoreLoader.load(from: project, defaultTZ: defaultTZ, verbose: verbose)
+            entities = try EntityStoreLoader.load(from: project, settings: settings, verbose: verbose)
             vprint(verbose, "  ✓ \(entities.byFull.count) entities")
         }
 
         if setting.accounts {
             vprint(verbose, "▶ Accounts …")
-            accounts = try AccountStoreLoader.load(from: project, defaultTZ: defaultTZ, verbose: verbose)
+            accounts = try AccountStoreLoader.load(from: project, settings: settings, verbose: verbose)
             vprint(verbose, "  ✓ \(accounts.count) accounts")
         }
 
@@ -96,13 +96,13 @@ public struct EntryCompileDriver {
 
         if setting.entries {
             vprint(verbose, "▶ Entries …")
-            entries = try EntryCompilerEntriesLoader.load(from: project, defaultTZ: defaultTZ)
+            entries = try EntryCompilerEntriesLoader.load(from: project, settings: settings)
             vprint(verbose, "  ✓ \(entries.count) entries")
         }
 
         if setting.precondition {
             vprint(verbose, "▶ Resolving …")
-            resolved = try entries.resolved(using: entities, accounts: accounts, transactions: transactions) // :contentReference[oaicite:7]{index=7}
+            resolved = try entries.resolved(using: entities, accounts: accounts, transactions: transactions, settings: settings) // :contentReference[oaicite:7]{index=7}
             vprint(verbose, "  ✓ \(resolved.count) resolved entries")
         }
 

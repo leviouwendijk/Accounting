@@ -12,7 +12,7 @@ public struct EntryCompiler: Sendable {
         self.settings = try parsers.makeSettings(root)
         self.entities = try EntityStoreLoader.load(
             from: self.project,
-            defaultTZ: settings.entry.defaultTimezone,
+            settings: settings,
             verbose: false
         )
     }

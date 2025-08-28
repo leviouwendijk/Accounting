@@ -41,21 +41,43 @@ public extension EntryCompilerParsing {
         try expectKeyword("aggregation"); try beginBlock()
 
         var includePrev: Bool?
+        var chartFind: String?
+        var chartVersion: ChartVersion?
 
         while current != .rBrace && current != .eof {
             switch current {
+
             case .ident("include_previous_periods"):
                 advance(); try expect(.equals)
                 includePrev = try parseBoolValue()
+
+            case .ident("chart"):
+                let parsed = try parseChartBlock()
+                chartFind = parsed.find
+                chartVersion = parsed.version
+
             default:
-                throw ParserError.unexpectedToken(current, expected: "include_previous_periods", at: loc())
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "include_previous_periods or chart",
+                    at: loc()
+                )
             }
         }
 
         try endBlock()
+
         guard let ip = includePrev else {
             throw ParserError.unexpectedToken(current, expected: "include_previous_periods", at: loc())
         }
-        return AggregationSettings(includePreviousPeriods: ip)
+        guard let cf = chartFind, let cv = chartVersion else {
+            throw ParserError.unexpectedToken(current, expected: "chart { find <ident> version { major minor } }", at: loc())
+        }
+
+        return AggregationSettings(
+            includePreviousPeriods: ip,
+            chartFind: cf,
+            chartVersion: cv
+        )
     }
 }

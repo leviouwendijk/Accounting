@@ -3,7 +3,8 @@ import Foundation
 public enum EntityStoreLoader {
     public static func load(
         from project: EntryCompilerProject,
-        defaultTZ: TimeZone,
+        // defaultTZ: TimeZone,
+        settings: EntryCompilerSettings,
         verbose: Bool = false
     ) throws -> EntityStore {
         let root = project.url(.config).appendingPathComponent("entities", isDirectory: true)
@@ -17,7 +18,7 @@ public enum EntityStoreLoader {
                 let (toks, lineMap) = lx.collectAllTokensWithLineMap()
                 let defs = try EntryCompilerEntitiesFileParser(
                     tokens: toks, 
-                    defaultTZ: defaultTZ,
+                    defaultTZ: settings.entry.defaultTimezone,
                     fileURL: url,
                     lineMap: lineMap,
                     verbose: verbose

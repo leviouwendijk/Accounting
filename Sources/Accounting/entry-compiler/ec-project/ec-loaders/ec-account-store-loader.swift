@@ -53,7 +53,8 @@ public enum AccountStoreLoader {
     /// Prefers a compiled RGS chart at: <project.config>/rgs.compiled.json
     public static func load(
         from project: EntryCompilerProject,
-        defaultTZ: TimeZone,
+        // defaultTZ: TimeZone,
+        settings: EntryCompilerSettings,
         verbose: Bool = false
     ) throws -> AccountStore {
         let fm = FileManager.default
@@ -81,10 +82,10 @@ public enum AccountStoreLoader {
         // (Future) apply `defs` as presentation overrides; skipped for now.
 
         // 2) Prefer compiled chart if present
-        // ABOUT VERSION: REPLACE THIS WITH SETTINGS OBJECT (pair with timezone?)
-        // then we can pass it as a generic settings object -- requires struct?
-        let version = ChartVersion(major: 3, minor: 8)
-        let compiledChartURL = project.rgs(version: version)
+        let compiledChartURL = project.resource(
+            finding: settings.aggregation.chartFind,
+            version: settings.aggregation.chartVersion
+        )
 
         if fm.fileExists(atPath: compiledChartURL.path) {
             let data = try Data(contentsOf: compiledChartURL)

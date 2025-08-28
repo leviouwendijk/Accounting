@@ -14,7 +14,7 @@ public struct Entry: Hashable, Codable, Sendable {
     public var details: String? = nil
     public var timezone: String? = nil
     public var transactionReferences: [Int]
-    public let location: SourceLocation?
+    public var location: SourceLocation?
 
     public init(
         id: Int? = nil,
