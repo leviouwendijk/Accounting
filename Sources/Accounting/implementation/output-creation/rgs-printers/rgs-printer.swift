@@ -49,18 +49,22 @@ public enum RGSPrinter {
 
     public static func printBalanceSidesSummary(
         title: String,
-        equation: BalanceEquation,
+        sections: BalanceAlphaSections,
         maps: RGSAssemblerResult,
         omslag: OmslagMode = .apply
-    ) {
+    ) throws {
+        // Resolve real root ids to fetch directions for display flipping
+        let A = try RGSAssembler.resolveSectionRoot("A", maps: maps).id
+        let J = try RGSAssembler.resolveSectionRoot("J", maps: maps).id
+        let K = try RGSAssembler.resolveSectionRoot("K", maps: maps).id
+
         func shown(_ raw: Decimal, _ id: Int) -> Decimal {
-            let dir = maps.directionById[id] ?? .debit
-            return RGSAssembler.present(raw, direction: dir, mode: omslag)
+            RGSAssembler.present(raw, direction: maps.directionById[id] ?? .debit, mode: omslag)
         }
 
-        let a = shown(equation.assets.raw, equation.assets.id)
-        let e = shown(equation.equity.raw, equation.equity.id)
-        let l = shown(equation.liabilities.raw,   equation.liabilities.id)
+        let a = shown(sections.assets, A)
+        let e = shown(sections.equity, J)
+        let l = shown(sections.liabilities, K)
 
         print("\n\(title)")
         print(String(repeating: "—", count: title.count))
@@ -68,6 +72,6 @@ public enum RGSPrinter {
         print("Equity (J)\t\t\(e)")
         print("Liabilities (K)\t\(l)")
         print("Check: Assets vs Equity+Liabilities → \(a) vs \(e + l)")
-        print("Balanced? \(equation.diffRaw == 0 ? "✓" : "✗  diff=\(equation.diffRaw)") )")
+        print("Balanced? \(sections.diffRaw == 0 ? "✓" : "✗  diff=\(sections.diffRaw)") )")
     }
 }

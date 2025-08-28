@@ -50,18 +50,11 @@ extension RGSAssembler {
     }
 
     /// Optional assert: throws if A + J + K != 0 within epsilon.
-    public static func assertBalanced(
-        _ eq: BalanceEquation,
-        eps: Decimal = 0
-    ) throws {
-        let diff = eq.diffRaw
+    public static func assertBalanced(_ s: BalanceAlphaSections, eps: Decimal = 0) throws {
+        let diff = s.diffRaw
         if diff != 0 && abs((diff as NSDecimalNumber).doubleValue) > (eps as NSDecimalNumber).doubleValue {
             throw BalanceEquationError.unbalanced(
-                diff: diff,
-                assets: eq.assets.raw,
-                equity: eq.equity.raw,
-                liabilities: eq.liabilities.raw,
-                eps: eps
+                diff: diff, assets: s.assets, equity: s.equity, liabilities: s.liabilities, eps: eps
             )
         }
     }
