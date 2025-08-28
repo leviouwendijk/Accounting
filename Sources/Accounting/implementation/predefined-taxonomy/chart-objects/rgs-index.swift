@@ -151,6 +151,7 @@ public extension RGSIndex {
         return (index, enriched)
     }
 
+    // slowly being ported over to RGSNodeSortingCode.canonicalKey itself
     @inline(__always)
     static func canonicalSortKey(_ sk: String) -> String {
         // Trim whitespace
