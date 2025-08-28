@@ -11,7 +11,7 @@ public struct CompiledChart: Sendable, Codable {
         name: String,                    // "RGS-DutchGAAP-2025 (v3.8)",
         version: ChartVersion,           // 3.8,
         nodes: [RGSNode],                // leaf + intermediate + whatever you want (even just leaves),
-        index: RGSIndex?
+        index: RGSIndex? = nil
     ) {
         self.name = name
         self.version = version
