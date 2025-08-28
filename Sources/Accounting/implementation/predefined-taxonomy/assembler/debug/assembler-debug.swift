@@ -99,6 +99,7 @@ extension RGSAssembler {
         verbose: Bool = true
     ) throws -> StatementBundle {
         let ch = try chart.ensuringIndex(enrichNodes: true, strict: false)
+        dumpParentCandidates(ch)
         guard let index = ch.index else { throw NSError(domain: "RGSAssembler", code: 1, userInfo: [NSLocalizedDescriptionKey:"Missing index"]) }
 
         // let maps = try RGSAssembler.makeMaps(from: ch)
@@ -106,6 +107,8 @@ extension RGSAssembler {
 
         // seed
         let seed = RGSAssembler.seedLeafs(from: trialRows, using: index)
+
+        compareRollupsAndPrint(seed: seed, maps: maps, index: index)
 
         // rollup A: by explicit parent links
         let totalsA = RGSAssembler.rollupAmounts(seed, parentById: maps.parentById)
@@ -169,4 +172,96 @@ extension RGSAssembler {
             FileHandle.standardError.write(Data(s.utf8))
         }
     }
+
+    // Debug: dump each node's keys + candidate parents
+    public static func dumpParentCandidates(_ ch: CompiledChart) {
+        guard let idx = ch.index else {
+            fputs("dumpParentCandidates: no index\n", stderr)
+            return
+        }
+        for n in ch.nodes {
+            let id = n.id
+            let code = n.codes.code
+            let name = n.labels.short
+            let key = n.xlsx?.cachedSortingKey ?? "<no-key>"
+            let xParent = n.xlsx?.links.parentId.map { String($0) } ?? "<nil>"
+            let pkey = (key.isEmpty ? nil : RGSNodeSortingCode(key: key).parentKeyString) ?? "<no-parentKey>"
+            let resolvedByKey = pkey != "<no-parentKey>" ? (idx.bySortKey[pkey]?.description ?? "<missing>") : "<na>"
+            let line = "NODE id=\(id) code=\(code) key='\(key)' name='\(name)' x.parent=\(xParent) parentKey='\(pkey)' indexLookup=\(resolvedByKey)\n"
+            FileHandle.standardError.write(Data(line.utf8))
+        }
+    }
+
+    // Compare two rollups and print top differences
+    public static func compareRollupsAndPrint(seed: [Int: Decimal],
+                                maps: RGSAssemblerResult,
+                                index: RGSIndex,
+                                top: Int = 30) {
+        let totalsA = RGSAssembler.rollupAmounts(seed, parentById: maps.parentById) // parentId walk
+        let totalsB = RGSAssembler.rollupBySortingKey(seed, idToKey: maps.sortKeyById, keyToId: maps.keyToId) // key walk
+
+        // union ids
+        let all = Set(totalsA.keys).union(Set(totalsB.keys)).union(Set(seed.keys))
+        var diffs: [(id:Int, key:String, name:String, a:Decimal, b:Decimal, diff: Decimal)] = []
+        for id in all {
+            let a = totalsA[id] ?? 0
+            let b = totalsB[id] ?? 0
+            let d = (a - b).magnitude
+            if d != 0 {
+                let key = maps.sortKeyById[id] ?? "<no-key>"
+                let name = maps.nameById[id] ?? "<no-name>"
+                diffs.append((id, key, name, a, b, d))
+            }
+        }
+        diffs.sort { $0.diff > $1.diff }
+        FileHandle.standardError.write(Data(("R O L L U P  D I F F S  (top \(min(top, diffs.count)))\n").utf8))
+        for t in diffs.prefix(top) {
+            let s = "id=\(t.id) key='\(t.key)' name='\(t.name)' parentRoll=\(t.a) keyRoll=\(t.b) diff=\(t.diff)\n"
+            FileHandle.standardError.write(Data(s.utf8))
+            // then print parent chain for both parent-determined parent and key-determined parent
+            if let pByParent = maps.parentById[t.id] {
+                let pk = maps.sortKeyById[pByParent] ?? "<no-key>"
+                FileHandle.standardError.write(Data(("  parentId(from x.links)=\(pByParent) key=\(pk)\n").utf8))
+            }
+            // find key parent
+            if let k = maps.sortKeyById[t.id],
+               let pkey = RGSNodeSortingCode(key: k).parentKeyString,
+               let pid = maps.keyToId[pkey] {
+                let pk = maps.sortKeyById[pid] ?? "<no-key>"
+                FileHandle.standardError.write(Data(("  parentId(from key) =\(pid) key=\(pk)\n").utf8))
+            }
+        }
+    }
+
+    public func debugChain(forIdentifier idOrCode: String, ch: CompiledChart, maps: RGSAssemblerResult, index: RGSIndex) {
+        // try code → id first
+        var id: Int? = nil
+        if let i = index.byIdentifier[idOrCode] { id = i }
+        else if let i = Int(idOrCode) { id = i } // allow id input
+        guard let start = id else {
+            FileHandle.standardError.write(Data(("debugChain: no id for '\(idOrCode)'\n").utf8))
+            return
+        }
+        var cur = start
+        var out: [String] = []
+        while true {
+            let key = maps.sortKeyById[cur] ?? "<no-key>"
+            let name = maps.nameById[cur] ?? "<no-name>"
+            out.append("\(cur) [\(key)] \(name)")
+            if let p = maps.parentById[cur] {
+                cur = p
+                continue
+            }
+            // fallback by key
+            if let k = maps.sortKeyById[cur],
+               let pk = RGSNodeSortingCode(key: k).parentKeyString,
+               let pid = maps.keyToId[pk] {
+                cur = pid
+                continue
+            }
+            break
+        }
+        FileHandle.standardError.write(Data(("CHAIN for \(idOrCode):\n" + out.joined(separator: "  ->  ") + "\n").utf8))
+    }
+
 }
