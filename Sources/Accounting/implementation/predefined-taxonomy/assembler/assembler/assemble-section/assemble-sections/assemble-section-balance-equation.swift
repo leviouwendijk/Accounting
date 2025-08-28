@@ -33,21 +33,33 @@ public struct BalanceEquation: Sendable {
 }
 
 extension RGSAssembler {
-    /// Compute A/J/K subtotals from an already rolled-up totals table.
-    public static func balanceEquation(
-        totals: [Int: Decimal],
-        maps: RGSAssemblerResult,
-        letters: (assets: String, equity: String, liabilities: String) = ("A","J","K")
-    ) throws -> BalanceEquation {
-        let A = try resolveSectionRoot(letters.assets, maps: maps)
-        let J = try resolveSectionRoot(letters.equity, maps: maps)
-        let K = try resolveSectionRoot(letters.liabilities, maps: maps)
+    public static func equation(from alpha: BalanceAlphaSections,
+                         maps: RGSAssemblerResult) throws -> BalanceEquation {
+        let A = try resolveSectionRoot("A", maps: maps)
+        let J = try resolveSectionRoot("J", maps: maps)
+        let K = try resolveSectionRoot("K", maps: maps)
         return BalanceEquation(
-            assets:      (A.key, A.id, totals[A.id] ?? 0),
-            equity:      (J.key, J.id, totals[J.id] ?? 0),
-            liabilities: (K.key, K.id, totals[K.id] ?? 0)
+            assets:      (A.key, A.id, alpha.assets),
+            equity:      (J.key, J.id, alpha.equity),
+            liabilities: (K.key, K.id, alpha.liabilities)
         )
     }
+
+    // /// Compute A/J/K subtotals from an already rolled-up totals table.
+    // public static func balanceEquation(
+    //     totals: [Int: Decimal],
+    //     maps: RGSAssemblerResult,
+    //     letters: (assets: String, equity: String, liabilities: String) = ("A","J","K")
+    // ) throws -> BalanceEquation {
+    //     let A = try resolveSectionRoot(letters.assets, maps: maps)
+    //     let J = try resolveSectionRoot(letters.equity, maps: maps)
+    //     let K = try resolveSectionRoot(letters.liabilities, maps: maps)
+    //     return BalanceEquation(
+    //         assets:      (A.key, A.id, totals[A.id] ?? 0),
+    //         equity:      (J.key, J.id, totals[J.id] ?? 0),
+    //         liabilities: (K.key, K.id, totals[K.id] ?? 0)
+    //     )
+    // }
 
     /// Optional assert: throws if A + J + K != 0 within epsilon.
     public static func assertBalanced(_ s: BalanceAlphaSections, eps: Decimal = 0) throws {
