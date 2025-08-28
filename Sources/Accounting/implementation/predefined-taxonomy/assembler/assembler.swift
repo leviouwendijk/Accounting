@@ -40,7 +40,8 @@ public enum RGSAssembler {
         trialRows: [TrialBalanceRow],
         cut: AssembleCut,
         omslag: OmslagMode,
-        for businessEntity: BusinessEntity = .vof
+        for businessEntity: BusinessEntity = .vof,
+        autoClose: Bool = true
     ) throws -> StatementBundle {
         let ch = try chart.ensuringIndex(enrichNodes: true, strict: false)
         guard let index = ch.index else { throw NSError(domain: "RGSAssembler", code: 1, userInfo: [NSLocalizedDescriptionKey:"Missing index"]) }
@@ -53,141 +54,106 @@ public enum RGSAssembler {
         let targets  = AutoCloseTargets(for: businessEntity)
         let resolved = try targets.resolve(in: index, validateWith: maps)
 
-        // Make sure these codes are included in the presentation even if zero
-        var localCut = cut
-        localCut.includeCodes.append(contentsOf: [resolved.ni.code, resolved.equity.code])
-        // --- end auto-close resolve ---
-
         // Seed + roll-up
         let seed   = RGSAssembler.seedLeafs(from: trialRows, using: index)
         try assertSeedSumsToZero(seed)
 
+        if !autoClose {
+            let totals = RGSAssembler.rollupBySortingKey(
+                seed    ,  
+                idToKey :  maps.sortKeyById,
+                keyToId :  maps.keyToId
+            )
 
-        // --- auto-close overlay (you already have this) ---
-        let ni = seed.reduce(into: Decimal(0)) { acc, kv in
-            if maps.kindById[kv.key] == .income { acc += kv.value }    // debit - credit
+            // Forced inclusions (codes → ids)
+            let forcedIds = Set(cut.includeCodes.compactMap { index.byIdentifier[$0] })
+            let forcedChain: Set<Int> = cut.includeIntermediates ? Set(forcedIds.flatMap { chainToRoot($0, parentById: maps.parentById) }) : forcedIds
+
+            // Labels by sort-key prefix
+            let labels = index.labelByGroupKey
+
+            // Build lines
+            let bs = linesFor(
+                .balance,
+                roll: maps,
+                totals: totals,
+                labels: labels,
+                cut: cut,
+                forcedIds: forcedIds,
+                forcedChain: forcedChain,
+                omslag: omslag
+            )
+
+            let is_ = linesFor(
+                .income,
+                roll: maps,
+                totals: totals,
+                labels: labels,
+                cut: cut,
+                forcedIds: forcedIds,
+                forcedChain: forcedChain,
+                omslag: omslag
+            )
+
+            return StatementBundle(balance: bs, income: is_, totalsById: totals)
+        } else {
+            // Make sure these codes are included in the presentation even if zero
+            var localCut = cut
+            localCut.includeCodes.append(contentsOf: [resolved.ni.code, resolved.equity.code])
+            // --- end auto-close resolve ---
+
+            // --- auto-close overlay (you already have this) ---
+            let ni = seed.reduce(into: Decimal(0)) { acc, kv in
+                if maps.kindById[kv.key] == .income { acc += kv.value }    // debit - credit
+            }
+            let manualAtNi     = seed[resolved.ni.id] ?? 0
+            let manualAtEquity = seed[resolved.equity.id] ?? 0
+            let hasManual = (manualAtNi != 0 || manualAtEquity != 0)
+
+            var seedWithAC = seed
+            if !hasManual && ni != 0 {
+                seedWithAC[resolved.ni.id,     default: 0] += (-ni) // zero P&L node
+                seedWithAC[resolved.equity.id, default: 0] += ( ni) // push into equity
+            }
+
+            // --- two rollups: NO overlay for IS, overlay for BS ---
+            let totalsIncome  = RGSAssembler.rollupBySortingKey(seed,        idToKey: maps.sortKeyById, keyToId: maps.keyToId)
+            let totalsBalance = RGSAssembler.rollupBySortingKey(seedWithAC,  idToKey: maps.sortKeyById, keyToId: maps.keyToId)
+            // --- end auto-close overlay ---
+
+            // Forced inclusions (codes → ids)
+            let forcedIds = Set(localCut.includeCodes.compactMap { index.byIdentifier[$0] })
+            let forcedChain: Set<Int> = localCut.includeIntermediates ? Set(forcedIds.flatMap { chainToRoot($0, parentById: maps.parentById) }) : forcedIds
+
+            // Labels by sort-key prefix
+            let labels = index.labelByGroupKey
+
+            // Build lines
+            let bs = linesFor(
+                .balance,
+                roll: maps,
+                totals: totalsBalance,
+                labels: labels,
+                cut: localCut,
+                forcedIds: forcedIds,
+                forcedChain: forcedChain,
+                omslag: omslag
+            )
+
+            let is_ = linesFor(
+                .income,
+                roll: maps,
+                totals: totalsIncome,
+                labels: labels,
+                cut: localCut,
+                forcedIds: forcedIds,
+                forcedChain: forcedChain,
+                omslag: omslag
+            )
+
+            return StatementBundle(balance: bs, income: is_, totalsById: totalsBalance)
         }
-        let manualAtNi     = seed[resolved.ni.id] ?? 0
-        let manualAtEquity = seed[resolved.equity.id] ?? 0
-        let hasManual = (manualAtNi != 0 || manualAtEquity != 0)
-
-        var seedWithAC = seed
-        if !hasManual && ni != 0 {
-            seedWithAC[resolved.ni.id,     default: 0] += (-ni) // zero P&L node
-            seedWithAC[resolved.equity.id, default: 0] += ( ni) // push into equity
-        }
-
-        // --- two rollups: NO overlay for IS, overlay for BS ---
-        let totalsIncome  = RGSAssembler.rollupBySortingKey(seed,        idToKey: maps.sortKeyById, keyToId: maps.keyToId)
-        let totalsBalance = RGSAssembler.rollupBySortingKey(seedWithAC,  idToKey: maps.sortKeyById, keyToId: maps.keyToId)
-        // --- end auto-close overlay ---
-
-
-        // previous totals, without auto-close:
-        //
-        // let totals = RGSAssembler.rollupBySortingKey(
-        //     seed    ,  
-        //     idToKey :  maps.sortKeyById,
-        //     keyToId :  maps.keyToId
-        // )
-
-        // Forced inclusions (codes → ids)
-        let forcedIds = Set(localCut.includeCodes.compactMap { index.byIdentifier[$0] })
-        let forcedChain: Set<Int> = localCut.includeIntermediates ? Set(forcedIds.flatMap { chainToRoot($0, parentById: maps.parentById) }) : forcedIds
-
-        // Labels by sort-key prefix
-        let labels = index.labelByGroupKey
-
-        // Build lines
-        let bs = linesFor(
-            .balance,
-            roll: maps,
-            totals: totalsBalance,
-            labels: labels,
-            cut: localCut,
-            forcedIds: forcedIds,
-            forcedChain: forcedChain,
-            omslag: omslag
-        )
-
-        let is_ = linesFor(
-            .income,
-            roll: maps,
-            totals: totalsIncome,
-            labels: labels,
-            cut: localCut,
-            forcedIds: forcedIds,
-            forcedChain: forcedChain,
-            omslag: omslag
-        )
-
-        // return StatementBundle(balance: bs, income: is_, totalsById: totals)
-        return StatementBundle(balance: bs, income: is_, totalsById: totalsBalance)
     }
-
-
-    // public static func makeMaps(from chart: CompiledChart) throws -> RGSAssemblerResult {
-    //     let ch = try chart.ensuringIndex(enrichNodes: true, strict: false) // fills parentId/l2Id
-    //     var kindById: [Int: StatementKind] = [:]
-    //     var sortKeyById: [Int: String] = [:]
-    //     var directionById: [Int: Direction] = [:]
-    //     var parentById: [Int: Int] = [:]
-
-    //     for n in ch.nodes {
-    //         if let x = n.xlsx {
-    //             sortKeyById[n.id] = x.cachedSortingKey
-    //             if let pid = x.links.parentId { parentById[n.id] = pid }
-    //         }
-    //         directionById[n.id] = n.direction
-    //         // B* => balance, W* => income
-    //         if n.codes.code.hasPrefix("B") { kindById[n.id] = .balance }
-    //         else if n.codes.code.hasPrefix("W") { kindById[n.id] = .income }
-    //     }
-
-    //     return .init(totalsById: [:],
-    //                  kindById: kindById,
-    //                  sortKeyById: sortKeyById,
-    //                  directionById: directionById,
-    //                  parentById: parentById)
-    // }
-
-    // public static func makeMaps(from chart: CompiledChart) throws -> RGSAssemblerResult {
-    //     let ch = try chart.ensuringIndex(enrichNodes: true, strict: false)
-    //     guard let idx = ch.index else { fatalError("index missing") }
-
-    //     var kindById: [Int: StatementKind] = [:]
-    //     var sortKeyById: [Int: String] = [:]
-    //     var directionById: [Int: Direction] = [:]
-    //     var parentById: [Int: Int] = [:]
-
-    //     for n in ch.nodes {
-    //         guard let x = n.xlsx else { continue }
-    //         let key = x.cachedSortingKey
-    //         sortKeyById[n.id] = key
-    //         directionById[n.id] = n.direction
-    //         if n.codes.code.hasPrefix("B") { kindById[n.id] = .balance }
-    //         else if n.codes.code.hasPrefix("W") { kindById[n.id] = .income }
-
-    //         // primary: use enriched parentId
-    //         if let pid = x.links.parentId {
-    //             parentById[n.id] = pid
-    //         } else {
-    //             // fallback: derive from sort-key prefix
-    //             if let pkey = RGSNodeSortingCode(key: key).parentKeyString,
-    //                let pid = idx.bySortKey[pkey] {
-    //                 parentById[n.id] = pid
-    //             }
-    //         }
-    //     }
-
-    //     return .init(
-    //         totalsById: [:],
-    //         kindById: kindById,
-    //         sortKeyById: sortKeyById,
-    //         directionById: directionById,
-    //         parentById: parentById
-    //     )
-    // }
 
     public static func makeMaps(from chart: CompiledChart) throws -> RGSAssemblerResult {
         let ch = try chart.ensuringIndex(enrichNodes: true, strict: false)
@@ -232,31 +198,6 @@ public enum RGSAssembler {
         }
         return byId
     }
-
-    // public static func rollupAmounts(
-    //     _ seed: [Int: Decimal],
-    //     parentById: [Int: Int]
-    // ) -> [Int: Decimal] {
-    //     var totals = seed
-    //     // single pass repeated until stable or use stack of ancestors:
-    //     // Build children map once:
-    //     var children: [Int: [Int]] = [:]
-    //     for (child, parent) in parentById { children[parent, default: []].append(child) }
-
-    //     // Post-order DFS
-    //     func dfs(_ id: Int) -> Decimal {
-    //         var sum = totals[id] ?? 0
-    //         for c in children[id] ?? [] { sum += dfs(c) }
-    //         totals[id] = sum
-    //         return sum
-    //     }
-    //     // Roots = ids that aren't someone’s child
-    //     let allIds = Set(parentById.keys).union(Set(parentById.values))
-    //     let childSet = Set(parentById.keys)
-    //     let roots = Array(allIds.subtracting(childSet))
-    //     for r in roots { _ = dfs(r) }
-    //     return totals
-    // }
 
     public static func rollupAmounts(
         _ seed: [Int: Decimal],
