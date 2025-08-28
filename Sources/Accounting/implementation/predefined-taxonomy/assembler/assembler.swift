@@ -39,7 +39,8 @@ public enum RGSAssembler {
         chart: CompiledChart,
         trialRows: [TrialBalanceRow],
         cut: AssembleCut,
-        omslag: OmslagMode
+        omslag: OmslagMode,
+        for businessEntity: BusinessEntity = .vof
     ) throws -> StatementBundle {
         let ch = try chart.ensuringIndex(enrichNodes: true, strict: false)
         guard let index = ch.index else { throw NSError(domain: "RGSAssembler", code: 1, userInfo: [NSLocalizedDescriptionKey:"Missing index"]) }
@@ -48,30 +49,54 @@ public enum RGSAssembler {
         let maps   = try RGSAssembler.makeMaps(from: ch)
         assertEdgesMatchKeys(maps)
 
+        // --- Auto-close: resolve target nodes (single-code variant) ---
+        let targets  = AutoCloseTargets(for: businessEntity)
+        let resolved = try targets.resolve(in: index, validateWith: maps)
+
+        // Make sure these codes are included in the presentation even if zero
+        var localCut = cut
+        localCut.includeCodes.append(contentsOf: [resolved.ni.code, resolved.equity.code])
+        // --- end auto-close resolve ---
+
         // Seed + roll-up
         let seed   = RGSAssembler.seedLeafs(from: trialRows, using: index)
         try assertSeedSumsToZero(seed)
 
         let totals = RGSAssembler.rollupBySortingKey(
-            seed,
-            idToKey: maps.sortKeyById,
-            keyToId: maps.keyToId
+            seed    ,  
+            idToKey :  maps.sortKeyById,
+            keyToId :  maps.keyToId
         )
 
         // Forced inclusions (codes → ids)
         let forcedIds = Set(cut.includeCodes.compactMap { index.byIdentifier[$0] })
-        let forcedChain: Set<Int> = cut.includeIntermediates
-            ? Set(forcedIds.flatMap { chainToRoot($0, parentById: maps.parentById) })
-            : forcedIds
+        let forcedChain: Set<Int> = localCut.includeIntermediates ? Set(forcedIds.flatMap { chainToRoot($0, parentById: maps.parentById) }) : forcedIds
 
         // Labels by sort-key prefix
         let labels = index.labelByGroupKey
 
         // Build lines
-        let bs = linesFor(.balance, roll: maps, totals: totals, labels: labels,
-                          cut: cut, forcedIds: forcedIds, forcedChain: forcedChain, omslag: omslag)
-        let is_ = linesFor(.income,  roll: maps, totals: totals, labels: labels,
-                          cut: cut, forcedIds: forcedIds, forcedChain: forcedChain, omslag: omslag)
+        let bs = linesFor(
+            .balance,
+            roll: maps,
+            totals: totals,
+            labels: labels,
+            cut: localCut,
+            forcedIds: forcedIds,
+            forcedChain: forcedChain,
+            omslag: omslag
+        )
+
+        let is_ = linesFor(
+            .income,
+            roll: maps,
+            totals: totals,
+            labels: labels,
+            cut: localCut,
+            forcedIds: forcedIds,
+            forcedChain: forcedChain,
+            omslag: omslag
+        )
 
         return StatementBundle(balance: bs, income: is_, totalsById: totals)
     }
