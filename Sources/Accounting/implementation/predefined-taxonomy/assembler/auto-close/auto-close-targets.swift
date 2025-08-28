@@ -16,9 +16,7 @@ public struct AutoCloseTargets: Sendable, Codable {
     public init(for businessEntity: BusinessEntity) {
         self = businessEntity.autoCloseTargets()
     }
-}
 
-public extension AutoCloseTargets {
     /// Resolve codes to node ids using the chart's identifier index.
     /// Throws if either code is missing.
     func resolve(in index: RGSIndex
