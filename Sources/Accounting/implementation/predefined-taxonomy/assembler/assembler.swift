@@ -117,9 +117,14 @@ public enum RGSAssembler {
             }
 
             // --- two rollups: NO overlay for IS, overlay for BS ---
-            let totalsIncome  = RGSAssembler.rollupBySortingKey(seed,        idToKey: maps.sortKeyById, keyToId: maps.keyToId)
+            var totalsIncome  = RGSAssembler.rollupBySortingKey(seed,        idToKey: maps.sortKeyById, keyToId: maps.keyToId)
             let totalsBalance = RGSAssembler.rollupBySortingKey(seedWithAC,  idToKey: maps.sortKeyById, keyToId: maps.keyToId)
             // --- end auto-close overlay ---
+
+            // place NI on the NI node for IS presentation (do NOT invert here)
+            if !hasManual && ni != 0 {
+                totalsIncome[resolved.ni.id, default: 0] += ni
+            }
 
             // Forced inclusions (codes → ids)
             let forcedIds = Set(localCut.includeCodes.compactMap { index.byIdentifier[$0] })
