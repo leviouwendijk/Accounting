@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RGSIndex: Hashable, Sendable {
+public struct RGSIndex: Hashable, Sendable, Codable {
     public let byIdentifier: [String:Int]     // "BLimBanRba" -> node.id
     public let bySortKey: [String:Int]        // "A.F.0104000" -> node.id
     public let labelByGroupKey: [String:String] // groupKey (any level) -> labelShort
@@ -13,10 +13,10 @@ public struct LocalAccountKey: Hashable, Sendable, Codable {
     public let set: String // level 2 : Immateriele Vaste Activa
     public let group: String // level 3 : categorical
     public let account: String // level 4
-    public let subaccount: String // level 5
+    public let subaccount: String? // level 5
 }
 
-public struct LocalChartIndex: Sendable {
+public struct LocalChartIndex: Sendable, Codable {
     public let localAccountToCode: [LocalAccountKey: String] // "key: assets.fixed_tangible.vehicles -> "BMva.."
     public let localAccountToId: [LocalAccountKey: Int]
 }

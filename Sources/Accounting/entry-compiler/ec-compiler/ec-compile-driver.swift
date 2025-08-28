@@ -71,7 +71,7 @@ public struct EntryCompileDriver {
         vprint(verbose, "  ✓ default timezone = \(defaultTZ.identifier)")
 
         var entities: EntityStore       = EntityStore([:])
-        var accounts: AccountStore      = try AccountStore([])
+        var accounts: AccountStore      = try AccountStore(nodes: [])
         var transactions: TransactionStore = try TransactionStore([])
         var entries: [Entry]            = []
         var resolved: [ResolvedEntry]   = []

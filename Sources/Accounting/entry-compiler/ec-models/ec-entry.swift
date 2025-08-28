@@ -52,6 +52,7 @@ public struct Entry: Hashable, Codable, Sendable {
             let acc: String = {
                 switch line.account {
                 case .code(let s): return s
+                case .identifier(let s): return s
                 case .path(let segs): return segs.joined(separator: ".")
                 }
             }()

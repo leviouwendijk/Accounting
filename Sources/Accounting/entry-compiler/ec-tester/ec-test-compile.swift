@@ -74,13 +74,16 @@ public func ecTestCompile(
     }
 
     let accItems: [AccountsSnapshot.Item] =
-        result.accounts.byCode.values
-            .sorted { $0.code < $1.code }
-            .map { a in
-                AccountsSnapshot.Item(code: a.code,
-                                      label: a.label,
-                                      direction: a.direction,
-                                      level: a.level)
+        Array(result.accounts.byCode.values)               // force Array
+            .sorted(by: { $0.codes.code < $1.codes.code }) // sort on node code
+            .map { n in
+                AccountsSnapshot.Item(
+                    code: n.codes.code,
+                    // TEMP: until you expose a preferred label on RGSNodeLabels
+                    label: n.codes.code,
+                    direction: n.direction ?? .debit,       // or guard/throw if you want strictness
+                    level: Int(n.level)
+                )
             }
 
     try writeJSON(AccountsSnapshot(items: accItems),

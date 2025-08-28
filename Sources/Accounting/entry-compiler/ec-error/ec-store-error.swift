@@ -28,6 +28,7 @@ public enum AccountStoreError: Error, CustomStringConvertible, Sendable {
     case notFound(code: String, at: SourceLocation?)
     case invalidReference(path: [String], at: SourceLocation?)
     case missingRequiredForNewAccount(code: String, missing: String, at: SourceLocation?)
+    case empty(at: SourceLocation?)
 
     public var description: String {
         switch self {
@@ -39,6 +40,8 @@ public enum AccountStoreError: Error, CustomStringConvertible, Sendable {
             return "Invalid account reference '\(path.joined(separator: "."))'\(at.describeSuffix)"
         case let .missingRequiredForNewAccount(code, missing, at):
             return "Cannot create new account '\(code)': missing \(missing)\(at.describeSuffix)"
+        case let .empty(at):
+            return "Store is empty \(at.describeSuffix)"
         }
     }
 }
