@@ -19,7 +19,7 @@ import Foundation
 //     return asg.count < bsg.count
 // }
 
-public struct RGSPresentationLine {
+public struct RGSPresentationLine: Sendable {
     public let label: String
     public let amount: Decimal
     public let id: Int

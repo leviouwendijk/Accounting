@@ -8,7 +8,46 @@ public struct RGSAssemblerResult: Sendable {
     public let parentById: [Int: Int]            // child -> parent
 }
 
+public struct StatementBundle: Sendable {
+    public let balance: [RGSPresentationLine]
+    public let income:  [RGSPresentationLine]
+    public let totalsById: [Int: Decimal]   // for debugging / future use
+    
+    public init(
+        balance: [RGSPresentationLine],
+        income: [RGSPresentationLine],
+        totalsById: [Int: Decimal]   // for debugging / future use
+    ) {
+        self.balance = balance
+        self.income = income
+        self.totalsById = totalsById
+    }
+}
+
 public enum RGSAssembler {
+    public static func assemble(
+        chart: CompiledChart,
+        trialRows: [TrialBalanceRow],
+        target: TargetLevel,
+        omslag: OmslagMode
+    ) throws -> StatementBundle {
+        // 1) Ensure index + parent links available
+        let ch = try chart.ensuringIndex(enrichNodes: true, strict: false)
+        let index = ch.index!                           // you just ensured it
+        // 2) Build maps once
+        let maps = try RGSAssembler.makeMaps(from: ch)  // your renamed makeMaps
+        // 3) Seed + roll up
+        let seed   = RGSAssembler.seedLeafs(from: trialRows, using: index)
+        let totals = RGSAssembler.rollupAmounts(seed, parentById: maps.parentById)
+        // 4) Labels for group keys
+        let labels = index.labelByGroupKey
+        // 5) Build lines
+        let bs = linesFor(.balance, roll: maps, totals: totals, labels: labels, target: target, omslag: omslag)
+        let is_ = linesFor(.income,  roll: maps, totals: totals, labels: labels, target: target, omslag: omslag)
+        return StatementBundle(balance: bs, income: is_, totalsById: totals)
+    }
+
+
     // 1) Build maps from the compiled chart
     public static func makeMaps(from chart: CompiledChart) throws -> RGSAssemblerResult {
         let ch = try chart.ensuringIndex(enrichNodes: true, strict: false) // fills parentId/l2Id
