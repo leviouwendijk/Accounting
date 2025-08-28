@@ -69,7 +69,7 @@ public enum RGSAssembler {
         )
 
         // Forced inclusions (codes → ids)
-        let forcedIds = Set(cut.includeCodes.compactMap { index.byIdentifier[$0] })
+        let forcedIds = Set(localCut.includeCodes.compactMap { index.byIdentifier[$0] })
         let forcedChain: Set<Int> = localCut.includeIntermediates ? Set(forcedIds.flatMap { chainToRoot($0, parentById: maps.parentById) }) : forcedIds
 
         // Labels by sort-key prefix
