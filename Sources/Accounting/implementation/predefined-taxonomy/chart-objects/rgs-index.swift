@@ -55,7 +55,8 @@ public extension RGSIndex {
             }
 
             if let x = n.xlsx {
-                let sk = x.cachedSortingKey.trimmingCharacters(in: .whitespacesAndNewlines)
+                let skRaw = x.cachedSortingKey
+                let sk = canonicalSortKey(skRaw)
 
                 // skip empty sort keys (common for top-level headings)
                 guard !sk.isEmpty else {
@@ -148,5 +149,26 @@ public extension RGSIndex {
         }
 
         return (index, enriched)
+    }
+
+    @inline(__always)
+    static func canonicalSortKey(_ sk: String) -> String {
+        // Trim whitespace
+        let parts = sk.trimmingCharacters(in: .whitespacesAndNewlines)
+        .split(separator: ".", omittingEmptySubsequences: true)
+        .map(String.init)
+
+        guard parts.count >= 3 else { return parts.joined(separator: ".") }
+
+        var segs = parts
+        // Merge patterns like "E.H.A.020" -> "E.H.A020"
+        if segs.count >= 4,
+           segs[segs.count-2].range(of: #"^[A-Z]+$"#, options: .regularExpression) != nil,
+           segs.last!.range(of: #"^[0-9]+$"#, options: .regularExpression) != nil {
+               let merged = segs[segs.count-2] + segs.last!
+               segs.removeLast()
+               segs[segs.count-1] = merged
+        }
+        return segs.joined(separator: ".")
     }
 }
