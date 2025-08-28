@@ -129,7 +129,9 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
         "aggregation", 
         "chart",
         "find",
-        "version"
+        "version",
+        "major",
+        "minor"
     ]
 
     let stringBlocks: Set<String> = [
