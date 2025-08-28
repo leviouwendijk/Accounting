@@ -29,6 +29,7 @@ public enum AccountStoreError: Error, CustomStringConvertible, Sendable {
     case invalidReference(path: [String], at: SourceLocation?)
     case missingRequiredForNewAccount(code: String, missing: String, at: SourceLocation?)
     case empty(at: SourceLocation?)
+    case compiledChartIndexEmpty
 
     public var description: String {
         switch self {
@@ -42,6 +43,8 @@ public enum AccountStoreError: Error, CustomStringConvertible, Sendable {
             return "Cannot create new account '\(code)': missing \(missing)\(at.describeSuffix)"
         case let .empty(at):
             return "Store is empty \(at.describeSuffix)"
+        case .compiledChartIndexEmpty:
+            return "Account Store has a CompiledChart with an empty index"
         }
     }
 }

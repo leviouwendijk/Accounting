@@ -5,7 +5,7 @@ public struct CompiledChart: Sendable, Codable {
     public let name: String                    // "RGS-DutchGAAP-2025 (v3.8)"
     public let version: ChartVersion           // 3.8
     public let nodes: [RGSNode]                // leaf + intermediate + whatever you want (even just leaves)
-    public let index: RGSIndex
+    public let index: RGSIndex?
 }
 
 public struct Account: Sendable, Codable, Hashable {

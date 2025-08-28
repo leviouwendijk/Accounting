@@ -55,8 +55,11 @@ public struct AccountStore: Codable, Sendable {
             }
         }
         var identMap: [String: RGSNode] = [:]
+
+        guard let idx = chart.index else { throw AccountStoreError.compiledChartIndexEmpty }
+
         // Index provides ident -> node.id
-        for (ident, id) in chart.index.byIdentifier {
+        for (ident, id) in idx.byIdentifier {
             // nodes are typically few enough that building a dict is fine;
             // if you already have a nodeById map elsewhere, reuse it.
             if let node = chart.nodes.first(where: { $0.id == id }) {
