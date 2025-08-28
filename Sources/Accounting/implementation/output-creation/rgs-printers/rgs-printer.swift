@@ -118,8 +118,9 @@ public enum RGSPrinter {
 
         // Bottom summary
         print("== Summary ==")
-        print("Equity + Liabilities: \(t.equityPlusLiabilities)")
-        print("Check: Assets vs Equity+Liabilities → \(t.assets) vs \(t.equityPlusLiabilities)")
+        print("Subtotal Equity + Liabilities: \(t.equityPlusLiabilities)")
+        print()
+        print("Check: (Assets ==  Equity+Liabilities)? → \(t.assets) == \(t.equityPlusLiabilities)")
     }
 
     public static func printBalanceSidesSummary(
