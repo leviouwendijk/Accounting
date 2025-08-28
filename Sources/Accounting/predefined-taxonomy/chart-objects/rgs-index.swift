@@ -5,18 +5,30 @@ public struct RGSIndex: Hashable, Sendable, Codable {
     public let bySortKey: [String:Int]        // "A.F.0104000" -> node.id
     public let labelByGroupKey: [String:String] // groupKey (any level) -> labelShort
     public let byReference: [String:Int]    // in rare cases of referentienummer use
+    
+    public init(
+        byIdentifier: [String:Int],
+        bySortKey: [String:Int],    
+        labelByGroupKey: [String:String],
+        byReference: [String:Int]
+    ) {
+        self.byIdentifier = byIdentifier
+        self.bySortKey = bySortKey
+        self.labelByGroupKey = labelByGroupKey
+        self.byReference = byReference
+    }
 }
 
-// mock version of a new structured account key
-public struct LocalAccountKey: Hashable, Sendable, Codable {
-    public let section: String // level 1 : BALANS
-    public let set: String // level 2 : Immateriele Vaste Activa
-    public let group: String // level 3 : categorical
-    public let account: String // level 4
-    public let subaccount: String? // level 5
-}
+// // mock version of a new structured account key
+// public struct LocalAccountKey: Hashable, Sendable, Codable {
+//     public let section: String // level 1 : BALANS
+//     public let set: String // level 2 : Immateriele Vaste Activa
+//     public let group: String // level 3 : categorical
+//     public let account: String // level 4
+//     public let subaccount: String? // level 5
+// }
 
-public struct LocalChartIndex: Sendable, Codable {
-    public let localAccountToCode: [LocalAccountKey: String] // "key: assets.fixed_tangible.vehicles -> "BMva.."
-    public let localAccountToId: [LocalAccountKey: Int]
-}
+// public struct LocalChartIndex: Sendable, Codable {
+//     public let localAccountToCode: [LocalAccountKey: String] // "key: assets.fixed_tangible.vehicles -> "BMva.."
+//     public let localAccountToId: [LocalAccountKey: Int]
+// }
