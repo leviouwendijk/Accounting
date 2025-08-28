@@ -28,7 +28,7 @@ public enum StatementLibrary {
             rows: [
                 .init(id: .init(raw: "revenue"), label: "Revenue", kind: .income,
                       materialityThreshold: materiality,
-                      rgs: [.init(includeCodes: ["WOmzNodOdh","WOmzNohOlh"], includePrefixes: nil, includeLevel: nil, filterDirection: nil)]),
+                      rgs: [.init(includeCodes: ["WOmzNodOdh","WOmzNopOlh"], includePrefixes: nil, includeLevel: nil, filterDirection: nil)]),
                 .init(id: .init(raw: "cogs_expenses"), label: "COGS/Expenses", kind: .income,
                       materialityThreshold: materiality,
                       rgs: [.init(includeCodes: ["WKprKvgKvg"], includePrefixes: nil, includeLevel: nil, filterDirection: nil)])
