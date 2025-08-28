@@ -46,6 +46,62 @@ public enum RGSPrinter {
         }
     }
 
+    public static func presentedSectionTotals(
+        chart: CompiledChart,
+        bundle: StatementBundle,
+        bounds: AlphaBounds = .default,
+        omslag: OmslagMode = .apply
+    ) throws -> [String: Decimal] { // keys: "A","J","K"
+        let maps  = try RGSAssembler.makeMaps(from: chart)
+        let alpha = try RGSAssembler.balanceAlphaSections(
+            totals: bundle.totalsById, maps: maps, bounds: bounds
+        )
+        // resolve real roots to get correct directions for display flipping
+        let A = try? RGSAssembler.resolveSectionRoot("A", maps: maps).id
+        let J = try? RGSAssembler.resolveSectionRoot("J", maps: maps).id
+        let K = try? RGSAssembler.resolveSectionRoot("K", maps: maps).id
+        func shown(_ raw: Decimal, _ id: Int?) -> Decimal {
+            guard let id = id else { return raw }
+            return RGSAssembler.present(
+                raw, direction: maps.directionById[id] ?? .debit, mode: omslag
+            )
+        }
+        return [
+            "A": shown(alpha.assets,      A),
+            "J": shown(alpha.equity,      J),
+            "K": shown(alpha.liabilities, K)
+        ]
+    }
+
+    public static func printSectionsWithFooters(
+        _ title: String,
+        sections: [RGSPresentationSection],
+        chart: CompiledChart,
+        bundle: StatementBundle,
+        bounds: AlphaBounds = .default,
+        omslag: OmslagMode = .apply
+    ) throws {
+        let totals = try presentedSectionTotals(
+            chart: chart, bundle: bundle, bounds: bounds, omslag: omslag
+        )
+
+        print("\n\(title)")
+        print(String(repeating: "—", count: title.count))
+        for s in sections {
+            print("• \(s.title)")
+            print(String(repeating: "—", count: s.title.count))
+            for r in s.lines {
+                let indent = String(repeating: "  ", count: max(0, r.level - 2))
+                print("\(indent)• \(r.label)  \(r.amount)")
+            }
+            if let subtotal = totals[s.key] {
+                // footer line (indent aligns under section content)
+                print("  — Subtotal \(s.title): \(subtotal)")
+            }
+            print("")
+        }
+    }
+
     public static func printBalanceSidesSummary(
         title: String,
         sections: BalanceAlphaSections,
