@@ -49,48 +49,31 @@ public enum DateSpecification: Hashable, Codable, Sendable, Equatable {
             .init(codingPath: decoder.codingPath, debugDescription: "Invalid DateSpecification")
         )
     }
-}
 
-public enum DateInferenceError: Error { case missingYearMonth(String) }
+    public func resolved(for entry: Entry, using settings: EntryCompilerSettings) throws -> DateSpecification {
+        let tz = entry.timezone.flatMap(TimeZone.init(identifier:)) ?? settings.entry.defaultTimezone
 
-func resolveDate(_ spec: DateSpecification, filePath: String?, tz: TimeZone) throws -> Date {
-    switch spec {
-    case .absolute(let d):
-        return d
+        switch self {
+        case .absolute:
+            return self
+        case .infer(let day):
+            guard let path = entry.location?.file, !path.isEmpty else {
+                throw EntryDateInferenceError.badPath("<missing file path on entry>")
+            }
+            let (year, _, month) = try inferYearQuarterMonth(from: path)
 
-    case .infer(let day):
-        guard let filePath, !filePath.isEmpty else {
-            throw DateInferenceError.missingYearMonth("no file path on entry")
+            var cal = Calendar(identifier: .gregorian)
+            cal.timeZone = tz
+
+            var comps = DateComponents()
+            comps.year = year
+            comps.month = month
+            comps.day = day
+
+            guard let d = cal.date(from: comps) else {
+                throw EntryDateInferenceError.badDay(year, month, day)
+            }
+            return .absolute(d)
         }
-        // Support both: .../2025/1/1.ec  and  .../2025/1/1/main.ec
-        let fileURL = URL(fileURLWithPath: filePath)
-        // work with directories; drop the filename
-        var comps = fileURL.deletingLastPathComponent().pathComponents
-
-        // If last directory is a numeric day (1–31), drop it; month is the one before.
-        if let last = comps.last, let d = Int(last), (1...31).contains(d) {
-            comps.removeLast()
-        }
-
-        guard let monthStr = comps.last, let month = Int(monthStr), (1...12).contains(month) else {
-            throw DateInferenceError.missingYearMonth("month not found in path: \(filePath)")
-        }
-        comps.removeLast()
-
-        // Year is the previous numeric (e.g. 2025)
-        guard let yearStr = comps.last, let year = Int(yearStr), (1900...2100).contains(year) else {
-            throw DateInferenceError.missingYearMonth("year not found in path: \(filePath)")
-        }
-
-        var dc = DateComponents()
-        dc.calendar = Calendar(identifier: .gregorian)
-        dc.timeZone = tz
-        dc.year = year
-        dc.month = month
-        dc.day = day
-        guard let full = dc.date else {
-            throw DateInferenceError.missingYearMonth("invalid Y/M/D from path: \(filePath)")
-        }
-        return full
     }
 }

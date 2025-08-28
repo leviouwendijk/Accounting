@@ -64,12 +64,12 @@ public enum EntryResolutionPass {
                 at: e.location
             )
 
-            let tz = (e.timezone.flatMap(TimeZone.init(identifier:))) ?? settings.entry.defaultTimezone
-            let resolved = try resolveDate(e.date, filePath: e.location?.file, tz: tz)
+            // let tz = (e.timezone.flatMap(TimeZone.init(identifier:))) ?? settings.entry.defaultTimezone
+            let resolved = try e.date.resolved(for: e, using: settings)
 
             return ResolvedEntry(
                 id: e.id,
-                date: .absolute(resolved),
+                date: resolved,
                 lines: lines,
                 details: e.details,
                 timezone: e.timezone,
