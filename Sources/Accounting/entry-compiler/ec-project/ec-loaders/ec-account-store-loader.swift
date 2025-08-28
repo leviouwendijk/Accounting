@@ -59,29 +59,7 @@ public enum AccountStoreLoader {
     ) throws -> AccountStore {
         let fm = FileManager.default
 
-        // 1) Parse any local account .ec files (kept for later, not applied yet)
-        let dir = project.url(.config).appendingPathComponent("accounts", isDirectory: true)
-        var defs: [AccountDef] = []
-        if let e = fm.enumerator(at: dir, includingPropertiesForKeys: nil) {
-            for case let url as URL in e where url.pathExtension == "ec" {
-                let src = try String(contentsOf: url, encoding: .utf8)
-                var lx = EntryCompilerLexer(source: src, flavor: .accounts)
-                let (toks, lineMap) = lx.collectAllTokensWithLineMap()
-
-                let parser = EntryCompilerAccountsFileParser(
-                    tokens: toks,
-                    fileURL: url,
-                    lineMap: lineMap,
-                    verbose: verbose
-                )
-                let parsed = try parser.parseAccountsFile()
-                defs.append(contentsOf: parsed)
-                if verbose { fputs("  ✓ \(url.lastPathComponent): \(parsed.count) def(s)\n", stderr) }
-            }
-        }
-        // (Future) apply `defs` as presentation overrides; skipped for now.
-
-        // 2) Prefer compiled chart if present
+        // 1) Prefer compiled chart if present — fast path, NO .ec parsing
         let compiledChartURL = project.resource(
             finding: settings.aggregation.chartFind,
             version: settings.aggregation.chartVersion
@@ -91,12 +69,39 @@ public enum AccountStoreLoader {
             let data = try Data(contentsOf: compiledChartURL)
             let chart = try JSONDecoder().decode(CompiledChart.self, from: data)
             if verbose { fputs("  ✓ loaded compiled RGS chart (\(chart.nodes.count) nodes)\n", stderr) }
+
+            // Build node-backed store (no project .ec parsing / override prints)
             return try AccountStore(chart: chart)
         }
 
-        // 3) Fallback: empty store (we’re deferring mapping/aggregation for now)
-        if verbose { fputs("  ! no rgs/<v#_#>.json; returning empty AccountStore\n", stderr) }
-        return try AccountStore(nodes: [])
+        // // 2) Fallback: parse local config/accounts/*.ec (legacy behavior)
+        // let dir = project.url(.config).appendingPathComponent("accounts", isDirectory: true)
+        // var defs: [AccountDef] = []
+        // if let e = fm.enumerator(at: dir, includingPropertiesForKeys: nil) {
+        //     for case let url as URL in e where url.pathExtension == "ec" {
+        //         let src = try String(contentsOf: url, encoding: .utf8)
+        //         var lx = EntryCompilerLexer(source: src, flavor: .accounts)
+        //         let (toks, lineMap) = lx.collectAllTokensWithLineMap()
+
+        //         let parser = EntryCompilerAccountsFileParser(
+        //             tokens: toks,
+        //             fileURL: url,
+        //             lineMap: lineMap,
+        //             verbose: verbose
+        //         )
+        //         let parsed = try parser.parseAccountsFile()
+        //         defs.append(contentsOf: parsed)
+        //         if verbose { fputs("  ✓ \(url.lastPathComponent): \(parsed.count) def(s)\n", stderr) }
+        //     }
+        // }
+
+        // var builder = AccountStoreBuilder()
+        // try builder.addOverrides(defs)   // legacy builder path
+        // return try builder.freeze()
+
+        // remove RGSAccount fallback until further notice
+        // require use of JSON chart of accounts (config/resources/rgs/v#_#.json)
+        throw AccountStoreError.empty(at: SourceLocation(file: compiledChartURL.path, line: 0, column: 0))
     }
 
     // Convenience shims for node-backed API only
