@@ -22,6 +22,24 @@ public struct RGSPresentationSection: Sendable {
     }
 }
 
+public struct PresentedBalanceTotals: Sendable {
+    public let assets: Decimal
+    public let equity: Decimal
+    public let liabilities: Decimal
+    
+    public init(
+        assets: Decimal,
+        equity: Decimal,
+        liabilities: Decimal
+    ) {
+        self.assets = assets
+        self.equity = equity
+        self.liabilities = liabilities
+    }
+
+    public var equityPlusLiabilities: Decimal { equity + liabilities }
+}
+
 public enum RGSPrinter {
     public static func printLines(_ title: String, lines: [RGSPresentationLine]) {
         print("\n\(title)")
@@ -51,26 +69,25 @@ public enum RGSPrinter {
         bundle: StatementBundle,
         bounds: AlphaBounds = .default,
         omslag: OmslagMode = .apply
-    ) throws -> [String: Decimal] { // keys: "A","J","K"
+    ) throws -> PresentedBalanceTotals {
         let maps  = try RGSAssembler.makeMaps(from: chart)
         let alpha = try RGSAssembler.balanceAlphaSections(
             totals: bundle.totalsById, maps: maps, bounds: bounds
         )
-        // resolve real roots to get correct directions for display flipping
+        // resolve real roots for correct display flipping
         let A = try? RGSAssembler.resolveSectionRoot("A", maps: maps).id
         let J = try? RGSAssembler.resolveSectionRoot("J", maps: maps).id
         let K = try? RGSAssembler.resolveSectionRoot("K", maps: maps).id
+
         func shown(_ raw: Decimal, _ id: Int?) -> Decimal {
             guard let id = id else { return raw }
-            return RGSAssembler.present(
-                raw, direction: maps.directionById[id] ?? .debit, mode: omslag
-            )
+            return RGSAssembler.present(raw, direction: maps.directionById[id] ?? .debit, mode: omslag)
         }
-        return [
-            "A": shown(alpha.assets,      A),
-            "J": shown(alpha.equity,      J),
-            "K": shown(alpha.liabilities, K)
-        ]
+
+        let a = shown(alpha.assets,      A)
+        let e = shown(alpha.equity,      J)
+        let k = shown(alpha.liabilities, K)
+        return PresentedBalanceTotals(assets: a, equity: e, liabilities: k)
     }
 
     public static func printSectionsWithFooters(
@@ -81,9 +98,7 @@ public enum RGSPrinter {
         bounds: AlphaBounds = .default,
         omslag: OmslagMode = .apply
     ) throws {
-        let totals = try presentedSectionTotals(
-            chart: chart, bundle: bundle, bounds: bounds, omslag: omslag
-        )
+        let t = try presentedSectionTotals(chart: chart, bundle: bundle, bounds: bounds, omslag: omslag)
 
         print("\n\(title)")
         print(String(repeating: "—", count: title.count))
@@ -94,12 +109,17 @@ public enum RGSPrinter {
                 let indent = String(repeating: "  ", count: max(0, r.level - 2))
                 print("\(indent)• \(r.label)  \(r.amount)")
             }
-            if let subtotal = totals[s.key] {
-                // footer line (indent aligns under section content)
-                print("  — Subtotal \(s.title): \(subtotal)")
-            }
+            // section footers
+            if s.key == "A" { print("  — Subtotal Assets: \(t.assets)") }
+            if s.key == "J" { print("  — Subtotal Equity: \(t.equity)") }
+            if s.key == "K" { print("  — Subtotal Liabilities: \(t.liabilities)") }
             print("")
         }
+
+        // Bottom summary
+        print("== Summary ==")
+        print("Equity + Liabilities: \(t.equityPlusLiabilities)")
+        print("Check: Assets vs Equity+Liabilities → \(t.assets) vs \(t.equityPlusLiabilities)")
     }
 
     public static func printBalanceSidesSummary(
