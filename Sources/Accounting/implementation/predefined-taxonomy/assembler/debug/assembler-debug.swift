@@ -101,6 +101,7 @@ extension RGSAssembler {
         let ch = try chart.ensuringIndex(enrichNodes: true, strict: false)
         guard let index = ch.index else { throw NSError(domain: "RGSAssembler", code: 1, userInfo: [NSLocalizedDescriptionKey:"Missing index"]) }
 
+        // let maps = try RGSAssembler.makeMaps(from: ch)
         let maps = try RGSAssembler.makeMapsDebug(from: ch, verbose: verbose)
 
         // seed
@@ -152,7 +153,7 @@ extension RGSAssembler {
             let d = (a - b).magnitude
             if d != 0 {
                 let key = maps.sortKeyById[id] ?? ""
-                let name = (maps as? RGSAssemblerResult)?.nameById[id] ?? "—"
+                let name = maps.nameById[id] ?? "—"
                 diffs.append((id, key, name, a, b, d))
             }
         }
