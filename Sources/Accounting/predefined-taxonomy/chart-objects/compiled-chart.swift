@@ -7,7 +7,7 @@ public struct CompiledChart: Sendable, Codable {
     public let nodes: [RGSNode]                // leaf + intermediate + whatever you want (even just leaves)
     public let index: RGSIndex?
     
-    public init(
+    internal init(
         name: String,                    // "RGS-DutchGAAP-2025 (v3.8)",
         version: ChartVersion,           // 3.8,
         nodes: [RGSNode],                // leaf + intermediate + whatever you want (even just leaves),
@@ -18,6 +18,23 @@ public struct CompiledChart: Sendable, Codable {
         self.nodes = nodes
         self.index = index
     }
+
+    public init(
+        name: String,
+        version: ChartVersion,           
+        nodes: [RGSNode]
+    ) throws {
+        let unindexedChart = CompiledChart(name: name, version: version, nodes: nodes, index: nil)
+        let indexed = try unindexedChart.ensuringIndex()
+        self = indexed
+    }
+
+    /// If `index` is nil, derive it from `nodes`; otherwise return self.
+    public func ensuringIndex() throws -> CompiledChart {
+        if index != nil { return self }
+        let built = try RGSIndex.build(from: nodes)
+        return CompiledChart(name: name, version: version, nodes: nodes, index: built)
+    }
 }
 
 // public struct Account: Sendable, Codable, Hashable {
@@ -26,3 +43,4 @@ public struct CompiledChart: Sendable, Codable {
 //     public let name: String
 //     public let rgsIdentifier: String           // store string; resolve to id once on load
 // }
+
