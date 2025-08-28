@@ -21,7 +21,7 @@ public extension EntryCompilerParsing {
 
         while current != .rBrace && current != .eof {
             switch current {
-            case .ident("default_timezone"):
+            case .ident("default_timezone"), .keyword("default_timezone"):
                 advance(); try expect(.equals)
                 let parsedTZ = try parseTimeZoneValue() // supports IANA
                 tz = parsedTZ
@@ -47,11 +47,11 @@ public extension EntryCompilerParsing {
         while current != .rBrace && current != .eof {
             switch current {
 
-            case .ident("include_previous_periods"):
+            case .keyword("include_previous_periods"):
                 advance(); try expect(.equals)
                 includePrev = try parseBoolValue()
 
-            case .ident("chart"):
+            case .keyword("chart"):
                 let parsed = try parseChartBlock()
                 chartFind = parsed.find
                 chartVersion = parsed.version
