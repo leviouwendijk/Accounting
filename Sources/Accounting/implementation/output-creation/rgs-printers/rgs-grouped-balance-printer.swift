@@ -8,8 +8,8 @@ public func printGroupedBalance(
 ) throws {
     // 1) Maps & labels
     let maps  = try RGSAssembler.makeMaps(from: chart)               // id -> sortKey
-    let ch    = try chart.ensuringIndex(enrichNodes: true, strict: false)
-    guard let idx = ch.index else { throw NSError(domain: "printer", code: 1) }
+    let ch = try chart.ensuringIndex(enrichNodes: true, strict: false)
+    guard let idx = ch.index else { throw RGSPrinterError.missingIndex }
     let labelForPrefix = idx.labelByGroupKey                          // "B.XX" -> "Header"
 
     // 2) Group lines by L2 prefix of their sort key (e.g., "B.A", "B.E", "B.L")

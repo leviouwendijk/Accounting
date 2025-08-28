@@ -44,7 +44,7 @@ public enum RGSAssembler {
         autoClose: Bool = true
     ) throws -> StatementBundle {
         let ch = try chart.ensuringIndex(enrichNodes: true, strict: false)
-        guard let index = ch.index else { throw NSError(domain: "RGSAssembler", code: 1, userInfo: [NSLocalizedDescriptionKey:"Missing index"]) }
+        guard let index = ch.index else { throw RGSAssemblerError.missingIndex }
 
         // Build maps + fallbacks
         let maps   = try RGSAssembler.makeMaps(from: ch)
@@ -162,7 +162,7 @@ public enum RGSAssembler {
 
     public static func makeMaps(from chart: CompiledChart) throws -> RGSAssemblerResult {
         let ch = try chart.ensuringIndex(enrichNodes: true, strict: false)
-        guard let idx = ch.index else { fatalError("index missing") }
+        guard let idx = ch.index else { throw RGSAssemblerError.missingIndex }
 
         var kindById: [Int: StatementKind] = [:]
         var sortKeyById: [Int: String] = [:]
@@ -280,7 +280,6 @@ public enum RGSAssembler {
     @inline(__always)
     public static func assertSeedSumsToZero(_ seed: [Int: Decimal]) throws {
         let sum = seed.values.reduce(0, +)
-        if sum != 0 { throw NSError(domain: "RGSAssembler", code: 2,
-            userInfo: [NSLocalizedDescriptionKey:"Seed totals not zero: \(sum)"]) }
+        if sum != 0 { throw RGSAssemblerError.seedTotalsNotZero(sum) }
     }
 }
