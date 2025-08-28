@@ -80,7 +80,12 @@ public func linesFor(
     rows.sort { RGSNodeSortingCode(key: $0.key) < RGSNodeSortingCode(key: $1.key) } // uses your comparator. :contentReference[oaicite:3]{index=3}
 
     return rows.map { (id, key, lvl, amt) in
-        let label = labels[key] ?? labels[key.split(separator: ".").dropLast().joined(separator: ".")] ?? "—"
+        let parentKey = key.split(separator: ".").dropLast().joined(separator: ".")
+        let label =
+            roll.nameById[id]           // node’s own short label (best)
+            ?? labels[key]              // prefix table
+            ?? labels[parentKey]
+            ?? key
         return RGSPresentationLine(label: label, amount: amt, id: id, level: lvl)
     }
 }
