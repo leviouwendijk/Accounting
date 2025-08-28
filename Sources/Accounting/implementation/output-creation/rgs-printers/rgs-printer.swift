@@ -143,45 +143,38 @@ public enum RGSPrinter {
         //     return nil
         // }
 
-        // replace classifyByAncestry with this L2-based classifier
-        // func classifyByL2(_ id: Int) -> RGSAssembleSection.Balance? {
-        //     guard maps.kindById[id] == .balance,
-        //           let key = maps.sortKeyById[id], !key.isEmpty else { return nil }
-        //     // group at L2 boundary (first two segments; falls back to side when needed)
-        //     let l2 = RGSNodeSortingCode(key: key).l2Key(fallbackSide: "B")
-        //     guard let letter = RGSAssembler.firstLetterSegment(from: l2) else { return nil }
-        //     return RGSAssembler.classifyBalance(letter: letter, bounds: bounds)
-        // }
-
-        func classifyBySide(_ id: Int) -> RGSAssembleSection.Balance? {
+        // Classify a node by its L2 sorting key (robust for parents and children).
+        func classifyByL2(_ id: Int) -> RGSAssembleSection.Balance? {
             guard maps.kindById[id] == .balance,
-                  var key = maps.sortKeyById[id], !key.isEmpty else { return nil }
-            while true {
-                if key.hasPrefix("B.A") { return .assets }
-                if key.hasPrefix("B.J") { return .equity }
-                if key.hasPrefix("B.K") { return .liabilities }
-                guard let pk = RGSNodeSortingCode(key: key).parentKeyString, !pk.isEmpty else { break }
-                key = pk
-            }
-            return nil
+                  let key = maps.sortKeyById[id], !key.isEmpty else { return nil }
+            let l2 = RGSNodeSortingCode(key: key).l2Key(fallbackSide: "B") // e.g. "B.A"
+            guard let letter = RGSAssembler.firstLetterSegment(from: l2) else { return nil }
+            return RGSAssembler.classifyBalance(letter: letter, bounds: bounds)
         }
 
-        // Source lines exactly as assembled (optionally skip the level-1 root only)
+        // Source lines exactly as assembled (only drop the true root if asked)
         let src = bundle.balance.filter { !dropRootLine || $0.level > 1 }
 
-        // Stable partition: append in original order, do not drop anything
-        var assets: [RGSPresentationLine]      = []
-        var equity: [RGSPresentationLine]      = []
-        var liabs:  [RGSPresentationLine]      = []
-        var other:  [RGSPresentationLine]      = []
+        // Stable partition — DO NOT drop unclassified; put them in `other`
+        var assets: [RGSPresentationLine] = []
+        var equity: [RGSPresentationLine] = []
+        var liabs:  [RGSPresentationLine] = []
+        var other:  [RGSPresentationLine] = []
 
         for r in src {
-            switch classifyBySide(r.id) {
+            switch classifyByL2(r.id) {
             case .some(.assets):      assets.append(r)
             case .some(.equity):      equity.append(r)
             case .some(.liabilities): liabs.append(r)
-            case .none:               other.append(r)
+            case .none:               other.append(r)   // keep it; don’t drop
             }
+        }
+
+        // Optional safety: assert we didn’t lose rows
+        let inCount  = src.count
+        let outCount = assets.count + equity.count + liabs.count + other.count
+        if inCount != outCount {
+            fputs("printer: dropped \(inCount - outCount) line(s)\n", stderr)
         }
 
         // Build sections (fixed titles; we’re not pulling category labels like “Omrekeningsverschillen”)
