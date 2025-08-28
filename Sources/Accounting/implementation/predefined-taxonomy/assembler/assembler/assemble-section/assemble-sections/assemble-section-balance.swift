@@ -34,8 +34,20 @@ public extension RGSAssembler {
         bounds: AlphaBounds = .default
     ) throws -> BalanceAlphaSections {
 
-        // Build parent set to detect leaves
-        let parentSet = Set(maps.parentById.values)
+        // Build parent set by walking SortingKey ancestry (more complete than edge links)
+        var parentSet = Set<Int>()
+        for (_, key) in maps.sortKeyById {
+            var curKey: String? = key
+            while let k = curKey {
+                guard let pk = RGSNodeSortingCode(key: k).parentKeyString, !pk.isEmpty else { break }
+                if let pid = maps.keyToId[pk] {
+                    parentSet.insert(pid)
+                    curKey = pk
+                } else {
+                    break
+                }
+            }
+        }
 
         var totalsRaw: [RGSAssembleSection.Balance: Decimal] = [:]
         var idsBySection: [RGSAssembleSection.Balance: [Int]] = [:]
