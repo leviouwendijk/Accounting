@@ -47,7 +47,7 @@ public extension EntryCompilerParsing {
         while current != .rBrace && current != .eof {
             switch current {
 
-            case .keyword("include_previous_periods"):
+            case .keyword("include_previous_periods"), .ident("include_previous_periods"):
                 advance(); try expect(.equals)
                 includePrev = try parseBoolValue()
 
