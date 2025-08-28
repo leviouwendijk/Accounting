@@ -128,19 +128,29 @@ public enum RGSPrinter {
     ) throws -> [RGSPresentationSection] {
         let maps  = try RGSAssembler.makeMaps(from: chart)
 
-        // Classify a node by walking its SortingKey ancestry
-        func classifyByAncestry(_ id: Int) -> RGSAssembleSection.Balance? {
+        // // Classify a node by walking its SortingKey ancestry
+        // func classifyByAncestry(_ id: Int) -> RGSAssembleSection.Balance? {
+        //     guard maps.kindById[id] == .balance,
+        //           var key = maps.sortKeyById[id], !key.isEmpty else { return nil }
+        //     while true {
+        //         if let letter = RGSAssembler.firstLetterSegment(from: key),
+        //            let sec = RGSAssembler.classifyBalance(letter: letter, bounds: bounds) {
+        //             return sec
+        //         }
+        //         guard let pk = RGSNodeSortingCode(key: key).parentKeyString, !pk.isEmpty else { break }
+        //         key = pk
+        //     }
+        //     return nil
+        // }
+
+        // replace classifyByAncestry with this L2-based classifier
+        func classifyByL2(_ id: Int) -> RGSAssembleSection.Balance? {
             guard maps.kindById[id] == .balance,
-                  var key = maps.sortKeyById[id], !key.isEmpty else { return nil }
-            while true {
-                if let letter = RGSAssembler.firstLetterSegment(from: key),
-                   let sec = RGSAssembler.classifyBalance(letter: letter, bounds: bounds) {
-                    return sec
-                }
-                guard let pk = RGSNodeSortingCode(key: key).parentKeyString, !pk.isEmpty else { break }
-                key = pk
-            }
-            return nil
+                  let key = maps.sortKeyById[id], !key.isEmpty else { return nil }
+            // group at L2 boundary (first two segments; falls back to side when needed)
+            let l2 = RGSNodeSortingCode(key: key).l2Key(fallbackSide: "B")
+            guard let letter = RGSAssembler.firstLetterSegment(from: l2) else { return nil }
+            return RGSAssembler.classifyBalance(letter: letter, bounds: bounds)
         }
 
         // Source lines exactly as assembled (optionally skip the level-1 root only)
@@ -153,7 +163,7 @@ public enum RGSPrinter {
         var other:  [RGSPresentationLine]      = []
 
         for r in src {
-            switch classifyByAncestry(r.id) {
+            switch classifyByL2(r.id) {
             case .some(.assets):      assets.append(r)
             case .some(.equity):      equity.append(r)
             case .some(.liabilities): liabs.append(r)
