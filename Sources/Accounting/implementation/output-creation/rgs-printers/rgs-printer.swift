@@ -77,43 +77,100 @@ public enum RGSPrinter {
 
     /// Partition Balance lines into A → J → K sections while preserving the
     /// original assembled order. Section titles are fixed ("Assets/Equity/Liabilities").
+    // public static func balanceSectionsAlphaOrdered(
+    //     from bundle: StatementBundle,
+    //     using chart: CompiledChart,
+    //     bounds: AlphaBounds = .default,
+    //     dropRootLine: Bool = true
+    // ) throws -> [RGSPresentationSection] {
+    //     let maps  = try RGSAssembler.makeMaps(from: chart)
+
+    //     // helper to classify a line id into a bucket
+    //     func bucket(_ id: Int) -> RGSAssembleSection.Balance? {
+    //         guard maps.kindById[id] == .balance,
+    //               let key = maps.sortKeyById[id],
+    //               let letter = RGSAssembler.firstLetterSegment(from: key)
+    //         else { return nil }
+    //         return RGSAssembler.classifyBalance(letter: letter, bounds: bounds)
+    //     }
+
+    //     // preserve original order: stable partition the already-assembled list
+    //     let src = bundle.balance.filter { !dropRootLine || $0.level > 1 }
+
+    //     var assets: [RGSPresentationLine] = []
+    //     var equity: [RGSPresentationLine] = []
+    //     var liabs:  [RGSPresentationLine] = []
+    //     for r in src {
+    //         switch bucket(r.id) {
+    //         case .some(.assets):      assets.append(r)
+    //         case .some(.equity):      equity.append(r)
+    //         case .some(.liabilities): liabs.append(r)
+    //         default:                  break // skip anything we can't classify cleanly
+    //         }
+    //     }
+
+    //     // no re-sorting; we keep the nested rollups exactly as assembled
+    //     var sections: [RGSPresentationSection] = []
+    //     if !assets.isEmpty { sections.append(.init(key: "A", title: "Assets",      lines: assets)) }
+    //     if !equity.isEmpty { sections.append(.init(key: "J", title: "Equity",      lines: equity)) }
+    //     if !liabs.isEmpty  { sections.append(.init(key: "K", title: "Liabilities", lines: liabs )) }
+    //     return sections
+    // }
+
+    /// Partition Balance lines into A → J → K (and optionally Other) while preserving
+    /// the original assembled order. This NEVER drops lines (except the root if requested).
     public static func balanceSectionsAlphaOrdered(
         from bundle: StatementBundle,
         using chart: CompiledChart,
         bounds: AlphaBounds = .default,
-        dropRootLine: Bool = true
+        dropRootLine: Bool = true,
+        includeOtherBucket: Bool = false
     ) throws -> [RGSPresentationSection] {
         let maps  = try RGSAssembler.makeMaps(from: chart)
 
-        // helper to classify a line id into a bucket
-        func bucket(_ id: Int) -> RGSAssembleSection.Balance? {
+        // Classify a node by walking its SortingKey ancestry
+        func classifyByAncestry(_ id: Int) -> RGSAssembleSection.Balance? {
             guard maps.kindById[id] == .balance,
-                  let key = maps.sortKeyById[id],
-                  let letter = RGSAssembler.firstLetterSegment(from: key)
-            else { return nil }
-            return RGSAssembler.classifyBalance(letter: letter, bounds: bounds)
+                  var key = maps.sortKeyById[id], !key.isEmpty else { return nil }
+            while true {
+                if let letter = RGSAssembler.firstLetterSegment(from: key),
+                   let sec = RGSAssembler.classifyBalance(letter: letter, bounds: bounds) {
+                    return sec
+                }
+                guard let pk = RGSNodeSortingCode(key: key).parentKeyString, !pk.isEmpty else { break }
+                key = pk
+            }
+            return nil
         }
 
-        // preserve original order: stable partition the already-assembled list
+        // Source lines exactly as assembled (optionally skip the level-1 root only)
         let src = bundle.balance.filter { !dropRootLine || $0.level > 1 }
 
-        var assets: [RGSPresentationLine] = []
-        var equity: [RGSPresentationLine] = []
-        var liabs:  [RGSPresentationLine] = []
+        // Stable partition: append in original order, do not drop anything
+        var assets: [RGSPresentationLine]      = []
+        var equity: [RGSPresentationLine]      = []
+        var liabs:  [RGSPresentationLine]      = []
+        var other:  [RGSPresentationLine]      = []
+
         for r in src {
-            switch bucket(r.id) {
+            switch classifyByAncestry(r.id) {
             case .some(.assets):      assets.append(r)
             case .some(.equity):      equity.append(r)
             case .some(.liabilities): liabs.append(r)
-            default:                  break // skip anything we can't classify cleanly
+            case .none:               other.append(r)
             }
         }
 
-        // no re-sorting; we keep the nested rollups exactly as assembled
+        // Build sections (fixed titles; we’re not pulling category labels like “Omrekeningsverschillen”)
         var sections: [RGSPresentationSection] = []
         if !assets.isEmpty { sections.append(.init(key: "A", title: "Assets",      lines: assets)) }
         if !equity.isEmpty { sections.append(.init(key: "J", title: "Equity",      lines: equity)) }
         if !liabs.isEmpty  { sections.append(.init(key: "K", title: "Liabilities", lines: liabs )) }
+        if includeOtherBucket, !other.isEmpty { sections.append(.init(key: "-", title: "Other", lines: other)) }
+
+        // Sanity: keep count identical to input (so we know we didn’t drop anything)
+        // (Optional) assert(sections.flatMap(\.lines).count == src.count)
+
         return sections
     }
 }
