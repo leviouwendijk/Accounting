@@ -121,11 +121,15 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
     ]
 
     let settings: Set<String> = [
-        "settings", 
+        "settings",
+        "entry"
     ]
 
     let aggregation: Set<String> = [
         "aggregation", 
+        "chart",
+        "find",
+        "version"
     ]
 
     let stringBlocks: Set<String> = [
@@ -174,8 +178,8 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
 
     switch flavor {
     case .settings:
-        var keywords = union(global, date, settings, aggregation)
-        keywords.formUnion(["entry"])
+        let keywords = union(global, date, settings, aggregation)
+        // keywords.formUnion(["entry"])
         return .init(keywords: keywords, idents: [])
 
     case .accounts:
