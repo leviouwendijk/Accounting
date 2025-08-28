@@ -144,13 +144,26 @@ public enum RGSPrinter {
         // }
 
         // replace classifyByAncestry with this L2-based classifier
-        func classifyByL2(_ id: Int) -> RGSAssembleSection.Balance? {
+        // func classifyByL2(_ id: Int) -> RGSAssembleSection.Balance? {
+        //     guard maps.kindById[id] == .balance,
+        //           let key = maps.sortKeyById[id], !key.isEmpty else { return nil }
+        //     // group at L2 boundary (first two segments; falls back to side when needed)
+        //     let l2 = RGSNodeSortingCode(key: key).l2Key(fallbackSide: "B")
+        //     guard let letter = RGSAssembler.firstLetterSegment(from: l2) else { return nil }
+        //     return RGSAssembler.classifyBalance(letter: letter, bounds: bounds)
+        // }
+
+        func classifyBySide(_ id: Int) -> RGSAssembleSection.Balance? {
             guard maps.kindById[id] == .balance,
-                  let key = maps.sortKeyById[id], !key.isEmpty else { return nil }
-            // group at L2 boundary (first two segments; falls back to side when needed)
-            let l2 = RGSNodeSortingCode(key: key).l2Key(fallbackSide: "B")
-            guard let letter = RGSAssembler.firstLetterSegment(from: l2) else { return nil }
-            return RGSAssembler.classifyBalance(letter: letter, bounds: bounds)
+                  var key = maps.sortKeyById[id], !key.isEmpty else { return nil }
+            while true {
+                if key.hasPrefix("B.A") { return .assets }
+                if key.hasPrefix("B.J") { return .equity }
+                if key.hasPrefix("B.K") { return .liabilities }
+                guard let pk = RGSNodeSortingCode(key: key).parentKeyString, !pk.isEmpty else { break }
+                key = pk
+            }
+            return nil
         }
 
         // Source lines exactly as assembled (optionally skip the level-1 root only)
@@ -163,7 +176,7 @@ public enum RGSPrinter {
         var other:  [RGSPresentationLine]      = []
 
         for r in src {
-            switch classifyByL2(r.id) {
+            switch classifyBySide(r.id) {
             case .some(.assets):      assets.append(r)
             case .some(.equity):      equity.append(r)
             case .some(.liabilities): liabs.append(r)
