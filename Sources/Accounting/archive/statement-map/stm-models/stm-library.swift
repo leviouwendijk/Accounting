@@ -9,13 +9,13 @@ public enum StatementLibrary {
             rows: [
                 .init(id: .init(raw: "assets"), label: "Assets", kind: .balance,
                       materialityThreshold: materiality,
-                      rgs: [.init(includeCodes: ["BLimBanRba", "BVrdGehVoo"], includePrefixes: nil, includeLevel: nil, filterDirection: nil)]),
+                      rgs: [.init(includeCodes: ["BLimBanRba", "BVrdGehVoo"], includePrefixes: nil, includeLevel: nil, includeOmslagPrefixes: [], filterDirection: nil)]),
                 .init(id: .init(raw: "equity"), label: "Equity", kind: .balance,
                       materialityThreshold: 0,
-                      rgs: [.init(includeCodes: [/* put one equity RGS code you have */], includePrefixes: nil, includeLevel: nil, filterDirection: nil)]),
+                      rgs: [.init(includeCodes: [/* put one equity RGS code you have */], includePrefixes: nil, includeLevel: nil,  includeOmslagPrefixes: [], filterDirection: nil)]),
                 .init(id: .init(raw: "liabilities"), label: "Liabilities", kind: .balance,
                       materialityThreshold: 0,
-                      rgs: [.init(includeCodes: [/* one liability code */], includePrefixes: nil, includeLevel: nil, filterDirection: nil)])
+                      rgs: [.init(includeCodes: [/* one liability code */], includePrefixes: nil, includeLevel: nil, includeOmslagPrefixes: [], filterDirection: nil)])
             ]
         )
     }
@@ -28,10 +28,10 @@ public enum StatementLibrary {
             rows: [
                 .init(id: .init(raw: "revenue"), label: "Revenue", kind: .income,
                       materialityThreshold: materiality,
-                      rgs: [.init(includeCodes: ["WOmzNodOdh","WOmzNopOlh"], includePrefixes: nil, includeLevel: nil, filterDirection: nil)]),
+                      rgs: [.init(includeCodes: ["WOmzNodOdh","WOmzNopOlh"], includePrefixes: nil, includeLevel: nil,  includeOmslagPrefixes: [], filterDirection: nil)]),
                 .init(id: .init(raw: "cogs_expenses"), label: "COGS/Expenses", kind: .income,
                       materialityThreshold: materiality,
-                      rgs: [.init(includeCodes: ["WKprKvgKvg"], includePrefixes: nil, includeLevel: nil, filterDirection: nil)])
+                      rgs: [.init(includeCodes: ["WKprKvgKvg"], includePrefixes: nil, includeLevel: nil, includeOmslagPrefixes: [], filterDirection: nil)])
             ]
         )
     }
@@ -43,11 +43,11 @@ public enum StatementLibrary {
             kind: .cash,
             rows: [
                 .init(id: .init(raw: "operating"), label: "Cash from Operating Activities", kind: .cash,
-                      materialityThreshold: materiality, rgs: [.init(includePrefixes: ["40","50","60","61","62"], includeLevel: nil, filterDirection: nil)]),
+                      materialityThreshold: materiality, rgs: [.init(includeCodes: [], includePrefixes: ["40","50","60","61","62"], includeLevel: nil, includeOmslagPrefixes: [], filterDirection: nil)]),
                 .init(id: .init(raw: "investing"), label: "Cash from Investing Activities", kind: .cash,
-                      materialityThreshold: materiality, rgs: [.init(includePrefixes: ["12"], includeLevel: nil, filterDirection: nil)]),
+                      materialityThreshold: materiality, rgs: [.init(includeCodes: [], includePrefixes: ["12"], includeLevel: nil, includeOmslagPrefixes: [], filterDirection: nil)]),
                 .init(id: .init(raw: "financing"), label: "Cash from Financing Activities", kind: .cash,
-                      materialityThreshold: materiality, rgs: [.init(includePrefixes: ["30"], includeLevel: nil, filterDirection: nil)])
+                      materialityThreshold: materiality, rgs: [.init(includeCodes: [], includePrefixes: ["30"], includeLevel: nil, includeOmslagPrefixes: [], filterDirection: nil)])
             ]
         )
     }
@@ -58,11 +58,11 @@ public enum StatementLibrary {
             kind: .equity,
             rows: [
                 .init(id: .init(raw: "share_capital"), label: "Share Capital", kind: .equity,
-                      materialityThreshold: materiality, rgs: [.init(includePrefixes: ["30"], includeLevel: nil, filterDirection: nil)]),
+                      materialityThreshold: materiality, rgs: [.init(includeCodes: [], includePrefixes: ["30"], includeLevel: nil, includeOmslagPrefixes: [], filterDirection: nil)]),
                 .init(id: .init(raw: "reserves"), label: "Reserves", kind: .equity,
-                      materialityThreshold: materiality, rgs: [.init(includePrefixes: ["30"], includeLevel: nil, filterDirection: nil)]),
+                      materialityThreshold: materiality, rgs: [.init(includeCodes: [], includePrefixes: ["30"], includeLevel: nil, includeOmslagPrefixes: [], filterDirection: nil)]),
                 .init(id: .init(raw: "retained"), label: "Retained Earnings", kind: .equity,
-                      materialityThreshold: materiality, rgs: [.init(includePrefixes: ["30"], includeLevel: nil, filterDirection: nil)])
+                      materialityThreshold: materiality, rgs: [.init(includeCodes: [], includePrefixes: ["30"], includeLevel: nil, includeOmslagPrefixes: [], filterDirection: nil)])
             ]
         )
     }
