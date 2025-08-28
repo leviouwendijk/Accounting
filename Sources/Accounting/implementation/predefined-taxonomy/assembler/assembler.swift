@@ -46,9 +46,12 @@ public enum RGSAssembler {
 
         // Build maps + fallbacks
         let maps   = try RGSAssembler.makeMaps(from: ch)
+        assertEdgesMatchKeys(maps)
 
         // Seed + roll-up
         let seed   = RGSAssembler.seedLeafs(from: trialRows, using: index)
+        try assertSeedSumsToZero(seed)
+
         let totals = RGSAssembler.rollupBySortingKey(
             seed,
             idToKey: maps.sortKeyById,
@@ -277,5 +280,12 @@ public enum RGSAssembler {
                 fputs("  id=\(id) childKey='\(ck)' parentKey='\(pk)'\n", stderr)
             }
         }
+    }
+
+    @inline(__always)
+    public static func assertSeedSumsToZero(_ seed: [Int: Decimal]) throws {
+        let sum = seed.values.reduce(0, +)
+        if sum != 0 { throw NSError(domain: "RGSAssembler", code: 2,
+            userInfo: [NSLocalizedDescriptionKey:"Seed totals not zero: \(sum)"]) }
     }
 }

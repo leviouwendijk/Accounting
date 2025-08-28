@@ -112,6 +112,7 @@ extension RGSAssembler {
 
         // seed
         let seed = RGSAssembler.seedLeafs(from: trialRows, using: index)
+        try assertSeedSumsToZero(seed)
 
         compareRollupsAndPrint(seed: seed, maps: maps, index: index)
 
