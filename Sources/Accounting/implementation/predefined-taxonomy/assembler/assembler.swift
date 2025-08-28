@@ -25,7 +25,7 @@ public struct StatementBundle: Sendable {
 }
 
 public enum RGSAssembler {
-    static func assemble(
+    public static func assemble(
         chart: CompiledChart,
         trialRows: [TrialBalanceRow],
         cut: AssembleCut,
