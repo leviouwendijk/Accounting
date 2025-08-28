@@ -96,10 +96,15 @@ extension RGSAssembler {
         trialRows: [TrialBalanceRow],
         cut: AssembleCut,
         omslag: OmslagMode,
-        verbose: Bool = true
+        verbose: Bool = true,
+        dump: Bool = false
     ) throws -> StatementBundle {
         let ch = try chart.ensuringIndex(enrichNodes: true, strict: false)
-        dumpParentCandidates(ch)
+
+        if dump {
+            dumpParentCandidates(ch)
+        }
+
         guard let index = ch.index else { throw NSError(domain: "RGSAssembler", code: 1, userInfo: [NSLocalizedDescriptionKey:"Missing index"]) }
 
         let maps = try RGSAssembler.makeMapsDebug(from: ch, verbose: verbose)
