@@ -75,59 +75,45 @@ public enum RGSPrinter {
         print("Balanced? \(sections.diffRaw == 0 ? "✓" : "✗  diff=\(sections.diffRaw)") )")
     }
 
-    /// Sections in A → J → K order with nested lines sorted by RGS comparator.
+    /// Partition Balance lines into A → J → K sections while preserving the
+    /// original assembled order. Section titles are fixed ("Assets/Equity/Liabilities").
     public static func balanceSectionsAlphaOrdered(
         from bundle: StatementBundle,
         using chart: CompiledChart,
         bounds: AlphaBounds = .default,
         dropRootLine: Bool = true
     ) throws -> [RGSPresentationSection] {
-        // Maps & labels
         let maps  = try RGSAssembler.makeMaps(from: chart)
-        let ch    = try chart.ensuringIndex(enrichNodes: true, strict: false)
-        guard let idx = ch.index else { throw SectioningError.missingIndex }
-        let labels = idx.labelByGroupKey
 
-        // Precompute section by id (A/J/K) for balance nodes only
-        var bucketById: [Int: RGSAssembleSection.Balance] = [:]
-        for (id, key) in maps.sortKeyById {
-            guard maps.kindById[id] == .balance else { continue }
-            if let letter = RGSAssembler.firstLetterSegment(from: key),
-               let sec = RGSAssembler.classifyBalance(letter: letter, bounds: bounds) {
-                bucketById[id] = sec
+        // helper to classify a line id into a bucket
+        func bucket(_ id: Int) -> RGSAssembleSection.Balance? {
+            guard maps.kindById[id] == .balance,
+                  let key = maps.sortKeyById[id],
+                  let letter = RGSAssembler.firstLetterSegment(from: key)
+            else { return nil }
+            return RGSAssembler.classifyBalance(letter: letter, bounds: bounds)
+        }
+
+        // preserve original order: stable partition the already-assembled list
+        let src = bundle.balance.filter { !dropRootLine || $0.level > 1 }
+
+        var assets: [RGSPresentationLine] = []
+        var equity: [RGSPresentationLine] = []
+        var liabs:  [RGSPresentationLine] = []
+        for r in src {
+            switch bucket(r.id) {
+            case .some(.assets):      assets.append(r)
+            case .some(.equity):      equity.append(r)
+            case .some(.liabilities): liabs.append(r)
+            default:                  break // skip anything we can't classify cleanly
             }
         }
 
-        // Partition the bundle’s Balance lines
-        let allLines = bundle.balance
-        let parts: [RGSAssembleSection.Balance: [RGSPresentationLine]] =
-            Dictionary(grouping: allLines) { bucketById[$0.id] ?? .assets } // default won’t surface if filtered below
-
-        // Keep only A/J/K in this order
-        let order: [RGSAssembleSection.Balance] = [.assets, .equity, .liabilities]
+        // no re-sorting; we keep the nested rollups exactly as assembled
         var sections: [RGSPresentationSection] = []
-
-        for sec in order {
-            guard var lines = parts[sec] else { continue }
-            if dropRootLine { lines.removeAll { $0.level == 1 } }
-
-            // Sort lines by sorting key
-            lines.sort { a, b in
-                let ka = maps.sortKeyById[a.id] ?? ""
-                let kb = maps.sortKeyById[b.id] ?? ""
-                return RGSNodeSortingCode(key: ka) < RGSNodeSortingCode(key: kb)
-            }
-
-            guard !lines.isEmpty else { continue }
-
-            // Title from the A/J/K group node label if present; fall back to enum name
-            let letter = (sec == .assets ? "A" : sec == .equity ? "J" : "K")
-            let title  = labels["B.\(letter)"] ?? labels[letter] ??
-                         (sec == .assets ? "Assets" : sec == .equity ? "Equity" : "Liabilities")
-
-            sections.append(.init(key: letter, title: title, lines: lines))
-        }
-
+        if !assets.isEmpty { sections.append(.init(key: "A", title: "Assets",      lines: assets)) }
+        if !equity.isEmpty { sections.append(.init(key: "J", title: "Equity",      lines: equity)) }
+        if !liabs.isEmpty  { sections.append(.init(key: "K", title: "Liabilities", lines: liabs )) }
         return sections
     }
 }
