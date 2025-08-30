@@ -1135,21 +1135,21 @@ public enum LegacyTranslation {
         .init(
             174, 
             "Camera Equipment",
-            "WBedEemKai",
+            "WBedEemKai", 
             "any_camera_equipment"
         ),
 
         .init(
             175, 
             "Data Storage Equipment",
-            "acc",
+            "WBedEemKai",
             "any_data_storage_hardware"
         ),
 
         .init(
             176, 
             "Hardware",
-            "WBedEemKai",
+            "WBedKanKak", // (kantoor inventaris) wrong WBedEemKai -> WBedKanKak corrected
             "any_hardware"
         ),
 

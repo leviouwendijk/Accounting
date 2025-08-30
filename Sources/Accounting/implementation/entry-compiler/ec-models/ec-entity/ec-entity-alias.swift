@@ -4,7 +4,10 @@ public struct EntityAlias: Hashable, Codable, Sendable {
     public let name: String
     public let variant: [String]?
 
-    public init(name: String, variant: [String]? = nil) {
+    public init(
+        name: String,
+        variant: [String]? = nil
+    ) {
         self.name = name
         self.variant = variant
     }

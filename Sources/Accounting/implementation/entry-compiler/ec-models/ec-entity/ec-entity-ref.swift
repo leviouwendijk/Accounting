@@ -6,8 +6,13 @@ public struct EntityRef: Hashable, Codable, Sendable {
     public let family: String?
     public let alias: EntityAlias
 
-    public init(class: String?, family: String?, alias: EntityAlias) {
-        self.`class` = `class`; self.family = family; self.alias = alias
+    public init(class: String?,
+            family: String?,
+            alias: EntityAlias
+    ) {
+        self.`class` = `class`
+        self.family = family
+        self.alias = alias
     }
 
     public var printable: String {

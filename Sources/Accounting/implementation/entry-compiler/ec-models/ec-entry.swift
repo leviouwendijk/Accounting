@@ -1,5 +1,6 @@
 import Foundation
 import Extensions
+import plate
 
 public enum EntrySort: String, RawRepresentable, Hashable, Codable, Sendable, StringParsableEnum {
     case regular
@@ -37,6 +38,39 @@ public struct Entry: Hashable, Codable, Sendable {
         self.transactionReferences = transactionReferences
         self.metadata = metadata
         self.location = location
+
+        let (placeholders, report) = entityPlaceholderWarning()
+        print(report)
+        print()
+        let str = (placeholders > 0) ? "\(placeholders)".ansi(.red, .bold) : "\(placeholders).ansi(.green)"
+        print(str)
+    }
+
+    public func entityPlaceholderWarning(
+        for values: [String] = ["asset_placeholder"]
+    ) -> (Int, String) {
+        var count = 0
+        var matches: [String] = []
+
+        func match(_ match: String, at location: SourceLocation? = nil) {
+            matches.append("! WARNING: Placeholder detected\n")
+            matches.append("    value: \"match\"\n")
+            if let l = location {
+                matches.append("    at: \(l.description)\n")
+            }
+        }
+
+        for l in lines {
+            for v in values {
+                if l.entity.alias.name.contains(v) {
+                    count += 1
+                    match(v, at: l.location)
+                }
+            }
+            
+        }
+        let result = matches.joined(separator: "\n")
+        return (count, result)
     }
 
     public var viewableString: String {
