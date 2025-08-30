@@ -10,7 +10,7 @@ public enum BusinessEntity: Sendable, Codable {
         switch self {
         case .vof:
             netIncomeCode        =  "WNerKapKap"
-            retainedEarningsCode =  "BEivKapOnd"
+            retainedEarningsCode =  "BEivKapOndAow" // instead of level 4 BEivKapOnd
         }
 
         return AutoCloseTargets(

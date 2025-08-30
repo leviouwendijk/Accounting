@@ -21,8 +21,8 @@ public struct LegacyMap: Sendable, Codable {
     public init(
         _ legacyId: Int,
         _ legacyName: String,
-        _ RGSAccountIdentifier: String,
-        _ localEntity: String
+        _ RGSAccountIdentifier: String, // rgs code, prepare for `in (<rgs string>)`
+        _ localEntity: String // infer from alias level, prepare as renderable for entries `for (<entity>)`, anyway
     ) {
         self.legacyId = legacyId
         self.legacyName = legacyName
@@ -33,28 +33,38 @@ public struct LegacyMap: Sendable, Codable {
 
 public enum LegacyTranslation {
     // (2025/08/30)
-    // > ~ $ legacy primary unused                                                                         @levi-m2 [11:50:13]
+    //
+    // > ~ $ legacy primary unused                                                                         @levi-m2 [12:15:56]
     // Unused:
     //  [4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 17, 18, 20, 21, 25, 26, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 46, 47, 49, 52, 53, 56, 57, 60, 61, 62, 66, 68, 69, 70, 71, 72, 73, 74, 75, 80, 81, 82, 83, 84, 85, 86, 88, 90, 93, 94, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 141, 142, 143, 144, 147, 149, 153, 154, 155, 156, 157, 158, 159, 161, 162, 163, 169, 172, 180, 182, 185, 186, 187, 189, 191, 194, 195, 196, 197, 199, 200, 201, 205, 214, 218, 219, 220, 221, 222, 223, 224]
+    // Count:
+    //  143
+
+    // Used:
+    //  [1, 2, 3, 8, 15, 16, 19, 22, 23, 24, 27, 28, 29, 30, 31, 32, 45, 48, 50, 51, 54, 55, 58, 59, 63, 64, 65, 67, 76, 77, 78, 79, 87, 89, 91, 92, 95, 140, 145, 146, 148, 150, 151, 152, 160, 164, 165, 166, 167, 168, 170, 171, 173, 174, 175, 176, 177, 178, 179, 181, 183, 184, 188, 190, 192, 193, 198, 202, 203, 204, 206, 207, 208, 209, 210, 211, 212, 213, 215, 216, 217]
+    // Count:
+    //  81
+    //
+    // COMMENTED OUT lines are NEVER USED IN LEGACY ENTRIES
 
     public static let rgs_v3_8: [LegacyMap] = [
         .init(
             1, 
             "Dividends Levi",
             "BEivKapProPok",
-            "people.owner.levi"
+            "levi"
         ),
         .init(
             2, 
             "Dividends Casper",
             "BEivKapProPok",
-            "people.owner.casper"
+            "casper"
         ),
         .init(
             3, 
             "Dividends Shusha",
             "BEivKapProPok",
-            "people.owner.shusha"
+            "shusha"
         ),
         // .init(
         //     4, 
@@ -80,14 +90,14 @@ public enum LegacyTranslation {
         //     "WKprKvgKvg",
         //     "" // NOT YET RESOLVED
         // ),
-        // .init(
-        //     8, 
-        //     "Direct Travel Cost",
-        //     "WBedAutBra", // remap to travel cost
-        //     "objects.usable.vehicle#honda_crv"
-        // ),
+
+        .init(
+            8, 
+            "Direct Travel Cost",
+            "WBedAutBra", // remap to travel cost
+            "vehicle#honda_crv"
+        ),
         
-        // // NEVER USED IN LEGACY ENTRIES
         // .init(
         //     9, 
         //     "Freight-in Cost",
@@ -95,7 +105,6 @@ public enum LegacyTranslation {
         //     "" 
         // ),
 
-        // // NEVER USED IN LEGACY ENTRIES
         // .init(
         //     10, 
         //     "Storage Cost",
@@ -103,7 +112,6 @@ public enum LegacyTranslation {
         //     ""
         // ),
 
-        // // NEVER USED IN LEGACY ENTRIES
         // .init(
         //     11, 
         //     "Manufacturing Overhead",
@@ -111,7 +119,6 @@ public enum LegacyTranslation {
         //     "ent"
         // ),
 
-        // // NEVER USED IN LEGACY ENTRIES
         // .init(
         //     12, 
         //     "Cash or Trade Discounts",
@@ -119,7 +126,6 @@ public enum LegacyTranslation {
         //     "ent"
         // ),
 
-        // // NEVER USED IN LEGACY ENTRIES
         // .init(
         //     13, 
         //     "Purchase Returns and Allowances",
@@ -137,14 +143,14 @@ public enum LegacyTranslation {
             15, 
             "Advertising",
             "acc",
-            "ent"
+            "google_ads"
         ),
 
         .init(
             16, 
             "Marketing",
-            "acc",
-            "ent"
+            "WBedKanDru",
+            "business_cards"
         ),
 
         // .init(
@@ -163,9 +169,10 @@ public enum LegacyTranslation {
         .init(
             19, 
             "Indirect Travel Cost",
-            "acc",
-            "ent"
+            "WBedAutBra",
+            "vehicle#honda_crv"
         ),
+
         // .init(
         //     20, 
         //     "Rent",
@@ -178,23 +185,24 @@ public enum LegacyTranslation {
         //     "acc",
         //     "ent"
         // ),
+
         .init(
             22, 
             "Supplies",
-            "acc",
+            "WBedKanKan",
             "ent"
         ),
         .init(
             23, 
             "Insurance",
-            "acc",
-            "ent"
+            "\n<INSURANCE GENERIC: Split into relevant ACCOUNT (car ins. cost (WBedAutAsa), or company legal (WBedAssBea)\n",
+            "\n<INSURANCE GENERIC: Split into relevant entity (car, or legal)>\n"
         ),
         .init(
             24, 
             "Maintenance",
-            "acc",
-            "ent"
+            "WBedAutRoa",
+            "vehicle#honda_legend"
         ),
 
         // .init(
@@ -209,42 +217,50 @@ public enum LegacyTranslation {
         //     "acc",
         //     "ent"
         // ),
+
+
         .init(
             27, 
             "Bank Fees",
-            "acc",
-            "ent"
+            "WBedAdlBan",
+            "bunq"
         ),
+
         .init(
             28, 
             "Subscriptions",
-            "acc",
-            "ent"
+            "\nIF SIMYO -> (WBedKanTef)\nIF SOFTWARE -> (WBedKanSof)\n IF HOSTING -> ()",
+            "\nIF SIMYO -> (simyo)\nIF SOFTWARE -> (gopro, answerthepublic, openai)\n IF HOSTING -> (WBedVkkWeb)\n"
         ),
+
         .init(
             29, 
             "Vet Costs",
-            "acc",
-            "ent"
+            "WBedAlkOal",
+            "(vchn_middenmeer || van_duin_tot_dijk)"
         ),
+
         .init(
             30, 
             "Dog Care",
-            "acc",
-            "ent"
+            "WBedAlkOal",
+            "(vegavriend || pets_place)"
         ),
+
         .init(
             31, 
             "Other General Costs",
-            "acc",
-            "ent"
+            "WBedAlkOal",
+            "\nIF FOOD (CORRECTED LATER) -> (mcdonalds, h_earth) || IF GOOGLE -> (google) \n"
         ),
+
         .init(
             32, 
             "Consulting Fees",
-            "acc",
-            "ent"
+            "WBedAeaAea",
+            "sub_rosa"
         ),
+
         // .init(
         //     33, 
         //     "Administrative Salaries",
@@ -321,9 +337,10 @@ public enum LegacyTranslation {
         .init(
             45, 
             "Refunds to Overhead Expenses",
-            "acc",
-            "ent"
+            "\nINSURANCE -> (WBedAutAsa), GOOGLE -> (WBedAlkOal), BUNQ -> (WBedAdlBan)\n",
+            "\n REFUNDS: (vehicle#honda_crv), (google), (bunq)"
         ),
+
         // .init(
         //     46, 
         //     "Other",
@@ -336,29 +353,33 @@ public enum LegacyTranslation {
         //     "acc",
         //     "ent"
         // ),
+
         .init(
             48, 
             "Main",
-            "acc",
-            "ent"
+            "BLimBanRba",
+            "main"
         ),
+
         // .init(
         //     49, 
         //     "Savings Main",
         //     "acc",
         //     "ent"
         // ),
+
         .init(
             50, 
             "Levi",
-            "acc",
-            "ent"
+            "BLimBanRba",
+            "levi"
         ),
+
         .init(
             51, 
             "Savings Levi",
-            "acc",
-            "ent"
+            "BLimBanSpa",
+            "levi"
         ),
         // .init(
         //     52, 
@@ -375,14 +396,14 @@ public enum LegacyTranslation {
         .init(
             54, 
             "Shusha",
-            "acc",
-            "ent"
+            "BLimBanRba",
+            "shusha"
         ),
         .init(
             55, 
             "Savings Shusha",
-            "acc",
-            "ent"
+            "BLimBanSpa",
+            "shusha"
         ),
         // .init(
         //     56, 
@@ -396,17 +417,18 @@ public enum LegacyTranslation {
         //     "acc",
         //     "ent"
         // ),
+
         .init(
             58, 
             "Casper",
-            "acc",
-            "ent"
+            "BLimBanRba",
+            "casper"
         ),
         .init(
             59, 
             "Savings Casper",
-            "acc",
-            "ent"
+            "BLimBanSpa",
+            "casper"
         ),
         // .init(
         //     60, 
@@ -429,20 +451,20 @@ public enum LegacyTranslation {
         .init(
             63, 
             "Consult",
-            "acc",
-            "ent"
+            "BVorDebHad",
+            "consult"
         ),
         .init(
             64, 
             "Session",
-            "acc",
-            "ent"
+            "BVorDebHad",
+            "session"
         ),
         .init(
             65, 
             "Trajectory",
-            "acc",
-            "ent"
+            "BVorDebHad",
+            "any_trajectory"
         ),
         // .init(
         //     66, 
@@ -453,8 +475,8 @@ public enum LegacyTranslation {
         .init(
             67, 
             "Leash",
-            "acc",
-            "ent"
+            "BVorDebHad",
+            "leash"
         ),
         // .init(
         //     68, 
@@ -507,26 +529,26 @@ public enum LegacyTranslation {
         .init(
             76, 
             "Leashes",
-            "acc",
-            "ent"
+            "BVrdGepVoo", // Voorraden > Gereed product
+            "leash" // inferred from deliverable product
         ),
         .init(
             77, 
             "Leash Rope",
-            "acc",
-            "ent"
+            "BVrdGehVoo", // Voorraden > Grond- en hulpstoffen
+            "rope" // inferred from storable objects
         ),
         .init(
             78, 
             "Leash O-Rings",
-            "acc",
-            "ent"
+            "BVrdGehVoo", // Voorraden > Grond- en hulpstoffen
+            "o_ring"
         ),
         .init(
             79, 
             "Leash Tape",
-            "acc",
-            "ent"
+            "BVrdGehVoo", // Voorraden > Grond- en hulpstoffen
+            "tape"
         ),
         // .init(
         //     80, 
@@ -573,8 +595,8 @@ public enum LegacyTranslation {
         .init(
             87, 
             "Computers",
-            "acc",
-            "ent"
+            "BMvaBeiVvpIna",
+            "\n ENSURE PROPER ENTITY (asset object macbooks etc.)\n"
         ),
         // .init(
         //     88, 
@@ -582,11 +604,12 @@ public enum LegacyTranslation {
         //     "acc",
         //     "ent"
         // ),
+
         .init(
             89, 
             "Monitors",
-            "acc",
-            "ent"
+            "BMvaBeiVvpIna",
+            "\n ENSURE PROPER ENTITY (monitor)\n"
         ),
         // .init(
         //     90, 
@@ -597,14 +620,14 @@ public enum LegacyTranslation {
         .init(
             91, 
             "Camera Equipment",
-            "acc",
-            "ent"
+            "BMvaBeiVvpIna",
+            "\n ENSURE PROPER ENTITY (monitor)\n"
         ),
         .init(
             92, 
             "Audio Equipment",
-            "acc",
-            "ent"
+            "BMvaBeiVvpIna",
+            "\n ENSURE PROPER ENTITY (monitor)\n"
         ),
         // .init(
         //     93, 
@@ -621,8 +644,8 @@ public enum LegacyTranslation {
         .init(
             95, 
             "Input VAT",
-            "acc",
-            "ent"
+            "BVorVbkTvo",
+            "belastingdienst"
         ),
         // .init(
         //     96, 
@@ -888,12 +911,16 @@ public enum LegacyTranslation {
         //     "acc",
         //     "ent"
         // ),
+
+
         .init(
             140, 
             "Output VAT",
-            "acc",
+            "BSchBepBtwOla", // subaccount level5: hoog tarief!
             "ent"
         ),
+        
+
         // .init(
         //     141, 
         //     "Other",
@@ -918,30 +945,36 @@ public enum LegacyTranslation {
         //     "acc",
         //     "ent"
         // ),
+
+
         .init(
             145, 
             "Capital Contributions Levi",
-            "acc",
-            "ent"
+            "BEivKapPrsPsk",
+            "levi"
         ),
+
         .init(
             146, 
             "Capital Contributions Casper",
-            "acc",
-            "ent"
+            "BEivKapPrsPsk",
+            "casper"
         ),
+
         // .init(
         //     147, 
         //     "Capital Contributions Shusha",
         //     "acc",
         //     "ent"
         // ),
+
         .init(
             148, 
             "Retained Earnings",
             "acc",
             "ent"
         ),
+
         // .init(
         //     149, 
         //     "Call Sales",
