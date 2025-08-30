@@ -34,7 +34,7 @@ public extension LegacyJournalEntry {
         } else {
             line("    // date missing; using inference upstream if desired")
         }
-
+        line("")
         line("    sort \(type.convertForEC())")
         line("")
         if let d = description, let sd = secondaryDescription {
@@ -90,6 +90,7 @@ public extension LegacyJournalEntry {
         let metadata = compileMetadata()
 
         if !metadata.isEmpty {
+            line("")
             line("    metadata {")
             for i in metadata {
                 line("        \(i.key) = \(i.value)")
