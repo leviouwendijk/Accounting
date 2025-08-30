@@ -38,7 +38,7 @@ public struct PrimaryAccount: Codable, Sendable, JSONReadable, JSONWritable, Ide
             \"acc\",
             \"ent\"
         ),\n
-        """.indent(2)
+        """.indent(times: 2)
     }
 }
 
