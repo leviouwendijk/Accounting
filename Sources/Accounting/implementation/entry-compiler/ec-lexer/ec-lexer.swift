@@ -59,6 +59,13 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
 
         guard let c = peek() else { return .eof }
 
+        
+        // Experimental: catch quote literals before entering punctuation switch
+        if c == "\"" {
+            advance()
+            return .string(readQuotedLiteral())
+        }
+
         // 2) punctuation
         switch c {
         case "{": advance(); return .lBrace

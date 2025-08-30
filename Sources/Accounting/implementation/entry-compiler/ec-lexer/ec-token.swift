@@ -17,6 +17,7 @@ public enum EntryCompilerToken: Equatable, Sendable {
     case equals                   // =
     case comma                  // , (separations in transactions { ref 1, 2, 3 } block)
     case hash                   // # for entity variants and subvariants
+    // case quote                   // "
 
     case eof
 }

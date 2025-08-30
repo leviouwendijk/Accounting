@@ -93,4 +93,28 @@ public extension EntryCompilerLexing {
         }
         return buffer.trimmingCharacters(in: .whitespacesAndNewlines)
     }
+
+    mutating func readQuotedLiteral() -> String {
+        var out = ""
+        while let ch = peek() {
+            if ch == "\"" { advance(); break }
+            if ch == "\\" {
+                advance()
+                guard let esc = peek() else { break }
+                switch esc {
+                case "\"": out.append("\"")
+                case "\\": out.append("\\")
+                case "n":  out.append("\n")
+                case "t":  out.append("\t")
+                case "r":  out.append("\r")
+                default:   out.append(Character(esc))
+                }
+                advance()
+            } else {
+                out.append(Character(ch))
+                advance()
+            }
+        }
+        return out
+    }
 }
