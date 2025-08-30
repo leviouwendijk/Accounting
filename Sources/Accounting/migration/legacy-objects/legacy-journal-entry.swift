@@ -7,8 +7,8 @@ public struct LegacyJournalEntry: Codable, Sendable, JSONReadable, JSONWritable,
     public let id: Int
 
     public let date: String?
-    public let createdAt: String
-    public let type: String
+    public let createdAt: String?
+    public let type: String?
 
     public let description: String?
     public let secondaryDescription: String?
@@ -82,8 +82,8 @@ public struct LegacyJournalEntry: Codable, Sendable, JSONReadable, JSONWritable,
     public init(
         id: Int,
         date: String?,
-        createdAt: String,
-        type: String,
+        createdAt: String?,
+        type: String?,
         description: String?,
         secondaryDescription: String?,
         reference: String?,
