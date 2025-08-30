@@ -23,4 +23,3 @@ public struct ExportPage<Row: Codable & Sendable>: Codable, Sendable, JSONReadab
         case totalPages = "total_pages"
     }
 }
-
