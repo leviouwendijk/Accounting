@@ -234,8 +234,13 @@ public struct LegacyJournalEntry: Codable, Sendable, JSONReadable, JSONWritable,
     }
 }
 
+public enum LegacyIDsFilterType: Sendable, Codable {
+    case used
+    case unused
+}
+
 extension Array where Element == LegacyJournalEntry {
-    public func findUnused(until n: Int) -> [Int] {
+    public func filtering(for type: LegacyIDsFilterType, until n: Int) -> [Int] {
         guard n > 0 else { return [] }
 
         let used: Set<Int> = Set(self.flatMap { e in
@@ -245,14 +250,20 @@ extension Array where Element == LegacyJournalEntry {
             ].compactMap { $0 }
         })
 
-        let usedInRangeCount = used.lazy.filter { 1...n ~= $0 }.count
+        let usedInRange: Set<Int> = used.filter { 1...n ~= $0 }
 
-        var unused: [Int] = []
-        unused.reserveCapacity(n - usedInRangeCount)
+        switch type {
+        case .used:
+            return usedInRange.sorted()
 
-        for i in 1...n where !used.contains(i) {
-            unused.append(i)
+        case .unused:
+            var unused: [Int] = []
+            unused.reserveCapacity(n - usedInRange.count)
+
+            for i in 1...n where !used.contains(i) {
+                unused.append(i)
+            }
+            return unused
         }
-        return unused
     }
 }
