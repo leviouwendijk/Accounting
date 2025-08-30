@@ -235,25 +235,22 @@ public struct LegacyJournalEntry: Codable, Sendable, JSONReadable, JSONWritable,
 }
 
 extension Array where Element == LegacyJournalEntry {
-    public func findUnused(until idInteger: Int) -> [Int] {
-        guard idInteger > 0 else { return [] }
+    public func findUnused(until n: Int) -> [Int] {
+        guard n > 0 else { return [] }
 
-        var used = Set<Int>()
-        used.reserveCapacity(idInteger / 2)
-
-        for e in self {
-            let maybeIDs: [Int?] = [
+        let used: Set<Int> = Set(self.flatMap { e in
+            [
                 e.debitAccount1, e.debitAccount2, e.debitAccount3, e.debitAccount4, e.debitAccount5,
                 e.creditAccount1, e.creditAccount2, e.creditAccount3, e.creditAccount4, e.creditAccount5
-            ]
-            for m in maybeIDs {
-                if let v = m { used.insert(v) }
-            }
-        }
+            ].compactMap { $0 }
+        })
+
+        let usedInRangeCount = used.lazy.filter { 1...n ~= $0 }.count
 
         var unused: [Int] = []
-        unused.reserveCapacity(Swift.max(0, idInteger - used.count))
-        for i in 1...idInteger where !used.contains(i) {
+        unused.reserveCapacity(n - usedInRangeCount)
+
+        for i in 1...n where !used.contains(i) {
             unused.append(i)
         }
         return unused
