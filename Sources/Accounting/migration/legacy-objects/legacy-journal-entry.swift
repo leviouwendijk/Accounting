@@ -41,17 +41,17 @@ public struct LegacyJournalEntry: Codable, Sendable, JSONReadable, JSONWritable,
     public let creditAmount5: String?
 
     // Inventory movements (legacy flags/counters)
-    public let dr1InventoryIncrease: Int?
-    public let dr2InventoryIncrease: Int?
-    public let dr3InventoryIncrease: Int?
-    public let dr4InventoryIncrease: Int?
-    public let dr5InventoryIncrease: Int?
+    public let dr1InventoryIncrease: String?
+    public let dr2InventoryIncrease: String?
+    public let dr3InventoryIncrease: String?
+    public let dr4InventoryIncrease: String?
+    public let dr5InventoryIncrease: String?
 
-    public let cr1InventoryDecrease: Int?
-    public let cr2InventoryDecrease: Int?
-    public let cr3InventoryDecrease: Int?
-    public let cr4InventoryDecrease: Int?
-    public let cr5InventoryDecrease: Int?
+    public let cr1InventoryDecrease: String?
+    public let cr2InventoryDecrease: String?
+    public let cr3InventoryDecrease: String?
+    public let cr4InventoryDecrease: String?
+    public let cr5InventoryDecrease: String?
 
     // Asset item links
     public let assetItemId1: Int?
@@ -91,8 +91,8 @@ public struct LegacyJournalEntry: Codable, Sendable, JSONReadable, JSONWritable,
         debitAmount1: String?, debitAmount2: String?, debitAmount3: String?, debitAmount4: String?, debitAmount5: String?,
         creditAccount1: Int?, creditAccount2: Int?, creditAccount3: Int?, creditAccount4: Int?, creditAccount5: Int?,
         creditAmount1: String?, creditAmount2: String?, creditAmount3: String?, creditAmount4: String?, creditAmount5: String?,
-        dr1InventoryIncrease: Int?, dr2InventoryIncrease: Int?, dr3InventoryIncrease: Int?, dr4InventoryIncrease: Int?, dr5InventoryIncrease: Int?,
-        cr1InventoryDecrease: Int?, cr2InventoryDecrease: Int?, cr3InventoryDecrease: Int?, cr4InventoryDecrease: Int?, cr5InventoryDecrease: Int?,
+        dr1InventoryIncrease: String?, dr2InventoryIncrease: String?, dr3InventoryIncrease: String?, dr4InventoryIncrease: String?, dr5InventoryIncrease: String?,
+        cr1InventoryDecrease: String?, cr2InventoryDecrease: String?, cr3InventoryDecrease: String?, cr4InventoryDecrease: String?, cr5InventoryDecrease: String?,
         assetItemId1: Int?, assetItemId2: Int?, assetItemId3: Int?, assetItemId4: Int?, assetItemId5: Int?,
         relatedBunqTransaction1: Int?, relatedBunqTransaction2: Int?, relatedBunqTransaction3: Int?, relatedBunqTransaction4: Int?, relatedBunqTransaction5: Int?,
         relatedJournalEntry1: Int?, relatedJournalEntry2: Int?, relatedJournalEntry3: Int?, relatedJournalEntry4: Int?, relatedJournalEntry5: Int?,
