@@ -1,14 +1,32 @@
 import Foundation
 import plate
+import Extensions
 
 public typealias LegacyJournalEntriesPage = ExportPage<LegacyJournalEntry>
+
+public enum LegacyJournalEntryType: String, RawRepresentable, Sendable, Codable, StringParsableEnum {
+    case regular = "Regular Entry"
+    case adjusting = "Adjusting Entry"
+    case closing = "Closing Entry"
+
+    public func convertForEC() -> String {
+        switch self {
+        case .regular:
+            return "regular"
+        case .adjusting:
+            return "adjusting"
+        case .closing:
+            return "closing_deprecated"
+        }
+    }
+}
 
 public struct LegacyJournalEntry: Codable, Sendable, JSONReadable, JSONWritable, Identifiable {
     public let id: Int
 
     public let date: String?
     public let createdAt: String?
-    public let type: String?
+    public let type: LegacyJournalEntryType
 
     public let description: String?
     public let secondaryDescription: String?
@@ -83,7 +101,7 @@ public struct LegacyJournalEntry: Codable, Sendable, JSONReadable, JSONWritable,
         id: Int,
         date: String?,
         createdAt: String?,
-        type: String?,
+        type: String,
         description: String?,
         secondaryDescription: String?,
         reference: String?,
@@ -97,11 +115,11 @@ public struct LegacyJournalEntry: Codable, Sendable, JSONReadable, JSONWritable,
         relatedBunqTransaction1: Int?, relatedBunqTransaction2: Int?, relatedBunqTransaction3: Int?, relatedBunqTransaction4: Int?, relatedBunqTransaction5: Int?,
         relatedJournalEntry1: Int?, relatedJournalEntry2: Int?, relatedJournalEntry3: Int?, relatedJournalEntry4: Int?, relatedJournalEntry5: Int?,
         relatedOtherBankTransaction1: Int?, relatedOtherBankTransaction2: Int?, relatedOtherBankTransaction3: Int?, relatedOtherBankTransaction4: Int?, relatedOtherBankTransaction5: Int?
-    ) {
+    ) throws {
         self.id = id
         self.date = date
         self.createdAt = createdAt
-        self.type = type
+        self.type = try LegacyJournalEntryType.parse(from: type)
         self.description = description
         self.secondaryDescription = secondaryDescription
         self.reference = reference
