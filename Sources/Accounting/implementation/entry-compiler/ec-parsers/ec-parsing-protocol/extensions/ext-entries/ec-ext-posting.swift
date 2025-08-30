@@ -18,11 +18,11 @@ public extension EntryCompilerParsing {
             switch current {
             case .ident("entity"):
                 advance(); try expect(.equals)
-                let segs = readFlatSegments()
-                guard segs.count >= 2 else {
-                    throw ParserError.unexpectedToken(current, expected: "domain.alias.path", at: loc())
+                if current == .lPar {
+                    entityRef = try parseEntityRefInParens()     // NEW: (…)
+                } else {
+                    entityRef = try parseEntityRefFlexible()     // NEW: 1..3 segments incl. alias-only
                 }
-                entityRef = try makeEntityRef(from: segs)
 
             case .ident("account"):
                 advance()

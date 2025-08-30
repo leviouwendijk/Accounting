@@ -19,7 +19,10 @@ public extension EntryCompilerParsing {
 
     @inline(__always)
     func parseEntityRefFlexible() throws -> EntityRef {
-        try makeEntityRef(from: readFlatSegments())
+        if current == .lPar {
+            return try parseEntityRefInParens()
+        }
+        return try makeEntityRef(from: readFlatSegments())
     }
 
     @inline(__always)
