@@ -56,6 +56,12 @@ public extension EntryCompilerParsing {
                 let refs = try parseTransactionsBlock()
                 entry.transactionReferences.append(contentsOf: refs)
 
+            case .keyword("metadata"):
+                let m = try parseStringMapBlock(named: "metadata") // consumes 'metadata' and the block
+                // merge (allow multiple blocks; last write wins per key)
+                if entry.metadata.isEmpty { entry.metadata = m }
+                else { for (k, v) in m { entry.metadata[k] = v } }
+
             default:
                 throw ParserError.unexpectedToken(current, expected: "date, details, for, posting, or line", at: loc())
             }

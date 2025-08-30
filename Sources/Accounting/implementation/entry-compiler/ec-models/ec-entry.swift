@@ -14,6 +14,7 @@ public struct Entry: Hashable, Codable, Sendable {
     public var details: String? = nil
     public var timezone: String? = nil
     public var transactionReferences: [Int]
+    public var metadata: [String: String] = [:]
     public var location: SourceLocation?
 
     public init(
@@ -24,6 +25,7 @@ public struct Entry: Hashable, Codable, Sendable {
         details: String? = nil,
         timezone: String? = nil,
         transactionReferences: [Int] = [],
+        metadata: [String: String] = [:],
         location: SourceLocation? = nil
     ) {
         self.id = id
@@ -33,6 +35,7 @@ public struct Entry: Hashable, Codable, Sendable {
         self.details = details
         self.timezone = timezone
         self.transactionReferences = transactionReferences
+        self.metadata = metadata
         self.location = location
     }
 
