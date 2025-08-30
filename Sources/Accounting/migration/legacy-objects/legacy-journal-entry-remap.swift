@@ -94,7 +94,7 @@ public extension LegacyJournalEntry {
             for i in metadata {
                 line("        \(i.key) = \(i.value)")
             }
-            line("    {")
+            line("    }")
         }
 
         line("}")
