@@ -1,19 +1,6 @@
 import Foundation
 import plate
 
-internal struct MetaObject {
-    internal let key: String
-    internal let value: String
-    
-    public init(
-        _ key: String,
-        _ value: String
-    ) {
-        self.key = key
-        self.value = value
-    }
-}
-
 public extension LegacyJournalEntry {
     /// Render this journal entry to `.ec` text using a legacyId → LegacyMap lookup.
     /// You can pass either an array of maps or nothing (defaults to LegacyTranslation.rgs_v3_8).
@@ -181,27 +168,5 @@ public extension LegacyJournalEntry {
 
     private func cleanEntity(_ s: String) -> String {
         s.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-}
-
-public extension Sequence where Element == LegacyMap {
-    /// legacyId → LegacyMap
-    var byLegacyID: [Int: LegacyMap] {
-        var dict: [Int: LegacyMap] = [:]
-        dict.reserveCapacity(256)
-        for m in self { dict[m.legacyId] = m }
-        return dict
-    }
-}
-
-public extension Array where Element == LegacyJournalEntry {
-    /// Page → `.ec` text (array input)
-    func ecFile(using maps: [LegacyMap] = LegacyTranslation.rgs_v3_8) -> String {
-        ecFile(using: maps.byLegacyID)
-    }
-
-    /// Page → `.ec` text (dict input)
-    func ecFile(using dict: [Int: LegacyMap]) -> String {
-        self.map { $0.ecString(using: dict) }.joined(separator: "\n\n")
     }
 }

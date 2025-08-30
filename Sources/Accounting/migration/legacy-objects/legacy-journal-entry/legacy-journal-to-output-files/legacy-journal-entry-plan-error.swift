@@ -1,0 +1,19 @@
+import Foundation
+import plate
+
+public enum LegacyPlanError: Error, LocalizedError {
+    case missingDate(id: Int)
+    case invalidDate(id: Int, value: String)
+    case emptyFilename(id: Int)
+
+    public var errorDescription: String? {
+        switch self {
+        case .missingDate(let id):
+            return "Legacy entry \(id) has no date."
+        case .invalidDate(let id, let v):
+            return "Legacy entry \(id) has invalid date string: \(v)"
+        case .emptyFilename(let id):
+            return "Legacy entry \(id) produced an empty filename."
+        }
+    }
+}
