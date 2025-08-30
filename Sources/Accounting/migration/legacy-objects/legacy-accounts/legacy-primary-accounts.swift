@@ -37,7 +37,7 @@ public struct PrimaryAccount: Codable, Sendable, JSONReadable, JSONWritable, Ide
             \"\(name.esc)\",
             \"acc\",
             \"ent\"
-        ),\n\n
+        ),
         """.indent(times: 2)
     }
 }
@@ -47,6 +47,7 @@ extension Array where Element == PrimaryAccount {
         var out = ""
         for i in self {
             out.append(i.reprintedSwift())
+            out.append("\n\n")
         }
         return out
     }

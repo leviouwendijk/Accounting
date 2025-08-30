@@ -34,5 +34,6 @@ public struct LegacyMap: Sendable, Codable {
 public enum LegacyTranslation {
     public static let rgs_v3_8: [LegacyMap] = [
 
+
     ]
 }
