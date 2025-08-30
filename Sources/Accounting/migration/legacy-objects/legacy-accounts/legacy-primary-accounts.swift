@@ -31,7 +31,13 @@ public struct PrimaryAccount: Codable, Sendable, JSONReadable, JSONWritable, Ide
 
 
     public func reprintedSwift() -> String {
-        return ".init(\(id), \"\(name.esc)\", \"acc\", \"ent\"),".indent(2)
+        return """
+        .init(
+            \(id), 
+            \"\(name.esc)\",
+            \"acc\",
+            \"ent\"),
+        """.indent(2)
     }
 }
 
