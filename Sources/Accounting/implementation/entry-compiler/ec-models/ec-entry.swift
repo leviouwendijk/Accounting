@@ -49,7 +49,7 @@ public struct Entry: Hashable, Codable, Sendable {
         }
         print(report)
         print()
-        let str = (placeholders > 0) ? "\(placeholders)".ansi(.red, .bold) : "\(placeholders).ansi(.green)"
+        let str = (placeholders > 0) ? "\(placeholders)".ansi(.red, .bold) : "\(placeholders)".ansi(.green)
         print(str)
     }
 
