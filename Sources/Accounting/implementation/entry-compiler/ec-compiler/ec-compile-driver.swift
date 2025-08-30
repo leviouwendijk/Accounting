@@ -127,13 +127,7 @@ public struct EntryCompileDriver {
     @inline(__always)
     static func assertBalanced(_ entries: [ResolvedEntry]) throws {
         for e in entries {
-            var sum: Decimal = 0
-            for l in e.lines {
-                sum += (l.direction == .debit ? +l.amount : -l.amount)
-            }
-            if sum != 0 {
-                throw CompilingAssertionError.unbalanced(id: e.id, delta: sum)
-            }
+            try e.assertBalancing()
         }
     }
 }

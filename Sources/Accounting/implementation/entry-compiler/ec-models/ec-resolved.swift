@@ -45,4 +45,15 @@ public struct ResolvedEntry: Hashable, Codable, Sendable {
         self.timezone = timezone
         self.transactionReferences = transactionReferences
     }
+
+    @inlinable
+    public func assertBalancing() throws {
+        var sum: Decimal = 0
+        for l in lines {
+            sum += (l.direction == .debit ? +l.amount : -l.amount)
+        }
+        if sum != 0 {
+            throw CompilingAssertionError.unbalanced(id: id, delta: sum)
+        }
+    }
 }
