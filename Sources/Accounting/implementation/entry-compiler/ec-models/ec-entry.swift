@@ -39,7 +39,14 @@ public struct Entry: Hashable, Codable, Sendable {
         self.metadata = metadata
         self.location = location
 
+        printPlaceholderWarning(verbose: false)
+    }
+
+    public func printPlaceholderWarning(verbose: Bool = false) {
         let (placeholders, report) = entityPlaceholderWarning()
+        if placeholders == 0, !verbose { 
+            return 
+        }
         print(report)
         print()
         let str = (placeholders > 0) ? "\(placeholders)".ansi(.red, .bold) : "\(placeholders).ansi(.green)"
