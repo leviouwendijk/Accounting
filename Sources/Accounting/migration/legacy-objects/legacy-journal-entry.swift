@@ -6,7 +6,7 @@ public typealias LegacyJournalEntriesPage = ExportPage<LegacyJournalEntry>
 public struct LegacyJournalEntry: Codable, Sendable, JSONReadable, JSONWritable, Identifiable {
     public let id: Int
 
-    public let date: String
+    public let date: String?
     public let createdAt: String
     public let type: String
 
@@ -81,7 +81,7 @@ public struct LegacyJournalEntry: Codable, Sendable, JSONReadable, JSONWritable,
 
     public init(
         id: Int,
-        date: String,
+        date: String?,
         createdAt: String,
         type: String,
         description: String?,
