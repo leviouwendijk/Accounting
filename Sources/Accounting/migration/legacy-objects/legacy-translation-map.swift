@@ -358,7 +358,7 @@ public enum LegacyTranslation {
             48, 
             "Main",
             "BLimBanRba",
-            "main"
+            "balance.main"
         ),
 
         // .init(
@@ -372,14 +372,14 @@ public enum LegacyTranslation {
             50, 
             "Levi",
             "BLimBanRba",
-            "levi"
+            "balance.levi"
         ),
 
         .init(
             51, 
             "Savings Levi",
             "BLimBanSpa",
-            "levi"
+            "levi_savings"
         ),
         // .init(
         //     52, 
@@ -397,13 +397,13 @@ public enum LegacyTranslation {
             54, 
             "Shusha",
             "BLimBanRba",
-            "shusha"
+            "balance.shusha"
         ),
         .init(
             55, 
             "Savings Shusha",
             "BLimBanSpa",
-            "shusha"
+            "shusha_savings"
         ),
         // .init(
         //     56, 
@@ -422,13 +422,13 @@ public enum LegacyTranslation {
             58, 
             "Casper",
             "BLimBanRba",
-            "casper"
+            "balance.casper"
         ),
         .init(
             59, 
             "Savings Casper",
             "BLimBanSpa",
-            "casper"
+            "casper_savings"
         ),
         // .init(
         //     60, 
@@ -971,8 +971,8 @@ public enum LegacyTranslation {
         .init(
             148, 
             "Retained Earnings",
-            "acc",
-            "ent"
+            "BEivKapOndAow",
+            "closure"
         ),
 
         // .init(
@@ -981,23 +981,24 @@ public enum LegacyTranslation {
         //     "acc",
         //     "ent"
         // ),
+
         .init(
             150, 
             "Consult Sales",
-            "acc",
-            "ent"
+            "WOmzNodOdh",
+            "consult"
         ),
         .init(
             151, 
             "Session Sales",
-            "acc",
-            "ent"
+            "WOmzNodOdh",
+            "session"
         ),
         .init(
             152, 
             "Trajectory Sales",
-            "acc",
-            "ent"
+            "WOmzNodOdh",
+            "any_trajectory"
         ),
         // .init(
         //     153, 
@@ -1041,12 +1042,14 @@ public enum LegacyTranslation {
         //     "acc",
         //     "ent"
         // ),
+
         .init(
             160, 
             "Income Summary",
-            "acc",
-            "ent"
+            "BEivKapOndAow",
+            "closure"
         ),
+
         // .init(
         //     161, 
         //     "Gain on Disposal of Assets",
@@ -1068,32 +1071,32 @@ public enum LegacyTranslation {
         .init(
             164, 
             "VAT Rounding Remainder",
-            "acc",
-            "ent"
+            "WFbeRlmRbb",
+            "belastingdienst"
         ),
         .init(
             165, 
             "Leash Sales",
-            "acc",
-            "ent"
+            "WOmzNopOlh",
+            "leash"
         ),
         .init(
             166, 
             "Dog Care",
-            "acc",
-            "ent"
+            "BVorDebHad", // vorderingen
+            "boarding"
         ),
         .init(
             167, 
             "Dog Care Sales",
-            "acc",
-            "ent"
+            "WOmzNodOdh", // omzet
+            "boarding"
         ),
         .init(
             168, 
             "Interest Income",
-            "acc",
-            "ent"
+            "WFbeRlmObr",
+            "bunq"
         ),
         // .init(
         //     169, 
@@ -1104,62 +1107,69 @@ public enum LegacyTranslation {
         .init(
             170, 
             "Software Expense",
-            "acc",
-            "ent"
+            "WBedKanSof",
+            "any_software"
         ),
+
         .init(
             171, 
             "Gear",
-            "acc",
-            "ent"
+            "WBedEemKai",
+            "any_camera_equipment"
         ),
+
         // .init(
         //     172, 
         //     "Data Storage Equipment",
         //     "acc",
         //     "ent"
         // ),
+
         .init(
             173, 
             "Leash Stop Rings",
-            "acc",
-            "ent"
+            "BVrdGehVoo",
+            "stop_ring"
         ),
+
         .init(
             174, 
             "Camera Equipment",
-            "acc",
-            "ent"
+            "WBedEemKai",
+            "any_camera_equipment"
         ),
+
         .init(
             175, 
             "Data Storage Equipment",
             "acc",
-            "ent"
+            "any_data_storage_hardware"
         ),
+
         .init(
             176, 
             "Hardware",
-            "acc",
-            "ent"
+            "WBedEemKai",
+            "any_hardware"
         ),
+
         .init(
             177, 
             "Leashes",
-            "acc",
-            "ent"
+            "WKprInpInp", // kostprijswaarde productiegoederen
+            "leash"
         ),
         .init(
             178, 
             "Internal Use Leashes",
-            "acc",
-            "ent"
+            "WKprVomVom",
+            "leash"
         ),
         .init(
             179, 
             "Computers",
-            "acc",
-            "ent"
+            "WAfsAmvBei",
+            "asset_placeholder"
         ),
         // .init(
         //     180, 
@@ -1170,8 +1180,8 @@ public enum LegacyTranslation {
         .init(
             181, 
             "Monitors",
-            "acc",
-            "ent"
+            "WAfsAmvBei",
+            "asset_placeholder"
         ),
         // .init(
         //     182, 
@@ -1182,14 +1192,14 @@ public enum LegacyTranslation {
         .init(
             183, 
             "Camera Equipment",
-            "acc",
-            "ent"
+            "WAfsAmvBei",
+            "asset_placeholder"
         ),
         .init(
             184, 
             "Audio Equipment",
-            "acc",
-            "ent"
+            "WAfsAmvBei",
+            "asset_placeholder"
         ),
         // .init(
         //     185, 
@@ -1212,8 +1222,8 @@ public enum LegacyTranslation {
         .init(
             188, 
             "Computers",
-            "acc",
-            "ent"
+            "BMvaBeiCaeAfs", // Cumulatieve afschrijvingen . afschrijvingen
+            "asset_placeholder"
         ),
         // .init(
         //     189, 
@@ -1224,8 +1234,8 @@ public enum LegacyTranslation {
         .init(
             190, 
             "Monitors",
-            "acc",
-            "ent"
+            "BMvaBeiCaeAfs",
+            "asset_placeholder"
         ),
         // .init(
         //     191, 
@@ -1236,14 +1246,14 @@ public enum LegacyTranslation {
         .init(
             192, 
             "Camera Equipment",
-            "acc",
-            "ent"
+            "BMvaBeiCaeAfs",
+            "asset_placeholder"
         ),
         .init(
             193, 
             "Audio Equipment",
-            "acc",
-            "ent"
+            "BMvaBeiCaeAfs",
+            "asset_placeholder"
         ),
         // .init(
         //     194, 
@@ -1269,11 +1279,12 @@ public enum LegacyTranslation {
         //     "acc",
         //     "ent"
         // ),
+
         .init(
             198, 
             "Adoption",
-            "acc",
-            "ent"
+            "BVorDebHad", // vorderingen
+            "adoption"
         ),
         // .init(
         //     199, 
@@ -1295,75 +1306,78 @@ public enum LegacyTranslation {
         // ),
         .init(
             202, 
-            "Adoption Sales",
-            "acc",
-            "ent"
+            "Adoption Sales", 
+            "WOmzNodOdh", // omzet
+            "adoption"
         ),
         .init(
             203, 
             "Client Damage Claims",
-            "acc",
-            "ent"
+            "WBedAssScb",
+            "any_damage_claim"
         ),
         .init(
             204, 
             "PayPal",
-            "acc",
-            "ent"
+            "BLimBanRba",
+            "paypal"
         ),
+
         // .init(
         //     205, 
         //     "Stripe",
         //     "acc",
         //     "ent"
         // ),
+
         .init(
             206, 
             "Hosting Services",
-            "acc",
-            "ent"
+            "WBedVkkWeb",
+            "namecheap"
         ),
         .init(
             207, 
             "General",
-            "acc",
-            "ent"
+            "WBedAlkOal",
+            "google" // just a verification transaction in existing history, so no any_general needed
         ),
+
         .init(
             208, 
             "Research Material",
-            "acc",
-            "ent"
+            "WBedKanVak",
+            "any_literature"
         ),
         .init(
             209, 
             "Packaging",
-            "acc",
-            "ent"
+            "WBedVkkVrk",
+            "any_packagable"
         ),
         .init(
             210, 
             "Shipping",
-            "acc",
-            "ent"
+            "WBedVkkVrk",
+            "any_shippable"
         ),
         .init(
             211, 
             "Phones",
-            "acc",
+            "BMvaBeiVvpIna",
             "ent"
         ),
         .init(
             212, 
             "VAT Rounding Deficit",
-            "acc",
-            "ent"
+            "WFbeOrlRlb",
+            "belastingdienst"
         ),
         .init(
             213, 
             "Carry Forward Input VAT",
-            "acc",
-            "ent"
+            "BVorVbkTvo",
+            "carry_forward_vat"
         ),
         // .init(
         //     214, 
@@ -1374,20 +1388,21 @@ public enum LegacyTranslation {
         .init(
             215, 
             "Work Clothes",
-            "acc",
-            "ent"
+            "WBedOvpWkv",
+            "any_clothing"
         ),
+
         .init(
             216, 
             "Phones",
-            "acc",
-            "ent"
+            "BMvaBeiCaeAfs", // Cumulatieve afschrijvingen . afschrijvingen
+            "asset_placeholder"
         ),
         .init(
             217, 
             "Phones",
-            "acc",
-            "ent"
+            "WAfsAmvBei", // dep exp
+            "asset_placeholder"
         ),
         // .init(
         //     218, 
