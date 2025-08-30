@@ -917,7 +917,7 @@ public enum LegacyTranslation {
             140, 
             "Output VAT",
             "BSchBepBtwOla", // subaccount level5: hoog tarief!
-            "ent"
+            "belastingdienst"
         ),
         
 
