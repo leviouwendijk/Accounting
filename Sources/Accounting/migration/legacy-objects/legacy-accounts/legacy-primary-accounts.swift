@@ -47,7 +47,7 @@ extension Array where Element == PrimaryAccount {
         var out = ""
         for i in self {
             out.append(i.reprintedSwift())
-            out.append("\n\n")
+            out.append("\n")
         }
         return out
     }
