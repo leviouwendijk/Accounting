@@ -21,7 +21,7 @@ public extension LegacyJournalEntry {
         } else {
             line("    // date missing; using inference upstream if desired")
         }
-        line("    sort regular")
+        line("    sort \(type.convertForEC())")
 
         let debits: [(Int?, String?)] = [
             (debitAccount1, debitAmount1),
@@ -43,9 +43,9 @@ public extension LegacyJournalEntry {
             guard let acctID = acctIDOpt, let amt = cleanedAmount(amtOpt) else { continue }
             guard let m = dict[acctID] else { continue }
             line("")
-            line("  for (\(cleanEntity(m.entity))) in (\(m.account)) {")
-            line("    debit = \(amt)")
-            line("  }")
+            line("    for (\(cleanEntity(m.entity))) in (\(m.account)) {")
+            line("        debit = \(amt)")
+            line("    }")
         }
 
         // Credits
@@ -53,9 +53,9 @@ public extension LegacyJournalEntry {
             guard let acctID = acctIDOpt, let amt = cleanedAmount(amtOpt) else { continue }
             guard let m = dict[acctID] else { continue }
             line("")
-            line("  for (\(cleanEntity(m.entity))) in (\(m.account)) {")
-            line("    credit = \(amt)")
-            line("  }")
+            line("    for (\(cleanEntity(m.entity))) in (\(m.account)) {")
+            line("        credit = \(amt)")
+            line("    }")
         }
 
         line("}")
