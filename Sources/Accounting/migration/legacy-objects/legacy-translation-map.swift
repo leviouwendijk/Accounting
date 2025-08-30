@@ -195,8 +195,8 @@ public enum LegacyTranslation {
         .init(
             23, 
             "Insurance",
-            "\n<INSURANCE GENERIC: Split into relevant ACCOUNT (car ins. cost (WBedAutAsa), or company legal (WBedAssBea)\n",
-            "\n<INSURANCE GENERIC: Split into relevant entity (car, or legal)>\n"
+            "\n<MANUAL: INSURANCE GENERIC: Split into relevant ACCOUNT (car ins. cost (WBedAutAsa), or company legal (WBedAssBea)\n",
+            "\n<MANUAL: INSURANCE GENERIC: Split into relevant entity (car, or legal)>\n"
         ),
         .init(
             24, 
@@ -229,8 +229,8 @@ public enum LegacyTranslation {
         .init(
             28, 
             "Subscriptions",
-            "\nIF SIMYO -> (WBedKanTef)\nIF SOFTWARE -> (WBedKanSof)\n IF HOSTING -> ()",
-            "\nIF SIMYO -> (simyo)\nIF SOFTWARE -> (gopro, answerthepublic, openai)\n IF HOSTING -> (WBedVkkWeb)\n"
+            "\nMANUAL: IF SIMYO -> (WBedKanTef)\nIF SOFTWARE -> (WBedKanSof)\n IF HOSTING -> ()",
+            "\nMANUAL: IF SIMYO -> (simyo)\nIF SOFTWARE -> (gopro, answerthepublic, openai)\n IF HOSTING -> (WBedVkkWeb)\n"
         ),
 
         .init(
@@ -251,7 +251,7 @@ public enum LegacyTranslation {
             31, 
             "Other General Costs",
             "WBedAlkOal",
-            "\nIF FOOD (CORRECTED LATER) -> (mcdonalds, h_earth) || IF GOOGLE -> (google) \n"
+            "\nMANUAL: IF FOOD (CORRECTED LATER) -> (mcdonalds, h_earth) || IF GOOGLE -> (google) \n"
         ),
 
         .init(
@@ -337,8 +337,8 @@ public enum LegacyTranslation {
         .init(
             45, 
             "Refunds to Overhead Expenses",
-            "\nINSURANCE -> (WBedAutAsa), GOOGLE -> (WBedAlkOal), BUNQ -> (WBedAdlBan)\n",
-            "\n REFUNDS: (vehicle#honda_crv), (google), (bunq)"
+            "\nMANUAL: INSURANCE -> (WBedAutAsa), GOOGLE -> (WBedAlkOal), BUNQ -> (WBedAdlBan)\n",
+            "\nMANUAL: REFUNDS: (vehicle#honda_crv), (google), (bunq)"
         ),
 
         // .init(
@@ -596,7 +596,7 @@ public enum LegacyTranslation {
             87, 
             "Computers",
             "BMvaBeiVvpIna",
-            "\n ENSURE PROPER ENTITY (asset object macbooks etc.)\n"
+            "\nMANUAL: ENSURE PROPER ENTITY (asset object macbooks etc.)\n"
         ),
         // .init(
         //     88, 
@@ -621,13 +621,13 @@ public enum LegacyTranslation {
             91, 
             "Camera Equipment",
             "BMvaBeiVvpIna",
-            "\n ENSURE PROPER ENTITY (monitor)\n"
+            "\nMANUAL: ENSURE PROPER ENTITY (monitor)\n"
         ),
         .init(
             92, 
             "Audio Equipment",
             "BMvaBeiVvpIna",
-            "\n ENSURE PROPER ENTITY (monitor)\n"
+            "\nMANUAL: ENSURE PROPER ENTITY (monitor)\n"
         ),
         // .init(
         //     93, 
