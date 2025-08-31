@@ -166,7 +166,7 @@ public extension LegacyJournalEntry {
         // store legacy entry id
         metadata.append(
             MetaObject(
-                "legacy_entry_id",
+                "legacy_journal_entry_id",
                 String(id)
             )
         )
