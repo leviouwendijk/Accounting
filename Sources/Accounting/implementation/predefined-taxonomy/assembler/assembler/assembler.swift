@@ -59,10 +59,17 @@ public enum RGSAssembler {
         try assertSeedSumsToZero(seed)
 
         if !autoClose {
-            let totals = RGSAssembler.rollupBySortingKey(
-                seed    ,  
-                idToKey :  maps.sortKeyById,
-                keyToId :  maps.keyToId
+            // ROLLING UP BY SORTINGKEY
+            // let totals = RGSAssembler.rollupBySortingKey(
+            //     seed    ,  
+            //     idToKey :  maps.sortKeyById,
+            //     keyToId :  maps.keyToId
+            // )
+
+            // ATTEMPT TO ROLL UP BY PARENT BY ID
+            let totals = RGSAssembler.rollupAmounts(
+                seed,  
+                parentById:  maps.parentById
             )
 
             // Forced inclusions (codes → ids)
@@ -117,8 +124,12 @@ public enum RGSAssembler {
             }
 
             // --- two rollups: NO overlay for IS, overlay for BS ---
-            var totalsIncome  = RGSAssembler.rollupBySortingKey(seed,        idToKey: maps.sortKeyById, keyToId: maps.keyToId)
-            let totalsBalance = RGSAssembler.rollupBySortingKey(seedWithAC,  idToKey: maps.sortKeyById, keyToId: maps.keyToId)
+            // var totalsIncome  = RGSAssembler.rollupBySortingKey(seed,        idToKey: maps.sortKeyById, keyToId: maps.keyToId)
+            // let totalsBalance = RGSAssembler.rollupBySortingKey(seedWithAC,  idToKey: maps.sortKeyById, keyToId: maps.keyToId)
+
+            // ATTEMPTING PARENT BY ID ROLLUP
+            var totalsIncome  = RGSAssembler.rollupAmounts(seed,        parentById: maps.parentById)
+            let totalsBalance = RGSAssembler.rollupAmounts(seedWithAC,  parentById: maps.parentById)
             // --- end auto-close overlay ---
 
             // place NI on the NI node for IS presentation (do NOT invert here)
