@@ -207,6 +207,7 @@ public enum LegacyTranslation {
         ),
 
 
+        //OVERRIDES ADDED
         .init(
             23, 
             "Insurance",
@@ -242,6 +243,7 @@ public enum LegacyTranslation {
             "bunq"
         ),
 
+        // RESOLVED IN OVERRIDES
         .init(
             28, 
             "Subscriptions",
@@ -353,6 +355,7 @@ public enum LegacyTranslation {
         //     "ent"
         // ),
 
+        // OVERRIDES
         .init(
             45, 
             "Refunds to Overhead Expenses",
@@ -615,7 +618,7 @@ public enum LegacyTranslation {
             87, 
             "Computers",
             "BMvaBeiVvpIna",
-            "MANUAL: ENSURE PROPER ENTITY (asset object macbooks etc.)"
+            "asset_placeholder"
         ),
         // .init(
         //     88, 
@@ -628,7 +631,7 @@ public enum LegacyTranslation {
             89, 
             "Monitors",
             "BMvaBeiVvpIna",
-            " ENSURE PROPER ENTITY (monitor)"
+            "asset_placeholder"
         ),
         // .init(
         //     90, 
@@ -640,13 +643,13 @@ public enum LegacyTranslation {
             91, 
             "Camera Equipment",
             "BMvaBeiVvpIna",
-            "MANUAL: ENSURE PROPER ENTITY (monitor)"
+            "asset_placeholder"
         ),
         .init(
             92, 
             "Audio Equipment",
             "BMvaBeiVvpIna",
-            "MANUAL: ENSURE PROPER ENTITY (monitor)"
+            "asset_placeholder"
         ),
         // .init(
         //     93, 
@@ -1872,6 +1875,82 @@ public enum LegacyTranslation {
                 "MISTAKENLY BOOKED AS INSURANCE",
                 "WBedAdlBan",
                 "bunq"
+            ),
+        ),
+
+
+        .init(
+            legacyEntryIds: [
+                667
+            ],
+
+            legacyMapOverride: .init(
+                28, 
+                "Subscriptions",
+                "WBedKanSof",
+                "openai"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                148,
+                203,
+                225,
+                273,
+                337,
+                375,
+                441,
+                556,
+                616,
+                680,
+
+            ],
+
+            legacyMapOverride: .init(
+                28, 
+                "Phone cost",
+                "WBedKanTef",
+                "simyo"
+            ),
+        ),
+        
+        .init(
+            legacyEntryIds: [
+                557,
+            ],
+
+            legacyMapOverride: .init(
+                28, 
+                "Subscriptions",
+                "WBedKanSof",
+                "gopro"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                613,
+            ],
+
+            legacyMapOverride: .init(
+                28, 
+                "Subscriptions",
+                "WBedKanSof",
+                "answerthepublic"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                620,
+            ],
+
+            legacyMapOverride: .init(
+                28, 
+                "Web hosting (as subscriptions)",
+                "WBedVkkWeb",
+                "namecheap"
             ),
         ),
 
