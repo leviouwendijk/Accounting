@@ -65,19 +65,19 @@ public enum LegacyTranslation {
             1, 
             "Dividends Levi",
             "BEivKapProPok",
-            "levi"
+            "owner.levi"
         ),
         .init(
             2, 
             "Dividends Casper",
             "BEivKapProPok",
-            "casper"
+            "owner.casper"
         ),
         .init(
             3, 
             "Dividends Shusha",
             "BEivKapProPok",
-            "shusha"
+            "owner.shusha"
         ),
         // .init(
         //     4, 
@@ -973,14 +973,14 @@ public enum LegacyTranslation {
             145, 
             "Capital Contributions Levi",
             "BEivKapPrsPsk",
-            "levi"
+            "owner.levi"
         ),
 
         .init(
             146, 
             "Capital Contributions Casper",
             "BEivKapPrsPsk",
-            "casper"
+            "owner.casper"
         ),
 
         // .init(
