@@ -1,50 +1,6 @@
 import Foundation
 import plate
 
-// Handy mapping for "legacyAssetId -> preferred entity alias/unit + expense account"
-public struct LegacyAssetMapping: Sendable, Codable {
-    /// Entity (root) alias, e.g. "macbook"
-    public let alias: String
-    /// Unit alias, e.g. "levi_air_m2"
-    public let unit: String
-    /// Optional depreciation expense account code, e.g. "WAfsAmvBei"
-    public let account: String?
-
-    public init(alias: String, unit: String, account: String? = nil) {
-        self.alias = alias
-        self.unit = unit
-        self.account = account
-    }
-}
-
-import Foundation
-
-public extension LegacyAssetItem {
-    /// Render this asset to `.ec` and write it safely to `url`.
-    @discardableResult
-    func writeEC(
-        to url: URL,
-        className: String = "objects",
-        family: String = "usable",
-        rootAlias: String? = nil,
-        unitAlias: String? = nil,
-        depreciationExpenseAccountCode: String? = nil,
-        writeOptions: SafeWriteOptions = .init(),
-    ) throws -> SafeWriteResult {
-        let text = ecString(
-            className: className,
-            family: family,
-            rootAlias: rootAlias,
-            unitAlias: unitAlias,
-            depreciationExpenseAccountCode: depreciationExpenseAccountCode
-        )
-
-        let sf = SafeFile(url)
-        let result = try sf.write(text, options: writeOptions)
-        return result
-    }
-}
-
 public extension LegacyAssetItem {
     /// Convenience overload: look up alias/unit/account by legacy asset id.
     /// Falls back to the main `ecString(…)` defaults when a field is missing.
