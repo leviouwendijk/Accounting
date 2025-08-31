@@ -1647,6 +1647,18 @@ public enum LegacyTranslation {
             ),
         ),
 
+        .init(
+            legacyEntryIds: [
+                291
+            ],
+
+            legacyMapOverride: .init(
+                31, 
+                "Other General Costs",
+                "WBedAlkOal",
+                "albert_heijn"
+            ),
+        ),
 
         .init(
             legacyEntryIds: [
