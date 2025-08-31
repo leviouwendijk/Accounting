@@ -35,90 +35,182 @@ public struct EntityStore: Sendable, Codable {
     //     )
     // }
 
+    // public func resolve(_ ref: EntityRef, at loc: SourceLocation?) throws -> EntityDef {
+    //     // Full key provided → direct lookup
+    //     if let c = ref.`class`, let f = ref.family {
+    //         let key = EntityKey(class: c, family: f, alias: ref.alias)
+    //         if let d = byFull[key] { return d }
+    //         throw EntityStoreError.notFound(ref: ref.printable, at: loc)
+    //     }
+
+    //     // Gather candidates by alias
+    //     let cands = byAlias[ref.alias.name] ?? []
+    //     guard !cands.isEmpty else {
+    //         throw EntityStoreError.notFound(ref: ref.printable, at: loc)
+    //     }
+
+    //     // Start with all candidates, then narrow down
+    //     var filtered = cands
+
+    //     // If class is provided, prefer class filter first…
+    //     if let c = ref.`class` {
+    //         let byClass = cands.filter { $0.`class` == c }
+    //         if byClass.count == 1 { return byFull[byClass[0]]! }
+    //         if byClass.count > 1 {
+    //             // Still ambiguous after class-filter
+    //             throw EntityStoreError.ambiguousAlias(
+    //                 alias: ref.alias.string,
+    //                 candidates: byClass.map { $0.identifier(displaying: .fullchain) },
+    //                 at: loc
+    //             )
+    //         }
+
+    //         // …if no hits by class, try interpreting that same token as *family*.
+    //         let byFamily = cands.filter { $0.family == c }
+    //         if byFamily.count == 1 { return byFull[byFamily[0]]! }
+    //         if byFamily.count > 1 {
+    //             throw EntityStoreError.ambiguousAlias(
+    //                 alias: ref.alias.string,
+    //                 candidates: byFamily.map { $0.identifier(displaying: .fullchain) },
+    //                 at: loc
+    //             )
+    //         }
+
+    //         // neither class nor family matched → fall through to alias-only logic
+    //         filtered = []
+    //     }
+
+    //     // If family is explicitly provided (3-seg form sometimes omits class), also filter.
+    //     if let f = ref.family {
+    //         let byF = (filtered.isEmpty ? cands : filtered).filter { $0.family == f }
+    //         if byF.count == 1 { return byFull[byF[0]]! }
+    //         if byF.count > 1 {
+    //             throw EntityStoreError.ambiguousAlias(
+    //                 alias: ref.alias.string,
+    //                 candidates: byF.map { $0.identifier(displaying: .fullchain) },
+    //                 at: loc
+    //             )
+    //         }
+    //         filtered = byF
+    //     }
+
+    //     // Alias-only path
+    //     if filtered.isEmpty {
+    //         if cands.count == 1, let only = cands.first {
+    //             return byFull[only]!
+    //         }
+    //         throw EntityStoreError.ambiguousAlias(
+    //             alias: ref.alias.string,
+    //             candidates: cands.map { $0.identifier(displaying: .fullchain) },
+    //             at: loc
+    //         )
+    //     }
+
+    //     // Exact single after previous filters
+    //     if filtered.count == 1, let only = filtered.first {
+    //         return byFull[only]!
+    //     }
+
+    //     // Still ambiguous
+    //     throw EntityStoreError.ambiguousAlias(
+    //         alias: ref.alias.string,
+    //         candidates: filtered.map { $0.identifier(displaying: .fullchain) },
+    //         at: loc
+    //     )
+    // }
+
     public func resolve(_ ref: EntityRef, at loc: SourceLocation?) throws -> EntityDef {
-        // Full key provided → direct lookup
+        // 1) Full key → direct lookup
         if let c = ref.`class`, let f = ref.family {
             let key = EntityKey(class: c, family: f, alias: ref.alias)
             if let d = byFull[key] { return d }
             throw EntityStoreError.notFound(ref: ref.printable, at: loc)
         }
 
-        // Gather candidates by alias
-        let cands = byAlias[ref.alias.name] ?? []
-        guard !cands.isEmpty else {
+        // 2) Candidates by alias
+        let all = byAlias[ref.alias.name] ?? []
+        guard !all.isEmpty else {
             throw EntityStoreError.notFound(ref: ref.printable, at: loc)
         }
 
-        // Start with all candidates, then narrow down
-        var filtered = cands
+        // Narrow by class/family (NO early ambiguous throws; we want root/#any prefs to apply)
+        var base = all
 
-        // If class is provided, prefer class filter first…
         if let c = ref.`class` {
-            let byClass = cands.filter { $0.`class` == c }
+            let byClass = base.filter { $0.`class` == c }
             if byClass.count == 1 { return byFull[byClass[0]]! }
-            if byClass.count > 1 {
-                // Still ambiguous after class-filter
-                throw EntityStoreError.ambiguousAlias(
-                    alias: ref.alias.string,
-                    candidates: byClass.map { $0.identifier(displaying: .fullchain) },
-                    at: loc
-                )
+            if !byClass.isEmpty { base = byClass }
+            else {
+                // Treat provided class token as family if class had no hits
+                let byFamily = base.filter { $0.family == c }
+                if byFamily.count == 1 { return byFull[byFamily[0]]! }
+                if !byFamily.isEmpty { base = byFamily }
             }
-
-            // …if no hits by class, try interpreting that same token as *family*.
-            let byFamily = cands.filter { $0.family == c }
-            if byFamily.count == 1 { return byFull[byFamily[0]]! }
-            if byFamily.count > 1 {
-                throw EntityStoreError.ambiguousAlias(
-                    alias: ref.alias.string,
-                    candidates: byFamily.map { $0.identifier(displaying: .fullchain) },
-                    at: loc
-                )
-            }
-
-            // neither class nor family matched → fall through to alias-only logic
-            filtered = []
         }
 
-        // If family is explicitly provided (3-seg form sometimes omits class), also filter.
         if let f = ref.family {
-            let byF = (filtered.isEmpty ? cands : filtered).filter { $0.family == f }
+            let byF = base.filter { $0.family == f }
             if byF.count == 1 { return byFull[byF[0]]! }
-            if byF.count > 1 {
-                throw EntityStoreError.ambiguousAlias(
-                    alias: ref.alias.string,
-                    candidates: byF.map { $0.identifier(displaying: .fullchain) },
-                    at: loc
-                )
-            }
-            filtered = byF
+            if !byF.isEmpty { base = byF }
         }
 
-        // Alias-only path
-        if filtered.isEmpty {
-            if cands.count == 1, let only = cands.first {
-                return byFull[only]!
-            }
-            throw EntityStoreError.ambiguousAlias(
+        // Helpers
+        func def(_ k: EntityKey) -> EntityDef { byFull[k]! }
+        func fullID(_ k: EntityKey) -> String { k.identifier(displaying: .fullchain) }
+        @inline(__always) func variants(of a: EntityAlias) -> [String] { a.variant ?? [] }
+        @inline(__always) func lower(_ xs: [String]) -> [String] { xs.map { $0.lowercased() } }
+        func ambiguous(_ cands: [EntityKey]) -> Error {
+            EntityStoreError.ambiguousAlias(
                 alias: ref.alias.string,
-                candidates: cands.map { $0.identifier(displaying: .fullchain) },
+                candidates: cands.map(fullID),
                 at: loc
             )
         }
 
-        // Exact single after previous filters
-        if filtered.count == 1, let only = filtered.first {
-            return byFull[only]!
+        let refVars = lower(variants(of: ref.alias))
+        let hasAny = refVars.contains("any")
+
+        // 3) Explicit variants (not wildcard)
+        if !refVars.isEmpty && !hasAny {
+            let exact = base.filter { lower(variants(of: $0.alias)) == refVars }
+            if exact.count == 1 { return def(exact[0]) }
+            if exact.count > 1 { throw ambiguous(exact) }
+            // else fall through: maybe class/family narrowing already unique
         }
 
-        // Still ambiguous
-        throw EntityStoreError.ambiguousAlias(
-            alias: ref.alias.string,
-            candidates: filtered.map { $0.identifier(displaying: .fullchain) },
-            at: loc
-        )
-    }
+        // 4) '#any' wildcard semantics
+        if hasAny {
+            // 4a. Prefer explicit '#any' entity if present uniquely
+            let exactAny = base.filter { lower(variants(of: $0.alias)) == refVars }
+            if exactAny.count == 1 { return def(exactAny[0]) }
 
+            // 4b. Prefer unique root (no variants)
+            let roots = base.filter { variants(of: $0.alias).isEmpty }
+            if roots.count == 1 { return def(roots[0]) }
+
+            // 4c. Deterministic fallback: nearest to root (fewest variants), tie-break by full id
+            if let chosen = base.min(by: { lhs, rhs in
+                let lv = variants(of: lhs.alias).count
+                let rv = variants(of: rhs.alias).count
+                if lv != rv { return lv < rv }
+                return fullID(lhs) < fullID(rhs)
+            }) {
+                return def(chosen)
+            }
+        }
+
+        // 5) No variants supplied → prefer unique root if available
+        if refVars.isEmpty {
+            let roots = base.filter { variants(of: $0.alias).isEmpty }
+            if roots.count == 1 { return def(roots[0]) }
+        }
+
+        // 6) If narrowing made it unique, return it
+        if base.count == 1 { return def(base[0]) }
+
+        // 7) Still ambiguous
+        throw ambiguous(base)
+    }
 
     var all: [EntityDef] { Array(byFull.values) }
     var count: Int { byFull.count }
