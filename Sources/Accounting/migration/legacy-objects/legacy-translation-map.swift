@@ -1829,7 +1829,6 @@ public enum LegacyTranslation {
             ),
         ),
 
-
         .init(
             legacyEntryIds: [
                 159,
@@ -1864,7 +1863,6 @@ public enum LegacyTranslation {
                 "unive"
             ),
         ),
-
 
         .init(
             legacyEntryIds: [
@@ -1905,7 +1903,6 @@ public enum LegacyTranslation {
                 556,
                 616,
                 680,
-
             ],
 
             legacyMapOverride: .init(
@@ -1954,8 +1951,5 @@ public enum LegacyTranslation {
                 "namecheap"
             ),
         ),
-
-
-
     ]
 }
