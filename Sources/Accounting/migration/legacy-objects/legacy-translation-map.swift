@@ -208,8 +208,8 @@ public enum LegacyTranslation {
         .init(
             23, 
             "Insurance",
-            "\n<MANUAL: INSURANCE GENERIC: Split into relevant ACCOUNT (car ins. cost (WBedAutAsa), or company legal (WBedAssBea)\n",
-            "\n<MANUAL: INSURANCE GENERIC: Split into relevant entity (car, or legal)>\n"
+            "<MANUAL: INSURANCE GENERIC: Split into relevant ACCOUNT (car ins. cost (WBedAutAsa), or company legal (WBedAssBea)",
+            "<MANUAL: INSURANCE GENERIC: Split into relevant entity (car, or legal)>"
         ),
         .init(
             24, 
@@ -242,8 +242,8 @@ public enum LegacyTranslation {
         .init(
             28, 
             "Subscriptions",
-            "\nMANUAL: IF SIMYO -> (WBedKanTef)\nIF SOFTWARE -> (WBedKanSof)\n IF HOSTING -> ()",
-            "\nMANUAL: IF SIMYO -> (simyo)\nIF SOFTWARE -> (gopro, answerthepublic, openai)\n IF HOSTING -> (WBedVkkWeb)\n"
+            "MANUAL: IF SIMYO -> (WBedKanTef)IF SOFTWARE -> (WBedKanSof) IF HOSTING -> ()",
+            "MANUAL: IF SIMYO -> (simyo)IF SOFTWARE -> (gopro, answerthepublic, openai) IF HOSTING -> (WBedVkkWeb)"
         ),
 
         // RESOLVED IN OVERRIDES
@@ -267,7 +267,7 @@ public enum LegacyTranslation {
             31, 
             "Other General Costs",
             "WBedAlkOal",
-            "\nMANUAL: IF FOOD (CORRECTED LATER) -> (mcdonalds, h_earth) || IF GOOGLE -> (google) \n"
+            "MANUAL: IF FOOD (CORRECTED LATER) -> (mcdonalds, h_earth) || IF GOOGLE -> (google) "
         ),
 
         .init(
@@ -353,8 +353,8 @@ public enum LegacyTranslation {
         .init(
             45, 
             "Refunds to Overhead Expenses",
-            "\nMANUAL: INSURANCE -> (WBedAutAsa), GOOGLE -> (WBedAlkOal), BUNQ -> (WBedAdlBan)\n",
-            "\nMANUAL: REFUNDS: (vehicle#honda_crv), (google), (bunq)"
+            "MANUAL: INSURANCE -> (WBedAutAsa), GOOGLE -> (WBedAlkOal), BUNQ -> (WBedAdlBan)",
+            "MANUAL: REFUNDS: (vehicle#honda_crv), (google), (bunq)"
         ),
 
         // .init(
@@ -612,7 +612,7 @@ public enum LegacyTranslation {
             87, 
             "Computers",
             "BMvaBeiVvpIna",
-            "\nMANUAL: ENSURE PROPER ENTITY (asset object macbooks etc.)\n"
+            "MANUAL: ENSURE PROPER ENTITY (asset object macbooks etc.)"
         ),
         // .init(
         //     88, 
@@ -625,7 +625,7 @@ public enum LegacyTranslation {
             89, 
             "Monitors",
             "BMvaBeiVvpIna",
-            "\n ENSURE PROPER ENTITY (monitor)\n"
+            " ENSURE PROPER ENTITY (monitor)"
         ),
         // .init(
         //     90, 
@@ -637,13 +637,13 @@ public enum LegacyTranslation {
             91, 
             "Camera Equipment",
             "BMvaBeiVvpIna",
-            "\nMANUAL: ENSURE PROPER ENTITY (monitor)\n"
+            "MANUAL: ENSURE PROPER ENTITY (monitor)"
         ),
         .init(
             92, 
             "Audio Equipment",
             "BMvaBeiVvpIna",
-            "\nMANUAL: ENSURE PROPER ENTITY (monitor)\n"
+            "MANUAL: ENSURE PROPER ENTITY (monitor)"
         ),
         // .init(
         //     93, 
