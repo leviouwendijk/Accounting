@@ -78,10 +78,11 @@ public extension EntryCompilerParsing {
                     try expect(.rBrace)
                 }
 
-            case .ident("effective_date"), .ident("date"), .keyword("date"):
+            case .ident("effective_date"), .ident("date"), .keyword("date"),
+                .keyword("effective_date"), .keyword("commission_date"):
                 advance()
                 let spec = try parseNamedDateOrInferExpecting(
-                    names: ["date","effective_date"],
+                    names: ["date","effective_date", "commission_date"],
                     tz: tz,
                     allowInfer: false,
                     allowUnixEpoch: true
