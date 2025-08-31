@@ -1467,6 +1467,31 @@ public enum LegacyTranslation {
     public static let rgs_v3_8_overrides: [LegacyMapOverrideExceptions] = [
         .init(
             legacyEntryIds: [
+                63,
+                64,
+                90,
+                100,
+                108,
+                114,
+                135,
+                156,
+                215,
+                330,
+                388,
+                501,
+                579,
+                669,
+            ],
+            legacyMapOverride: LegacyMap(
+                30, 
+                "Dog Care",
+                "WBedAlkOal",
+                "vegavriend"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
                 558,
                 595,
                 604,
