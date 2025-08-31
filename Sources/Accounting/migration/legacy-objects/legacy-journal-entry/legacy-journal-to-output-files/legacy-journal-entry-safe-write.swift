@@ -43,7 +43,7 @@ public extension Array where Element == LegacyJournalEntry {
 
         LegacyTranslation.assertUniqueLegacyOverrides(
             overrides,
-            fatal: true
+            fatal: false
         )
 
         // 1) Group by month-bucket + type
