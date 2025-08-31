@@ -1,13 +1,30 @@
 import Foundation
 import plate
 
-public struct MonthlyWriteResult: Sendable {
+public struct MonthlyWriteResult: Sendable, CustomStringConvertible, CustomDebugStringConvertible {
     public let yqm: YQM
     public let type: LegacyJournalEntryType
     public let relativePath: String
     public let url: URL
     public let count: Int
     public let bytesWritten: Int
+    public let safeWriteResult: SafeWriteResult
+
+    public var description: String {
+        let p = url.path
+        return "\(yqm.year)/Q\(yqm.quarter)/\(String(format: "%02d", yqm.month)) \(type.convertForEC()).ec → \(count) entries (\(bytesWritten) bytes) @ \(p)"
+    }
+
+    public var debugDescription: String {
+        let collatedDescs: [String] = [
+            self.description,
+            self.safeWriteResult.description,
+            self.safeWriteResult.debugDescription,
+            "\n"
+        ]
+        let out = collatedDescs.joined(separator: "\n")
+        return out
+    }
 }
 
 public extension Array where Element == LegacyJournalEntry {
@@ -17,7 +34,8 @@ public extension Array where Element == LegacyJournalEntry {
         padMonth: Bool = false,
         tz: TimeZone = .current,
         translation: [LegacyMap]? = nil,
-        fileHeader: ((YQM, LegacyJournalEntryType, [LegacyJournalEntry]) -> String)? = nil
+        fileHeader: ((YQM, LegacyJournalEntryType, [LegacyJournalEntry]) -> String)? = nil,
+        writeOptions: SafeWriteOptions = .init(),
     ) throws -> [MonthlyWriteResult] {
         precondition(root.isFileURL, "Output root must be a file URL")
 
@@ -63,8 +81,10 @@ public extension Array where Element == LegacyJournalEntry {
                 pieces.append(body)
                 let text = pieces.joined(separator: pieces.count > 1 ? "\n\n" : "")
 
-                // write
-                try text.write(to: fileURL, atomically: true, encoding: .utf8)
+                // try text.write(to: fileURL, atomically: true, encoding: .utf8)
+                // above replaced with SafeFile writing:
+                let sf = SafeFile(fileURL)
+                let writeResult = try sf.write(text, options: writeOptions)
 
                 // result
                 let bytes = text.lengthOfBytes(using: .utf8)
@@ -75,7 +95,8 @@ public extension Array where Element == LegacyJournalEntry {
                         relativePath: relative,
                         url: fileURL,
                         count: entries.count,
-                        bytesWritten: bytes
+                        bytesWritten: bytes,
+                        safeWriteResult: writeResult
                     )
                 )
             }
