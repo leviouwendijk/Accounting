@@ -1387,7 +1387,7 @@ public enum LegacyTranslation {
             211, 
             "Phones",
             "BMvaBeiVvpIna",
-            "ent"
+            "asset_placeholder"
         ),
         .init(
             212, 
