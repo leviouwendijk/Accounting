@@ -22,7 +22,7 @@ public extension Array where Element == LegacyJournalEntry {
 
     func ecFile(
         using dict: [Int: LegacyMap],
-        overrides: [LegacyMapOverrideExceptions],
+        overrides: [LegacyMapOverrideExceptions] = LegacyTranslation.rgs_v3_8_overrides,
         idProvider: ((LegacyJournalEntry) -> Int)? = nil
     ) -> String {
         self.map { e in e.ecString(using: dict, overrides: overrides, idOverride: idProvider?(e)) }

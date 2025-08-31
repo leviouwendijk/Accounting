@@ -2,17 +2,17 @@ import Foundation
 import plate
 
 public extension LegacyJournalEntry {
-    // func ecString(using translation: [LegacyMap]? = nil) -> String {
-    //     let dict = (translation ?? LegacyTranslation.rgs_v3_8).byLegacyID
-    //     return ecString(using: dict, overrides: [])
-    // }
+    func ecString(using translation: [LegacyMap]? = nil) -> String {
+        let dict = (translation ?? LegacyTranslation.rgs_v3_8).byLegacyID
+        return ecString(using: dict, overrides: [])
+    }
 
-    // func ecString(
-    //     using maps: [LegacyMap],
-    //     overrides: [LegacyMapOverrideExceptions],
-    // ) -> String {
-    //     ecString(using: maps.byLegacyID, overrides: overrides)
-    // }
+    func ecString(
+        using maps: [LegacyMap],
+        overrides: [LegacyMapOverrideExceptions] = LegacyTranslation.rgs_v3_8_overrides,
+    ) -> String {
+        ecString(using: maps.byLegacyID, overrides: overrides)
+    }
 
     /// Render with an explicit dictionary lookup.
     func ecString(
