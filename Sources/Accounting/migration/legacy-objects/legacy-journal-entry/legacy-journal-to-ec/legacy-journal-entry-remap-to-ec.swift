@@ -180,6 +180,18 @@ public extension LegacyJournalEntry {
             )
         )
 
+        // debit_account_id_1...5
+        let debitAccountIDs: [Int?] = [debitAccount1, debitAccount2, debitAccount3, debitAccount4, debitAccount5]
+        for (i, v) in debitAccountIDs.enumerated() where v != nil {
+            metadata.append(MetaObject("legacy_debit_account_id_\(i + 1)", String(v!)))
+        }
+
+        // credit_account_id_1...5
+        let creditAccountIDs: [Int?] = [creditAccount1, creditAccount2, creditAccount3, creditAccount4, creditAccount5]
+        for (i, v) in creditAccountIDs.enumerated() where v != nil {
+            metadata.append(MetaObject("legacy_credit_account_id_\(i + 1)", String(v!)))
+        }
+
         // reference
         if let r = reference, !r.isEmpty {
             metadata.append(MetaObject("legacy_reference", q(r)))
