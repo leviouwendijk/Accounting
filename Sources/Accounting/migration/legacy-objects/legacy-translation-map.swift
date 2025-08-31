@@ -1952,4 +1952,20 @@ public enum LegacyTranslation {
             ),
         ),
     ]
+
+    // call before moving on with overrides
+    public static func assertUniqueLegacyOverrides(_ overrides: [LegacyMapOverrideExceptions] = rgs_v3_8_overrides,
+                                                   fatal: Bool = false) {
+        do {
+            _ = try overrides.validateUniqueOverrides()
+        } catch let LegacyOverrideValidationError.duplicates(report) {
+            let msg = "[LegacyOverrides] \(report.description)\n"
+            // print to stderr as a WARNING by default
+            FileHandle.standardError.write(Data(msg.utf8))
+            if fatal { fatalError("Duplicate legacy overrides") }
+        } catch {
+            FileHandle.standardError.write(Data("[LegacyOverrides] \(error)\n".utf8))
+            if fatal { fatalError("Legacy override validation error") }
+        }
+    }
 }
