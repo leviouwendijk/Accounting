@@ -1777,7 +1777,7 @@ public enum LegacyTranslation {
 
         .init(
             legacyEntryIds: [
-                232,
+                252,
                 540
             ],
 
