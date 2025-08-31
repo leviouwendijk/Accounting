@@ -33,9 +33,11 @@ public extension Array where Element == LegacyJournalEntry {
         root: URL,
         padMonth: Bool = false,
         tz: TimeZone = .current,
-        translation: [LegacyMap]? = nil,
         fileHeader: ((YQM, LegacyJournalEntryType, [LegacyJournalEntry]) -> String)? = nil,
         writeOptions: SafeWriteOptions = .init(),
+        translation: [LegacyMap]? = nil,
+        overrides: [LegacyMapOverrideExceptions] = LegacyTranslation.rgs_v3_8_overrides,
+        idProvider: ((LegacyJournalEntry) -> Int)? = nil
     ) throws -> [MonthlyWriteResult] {
         precondition(root.isFileURL, "Output root must be a file URL")
 
@@ -72,10 +74,12 @@ public extension Array where Element == LegacyJournalEntry {
                     pieces.append(header(bucket, t, entries))
                 }
 
-                // entries content (uses your convertForEC() inside ecString(...))
+                // after (convert maps → dict, with default)
+                let mapDict: [Int: LegacyMap] = (translation ?? LegacyTranslation.rgs_v3_8).byLegacyID
+
                 let body = entries
                     .sorted { $0.id < $1.id }
-                    .map { $0.ecString(using: translation) }
+                    .map { e in e.ecString(using: mapDict, overrides: overrides, idOverride: idProvider?(e)) }
                     .joined(separator: "\n\n")
 
                 pieces.append(body)

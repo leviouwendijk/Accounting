@@ -2,22 +2,29 @@ import Foundation
 import plate
 
 public extension LegacyJournalEntry {
-    func ecString(using translation: [LegacyMap]? = nil) -> String {
-        let dict = (translation ?? LegacyTranslation.rgs_v3_8).byLegacyID
-        return ecString(using: dict, overrides: [])
-    }
+    // func ecString(using translation: [LegacyMap]? = nil) -> String {
+    //     let dict = (translation ?? LegacyTranslation.rgs_v3_8).byLegacyID
+    //     return ecString(using: dict, overrides: [])
+    // }
 
-    func ecString(using maps: [LegacyMap], overrides: [LegacyMapOverrideExceptions]) -> String {
-        ecString(using: maps.byLegacyID, overrides: overrides)
-    }
+    // func ecString(
+    //     using maps: [LegacyMap],
+    //     overrides: [LegacyMapOverrideExceptions],
+    // ) -> String {
+    //     ecString(using: maps.byLegacyID, overrides: overrides)
+    // }
 
     /// Render with an explicit dictionary lookup.
-    func ecString(using dict: [Int: LegacyMap], overrides: [LegacyMapOverrideExceptions]) -> String {
+    func ecString(
+        using dict: [Int: LegacyMap],
+        overrides: [LegacyMapOverrideExceptions],
+        idOverride: Int? = nil
+    ) -> String {
         var out: [String] = []
         func line(_ s: String) { out.append(s) }
 
         line("entry {")
-        line("    id = \(id)")
+        line("    id = \(idOverride ?? id)")
         if let d = date?.trimmingCharacters(in: .whitespacesAndNewlines), !d.isEmpty {
             line("    date = \(d)")
         } else {
