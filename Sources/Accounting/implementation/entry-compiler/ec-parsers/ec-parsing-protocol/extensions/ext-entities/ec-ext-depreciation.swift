@@ -28,6 +28,9 @@ public extension EntryCompilerParsing {
             if try parseDepreciationRollforward(into: &meta, tz: tz) { // stores dep.rollforward.* metadata
                 continue
             }
+            if try parseResidualValue(into: &meta, capturePercentInto: &residualPercent) {
+                continue 
+            }
 
             switch current {
             case .ident("method"), .keyword("method"):
