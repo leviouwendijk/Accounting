@@ -23,7 +23,7 @@ public extension EntryCompilerParsing {
         var key: EntityKey?
         var displayName: String?
         var metadata: [String:String] = [:]
-        var dep: DepreciationConfig?
+        var dep: DepreciationConfigDraft?
         var extraDefs: [EntityDef] = []              // collect unit/variant outputs
 
         let hint = _entityPathHint(fileURL: nil, inferredClass: inferredClass, inferredFamily: inferredFamily)
@@ -144,7 +144,7 @@ public extension EntryCompilerParsing {
         }
 
         var defs: [EntityDef] = []
-        let base = EntityDef(key: k, displayName: displayName, metadata: metadata, depreciation: dep)
+        let base = EntityDef(key: k, displayName: displayName, metadata: metadata, depreciation: nil, depreciationDraft: dep)
         defs.append(base)
         defs.append(contentsOf: extraDefs)
         core.trace("  end entity → total \(defs.count) def(s)")

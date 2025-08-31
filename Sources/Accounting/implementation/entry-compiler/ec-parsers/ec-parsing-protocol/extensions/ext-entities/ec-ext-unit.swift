@@ -21,7 +21,7 @@ public extension EntryCompilerParsing {
             var displayName: String?
             var metadata: [String:String] = [:]
             var details: String?
-            var dep: DepreciationConfig?
+            var dep: DepreciationConfigDraft?
 
             while current != .rBrace && current != .eof {
                 switch current {
@@ -60,7 +60,7 @@ public extension EntryCompilerParsing {
             let unitKey = EntityKey(class: baseKey.class, family: baseKey.family, alias: a)
             var mergedMeta = metadata
             if let d = details { mergedMeta["details"] = d }
-            out.append(EntityDef(key: unitKey, displayName: displayName, metadata: mergedMeta, depreciation: dep))
+            out.append(EntityDef(key: unitKey, displayName: displayName, metadata: mergedMeta, depreciation: nil, depreciationDraft: dep))
         }
 
         return out

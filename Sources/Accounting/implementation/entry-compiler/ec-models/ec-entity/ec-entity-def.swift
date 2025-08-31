@@ -5,16 +5,19 @@ public struct EntityDef: Sendable, Codable {
     public var displayName: String?
     public var metadata: [String:String]
     public var depreciation: DepreciationConfig?
+    public var depreciationDraft: DepreciationConfigDraft?
     
     public init(
         key: EntityKey,
         displayName: String?,
         metadata: [String:String],
-        depreciation: DepreciationConfig?
+        depreciation: DepreciationConfig?,
+        depreciationDraft: DepreciationConfigDraft? = nil
     ) {
         self.key = key
         self.displayName = displayName
         self.metadata = metadata
         self.depreciation = depreciation
+        self.depreciationDraft = depreciationDraft
     }
 }

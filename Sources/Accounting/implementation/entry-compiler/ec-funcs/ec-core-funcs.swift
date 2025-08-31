@@ -17,3 +17,11 @@ public func writeJSON<T: Encodable>(_ value: T, to url: URL) throws {
     let data = try makeEncoder().encode(value)
     try data.write(to: url, options: .atomic)
 }
+
+
+@inlinable
+public func isoDate(_ d: Date) -> String {
+    let f = ISO8601DateFormatter()
+    f.formatOptions = [.withFullDate]
+    return f.string(from: d)
+}
