@@ -1710,5 +1710,116 @@ public enum LegacyTranslation {
             ),
         ),
 
+        .init(
+            legacyEntryIds: [
+                19
+            ],
+
+            legacyMapOverride: .init(
+                45, 
+                "Refunds to Overhead Expenses",
+                "WBedAdlBan",
+                "bunq"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                198
+            ],
+
+            legacyMapOverride: .init(
+                45, 
+                "Refunds to Overhead Expenses",
+                "WBedAlkOal",
+                "indeed"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                232,
+                275,
+                421,
+                439,
+                646,
+                651,
+                658
+            ],
+
+            legacyMapOverride: .init(
+                45, 
+                "Refunds to Overhead Expenses",
+                "WBedKanVak", // vakliteratuur
+                "amazon"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                242
+            ],
+
+            legacyMapOverride: .init(
+                45, 
+                "Refunds to Overhead Expenses",
+                "WBedKanDru", // drukwerk
+                "vistaprint"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                232,
+                540
+            ],
+
+            legacyMapOverride: .init(
+                45, 
+                "Refunds to Overhead Expenses",
+                "WBedAlkOal", // general
+                "amazon"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                583
+            ],
+
+            legacyMapOverride: .init(
+                45, 
+                "Refunds to Overhead Expenses",
+                "WBedAssBea", // vergoeding verzekering premie -- premie kost
+                "centraal_beheer"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                662
+            ],
+
+            legacyMapOverride: .init(
+                45, 
+                "Refunds to Overhead Expenses",
+                "WBedOvpWkv", // kosten werkkleding
+                "uniqlo"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                663
+            ],
+
+            legacyMapOverride: .init(
+                45, 
+                "Refunds to Overhead Expenses",
+                "WBedAlkOal", // general
+                "google"
+            ),
+        ),
+
     ]
 }
