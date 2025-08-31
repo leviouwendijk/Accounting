@@ -8,9 +8,13 @@ public enum EntryResolutionPass {
         transactions: TransactionStore,
         settings: EntryCompilerSettings
     ) throws -> [ResolvedEntry] {
-        try entries.map { e in
+        // addition replacing entities line below
+        let entitiesResolved = try DepreciationResolutionPass.run(on: entities, using: accounts)
+
+        return try entries.map { e in
             let lines = try e.lines.map { l in
-                let eDef = try entities.resolve(l.entity, at: l.location)
+                // let eDef = try entities.resolve(l.entity, at: l.location)
+                let eDef = try entitiesResolved.resolve(l.entity, at: l.location)
 
                 // AccountStore.resolve now returns RGSNode
                 let node = try accounts.resolve(l.account, at: l.location)
