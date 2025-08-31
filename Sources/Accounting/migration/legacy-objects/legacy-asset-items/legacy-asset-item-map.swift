@@ -21,7 +21,7 @@ public struct LegacyAssetMapping: Sendable, Codable {
 }
 
 public enum LegacyAssetMappings {
-    public static let rgs_3_8: [Int: LegacyAssetMapping] = [
+    public static let rgs_v3_8: [Int: LegacyAssetMapping] = [
         1: .init(
             alias: "macbook",
             of: "levi",
