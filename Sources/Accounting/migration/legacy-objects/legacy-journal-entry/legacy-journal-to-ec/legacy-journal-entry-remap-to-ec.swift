@@ -2,15 +2,17 @@ import Foundation
 import plate
 
 public extension LegacyJournalEntry {
-    /// Render this journal entry to `.ec` text using a legacyId → LegacyMap lookup.
-    /// You can pass either an array of maps or nothing (defaults to LegacyTranslation.rgs_v3_8).
     func ecString(using translation: [LegacyMap]? = nil) -> String {
         let dict = (translation ?? LegacyTranslation.rgs_v3_8).byLegacyID
-        return ecString(using: dict)
+        return ecString(using: dict, overrides: [])
+    }
+
+    func ecString(using maps: [LegacyMap], overrides: [LegacyMapOverrideExceptions]) -> String {
+        ecString(using: maps.byLegacyID, overrides: overrides)
     }
 
     /// Render with an explicit dictionary lookup.
-    func ecString(using dict: [Int: LegacyMap]) -> String {
+    func ecString(using dict: [Int: LegacyMap], overrides: [LegacyMapOverrideExceptions]) -> String {
         var out: [String] = []
         func line(_ s: String) { out.append(s) }
 
@@ -82,7 +84,7 @@ public extension LegacyJournalEntry {
         for (i, pair) in debits.enumerated() {
             let (acctIDOpt, amtOpt) = pair
             guard let acctID = acctIDOpt, let amt = cleanedAmount(amtOpt) else { continue }
-            guard let m = dict[acctID] else { continue }
+            guard let m = resolveMap(acctID: acctID, entryID: id, dict: dict, overrides: overrides) else { continue }
             line("")
             line("    for (\(cleanEntity(m.entity))) in (\(m.account)) {")
             line("        debit = \(amt)")
@@ -102,7 +104,7 @@ public extension LegacyJournalEntry {
         for (i, pair) in credits.enumerated() {
             let (acctIDOpt, amtOpt) = pair
             guard let acctID = acctIDOpt, let amt = cleanedAmount(amtOpt) else { continue }
-            guard let m = dict[acctID] else { continue }
+            guard let m = resolveMap(acctID: acctID, entryID: id, dict: dict, overrides: overrides) else { continue }
             line("")
             line("    for (\(cleanEntity(m.entity))) in (\(m.account)) {")
             line("        credit = \(amt)")
@@ -238,5 +240,19 @@ public extension LegacyJournalEntry {
 
     private func cleanEntity(_ s: String) -> String {
         s.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func resolveMap(
+        acctID: Int,
+        entryID: Int,
+        dict: [Int: LegacyMap],
+        overrides: [LegacyMapOverrideExceptions]
+    ) -> LegacyMap? {
+        if let hit = overrides.first(where: {
+            $0.legacyEntryIds.contains(entryID) && $0.legacyMapOverride.legacyId == acctID
+        }) {
+            return hit.legacyMapOverride
+        }
+        return dict[acctID]
     }
 }

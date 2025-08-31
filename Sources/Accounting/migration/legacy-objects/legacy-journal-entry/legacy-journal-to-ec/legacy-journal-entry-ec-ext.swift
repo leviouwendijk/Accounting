@@ -2,7 +2,6 @@ import Foundation
 import plate
 
 public extension Sequence where Element == LegacyMap {
-    /// legacyId → LegacyMap
     var byLegacyID: [Int: LegacyMap] {
         var dict: [Int: LegacyMap] = [:]
         dict.reserveCapacity(256)
@@ -12,13 +11,18 @@ public extension Sequence where Element == LegacyMap {
 }
 
 public extension Array where Element == LegacyJournalEntry {
-    /// Page → `.ec` text (array input)
-    func ecFile(using maps: [LegacyMap] = LegacyTranslation.rgs_v3_8) -> String {
-        ecFile(using: maps.byLegacyID)
+    func ecFile(
+        using maps: [LegacyMap] = LegacyTranslation.rgs_v3_8,
+        overrides: [LegacyMapOverrideExceptions] = LegacyTranslation.rgs_v3_8_overrides
+    ) -> String {
+        ecFile(using: maps.byLegacyID, overrides: overrides)
     }
 
-    /// Page → `.ec` text (dict input)
-    func ecFile(using dict: [Int: LegacyMap]) -> String {
-        self.map { $0.ecString(using: dict) }.joined(separator: "\n\n")
+    func ecFile(
+        using dict: [Int: LegacyMap],
+        overrides: [LegacyMapOverrideExceptions]
+    ) -> String {
+        self.map { $0.ecString(using: dict, overrides: overrides) }
+        .joined(separator: "\n\n")
     }
 }
