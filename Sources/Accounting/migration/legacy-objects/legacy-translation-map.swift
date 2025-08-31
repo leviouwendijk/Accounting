@@ -1,7 +1,7 @@
 import Foundation
 
 public struct LegacyMap: Sendable, Codable {
-    public let legacyId: Int
+    public let legacyId: Int // primary account
     public let legacyName: String // for context quick look
     public let account: String // -> AccountRef -> AccountKey / RGSNode?
     public let entity: String // -> EntityRef -> EntityKey
@@ -28,6 +28,19 @@ public struct LegacyMap: Sendable, Codable {
         self.legacyName = legacyName
         self.account = RGSAccountIdentifier
         self.entity = localEntity
+    }
+}
+
+public struct LegacyMapOverrideExceptions: Sendable, Codable {
+    public let legacyEntryIds: [Int]
+    public let legacyMapOverride: LegacyMap
+    
+    public init(
+        legacyEntryIds: [Int],
+        legacyMapOverride: LegacyMap
+    ) {
+        self.legacyEntryIds = legacyEntryIds
+        self.legacyMapOverride = legacyMapOverride
     }
 }
 
@@ -245,6 +258,10 @@ public enum LegacyTranslation {
             "Dog Care",
             "WBedAlkOal",
             "(vegavriend || pets_place)"
+            // all of these are vegavriend, except:
+            // pets_place:
+            // legacy_id == 558, 595, 604, 608, 622,
+            // pets_and_co == 639
         ),
 
         .init(
@@ -1446,5 +1463,35 @@ public enum LegacyTranslation {
         //     "acc",
         //     "ent"
         // ),
+    ]
+
+    public static let rgs_v3_8_overrides: [LegacyMapOverrideExceptions] = [
+        .init(
+            legacyEntryIds: [
+                558,
+                595,
+                604,
+                608,
+                622
+            ],
+            legacyMapOverride: LegacyMap(
+                30, 
+                "Dog Care",
+                "WBedAlkOal",
+                "pets_place"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                639
+            ],
+            legacyMapOverride: LegacyMap(
+                30, 
+                "Dog Care",
+                "WBedAlkOal",
+                "pets_and_co"
+            ),
+        ),
     ]
 }
