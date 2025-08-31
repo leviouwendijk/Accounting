@@ -86,15 +86,17 @@ public extension LegacyAssetItem {
         w.open("unit")
         w.line("use alias \(unit)")
         if let desc = description, !desc.isEmpty {
+            w.line("")
             w.open("details")
             w.line(desc)
             w.close()
         }
 
+
+        w.line("")
         // metadata { legacy_* = … }
         w.open("metadata")
-        w.line("// original export fields preserved for traceability")
-        w.line("// NOTE: do not edit these; map/normalize in migration passes")
+        w.line("// legacy data object")
 
         // REQUIRED/IDs
         w.line("legacy_asset_item_id = \(id)")
@@ -121,6 +123,7 @@ public extension LegacyAssetItem {
 
         w.close() // metadata
 
+        w.line("")
         // depreciation { … }
         w.open("depreciation")
 
@@ -128,6 +131,14 @@ public extension LegacyAssetItem {
             w.line("account = \(acc)")
             w.line("")
         }
+
+        // method
+        if let meth = writeOffMethod {
+            w.line("method = \(meth.convertForEC())")
+        } else {
+            w.line("method = straight_line")
+        }
+        w.line("")
 
         // valuation
         w.open("valuation")
@@ -142,19 +153,15 @@ public extension LegacyAssetItem {
         // commission_date { y/m/d }
         let (y, m, d) = ymd(commissionDate)
         w.open("commission_date")
-        if let y { w.line("year = \(String(format: "%04d", y))") }
-        if let m { w.line("month = \(String(format: "%02d", m))") }
-        if let d { w.line("day = \(String(format: "%02d", d))") }
+        // if let y { w.line("year = \(String(format: "%04d", y))") }
+        // if let m { w.line("month = \(String(format: "%02d", m))") }
+        // if let d { w.line("day = \(String(format: "%02d", d))") }
+        if let y { w.line("year = \(y)") }
+        if let m { w.line("month = \(m)") }
+        if let d { w.line("day = \(d)") }
         w.close()
         w.line("")
 
-        // method
-        if let meth = writeOffMethod {
-            w.line("method = \(meth.convertForEC())")
-        } else {
-            w.line("method = straight_line")
-        }
-        w.line("")
 
         // useful_life
         emit(&w, key: "useful_life", usefulLife ?? "0.00")
