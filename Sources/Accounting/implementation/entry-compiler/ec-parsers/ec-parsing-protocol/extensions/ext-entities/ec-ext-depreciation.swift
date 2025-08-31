@@ -79,17 +79,15 @@ public extension EntryCompilerParsing {
                 }
 
             case .ident("effective_date"), .ident("date"), .keyword("date"),
-                .keyword("effective_date"), .keyword("commission_date"):
-                advance()
-                let spec = try parseNamedDateOrInferExpecting(
-                    names: ["date","effective_date", "commission_date"],
+                 .keyword("effective_date"), .keyword("commission_date"):
+                let (_, spec) = try parseNamedDateOrInferExpecting(
+                    names: ["date","effective_date","commission_date"],
                     tz: tz,
                     allowInfer: false,
                     allowUnixEpoch: true
-                ).spec
-                guard case let .absolute(d) = spec else {
-                    throw ParserError.unexpectedToken(current, expected: "absolute date", at: loc())
-                }
+                )
+                let d = try spec.asAbsolute(loc: loc())
+                // use `d` (and/or persist ISO string)
                 effective = d
                 meta["dep.effective_date"] = isoDate(d)
 
