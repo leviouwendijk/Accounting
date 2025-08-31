@@ -155,7 +155,7 @@ public enum LegacyTranslation {
         .init(
             15, 
             "Advertising",
-            "acc",
+            "WBedVkkRea",
             "google_ads"
         ),
 
