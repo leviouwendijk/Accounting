@@ -41,6 +41,11 @@ public extension Array where Element == LegacyJournalEntry {
     ) throws -> [MonthlyWriteResult] {
         precondition(root.isFileURL, "Output root must be a file URL")
 
+        LegacyTranslation.assertUniqueLegacyOverrides(
+            overrides,
+            fatal: true
+        )
+
         // 1) Group by month-bucket + type
         let buckets = try groupedByYQMAndType(tz: tz)
 
