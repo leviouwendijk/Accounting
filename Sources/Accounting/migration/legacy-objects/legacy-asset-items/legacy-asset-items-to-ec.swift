@@ -9,6 +9,7 @@ public extension LegacyAssetItem {
         className: String = "objects",
         family: String = "usable",
         rootAlias: String? = nil,
+        ofAlias: String? = nil,
         unitAlias: String? = nil,
         depreciationExpenseAccountCode: String? = nil
     ) -> String {
@@ -17,6 +18,7 @@ public extension LegacyAssetItem {
             className: className,
             family: family,
             rootAlias: m?.alias ?? rootAlias,
+            ofAlias: m?.entity ?? ofAlias,
             unitAlias: m?.unit ?? unitAlias,
             depreciationExpenseAccountCode: m?.account ?? depreciationExpenseAccountCode
         )
@@ -28,6 +30,7 @@ public extension LegacyAssetItem {
         className: String = "objects",
         family: String = "usable",
         rootAlias: String? = nil,
+        ofAlias: String? = nil,
         unitAlias: String? = nil,
         depreciationExpenseAccountCode: String? = nil
     ) -> String {
@@ -63,12 +66,17 @@ public extension LegacyAssetItem {
         let root = rootAlias ?? "asset_placeholder"          // placeholder policy
         let unit = unitAlias ?? "legacy_asset_id_\(id)"       // <- matches your snippet
 
+        var unitOwnerEntity = ""
+        if let alias = ofAlias {
+            unitOwnerEntity = "of \(alias)"
+        }
+
         // --- build ---
         var w = W()
         w.open("entity")
         w.line("use alias \(root)")
         w.line("")
-        w.open("unit")
+        w.open("unit \(unitOwnerEntity)")
         w.line("use alias \(unit)")
         if let desc = description, !desc.isEmpty {
             w.line("")

@@ -54,25 +54,71 @@ public extension LegacyJournalEntry {
             (creditAccount5, creditAmount5),
         ]
 
+        // // Debits
+        // for (acctIDOpt, amtOpt) in debits {
+        //     guard let acctID = acctIDOpt, let amt = cleanedAmount(amtOpt) else { continue }
+        //     guard let m = dict[acctID] else { continue }
+        //     line("")
+        //     line("    for (\(cleanEntity(m.entity))) in (\(m.account)) {")
+        //     line("        debit = \(amt)")
+        //     line("    }")
+        // }
+
+        // // Credits
+        // for (acctIDOpt, amtOpt) in credits {
+        //     guard let acctID = acctIDOpt, let amt = cleanedAmount(amtOpt) else { continue }
+        //     guard let m = dict[acctID] else { continue }
+        //     line("")
+        //     line("    for (\(cleanEntity(m.entity))) in (\(m.account)) {")
+        //     line("        credit = \(amt)")
+        //     line("    }")
+        // }
+
+        // START OF NEW
+        let drInventoryIncrease: [String?] = [dr1InventoryIncrease, dr2InventoryIncrease, dr3InventoryIncrease, dr4InventoryIncrease, dr5InventoryIncrease]
+        let crInventoryDecrease: [String?] = [cr1InventoryDecrease, cr2InventoryDecrease, cr3InventoryDecrease, cr4InventoryDecrease, cr5InventoryDecrease]
+
         // Debits
-        for (acctIDOpt, amtOpt) in debits {
+        for (i, pair) in debits.enumerated() {
+            let (acctIDOpt, amtOpt) = pair
             guard let acctID = acctIDOpt, let amt = cleanedAmount(amtOpt) else { continue }
             guard let m = dict[acctID] else { continue }
             line("")
             line("    for (\(cleanEntity(m.entity))) in (\(m.account)) {")
             line("        debit = \(amt)")
+
+            // --- NEW: inline inventory block (debits → add) ---
+            if i < drInventoryIncrease.count {
+                let add = parseInventoryCount(drInventoryIncrease[i])
+                if let block = prepareInventoryBlock(add: add, remove: nil) {
+                    line(block.indent(times: 2)) // keep indentation inside the `for {}` block
+                }
+            }
+
             line("    }")
         }
 
         // Credits
-        for (acctIDOpt, amtOpt) in credits {
+        for (i, pair) in credits.enumerated() {
+            let (acctIDOpt, amtOpt) = pair
             guard let acctID = acctIDOpt, let amt = cleanedAmount(amtOpt) else { continue }
             guard let m = dict[acctID] else { continue }
             line("")
             line("    for (\(cleanEntity(m.entity))) in (\(m.account)) {")
             line("        credit = \(amt)")
+
+            // --- NEW: inline inventory block (credits → remove) ---
+            if i < crInventoryDecrease.count {
+                let rem = parseInventoryCount(crInventoryDecrease[i])
+                if let block = prepareInventoryBlock(add: nil, remove: rem) {
+                    line(block.indent(times: 2))
+                }
+            }
+
             line("    }")
         }
+        // EO NEW
+
 
         let metadata = compileMetadata()
 
@@ -86,7 +132,23 @@ public extension LegacyJournalEntry {
         }
 
         line("}")
-        return out.joined(separator: "\n")
+
+        if type == .closing {
+            let closingOutput = commentOut(result: out)
+            return closingOutput.joined(separator: "\n")
+        } else {
+            return out.joined(separator: "\n")
+        }
+    }
+
+    private func commentOut(result: [String]) -> [String] {
+        var closingOut: [String] = []
+        let comment = "// "
+        for i in result {
+            let commentedOut = comment + i
+            closingOut.append(commentedOut)
+        }
+        return closingOut
     }
 
     private func compileMetadata() -> [MetaObject] {
@@ -100,6 +162,14 @@ public extension LegacyJournalEntry {
         }
 
         var metadata: [MetaObject] = []
+
+        // store legacy entry id
+        metadata.append(
+            MetaObject(
+                "legacy_entry_id",
+                String(id)
+            )
+        )
 
         // reference
         if let r = reference, !r.isEmpty {
