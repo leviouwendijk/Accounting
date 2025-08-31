@@ -498,7 +498,7 @@ public enum LegacyTranslation {
             67, 
             "Leash",
             "BVorDebHad",
-            "leash"
+            "leash#any"
         ),
         // .init(
         //     68, 
@@ -552,19 +552,19 @@ public enum LegacyTranslation {
             76, 
             "Leashes",
             "BVrdGepVoo", // Voorraden > Gereed product
-            "leash" // inferred from deliverable product
+            "leash#any" // inferred from deliverable product
         ),
         .init(
             77, 
             "Leash Rope",
             "BVrdGehVoo", // Voorraden > Grond- en hulpstoffen
-            "rope" // inferred from storable objects
+            "rope#any" // inferred from storable objects
         ),
         .init(
             78, 
             "Leash O-Rings",
             "BVrdGehVoo", // Voorraden > Grond- en hulpstoffen
-            "o_ring"
+            "o_ring#any"
         ),
         .init(
             79, 
@@ -1100,7 +1100,7 @@ public enum LegacyTranslation {
             165, 
             "Leash Sales",
             "WOmzNopOlh",
-            "leash"
+            "leash#any"
         ),
         .init(
             166, 
@@ -1151,7 +1151,7 @@ public enum LegacyTranslation {
             173, 
             "Leash Stop Rings",
             "BVrdGehVoo",
-            "stop_ring"
+            "stop_ring#any"
         ),
 
         .init(
@@ -1179,13 +1179,13 @@ public enum LegacyTranslation {
             177, 
             "Leashes",
             "WKprInpInp", // kostprijswaarde productiegoederen
-            "leash"
+            "leash#any"
         ),
         .init(
             178, 
             "Internal Use Leashes",
             "WKprVomVom",
-            "leash"
+            "leash#any"
         ),
         .init(
             179, 
