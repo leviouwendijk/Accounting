@@ -205,12 +205,15 @@ public enum LegacyTranslation {
             "WBedKanKan",
             "ent"
         ),
+
+
         .init(
             23, 
             "Insurance",
             "<MANUAL: INSURANCE GENERIC: Split into relevant ACCOUNT (car ins. cost (WBedAutAsa), or company legal (WBedAssBea)",
             "<MANUAL: INSURANCE GENERIC: Split into relevant entity (car, or legal)>"
         ),
+
         .init(
             24, 
             "Maintenance",
@@ -1810,7 +1813,8 @@ public enum LegacyTranslation {
 
         .init(
             legacyEntryIds: [
-                663
+                663,
+                229
             ],
 
             legacyMapOverride: .init(
@@ -1820,6 +1824,58 @@ public enum LegacyTranslation {
                 "google"
             ),
         ),
+
+
+        .init(
+            legacyEntryIds: [
+                159,
+                201,
+                273,
+                340,
+                389,
+                454,
+                564,
+                623,
+            ],
+
+            legacyMapOverride: .init(
+                23, 
+                "Insurance",
+                "WBedAssBea",
+                "centraal_beheer"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                627,
+                681,
+
+            ],
+
+            legacyMapOverride: .init(
+                23, 
+                "Insurance",
+                "WBedAssBea",
+                "unive"
+            ),
+        ),
+
+
+        .init(
+            legacyEntryIds: [
+                307
+            ],
+
+            legacyMapOverride: .init(
+                23, 
+                "MISTAKENLY BOOKED AS INSURANCE",
+                "WBedAdlBan",
+                "bunq"
+            ),
+        ),
+
+
 
     ]
 }
