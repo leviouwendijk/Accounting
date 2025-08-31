@@ -192,6 +192,22 @@ public extension LegacyJournalEntry {
             metadata.append(MetaObject("legacy_credit_account_id_\(i + 1)", String(v!)))
         }
 
+        // debit_amount_1...5  (numeric; normalized via cleanedAmount)
+        let debitAmts: [String?] = [debitAmount1, debitAmount2, debitAmount3, debitAmount4, debitAmount5]
+        for (i, v) in debitAmts.enumerated() {
+            if let val = cleanedAmount(v) {
+                metadata.append(MetaObject("legacy_debit_amount_\(i + 1)", val))
+            }
+        }
+
+        // credit_amount_1...5 (numeric; normalized via cleanedAmount)
+        let creditAmts: [String?] = [creditAmount1, creditAmount2, creditAmount3, creditAmount4, creditAmount5]
+        for (i, v) in creditAmts.enumerated() {
+            if let val = cleanedAmount(v) {
+                metadata.append(MetaObject("legacy_credit_amount_\(i + 1)", val))
+            }
+        }
+
         // reference
         if let r = reference, !r.isEmpty {
             metadata.append(MetaObject("legacy_reference", q(r)))
