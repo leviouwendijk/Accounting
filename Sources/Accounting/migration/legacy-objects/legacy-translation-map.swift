@@ -203,7 +203,7 @@ public enum LegacyTranslation {
             22, 
             "Supplies",
             "WBedKanKan",
-            "ent"
+            "office_supplies"
         ),
 
 
