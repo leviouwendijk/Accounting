@@ -246,6 +246,7 @@ public enum LegacyTranslation {
             "\nMANUAL: IF SIMYO -> (simyo)\nIF SOFTWARE -> (gopro, answerthepublic, openai)\n IF HOSTING -> (WBedVkkWeb)\n"
         ),
 
+        // RESOLVED IN OVERRIDES
         .init(
             29, 
             "Vet Costs",
@@ -253,17 +254,15 @@ public enum LegacyTranslation {
             "(vchn_middenmeer || van_duin_tot_dijk)"
         ),
 
+        // RESOLVED IN OVERRIDES
         .init(
             30, 
             "Dog Care",
             "WBedAlkOal",
             "(vegavriend || pets_place)"
-            // all of these are vegavriend, except:
-            // pets_place:
-            // legacy_id == 558, 595, 604, 608, 622,
-            // pets_and_co == 639
         ),
 
+        // RESOLVED IN OVERRIDES
         .init(
             31, 
             "Other General Costs",
@@ -1493,5 +1492,202 @@ public enum LegacyTranslation {
                 "pets_and_co"
             ),
         ),
+
+        .init(
+            legacyEntryIds: [
+                149
+            ],
+            legacyMapOverride: .init(
+                29, 
+                "Vet Costs",
+                "WBedAlkOal",
+                "van_duin_tot_dijk"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                688
+            ],
+            legacyMapOverride: .init(
+                29, 
+                "Vet Costs",
+                "WBedAlkOal",
+                "vchn_middenmeer"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                150, 
+                190,
+                258
+            ],
+
+            legacyMapOverride: .init(
+                31, 
+                "Other General Costs",
+                "WBedAlkOal",
+                "soepp"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                197
+            ],
+
+            legacyMapOverride: .init(
+                31, 
+                "Other General Costs",
+                "WBedAlkOal",
+                "indeed"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                250
+            ],
+
+            legacyMapOverride: .init(
+                31, 
+                "Other General Costs",
+                "WBedAlkOal",
+                "sencha"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                250
+            ],
+
+            legacyMapOverride: .init(
+                31, 
+                "Other General Costs",
+                "WBedAlkOal",
+                "luttik"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                358,
+                414,
+                424,
+                565,
+                615,
+                690
+            ],
+
+            legacyMapOverride: .init(
+                31, 
+                "Other General Costs",
+                "WBedAlkOal",
+                "mcdonalds"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                362,
+                655
+            ],
+
+            legacyMapOverride: .init(
+                31, 
+                "Other General Costs",
+                "WBedAlkOal",
+                "subway"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                369
+            ],
+
+            legacyMapOverride: .init(
+                31, 
+                "Other General Costs",
+                "WBedAlkOal",
+                "jumbo"
+            ),
+        ),
+
+
+        .init(
+            legacyEntryIds: [
+                537
+            ],
+
+            legacyMapOverride: .init(
+                31, 
+                "Other General Costs",
+                "WBedAlkOal",
+                "coffee_company"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                538
+            ],
+
+            legacyMapOverride: .init(
+                31, 
+                "Other General Costs",
+                "WBedAlkOal",
+                "vegan_bamboo_bar"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                642
+            ],
+
+            legacyMapOverride: .init(
+                31, 
+                "Other General Costs",
+                "WBedAlkOal",
+                "h_earth"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                663
+            ],
+
+            legacyMapOverride: .init(
+                31, 
+                "Other General Costs",
+                "WBedAlkOal",
+                "google"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                735,
+                736,
+                737,
+                738
+            ],
+
+            legacyMapOverride: .init(
+                31, 
+                "Other General Costs",
+                "WBedAlkOal",
+                "correction"
+            ),
+        ),
+
+
+
+
+
     ]
 }
