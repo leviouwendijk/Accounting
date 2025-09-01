@@ -17,6 +17,8 @@ public struct Entry: Hashable, Codable, Sendable {
     public var transactionReferences: [Int]
     public var metadata: [String: String] = [:]
     public var location: SourceLocation?
+    public var mistake: Mistake? = nil
+    public var verbose: Bool = false
 
     public init(
         id: Int? = nil,
@@ -27,7 +29,9 @@ public struct Entry: Hashable, Codable, Sendable {
         timezone: String? = nil,
         transactionReferences: [Int] = [],
         metadata: [String: String] = [:],
-        location: SourceLocation? = nil
+        location: SourceLocation? = nil,
+        mistake: Mistake? = nil,
+        verbose: Bool = false
     ) {
         self.id = id
         self.date = date
@@ -38,8 +42,10 @@ public struct Entry: Hashable, Codable, Sendable {
         self.transactionReferences = transactionReferences
         self.metadata = metadata
         self.location = location
+        self.mistake = mistake
+        self.verbose = verbose
 
-        printPlaceholderWarning(verbose: false)
+        printPlaceholderWarning(verbose: verbose)
     }
 
     public func printPlaceholderWarning(verbose: Bool = false) {

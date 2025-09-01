@@ -6,19 +6,25 @@ public struct ResolvedLine: Hashable, Codable, Sendable {
     public let direction: Direction
     public let amount: Decimal
     public let adjustment: InventoryAdjustment?
+
+    public let location: SourceLocation?
     
     public init(
         entity: EntityKey,
         account: AccountKey,
         direction: Direction,
         amount: Decimal,
-        adjustment: InventoryAdjustment?
+        adjustment: InventoryAdjustment?,
+
+        location: SourceLocation? = nil
     ) {
         self.entity = entity
         self.account = account
         self.direction = direction
         self.amount = amount
         self.adjustment = adjustment
+
+        self.location = location
     }
 }
 
@@ -30,6 +36,11 @@ public struct ResolvedEntry: Hashable, Codable, Sendable {
     public var timezone: String?
     public var metadata: [String: String]
     public var transactionReferences: [TransactionKey]
+
+    public var location: SourceLocation?
+    public var mistake: Mistake?
+    public var verbose: Bool
+
     
     public init(
         id: Int?,
@@ -38,7 +49,11 @@ public struct ResolvedEntry: Hashable, Codable, Sendable {
         details: String?,
         timezone: String?,
         metadata: [String: String],
-        transactionReferences: [TransactionKey]
+        transactionReferences: [TransactionKey],
+
+        location: SourceLocation? = nil,
+        mistake: Mistake? = nil,
+        verbose: Bool = false
     ) {
         self.id = id
         self.date = date
@@ -47,6 +62,10 @@ public struct ResolvedEntry: Hashable, Codable, Sendable {
         self.timezone = timezone
         self.metadata = metadata
         self.transactionReferences = transactionReferences
+
+        self.location = location
+        self.mistake = mistake
+        self.verbose = verbose
     }
 
     @inlinable
