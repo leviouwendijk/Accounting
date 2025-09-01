@@ -52,7 +52,9 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
         "posting",
         "line",
         "transactions",
-        "ref"
+        "ref",
+
+        "mistake", "resolvable", "payable", "receivable"   //  for mistakes block
     ]
 
     let account: Set<String> = [

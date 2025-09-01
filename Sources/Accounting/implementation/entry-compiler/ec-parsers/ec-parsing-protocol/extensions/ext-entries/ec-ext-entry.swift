@@ -62,6 +62,9 @@ public extension EntryCompilerParsing {
                 if entry.metadata.isEmpty { entry.metadata = m }
                 else { for (k, v) in m { entry.metadata[k] = v } }
 
+            case .keyword("mistake"):
+                entry.mistake = try parseMistakeBlock()
+
             default:
                 throw ParserError.unexpectedToken(current, expected: "date, details, for, posting, or line", at: loc())
             }

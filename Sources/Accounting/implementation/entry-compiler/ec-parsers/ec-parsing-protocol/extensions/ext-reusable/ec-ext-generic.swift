@@ -101,6 +101,16 @@ public extension EntryCompilerParsing {
             throw ParserError.unexpectedToken(current, expected: "integer", at: loc())
         }
     }
+
+    @discardableResult
+    @inlinable
+    func expectDecimal() throws -> Decimal {
+        guard case let .number(n) = current else {
+            throw ParserError.unexpectedToken(current, expected: "number", at: loc())
+        }
+        advance()
+        return n
+    }
 }
 
 
