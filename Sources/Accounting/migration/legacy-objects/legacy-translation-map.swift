@@ -666,7 +666,8 @@ public enum LegacyTranslation {
         .init(
             95, 
             "Input VAT",
-            "BVorVbkTvo",
+            // "BVorVbkTvo", // eigenlijk voorbelasting tegenpost
+            "BSchBepBtwVoo", // eigenlijk voorbelasting tegenpost
             "belastingdienst"
         ),
         // .init(
