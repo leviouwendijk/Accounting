@@ -115,6 +115,11 @@ public struct Entry: Hashable, Codable, Sendable {
             out.append(lineStr)
         }
         if let d = details { out.append("Details: \(d)") }
+        if let m = mistake { 
+            out.append("[!] Mistake:".ansi(.yellow)) 
+            out.append("\n")
+            out.append(m.description)
+        }
         return out.joined(separator: "\n")
     }
 }
