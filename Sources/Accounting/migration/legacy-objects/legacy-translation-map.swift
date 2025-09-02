@@ -1,5 +1,18 @@
 import Foundation
 
+// public struct LegacyAssetItemMap: Sendable, Codable {
+//     public let legacyAssetItemId: Int
+//     public let entryEntityString: String
+    
+//     public init(
+//         legacyAssetItemId: Int,
+//         entryEntityString: String
+//     ) {
+//         self.legacyAssetItemId = legacyAssetItemId
+//         self.entryEntityString = entryEntityString
+//     }
+// }
+
 public struct LegacyMap: Sendable, Codable {
     public let legacyId: Int // primary account
     public let legacyName: String // for context quick look

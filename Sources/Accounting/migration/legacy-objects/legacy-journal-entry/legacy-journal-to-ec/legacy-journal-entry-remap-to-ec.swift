@@ -1,24 +1,35 @@
 import Foundation
 import plate
 
+public protocol LegacyAssetMappingLike {
+    var entrySyntaxForEntity: String { get }
+}
+
+extension LegacyAssetMapping: LegacyAssetMappingLike {}
+
 public extension LegacyJournalEntry {
-    func ecString(using translation: [LegacyMap]? = nil) -> String {
+    func ecString(
+        using translation: [LegacyMap]? = nil,
+        assetMappings: [Int: LegacyAssetMappingLike] = LegacyAssetMappings.rgs_v3_8
+    ) -> String {
         let dict = (translation ?? LegacyTranslation.rgs_v3_8).byLegacyID
-        return ecString(using: dict, overrides: [])
+        return ecString(using: dict, overrides: [], assetMappings: assetMappings)
     }
 
     func ecString(
         using maps: [LegacyMap],
         overrides: [LegacyMapOverrideExceptions] = LegacyTranslation.rgs_v3_8_overrides,
+        assetMappings: [Int: LegacyAssetMappingLike] = LegacyAssetMappings.rgs_v3_8
     ) -> String {
-        ecString(using: maps.byLegacyID, overrides: overrides)
+        ecString(using: maps.byLegacyID, overrides: overrides, assetMappings: assetMappings)
     }
 
     /// Render with an explicit dictionary lookup.
     func ecString(
         using dict: [Int: LegacyMap],
         overrides: [LegacyMapOverrideExceptions],
-        idOverride: Int? = nil
+        idOverride: Int? = nil,
+        assetMappings: [Int: LegacyAssetMappingLike] = LegacyAssetMappings.rgs_v3_8
     ) -> String {
         var out: [String] = []
         func line(_ s: String) { out.append(s) }
@@ -63,70 +74,138 @@ public extension LegacyJournalEntry {
             (creditAccount5, creditAmount5),
         ]
 
-        // // Debits
-        // for (acctIDOpt, amtOpt) in debits {
-        //     guard let acctID = acctIDOpt, let amt = cleanedAmount(amtOpt) else { continue }
-        //     guard let m = dict[acctID] else { continue }
-        //     line("")
-        //     line("    for (\(cleanEntity(m.entity))) in (\(m.account)) {")
-        //     line("        debit = \(amt)")
-        //     line("    }")
-        // }
-
-        // // Credits
-        // for (acctIDOpt, amtOpt) in credits {
-        //     guard let acctID = acctIDOpt, let amt = cleanedAmount(amtOpt) else { continue }
-        //     guard let m = dict[acctID] else { continue }
-        //     line("")
-        //     line("    for (\(cleanEntity(m.entity))) in (\(m.account)) {")
-        //     line("        credit = \(amt)")
-        //     line("    }")
-        // }
-
-        // START OF NEW
         let drInventoryIncrease: [String?] = [dr1InventoryIncrease, dr2InventoryIncrease, dr3InventoryIncrease, dr4InventoryIncrease, dr5InventoryIncrease]
         let crInventoryDecrease: [String?] = [cr1InventoryDecrease, cr2InventoryDecrease, cr3InventoryDecrease, cr4InventoryDecrease, cr5InventoryDecrease]
+
+        // START OF NEW
+
+        // Map slot (1-based) → legacy asset id
+        @inline(__always) func assetId(forSlot idx: Int) -> Int? {
+            switch idx {
+            case 1: return assetItemId1
+            case 2: return assetItemId2
+            case 3: return assetItemId3
+            case 4: return assetItemId4
+            case 5: return assetItemId5
+            default: return nil
+            }
+        }
+
+        // Replace 'asset_placeholder' with concrete entity from LegacyAssetMappings using the slot's asset id.
+        @inline(__always) func replacePlaceholderEntity(_ ent: String?, slot: Int) -> String? {
+            guard let raw = ent?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else { return ent }
+            guard raw == "asset_placeholder",
+                  let lid = assetId(forSlot: slot),
+                  let map = LegacyAssetMappings.rgs_v3_8[lid]
+            else { return ent }
+            return map.entrySyntaxForEntity   // e.g. "macbook#levi(air_m2)"
+        }
+
+        // Buffer: (spec, slotIndex) so we can keep exact slot→asset mapping
+        var specs: [(spec: LineSpec, slot: Int)] = []
+        specs.reserveCapacity(10)
 
         // Debits
         for (i, pair) in debits.enumerated() {
             let (acctIDOpt, amtOpt) = pair
-            guard let acctID = acctIDOpt, let amt = cleanedAmount(amtOpt) else { continue }
+            guard let acctID = acctIDOpt, let amt = cleanedAmountDecimal(amtOpt) else { continue }
             guard let m = resolveMap(acctID: acctID, entryID: id, dict: dict, overrides: overrides) else { continue }
-            line("")
-            line("    for (\(cleanEntity(m.entity))) in (\(m.account)) {")
-            line("        debit = \(amt)")
+            let slot = i + 1
 
-            // --- NEW: inline inventory block (debits → add) ---
+            let entClean = cleanEntity(m.entity)
+            let entFinal = replacePlaceholderEntity(entClean, slot: slot)
+
+            var invAdd: Decimal? = nil
             if i < drInventoryIncrease.count {
-                let add = parseInventoryCount(drInventoryIncrease[i])
-                if let block = prepareInventoryBlock(add: add, remove: nil) {
-                    line(block.indent(times: 2)) // keep indentation inside the `for {}` block
-                }
+                invAdd = parseInventoryCount(drInventoryIncrease[i])   // already returns Decimal?
             }
 
-            line("    }")
+            specs.append((
+                LineSpec(account: m.account, entity: entFinal, dir: "dr", amount: amt, invAdd: invAdd, invRem: nil),
+                slot
+            ))
         }
 
         // Credits
         for (i, pair) in credits.enumerated() {
             let (acctIDOpt, amtOpt) = pair
-            guard let acctID = acctIDOpt, let amt = cleanedAmount(amtOpt) else { continue }
+            guard let acctID = acctIDOpt, let amt = cleanedAmountDecimal(amtOpt) else { continue }
             guard let m = resolveMap(acctID: acctID, entryID: id, dict: dict, overrides: overrides) else { continue }
-            line("")
-            line("    for (\(cleanEntity(m.entity))) in (\(m.account)) {")
-            line("        credit = \(amt)")
+            let slot = i + 1
 
-            // --- NEW: inline inventory block (credits → remove) ---
+            let entClean = cleanEntity(m.entity)
+            let entFinal = replacePlaceholderEntity(entClean, slot: slot)
+
+            var invRem: Decimal? = nil
             if i < crInventoryDecrease.count {
-                let rem = parseInventoryCount(crInventoryDecrease[i])
-                if let block = prepareInventoryBlock(add: nil, remove: rem) {
-                    line(block.indent(times: 2))
-                }
+                invRem = parseInventoryCount(crInventoryDecrease[i])   // already returns Decimal?
             }
 
+            specs.append((
+                LineSpec(account: m.account, entity: entFinal, dir: "cr", amount: amt, invAdd: nil, invRem: invRem),
+                slot
+            ))
+        }
+
+        // Emit in your block form (with inline inventory)
+        for (s, _) in specs {
+            guard let a = s.account, let d = s.dir, let q = s.amount else { continue }
+            let ent = s.entity ?? "asset_placeholder"
+            line("")
+            line("    for (\(ent)) in (\(a)) {")
+            if d == "dr" {
+                line("        debit = \(decString(q, scale: 2))")
+            } else {
+                line("        credit = \(decString(q, scale: 2))")
+            }
+            if let inv = prepareInventoryBlock(add: s.invAdd, remove: s.invRem) {
+                line(inv.indent(times: 2))
+            }
             line("    }")
         }
-        // EO NEW
+        // END OF NEW -- ADDING ASSET ITEM REPLACEMENTS, BY ASSET_ITEM_N
+
+        // previous implementation:
+        //
+        // // Debits
+        // for (i, pair) in debits.enumerated() {
+        //     let (acctIDOpt, amtOpt) = pair
+        //     guard let acctID = acctIDOpt, let amt = cleanedAmount(amtOpt) else { continue }
+        //     guard let m = resolveMap(acctID: acctID, entryID: id, dict: dict, overrides: overrides) else { continue }
+        //     line("")
+        //     line("    for (\(cleanEntity(m.entity))) in (\(m.account)) {")
+        //     line("        debit = \(amt)")
+
+        //     // --- NEW: inline inventory block (debits → add) ---
+        //     if i < drInventoryIncrease.count {
+        //         let add = parseInventoryCount(drInventoryIncrease[i])
+        //         if let block = prepareInventoryBlock(add: add, remove: nil) {
+        //             line(block.indent(times: 2)) // keep indentation inside the `for {}` block
+        //         }
+        //     }
+
+        //     line("    }")
+        // }
+
+        // // Credits
+        // for (i, pair) in credits.enumerated() {
+        //     let (acctIDOpt, amtOpt) = pair
+        //     guard let acctID = acctIDOpt, let amt = cleanedAmount(amtOpt) else { continue }
+        //     guard let m = resolveMap(acctID: acctID, entryID: id, dict: dict, overrides: overrides) else { continue }
+        //     line("")
+        //     line("    for (\(cleanEntity(m.entity))) in (\(m.account)) {")
+        //     line("        credit = \(amt)")
+
+        //     // --- NEW: inline inventory block (credits → remove) ---
+        //     if i < crInventoryDecrease.count {
+        //         let rem = parseInventoryCount(crInventoryDecrease[i])
+        //         if let block = prepareInventoryBlock(add: nil, remove: rem) {
+        //             line(block.indent(times: 2))
+        //         }
+        //     }
+
+        //     line("    }")
+        // }
 
 
         let metadata = compileMetadata()
@@ -273,6 +352,16 @@ public extension LegacyJournalEntry {
         return t
     }
 
+    // Decimal version for specs/emission
+    private func cleanedAmountDecimal(_ s: String?) -> Decimal? {
+        guard var t = s?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty else { return nil }
+        if t.contains(",") { t = t.replacingOccurrences(of: ",", with: ".") }
+        guard let dec = Decimal(string: t, locale: Locale(identifier: "en_US_POSIX")) else { return nil }
+        var d = dec, rounded = Decimal()
+        NSDecimalRound(&rounded, &d, 2, .plain)
+        return rounded
+    }
+
     private func cleanEntity(_ s: String) -> String {
         s.trimmingCharacters(in: .whitespacesAndNewlines)
     }
@@ -290,4 +379,5 @@ public extension LegacyJournalEntry {
         }
         return dict[acctID]
     }
+
 }
