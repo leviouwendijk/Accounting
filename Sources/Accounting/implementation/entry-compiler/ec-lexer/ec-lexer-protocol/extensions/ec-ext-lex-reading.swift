@@ -1,5 +1,17 @@
 import Foundation
 
+public enum LexerReadingSets {
+    static let digitsDot: CharacterSet = CharacterSet(charactersIn: "0123456789.")
+    static let identAllowed: CharacterSet = {
+        var s = CharacterSet.alphanumerics
+        s.insert(charactersIn: "_/")
+        // variations:
+        // let extra = CharacterSet(charactersIn: "_")
+        // let extra = CharacterSet(charactersIn: "_/-")
+        return s
+    }()
+}
+
 public extension EntryCompilerLexing {
     mutating func readUntilClosingBraceVerbatim() -> String {
         var depth = 1
@@ -35,9 +47,11 @@ public extension EntryCompilerLexing {
         }
     }
 
+    // stop constructing character set on each call
+    // retain access to let
     mutating func readNumber() -> Decimal {
         var buffer = ""
-        while let c = peek(), CharacterSet(charactersIn: "0123456789.").contains(c) {
+        while let c = peek(), LexerReadingSets.digitsDot.contains(c) {
             buffer.append(Character(c))
             advance()
         }
@@ -46,15 +60,32 @@ public extension EntryCompilerLexing {
 
     mutating func readIdent() -> String {
         var buffer = ""
-        // let extra = CharacterSet(charactersIn: "_")
-        // let extra = CharacterSet(charactersIn: "_/-")
-        let extra = CharacterSet(charactersIn: "_/")
-        while let c = peek(), CharacterSet.alphanumerics.union(extra) .contains(c) {
+        while let c = peek(), LexerReadingSets.identAllowed.contains(c) {
             buffer.append(Character(c))
             advance()
         }
         return buffer
     }
+    // mutating func readNumber() -> Decimal {
+    //     var buffer = ""
+    //     while let c = peek(), CharacterSet(charactersIn: "0123456789.").contains(c) {
+    //         buffer.append(Character(c))
+    //         advance()
+    //     }
+    //     return Decimal(string: buffer) ?? 0
+    // }
+
+    // mutating func readIdent() -> String {
+    //     var buffer = ""
+    //     // let extra = CharacterSet(charactersIn: "_")
+    //     // let extra = CharacterSet(charactersIn: "_/-")
+    //     let extra = CharacterSet(charactersIn: "_/")
+    //     while let c = peek(), CharacterSet.alphanumerics.union(extra) .contains(c) {
+    //         buffer.append(Character(c))
+    //         advance()
+    //     }
+    //     return buffer
+    // }
 
     mutating func readPattern(_ pattern: String) throws -> String {
         let regex = try NSRegularExpression(pattern: "^\(pattern)")

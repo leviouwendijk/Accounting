@@ -18,6 +18,9 @@ public func writeJSON<T: Encodable>(_ value: T, to url: URL) throws {
     try data.write(to: url, options: .atomic)
 }
 
+public extension Decimal {
+    var magnitude: Decimal { self < 0 ? -self : self }
+}
 
 @inlinable
 public func isoDate(_ d: Date) -> String {
@@ -26,6 +29,3 @@ public func isoDate(_ d: Date) -> String {
     return f.string(from: d)
 }
 
-public extension Decimal {
-    var magnitude: Decimal { self < 0 ? -self : self }
-}
