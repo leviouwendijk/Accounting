@@ -59,3 +59,20 @@ public enum EntryCompilerEntriesLoader {
     }
 }
 
+public final class CollisionReporter {
+    private var seen = Set<String>() // key = "\(id)|\(first)|\(here)"
+
+    public init() {}
+
+    public func callback() -> (Int, String, String) -> Void {
+        return { [weak self] id, first, here in
+            guard let self = self else { return }
+            let key = "\(id)|\(first)|\(here)"
+            guard self.seen.insert(key).inserted else { return } // print once
+            let msg = EntryCompilerEntriesLoader.idCollisionString(
+                id: id, firstSeen: first, conflict: here
+            )
+            fputs(msg + "\n", stderr)
+        }
+    }
+}
