@@ -126,56 +126,77 @@ public extension EntryCompilerParsing {
 
             // 1) Existing sugar: unit(<id|number>) → return "unit(<inner>)"
             //    (later merged into previous segment by normalizeUnitVariant)
+            // if name == "unit", current == .lPar {
+            //     try expect(.lPar)
+            //     let inner: String
+            //     switch current {
+            //     case .ident:
+            //         inner = try readNameWithVariantChain()
+            //     case let .number(n):
+            //         inner = "\(n)"; advance()
+            //     default:
+            //         throw ParserError.unexpectedToken(current, expected: "identifier or number", at: loc())
+            //     }
+            //     try expect(.rPar)
+            //     return "unit(\(inner))"
+            // }
             if name == "unit", current == .lPar {
                 try expect(.lPar)
-                let inner: String
-                switch current {
-                case .ident:
-                    inner = try readNameWithVariantChain()
-                case let .number(n):
-                    inner = "\(n)"; advance()
-                default:
-                    throw ParserError.unexpectedToken(current, expected: "identifier or number", at: loc())
-                }
+                let inner = try readAliasFlexible()
                 try expect(.rPar)
                 return "unit(\(inner))"
             }
 
             // 2) NEW sugar: ident[#…](<id|number>) → append as another variant: "#<inner>"
             //    Example: macbook#levi(air_m2) → "macbook#levi#air_m2"
+            // if current == .lPar {
+            //     try expect(.lPar)
+            //     let inner: String
+            //     switch current {
+            //     case .ident:
+            //         inner = try readNameWithVariantChain()
+            //     case let .number(n):
+            //         inner = "\(n)"; advance()
+            //     default:
+            //         throw ParserError.unexpectedToken(current, expected: "identifier or number", at: loc())
+            //     }
+            //     try expect(.rPar)
+            //     name.append("#")
+            //     name.append(inner)
+
+            //     // Allow further "#..." AFTER the parens too (e.g., macbook#levi(air_m2)#rev2)
+            //     while current == .hash {
+            //         advance() // eat '#'
+            //         var variant = ""
+            //         var sawAny = false
+            //         while true {
+            //             switch current {
+            //             case let .ident(v): variant += v; sawAny = true; advance()
+            //             case let .number(n): variant += String(describing: n); sawAny = true; advance()
+            //             default: break
+            //             }
+            //             if case .ident = current { continue }
+            //             if case .number = current { continue }
+            //             break
+            //         }
+            //         guard sawAny else {
+            //             throw ParserError.unexpectedToken(current, expected: "identifier or number after '#'", at: loc())
+            //         }
+            //         name.append("#")
+            //         name.append(variant)
+            //     }
+            // }
             if current == .lPar {
                 try expect(.lPar)
-                let inner: String
-                switch current {
-                case .ident:
-                    inner = try readNameWithVariantChain()
-                case let .number(n):
-                    inner = "\(n)"; advance()
-                default:
-                    throw ParserError.unexpectedToken(current, expected: "identifier or number", at: loc())
-                }
+                let inner = try readAliasFlexible()
                 try expect(.rPar)
                 name.append("#")
                 name.append(inner)
 
-                // Allow further "#..." AFTER the parens too (e.g., macbook#levi(air_m2)#rev2)
+                // keep your trailing "#…" logic:
                 while current == .hash {
-                    advance() // eat '#'
-                    var variant = ""
-                    var sawAny = false
-                    while true {
-                        switch current {
-                        case let .ident(v): variant += v; sawAny = true; advance()
-                        case let .number(n): variant += String(describing: n); sawAny = true; advance()
-                        default: break
-                        }
-                        if case .ident = current { continue }
-                        if case .number = current { continue }
-                        break
-                    }
-                    guard sawAny else {
-                        throw ParserError.unexpectedToken(current, expected: "identifier or number after '#'", at: loc())
-                    }
+                    advance()
+                    let variant = try readIdentOrNumberRun(requireAtLeastOne: true)
                     name.append("#")
                     name.append(variant)
                 }
