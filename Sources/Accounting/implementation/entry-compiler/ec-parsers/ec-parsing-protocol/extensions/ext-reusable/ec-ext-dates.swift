@@ -97,12 +97,30 @@ public extension EntryCompilerParsing {
         return try spec.asAbsolute(loc: loc())
     }
 
+    // @inline(__always)
+    // func matchNameToken(_ names: [String]) -> String? {
+    //     switch current {
+    //     case let .ident(s) where names.contains(s):   return s
+    //     case let .keyword(s) where names.contains(s): return s
+    //     default: return nil
+    //     }
+    // }
+
     @inline(__always)
     func matchNameToken(_ names: [String]) -> String? {
         switch current {
-        case let .ident(s) where names.contains(s):   return s
-        case let .keyword(s) where names.contains(s): return s
-        default: return nil
+        case let .ident(s), let .keyword(s):
+            switch names.count {
+            case 0: return nil
+            case 1: return (s == names[0]) ? s : nil
+            case 2: return (s == names[0] || s == names[1]) ? s : nil
+            case 3: return (s == names[0] || s == names[1] || s == names[2]) ? s : nil
+            default:
+                // Uncommon path; fine to do a linear scan here
+                return names.contains(s) ? s : nil
+            }
+        default:
+            return nil
         }
     }
 
