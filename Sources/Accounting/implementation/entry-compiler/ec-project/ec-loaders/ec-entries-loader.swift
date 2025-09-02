@@ -8,8 +8,9 @@ public enum EntryCompilerEntriesLoader {
     ) throws -> [Entry] {
         let root = project.url(.entries)
         var out: [Entry] = []
-        let fm = FileManager.default
+        var seen: [Int: String] = [:]     // id → first location (file:line:col)
 
+        let fm = FileManager.default
         if let e = fm.enumerator(at: root, includingPropertiesForKeys: nil) {
             for case let url as URL in e where url.pathExtension == "ec" {
                 let src = try String(contentsOf: url, encoding: .utf8)
@@ -22,6 +23,19 @@ public enum EntryCompilerEntriesLoader {
                     lineMap: lineMap
                 )
                 let entries = try parser.parseEntries()
+                
+                // check uniqueness
+                for en in entries {
+                    guard let id = en.id else { continue }
+                    let here = en.location?.description ?? url.path  // "file:line:col"
+                    if let first = seen[id] {
+                        throw EntryCompilerIntegrityError.idCollision(
+                            kind: .entry, id: id, paths: [first, here]
+                        )
+                    }
+                    seen[id] = here
+                }
+
                 out.append(contentsOf: entries)
             }
         }
