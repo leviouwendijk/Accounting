@@ -1,21 +1,22 @@
 import Foundation
 
-public struct DepreciationAuditTextOptions: Sendable, Codable {
-    public var title: String = "Depreciation audit"
-    public var underline: String = "──────────────────"
-    public var showHeader: Bool = true
-    public var onlyFailures: Bool = true
-    public var maxFailureDetailLines: Int = 6
-    public var showAllGoodLine: Bool = true     // prints "• all good" when there are no failures
-    public var useISODateOnly: Bool = true      // ISO date without time
-    public var includeSummaryBlock: Bool = true // periods checked / exact / within tol / aggregate covered / failures
-
-    public init() {}
-}
-
 public extension DepreciationAuditReport {
     /// Produce a CLI-friendly string rendering of the audit report.
     func renderText(_ opts: DepreciationAuditTextOptions = .init()) -> String {
+        @inline(__always)
+        func fmt(_ x: Decimal) -> String {
+            guard let digits = opts.fractionDigits else { return x.description }
+            var v = x, out = Decimal()
+            NSDecimalRound(&out, &v, digits, .plain)           // presentation-only
+            let nf = NumberFormatter()
+            nf.locale = Locale(identifier: "en_US_POSIX")
+            nf.numberStyle = .decimal
+            nf.minimumFractionDigits = digits
+            nf.maximumFractionDigits = digits
+            nf.minimumIntegerDigits = 1
+            return nf.string(from: out as NSDecimalNumber) ?? out.description
+        }
+
         var out: [String] = []
         let failures = self.failures
 
@@ -38,9 +39,7 @@ public extension DepreciationAuditReport {
 
         if opts.onlyFailures {
             if failures.isEmpty {
-                if opts.showAllGoodLine {
-                    out.append("• all as expected ")
-                }
+                if opts.showAllGoodLine { out.append("• all as expected ") }
                 return out.joined(separator: "\n")
             }
             out.append("")
@@ -49,16 +48,17 @@ public extension DepreciationAuditReport {
             if opts.useISODateOnly { df.formatOptions = [.withFullDate] }
 
             for f in failures {
+                out.append("mismatch".ansi(.yellow))
                 let period = "\(df.string(from: f.periodStart)) → \(df.string(from: f.periodEnd))"
                 out.append("    • \(f.entity.identifier(displaying: .fullchain)) [\(f.account.code)]  \(period)")
-                out.append("        expected: \(f.expected)")
-                out.append("        got: \(f.actual)  Δ=\(f.delta)")
-                out.append("        Δ = \(f.delta)")
+                out.append("        expected: \(fmt(f.expected))")
+                out.append("        got: \(fmt(f.actual))  Δ=\(fmt(f.delta))")
+                out.append("        Δ = \(fmt(f.delta))")
                 if let note = f.note, !note.isEmpty {
                     out.append("    note: \(note)")
                 }
                 for d in f.details.prefix(opts.maxFailureDetailLines) {
-                    out.append("    ↳ entry \(d.entryId ?? "—")  \(df.string(from: d.date))  \(d.amount)")
+                    out.append("    ↳ entry \(d.entryId ?? "—")  \(df.string(from: d.date))  \(fmt(d.amount))")
                 }
                 if f.details.count > opts.maxFailureDetailLines {
                     out.append("    ↳ (+\(f.details.count - opts.maxFailureDetailLines) more)")
@@ -67,14 +67,14 @@ public extension DepreciationAuditReport {
             }
             return out.joined(separator: "\n")
         } else {
-            // Print all items (rarely needed, but offered for completeness)
             let df = ISO8601DateFormatter()
             if opts.useISODateOnly { df.formatOptions = [.withFullDate] }
 
             for it in items {
+                out.append("match".ansi(.green))
                 let period = "\(df.string(from: it.periodStart)) → \(df.string(from: it.periodEnd))"
                 out.append("• \(it.entity.identifier(displaying: .fullchain)) [\(it.account.code)]  \(period)  \(it.coverage.rawValue)")
-                out.append("  expected \(it.expected)  got \(it.actual)  Δ=\(it.delta)")
+                out.append("  expected \(fmt(it.expected))  got \(fmt(it.actual))  Δ=\(fmt(it.delta))")
             }
             return out.joined(separator: "\n")
         }
