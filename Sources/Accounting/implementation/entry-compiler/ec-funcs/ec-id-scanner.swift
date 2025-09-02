@@ -38,7 +38,7 @@ public enum IDScanner: Sendable {
         project: EntryCompilerProject,
         settings: EntryCompilerSettings,
         kind: IDKind,
-        allowCollisions: Bool = false,
+        allowCollisions: Bool = true,
         verbose: Bool = false
     ) throws -> [Int] {
         switch kind {
