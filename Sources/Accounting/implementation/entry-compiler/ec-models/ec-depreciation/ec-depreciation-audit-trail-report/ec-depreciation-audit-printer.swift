@@ -50,8 +50,9 @@ public extension DepreciationAuditReport {
 
             for f in failures {
                 let period = "\(df.string(from: f.periodStart)) → \(df.string(from: f.periodEnd))"
-                out.append("  • \(f.entity.identifier(displaying: .fullchain)) [\(f.account.code)]  \(period)")
-                out.append("    expected \(f.expected)  got \(f.actual)  Δ=\(f.delta)")
+                out.append("    • \(f.entity.identifier(displaying: .fullchain)) [\(f.account.code)]  \(period)")
+                out.append("        expected: \(f.expected)")
+                out.append("        got: \(f.actual)  Δ=\(f.delta)")
                 if let note = f.note, !note.isEmpty {
                     out.append("    note: \(note)")
                 }
