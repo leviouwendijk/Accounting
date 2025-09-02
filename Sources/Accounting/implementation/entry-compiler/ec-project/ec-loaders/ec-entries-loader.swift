@@ -6,7 +6,7 @@ public enum EntryCompilerEntriesLoader {
         // defaultTZ: TimeZone
         settings: EntryCompilerSettings,
         allowCollisions: Bool = false,
-        onCollision: ((Int, String, String) -> Void)? = nil    // NEW
+        onCollision: ((Int, String, String) -> Void)? = nil
     ) throws -> [Entry] {
         let root = project.url(.entries)
         var out: [Entry] = []
