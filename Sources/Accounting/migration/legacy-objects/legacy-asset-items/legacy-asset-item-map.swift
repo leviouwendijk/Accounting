@@ -46,7 +46,7 @@ public enum LegacyAssetMappings {
         4: .init(
             alias: "airpods",
             of: "shusha",
-            unit: "shusha(max)",
+            unit: "max",
             account: "WAfsAmvBei"
         ),
 
