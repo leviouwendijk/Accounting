@@ -17,9 +17,10 @@ public enum IDKind: String, Sendable {
 public enum IDScanner: Sendable {
     public static func suggestNextEntryID(
         project: EntryCompilerProject,
-        settings: EntryCompilerSettings
+        settings: EntryCompilerSettings,
+        allowCollisions: Bool = true,
     ) throws -> Int {
-        let entries = try EntryCompilerEntriesLoader.load(from: project, settings: settings)
+        let entries = try EntryCompilerEntriesLoader.load(from: project, settings: settings, allowCollisions: allowCollisions)
         let latest = latestEntryID(in: entries) ?? 0
         return latest + 1
     }
@@ -37,11 +38,12 @@ public enum IDScanner: Sendable {
         project: EntryCompilerProject,
         settings: EntryCompilerSettings,
         kind: IDKind,
+        allowCollisions: Bool = false,
         verbose: Bool = false
     ) throws -> [Int] {
         switch kind {
         case .entry:
-            let entries = try EntryCompilerEntriesLoader.load(from: project, settings: settings) // scans entries/*.ec
+            let entries = try EntryCompilerEntriesLoader.load(from: project, settings: settings, allowCollisions: allowCollisions) // scans entries/*.ec
             return Array(Set(entries.compactMap { $0.id })).sorted()
         case .transaction:
             let store = try EntryCompilerTransactionsLoader.load(from: project, verbose: verbose) // scans transactions/*.ec

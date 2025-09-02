@@ -4,7 +4,8 @@ public enum EntryCompilerEntriesLoader {
     public static func load(
         from project: EntryCompilerProject,
         // defaultTZ: TimeZone
-        settings: EntryCompilerSettings
+        settings: EntryCompilerSettings,
+        allowCollisions: Bool = false
     ) throws -> [Entry] {
         let root = project.url(.entries)
         var out: [Entry] = []
@@ -29,9 +30,18 @@ public enum EntryCompilerEntriesLoader {
                     guard let id = en.id else { continue }
                     let here = en.location?.description ?? url.path  // "file:line:col"
                     if let first = seen[id] {
-                        throw EntryCompilerIntegrityError.idCollision(
-                            kind: .entry, id: id, paths: [first, here]
-                        )
+                        if !allowCollisions {
+                            throw EntryCompilerIntegrityError.idCollision(
+                                kind: .entry, id: id, paths: [first, here]
+                            )
+                        } else {
+                            let str = """
+                            ID COLLISION: \(id)
+                                \(first)
+                                \(here)
+                            """
+                            print(str)
+                        }
                     }
                     seen[id] = here
                 }
