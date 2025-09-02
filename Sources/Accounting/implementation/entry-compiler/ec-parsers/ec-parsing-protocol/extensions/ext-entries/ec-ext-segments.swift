@@ -43,6 +43,44 @@ public extension EntryCompilerParsing {
         return s
     }
 
+    /// Consume a contiguous run of ident/number tokens into a single string.
+    @inline(__always)
+    func readIdentOrNumberRun(requireAtLeastOne: Bool = true) throws -> String {
+        var out = ""
+        var saw = false
+        while true {
+            switch current {
+            case let .ident(s): out += s; saw = true; advance()
+            case let .number(n): out += String(describing: n); saw = true; advance()
+            default: break
+            }
+            // Stop when next isn't ident/number
+            switch current {
+            case .ident, .number: continue
+            default: break
+            }
+            break
+        }
+        if requireAtLeastOne && !saw {
+            throw ParserError.unexpectedToken(current, expected: "identifier or number", at: loc())
+        }
+        return out
+    }
+
+    /// Like `readNameWithVariantChain` but allows a number as the first token.
+    /// Example: `15_pro_max#rev2`
+    @inline(__always)
+    func readAliasFlexible() throws -> String {
+        var name = try readIdentOrNumberRun(requireAtLeastOne: true)
+        // optional #variant chains
+        while current == .hash {
+            advance()
+            let v = try readIdentOrNumberRun(requireAtLeastOne: true)
+            name.append("#"); name.append(v)
+        }
+        return name
+    }
+
     // Atom: ident[#…] | number | unit(<id|number>)
     // deprecating: use of keyword("inventory") in a segment (ident)
     // - Accepts: vehicle#honda_crv
@@ -146,9 +184,14 @@ public extension EntryCompilerParsing {
             return name
 
 
-        case let .number(n):
-            advance()
-            return "\(n)"
+        // attempted replacement for `15_pro_max` compatibility
+        // case let .number(n):
+        //     advance()
+        //     return "\(n)"
+
+        case .number:
+            // attempted glue number-first aliases like `15_pro_max` (and optional #variants)
+            return try readAliasFlexible()
 
         default:
             throw ParserError.unexpectedToken(current, expected: "segment", at: loc())
