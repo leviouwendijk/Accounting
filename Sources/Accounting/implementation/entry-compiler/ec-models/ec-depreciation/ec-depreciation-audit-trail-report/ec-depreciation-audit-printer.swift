@@ -53,6 +53,7 @@ public extension DepreciationAuditReport {
                 out.append("    • \(f.entity.identifier(displaying: .fullchain)) [\(f.account.code)]  \(period)")
                 out.append("        expected: \(f.expected)")
                 out.append("        got: \(f.actual)  Δ=\(f.delta)")
+                out.append("        Δ = \(f.delta)")
                 if let note = f.note, !note.isEmpty {
                     out.append("    note: \(note)")
                 }
@@ -62,6 +63,7 @@ public extension DepreciationAuditReport {
                 if f.details.count > opts.maxFailureDetailLines {
                     out.append("    ↳ (+\(f.details.count - opts.maxFailureDetailLines) more)")
                 }
+                out.append("")
             }
             return out.joined(separator: "\n")
         } else {
