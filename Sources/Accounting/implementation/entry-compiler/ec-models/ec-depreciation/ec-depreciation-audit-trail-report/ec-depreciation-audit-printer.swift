@@ -51,8 +51,10 @@ public extension DepreciationAuditReport {
                 out.append("mismatch".ansi(.yellow))
                 let period = "\(df.string(from: f.periodStart)) → \(df.string(from: f.periodEnd))"
                 out.append("    • \(f.entity.identifier(displaying: .fullchain)) [\(f.account.code)]  \(period)")
+                out.append("    to [\(f.account.code)]")
+                out.append("    period \(period)")
                 out.append("        expected: \(fmt(f.expected))")
-                out.append("        got: \(fmt(f.actual))  Δ=\(fmt(f.delta))")
+                out.append("        got: \(fmt(f.actual))")
                 out.append("        Δ = \(fmt(f.delta))")
                 if let note = f.note, !note.isEmpty {
                     out.append("    note: \(note)")
@@ -71,10 +73,34 @@ public extension DepreciationAuditReport {
             if opts.useISODateOnly { df.formatOptions = [.withFullDate] }
 
             for it in items {
-                out.append("match".ansi(.green))
+                // status line resembling failures style
+                switch it.coverage {
+                case .exact:
+                    out.append("match".ansi(.green))
+                case .withinTolerance:
+                    out.append("match (±tol)".ansi(.green))
+                case .aggregateCovered:
+                    out.append("aggregate covered".ansi(.green))
+                case .none:
+                    out.append("mismatch".ansi(.yellow))
+                }
+
                 let period = "\(df.string(from: it.periodStart)) → \(df.string(from: it.periodEnd))"
-                out.append("• \(it.entity.identifier(displaying: .fullchain)) [\(it.account.code)]  \(period)  \(it.coverage.rawValue)")
-                out.append("  expected \(fmt(it.expected))  got \(fmt(it.actual))  Δ=\(fmt(it.delta))")
+                out.append("    • \(it.entity.identifier(displaying: .fullchain)) [\(it.account.code)]  \(period)")
+                out.append("        expected: \(fmt(it.expected))")
+                out.append("        got: \(fmt(it.actual))")
+                out.append("        Δ = \(fmt(it.delta))")
+
+                if let note = it.note, !note.isEmpty {
+                    out.append("    note: \(note)")
+                }
+                for d in it.details.prefix(opts.maxFailureDetailLines) {
+                    out.append("    ↳ entry \(d.entryId ?? "—")  \(df.string(from: d.date))  \(fmt(d.amount))")
+                }
+                if it.details.count > opts.maxFailureDetailLines {
+                    out.append("    ↳ (+\(it.details.count - opts.maxFailureDetailLines) more)")
+                }
+                out.append("")
             }
             return out.joined(separator: "\n")
         }
