@@ -13,6 +13,12 @@ public enum LexerReadingSets {
 }
 
 public extension EntryCompilerLexing {
+    // optimization implementation
+    @inline(__always)
+    func isWS(_ c: UnicodeScalar) -> Bool {
+        c == " " || c == "\n" || c == "\t" || c == "\r"
+    }
+
     mutating func readUntilClosingBraceVerbatim() -> String {
         var depth = 1
         var buffer = ""
@@ -34,7 +40,9 @@ public extension EntryCompilerLexing {
 
     mutating func skipWhitespaceAndComments() {
         while let c = peek() {
-            if CharacterSet.whitespacesAndNewlines.contains(c) {
+            // replaced with optimized func
+            // if CharacterSet.whitespacesAndNewlines.contains(c) {
+            if isWS(c) {
                 advance(); continue
             }
             // single‑line comment `// ...`
