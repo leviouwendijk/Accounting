@@ -121,7 +121,7 @@ public enum LegacyTranslation {
             8, 
             "Direct Travel Cost",
             "WBedAutBra", // remap to travel cost
-            "vehicle#honda_crv"
+            "vehicle" // remap from crv to legend
         ),
         
         // .init(
@@ -196,7 +196,7 @@ public enum LegacyTranslation {
             19, 
             "Indirect Travel Cost",
             "WBedAutBra",
-            "vehicle#honda_crv"
+            "vehicle"
         ),
 
         // .init(
@@ -1978,7 +1978,35 @@ public enum LegacyTranslation {
                 "namecheap"
             ),
         ),
+
+        .init(
+            legacyEntryIds: [
+                590,
+            ],
+
+            legacyMapOverride: .init(
+                19, 
+                "Indirect Travel Cost",
+                "WBedAutPar",
+                "vehicle"
+            ),
+        ),
+
+        .init(
+            legacyEntryIds: [
+                254,
+            ],
+
+            legacyMapOverride: .init(
+                8, 
+                "Direct Travel Cost",
+                "WBedAutPar",
+                "vehicle"
+            ),
+        ),
     ]
+    // 254 parking
+    // 590 parking
 
     // call before moving on with overrides
     public static func assertUniqueLegacyOverrides(_ overrides: [LegacyMapOverrideExceptions] = rgs_v3_8_overrides,
