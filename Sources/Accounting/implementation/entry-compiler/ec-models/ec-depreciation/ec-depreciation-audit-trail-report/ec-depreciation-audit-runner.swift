@@ -8,6 +8,18 @@ public struct DepreciationAuditRunner {
         public var calendar: Calendar = .init(identifier: .gregorian)
 
         public init() {}
+
+        public init(
+            granularity: DepreciationGranularity = .monthly,
+            tolerance: Decimal = 0.01,
+            tolerateAggregateIntraQuarter: Bool = true,
+            calendar: Calendar = .init(identifier: .gregorian)
+        ) {
+            self.granularity = granularity
+            self.tolerance = tolerance
+            self.tolerateAggregateIntraQuarter = tolerateAggregateIntraQuarter
+            self.calendar = calendar
+        }
     }
 
     /// Low-level: you already have compiled stores + resolved entries.
