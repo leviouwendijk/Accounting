@@ -11,12 +11,16 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
 
     public let lexingSets: EntryCompilerLexingSets
 
+    private let stringKeywordSet: Set<String>
+
     public init(
         source: String,
         flavor: EntryCompilerLexingFlavor
     ) {
         self.scalars = Array(source.unicodeScalars)
         self.lexingSets = aggregateLexingSets(flavor: flavor)
+
+        self.stringKeywordSet = aggregateLexingSets(flavor: .string).keywords
     }
 
     public mutating func nextToken() -> EntryCompilerToken {
@@ -50,12 +54,15 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
             break
         }
 
-        if let lit = try? readPattern("\\d{4}[-/.]\\d{2}[-/.]\\d{2}") {
-            return .dateLiteral(lit)
-        }
-        if let lit = try? readPattern("\\d{2}[-/.]\\d{2}[-/.]\\d{4}") {
-            return .dateLiteral(lit)
-        }
+        // replace regex computations with func
+        if let lit = scanDateLiteral() { return .dateLiteral(lit) }
+
+        // if let lit = try? readPattern("\\d{4}[-/.]\\d{2}[-/.]\\d{2}") {
+        //     return .dateLiteral(lit)
+        // }
+        // if let lit = try? readPattern("\\d{2}[-/.]\\d{2}[-/.]\\d{4}") {
+        //     return .dateLiteral(lit)
+        // }
 
         guard let c = peek() else { return .eof }
 
@@ -93,9 +100,11 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
         if CharacterSet.letters.union(CharacterSet(charactersIn: "_")).contains(c) {
             let ident = readIdent()
 
-            let stringSet = aggregateLexingSets(flavor: .string).keywords
+            // stop rebuilding set everytime in scope
+            // replaced by lexer lifetime stored
+            // let stringSet = aggregateLexingSets(flavor: .string).keywords
 
-            if stringSet.contains(ident) {
+            if stringKeywordSet.contains(ident) {
                 detailsState = .awaitingOpen
                 return .keyword(ident)
             } else if lexingSets.keywords.contains(ident) {
@@ -108,4 +117,6 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
         advance()
         return nextToken()
     }
+
+
 }
