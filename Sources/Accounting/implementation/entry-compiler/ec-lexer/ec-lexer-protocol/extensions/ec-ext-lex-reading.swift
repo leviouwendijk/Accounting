@@ -133,27 +133,52 @@ public extension EntryCompilerLexing {
         return buffer.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    // mutating func readQuotedLiteral() -> String {
+    //     var out = ""
+    //     while let ch = peek() {
+    //         if ch == "\"" { advance(); break }
+    //         if ch == "\\" {
+    //             advance()
+    //             guard let esc = peek() else { break }
+    //             switch esc {
+    //             case "\"": out.append("\"")
+    //             case "\\": out.append("\\")
+    //             case "n":  out.append("\n")
+    //             case "t":  out.append("\t")
+    //             case "r":  out.append("\r")
+    //             default:   out.append(Character(esc))
+    //             }
+    //             advance()
+    //         } else {
+    //             out.append(Character(ch))
+    //             advance()
+    //         }
+    //     }
+    //     return out
+    // }
+
+    // replacing with scalarsView for optimized performance
     mutating func readQuotedLiteral() -> String {
-        var out = ""
+        var scalarsOut = String.UnicodeScalarView()
         while let ch = peek() {
             if ch == "\"" { advance(); break }
             if ch == "\\" {
                 advance()
                 guard let esc = peek() else { break }
                 switch esc {
-                case "\"": out.append("\"")
-                case "\\": out.append("\\")
-                case "n":  out.append("\n")
-                case "t":  out.append("\t")
-                case "r":  out.append("\r")
-                default:   out.append(Character(esc))
+                case "\"": scalarsOut.append("\"".unicodeScalars.first!)
+                case "\\": scalarsOut.append("\\".unicodeScalars.first!)
+                case "n":  scalarsOut.append(UnicodeScalar(10))  // \n
+                case "t":  scalarsOut.append(UnicodeScalar(9))   // \t
+                case "r":  scalarsOut.append(UnicodeScalar(13))  // \r
+                default:   scalarsOut.append(esc)
                 }
                 advance()
             } else {
-                out.append(Character(ch))
+                scalarsOut.append(ch)
                 advance()
             }
         }
-        return out
+        return String(scalarsOut)
     }
 }
