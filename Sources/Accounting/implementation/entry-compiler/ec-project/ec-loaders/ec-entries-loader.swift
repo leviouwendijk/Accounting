@@ -5,7 +5,8 @@ public enum EntryCompilerEntriesLoader {
         from project: EntryCompilerProject,
         // defaultTZ: TimeZone
         settings: EntryCompilerSettings,
-        allowCollisions: Bool = false
+        allowCollisions: Bool = false,
+        onCollision: ((Int, String, String) -> Void)? = nil    // NEW
     ) throws -> [Entry] {
         let root = project.url(.entries)
         var out: [Entry] = []
@@ -34,21 +35,27 @@ public enum EntryCompilerEntriesLoader {
                             throw EntryCompilerIntegrityError.idCollision(
                                 kind: .entry, id: id, paths: [first, here]
                             )
-                        } else {
-                            let str = """
-                            ID COLLISION: \(id)
-                                \(first)
-                                \(here)
-                            """
-                            print(str)
-                        }
+                        } 
+                        onCollision?(id, first, here)
                     }
                     seen[id] = here
                 }
-
                 out.append(contentsOf: entries)
             }
         }
         return out
     }
+
+    public static func idCollisionString(
+        id: Int,
+        firstSeen: String,
+        conflict: String
+    ) -> String {
+        return """
+        ID COLLISION: \(id)
+            \(firstSeen)
+            \(conflict)
+        """
+    }
 }
+
