@@ -6,6 +6,9 @@ public extension EntryCompilerParsing {
     @inlinable
     func parseId(into slot: inout Int?, what: String = "global id") throws {
         try expect(.keyword("id"))
+        if slot != nil {
+            throw ParserError.unexpectedToken(current, expected: "single \(what) directive", at: loc())
+        }
         try expect(.equals)
         guard case let .number(n) = current else {
             throw ParserError.unexpectedToken(current, expected: "number (\(what))", at: loc())
