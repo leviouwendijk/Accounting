@@ -50,7 +50,7 @@ public extension DepreciationAuditReport {
             for f in failures {
                 out.append("mismatch".ansi(.yellow))
                 let period = "\(df.string(from: f.periodStart)) → \(df.string(from: f.periodEnd))"
-                out.append("    • \(f.entity.identifier(displaying: .fullchain)) [\(f.account.code)]  \(period)")
+                out.append("    • \(f.entity.identifier(displaying: .fullchain))")
                 out.append("    to [\(f.account.code)]")
                 out.append("    period \(period)")
                 out.append("        expected: \(fmt(f.expected))")
