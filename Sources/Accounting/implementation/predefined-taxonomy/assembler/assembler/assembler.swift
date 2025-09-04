@@ -29,6 +29,7 @@ public enum RGSAssembler {
 
         if !autoClose {
             return try assembleNoAutoClose(
+                chart: ch,
                 index: index,
                 maps: maps,
                 cut: cut,
@@ -37,10 +38,10 @@ public enum RGSAssembler {
                 seedAE: seedAE
             )
         } else {
-            // pass a minimal tuple so helpers don’t depend on the concrete type of `resolved`
             let ac = (niId: resolved.ni.id, niCode: resolved.ni.code,
                       eqId: resolved.equity.id, eqCode: resolved.equity.code)
             return try assembleWithAutoClose(
+                chart: ch,
                 index: index,
                 maps: maps,
                 cut: cut,
@@ -54,6 +55,7 @@ public enum RGSAssembler {
 
     @inline(__always)
     public static func assembleNoAutoClose(
+        chart: CompiledChart,
         index: RGSIndex,
         maps: RGSAssemblerResult,
         cut: AssembleCut,
@@ -104,11 +106,27 @@ public enum RGSAssembler {
             breakdown = .init(byAccount: byAccount)
         }
 
-        return StatementBundle(balance: bs, income: is_, totalsById: totalsPlain, entity: breakdown)
+        // Bundle + analytics
+        let bundle = StatementBundle(
+            balance: bs,
+            income: is_,
+            totalsById: totalsPlain,
+            entity: breakdown
+        )
+        let analytics = try makeAnalytics(chart: chart, bundle: bundle, omslag: omslag)
+
+        return StatementBundle(
+            balance: bs,
+            income: is_,
+            totalsById: totalsPlain,
+            entity: breakdown,
+            analytics: analytics
+        )
     }
 
     @inline(__always)
     public static func assembleWithAutoClose(
+        chart: CompiledChart,
         index: RGSIndex,
         maps: RGSAssemblerResult,
         cut: AssembleCut,
@@ -120,11 +138,10 @@ public enum RGSAssembler {
         // Make sure these codes are included in the presentation even if zero
         var localCut = cut
         localCut.includeCodes.append(contentsOf: [autoCloseTargets.niCode, autoCloseTargets.eqCode])
-        // --- end auto-close resolve ---
 
-        // --- auto-close overlay (you already have this) ---
+        // --- auto-close overlay ---
         let ni = seed.reduce(into: Decimal(0)) { acc, kv in
-            if maps.kindById[kv.key] == .income { acc += kv.value }    // debit - credit
+            if maps.kindById[kv.key] == .income { acc += kv.value }
         }
         let manualAtNi     = seed[autoCloseTargets.niId] ?? 0
         let manualAtEquity = seed[autoCloseTargets.eqId] ?? 0
@@ -132,8 +149,8 @@ public enum RGSAssembler {
 
         var seedWithAC = seed
         if !hasManual && ni != 0 {
-            seedWithAC[autoCloseTargets.niId, default: 0] += (-ni) // zero P&L node
-            seedWithAC[autoCloseTargets.eqId, default: 0] += ( ni) // push into equity
+            seedWithAC[autoCloseTargets.niId,     default: 0] += (-ni) // zero P&L node
+            seedWithAC[autoCloseTargets.eqId,     default: 0] += ( ni) // push into equity
         }
 
         // Income (IS): compute from plain seed; NI gets added to NI node for presentation
@@ -178,7 +195,7 @@ public enum RGSAssembler {
         // Optional entity breakdown for IS (from entity-preserving rollup)
         var breakdown: EntityBreakdown? = nil
         do {
-            let totalsAE_Income    = RGSAssembler.rollupByAccountPreservingEntity(seedAE, parentById: maps.parentById)
+            let totalsAE_Income = RGSAssembler.rollupByAccountPreservingEntity(seedAE, parentById: maps.parentById)
             var byAccount: [Int: [Int?: Decimal]] = [:]
             for (k, v) in totalsAE_Income where v != 0 {
                 byAccount[k.accountId, default: [:]][k.entityId, default: 0] += v
@@ -186,7 +203,22 @@ public enum RGSAssembler {
             breakdown = .init(byAccount: byAccount)
         }
 
-        return StatementBundle(balance: bs, income: is_, totalsById: totalsBalance, entity: breakdown)
+        // Bundle + analytics (analytics should reflect the BS totals we present with AC)
+        let bundle = StatementBundle(
+            balance: bs,
+            income: is_,
+            totalsById: totalsBalance,
+            entity: breakdown
+        )
+        let analytics = try makeAnalytics(chart: chart, bundle: bundle, omslag: omslag)
+
+        return StatementBundle(
+            balance: bs,
+            income: is_,
+            totalsById: totalsBalance,
+            entity: breakdown,
+            analytics: analytics
+        )
     }
 
     @inline(__always)
@@ -198,5 +230,16 @@ public enum RGSAssembler {
         let forcedIds = Set(cut.includeCodes.compactMap { index.byIdentifier[$0] })
         let forcedChain: Set<Int> = cut.includeIntermediates ? Set(forcedIds.flatMap { chainToRoot($0, parentById: parentById) }) : forcedIds
         return (forcedIds, forcedChain)
+    }
+
+    @inline(__always)
+    private static func makeAnalytics(
+        chart: CompiledChart,
+        bundle: StatementBundle,
+        omslag: OmslagMode
+    ) throws -> BundleAnalytics {
+        let l2 = try RGSAssembler.makeL2Buckets(chart: chart, defaultEquityCode: "BEiv")
+        let totals = try RGSAssembler.presentedTotalsByL2(chart: chart, bundle: bundle, buckets: l2, omslag: omslag)
+        return BundleAnalytics(l2Buckets: l2, l2Totals: totals)
     }
 }

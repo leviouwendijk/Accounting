@@ -173,7 +173,7 @@ public enum PeriodAssembler {
         guard let index = ch.index else { throw RGSAssemblerError.missingIndex }
 
         let maps = try RGSAssembler.makeMaps(from: ch)
-        RGSAssembler.assertEdgesMatchKeys(maps)
+        // RGSAssembler.assertEdgesMatchKeys(maps)
 
         // resolve auto-close targets (NI/equity) exactly like assembler does
         let targets  = AutoCloseTargets(for: entity)

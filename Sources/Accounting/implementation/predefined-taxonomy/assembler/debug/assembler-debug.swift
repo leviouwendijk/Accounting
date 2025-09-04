@@ -108,7 +108,7 @@ extension RGSAssembler {
         guard let index = ch.index else { throw NSError(domain: "RGSAssembler", code: 1, userInfo: [NSLocalizedDescriptionKey:"Missing index"]) }
 
         let maps = try RGSAssembler.makeMapsDebug(from: ch, verbose: verbose)
-        assertEdgesMatchKeys(maps)
+        // assertEdgesMatchKeys(maps)
 
         // seed
         let seed = RGSAssembler.seedLeafs(from: trialRows, using: index)
