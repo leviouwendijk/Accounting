@@ -37,6 +37,8 @@ public extension PeriodAssembler {
         try RGSAssembler.assertSeedSumsToZero(seedWinBal)
         try RGSAssembler.assertSeedSumsToZero(seedOverlay)
 
+        let seedAEWin = RGSAssembler.seedLeafsAE(from: tbIncomeWindow, using: index)  // account×entity → amount  :contentReference[oaicite:4]{index=4}
+
         // OpeningBeg from pre-window → map to "<L4>Beg" when present (balance accounts only)
         let seedOpening: [Int: Decimal] = {
             guard let tbHist = tbPreWindowForOpening, !tbHist.isEmpty else { return [:] }
@@ -83,9 +85,7 @@ public extension PeriodAssembler {
 
         // Presentation lines
         let forcedIds = Set(localCut.includeCodes.compactMap { index.byIdentifier[$0] })
-        let forcedChain: Set<Int> = localCut.includeIntermediates
-            ? Set(forcedIds.flatMap { chainToRoot($0, parentById: maps.parentById) })
-            : forcedIds
+        let forcedChain: Set<Int> = localCut.includeIntermediates ? Set(forcedIds.flatMap { chainToRoot($0, parentById: maps.parentById) }) : forcedIds
         let labels = index.labelByGroupKey
 
         let bs = linesFor(.balance, roll: maps, totals: totalsBalance, labels: labels,
@@ -93,6 +93,26 @@ public extension PeriodAssembler {
         let is_ = linesFor(.income,  roll: maps, totals: totalsIncome,  labels: labels,
                           cut: localCut, forcedIds: forcedIds, forcedChain: forcedChain, omslag: omslag)
 
-        return StatementBundle(balance: bs, income: is_, totalsById: totalsBalance)
+        // -------- entity breakdown (like classic assembler) --------
+        // Roll up the window seed with entity retained, then bucket by account id.
+        let totalsAE_Income = RGSAssembler.rollupByAccountPreservingEntity(seedAEWin, parentById: maps.parentById) // :contentReference[oaicite:7]{index=7}
+        var byAccount: [Int: [Int?: Decimal]] = [:]
+        for (k, v) in totalsAE_Income where v != 0 {
+            byAccount[k.accountId, default: [:]][k.entityId, default: 0] += v
+        }
+        let breakdown = EntityBreakdown(byAccount: byAccount)  // :contentReference[oaicite:8]{index=8}
+        // -----------------------------------------------------------
+
+        // Optional analytics (same as classic assembler)
+        let bundle = StatementBundle(balance: bs, income: is_, totalsById: totalsBalance, entity: breakdown)
+        let analytics = try RGSAssembler.makeAnalytics(chart: chart, bundle: bundle, omslag: omslag) // :contentReference[oaicite:9]{index=9}
+
+        return StatementBundle(
+            balance: bs,
+            income: is_,
+            totalsById: totalsBalance,
+            entity: breakdown,
+            analytics: analytics
+        )
     }
 }

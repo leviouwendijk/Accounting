@@ -224,7 +224,7 @@ public enum RGSAssembler {
     }
 
     @inline(__always)
-    private static func makeForcedSets(
+    public static func makeForcedSets(
         index: RGSIndex,
         cut: AssembleCut,
         parentById: [Int: Int]
@@ -235,7 +235,7 @@ public enum RGSAssembler {
     }
 
     @inline(__always)
-    private static func makeAnalytics(
+    public static func makeAnalytics(
         chart: CompiledChart,
         bundle: StatementBundle,
         omslag: OmslagMode
