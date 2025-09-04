@@ -212,4 +212,131 @@ public enum RGSPrinter {
 
         return sections
     }
+
+    public static func balanceSectionsByL2Ordered(
+        from bundle: StatementBundle,
+        using chart: CompiledChart,
+        dropRootLine: Bool = true,
+        includeOtherBucket: Bool = false
+    ) throws -> [RGSPresentationSection] {
+        return try sectionsByL2Ordered(
+            lines: bundle.balance,
+            side: .balance,
+            chart: chart,
+            dropRootLine: dropRootLine,
+            includeOtherBucket: includeOtherBucket
+        )
+    }
+
+    public static func incomeSectionsByL2Ordered(
+        from bundle: StatementBundle,
+        using chart: CompiledChart,
+        dropRootLine: Bool = true,
+        includeOtherBucket: Bool = false
+    ) throws -> [RGSPresentationSection] {
+        return try sectionsByL2Ordered(
+            lines: bundle.income,
+            side: .income,
+            chart: chart,
+            dropRootLine: dropRootLine,
+            includeOtherBucket: includeOtherBucket
+        )
+    }
+
+    // ------------------------------------------------------------
+    // MARK: - Core L2 sectioning (identifier parents for grouping, SortingKey for order)
+    // ------------------------------------------------------------
+
+    @inline(__always)
+    private static func sectionsByL2Ordered(
+        lines: [RGSPresentationLine],
+        side: StatementKind,
+        chart: CompiledChart,
+        dropRootLine: Bool,
+        includeOtherBucket: Bool
+    ) throws -> [RGSPresentationSection] {
+        let maps  = try RGSAssembler.makeMaps(from: chart)   // has sortKeyById + parentById + nameById + keyToId
+        let ch    = try chart.ensuringIndex(enrichNodes: true, strict: false)
+        guard let _ = ch.index else { throw RGSPrinterError.missingIndex }
+
+        // Build node lookup for quick level checks
+        let nodeById = Dictionary(uniqueKeysWithValues: chart.nodes.map { ($0.id, $0) })
+
+        // Root id and side root key
+        let rootKey  = (side == .balance) ? "B" : "W"
+        let rootId   = maps.keyToId[rootKey]
+
+        // Optionally drop the literal root row from printing
+        let src: [RGSPresentationLine] = lines.filter { line in
+            guard dropRootLine, let rid = rootId else { return true }
+            return line.id != rid
+        }
+
+        // Discover L2 anchors dynamically: nodes with level==2 and kind==side
+        var anchors: [(id: Int, key: String, title: String)] = []
+        for n in chart.nodes where n.level == 2 {
+            guard maps.kindById[n.id] == side else { continue }
+            let key = maps.sortKeyById[n.id] ?? ""
+            let title = maps.nameById[n.id] ?? n.labels.short
+            anchors.append((n.id, key, title))
+        }
+        // Order anchors by SortingKey
+        anchors.sort { RGSNodeSortingCode(key: $0.key) < RGSNodeSortingCode(key: $1.key) }
+
+        // Helper: find L2 ancestor by walking identifier parents
+        @inline(__always)
+        func l2AncestorId(of id: Int) -> Int? {
+            var cur = id
+            while let p = maps.parentById[cur] {
+                if let pn = nodeById[p], pn.level == 2 { return p }
+                cur = p
+            }
+            return nil
+        }
+
+        // Group lines under their L2 ancestor
+        var bucketByAnchor: [Int: [RGSPresentationLine]] = [:]
+        var other: [RGSPresentationLine] = []
+
+        for r in src {
+            if let a = l2AncestorId(of: r.id) {
+                bucketByAnchor[a, default: []].append(r)
+            } else {
+                other.append(r)   // keep; malformed/misc nodes end up here
+            }
+        }
+
+        // Sort each bucket by SortingKey (order only)
+        func sortByKey(_ a: RGSPresentationLine, _ b: RGSPresentationLine) -> Bool {
+            let ka = maps.sortKeyById[a.id] ?? ""
+            let kb = maps.sortKeyById[b.id] ?? ""
+            return RGSNodeSortingCode(key: ka) < RGSNodeSortingCode(key: kb)
+        }
+        for k in bucketByAnchor.keys {
+            bucketByAnchor[k]!.sort(by: sortByKey)
+        }
+        other.sort(by: sortByKey)
+
+        // Emit sections in anchor order; skip empty buckets
+        var out: [RGSPresentationSection] = []
+        for (anchorId, key, title) in anchors {
+            if let lines = bucketByAnchor[anchorId], !lines.isEmpty {
+                // section key: for Balance use first letter (A/J/K etc.) if present, else code
+                let sectionKey: String = {
+                    guard side == .balance, let sk = maps.sortKeyById[anchorId] else { return key }
+                    let l2 = RGSNodeSortingCode(key: sk).l2Key(fallbackSide: "B")   // <- String, not Optional
+                    if let letter = RGSAssembler.firstLetterSegment(from: l2) {
+                        return letter
+                    } else {
+                        return key
+                    }
+                }()
+                out.append(.init(key: sectionKey, title: title, lines: lines))
+            }
+        }
+        if includeOtherBucket, !other.isEmpty {
+            out.append(.init(key: "-", title: "Other", lines: other))
+        }
+        return out
+    }
 }
