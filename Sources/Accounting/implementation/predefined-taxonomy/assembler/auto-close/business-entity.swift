@@ -18,4 +18,23 @@ public enum BusinessEntity: Sendable, Codable {
             retainedEarningsCode :  retainedEarningsCode
         )
     }
+
+    /// Defaults you can tweak later per legal form.
+    var periodOpeningRouting: PeriodOpeningRouting {
+        switch self {
+        case .vof:
+            return .init(
+                equityAnchorCode: "BEiv",
+                equityOpeningCode: "BEivKapOndBeg",
+                exceptionKeepLeafAnchors: ["BLim"] // cash & cash equivalents: keep at leaf
+            )
+        // // case .eenmanszaak: (add if you have it)
+        // default:
+        //     return .init(
+        //         equityAnchorCode: "BEiv",
+        //         equityOpeningCode: "BEivKapOndBeg",
+        //         exceptionKeepLeafAnchors: ["BLim"]
+        //     )
+        }
+    }
 }

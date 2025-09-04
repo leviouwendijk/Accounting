@@ -19,35 +19,6 @@ public struct RGSPresentationLine: Sendable {
     }
 }
 
-// public func linesFor(
-//     _ kind: StatementKind,
-//     roll: RGSAssemblerResult,
-//     totals: [Int: Decimal],
-//     labels: [String:String],
-//     target: TargetLevel,
-//     omslag: OmslagMode
-// ) -> [RGSPresentationLine] {
-//     // collect ids of desired statement kind & within level cutoff
-//     var rows: [(id:Int, key:String, lvl:Int, amt:Decimal)] = []
-//     for (id, key) in roll.sortKeyById {
-//         guard roll.kindById[id] == kind else { continue }
-//         let lvl = key.isEmpty ? 1 : key.split(separator: ".").count
-//         guard lvl <= target.rawValue else { continue }
-//         let raw = totals[id] ?? 0
-//         let shown = RGSAssembler.present(raw, direction: roll.directionById[id] ?? .debit, mode: omslag)
-//         rows.append((id, key, lvl, shown))
-//     }
-
-//     rows.sort { 
-//         RGSNodeSortingCode(key: $0.key) < RGSNodeSortingCode(key: $1.key)
-//     }
-
-//     return rows.map { (id, key, lvl, amt) in
-//         let label = labels[key] ?? labels[key.split(separator: ".").dropLast().joined(separator: ".")] ?? "—"
-//         return RGSPresentationLine(label: label, amount: amt, id: id, level: lvl)
-//     }
-// }
-
 public func linesFor(
     _ kind: StatementKind,
     roll: RGSAssemblerResult,
