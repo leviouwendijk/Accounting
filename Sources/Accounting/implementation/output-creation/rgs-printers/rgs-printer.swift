@@ -71,22 +71,20 @@ public enum RGSPrinter {
         omslag: OmslagMode = .apply
     ) throws -> PresentedBalanceTotals {
         let maps  = try RGSAssembler.makeMaps(from: chart)
-        let alpha = try RGSAssembler.balanceAlphaSections(
-            totals: bundle.totalsById, maps: maps, bounds: bounds
-        )
-        // resolve real roots for correct display flipping
-        let A = try? RGSAssembler.resolveSectionRoot("A", maps: maps).id
-        let J = try? RGSAssembler.resolveSectionRoot("J", maps: maps).id
-        let K = try? RGSAssembler.resolveSectionRoot("K", maps: maps).id
 
-        func shown(_ raw: Decimal, _ id: Int?) -> Decimal {
-            guard let id = id else { return raw }
-            return RGSAssembler.present(raw, direction: maps.directionById[id] ?? .debit, mode: omslag)
+        @inline(__always)
+        func shownAtKey(_ key: String) -> Decimal {
+            guard let id = maps.keyToId[key] else { return 0 }
+            let raw = bundle.totalsById[id] ?? 0
+            let dir = maps.directionById[id] ?? .debit
+            return RGSAssembler.present(raw, direction: dir, mode: omslag)
         }
 
-        let a = shown(alpha.assets,      A)
-        let e = shown(alpha.equity,      J)
-        let k = shown(alpha.liabilities, K)
+        // Read totals directly from identifier roots
+        let a = shownAtKey("B.A")
+        let e = shownAtKey("B.J")
+        let k = shownAtKey("B.K")
+
         return PresentedBalanceTotals(assets: a, equity: e, liabilities: k)
     }
 

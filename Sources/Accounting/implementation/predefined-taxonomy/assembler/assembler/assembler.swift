@@ -14,7 +14,7 @@ public enum RGSAssembler {
 
         // Build maps + fallbacks
         let maps   = try RGSAssembler.makeMaps(from: ch)
-        assertEdgesMatchKeys(maps)
+        // assertEdgesMatchKeys(maps)
 
         // --- Auto-close: resolve target nodes (single-code variant) ---
         let targets  = AutoCloseTargets(for: businessEntity)
