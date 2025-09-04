@@ -35,6 +35,77 @@ public extension DepreciationAuditReport {
 
             out.append("• periods checked: \(total)")
             out.append("• exact: \(exact)   within tol: \(tol)   aggregate covered: \(agg)   failures: \(failCnt)")
+
+            // === Amount totals (all periods) ===
+            let exactAmt = items.lazy
+                .filter { $0.coverage == .exact }
+                .reduce(Decimal(0)) { $0 + $1.expected }
+
+            let tolAmt = items.lazy
+                .filter { $0.coverage == .withinTolerance }
+                .reduce(Decimal(0)) { $0 + $1.expected }
+
+            var deficits: Decimal = 0
+            var surplus:  Decimal = 0
+            for it in items where it.coverage == .none {
+                if it.expected > it.actual {
+                    deficits += (it.expected - it.actual)
+                } else if it.actual > it.expected {
+                    surplus  += (it.actual - it.expected)
+                }
+            }
+            let misalignedAmt = deficits + surplus
+
+            out.append("")
+            out.append("Amounts:")
+            out.append("  • total exact: \(fmt(exactAmt))")
+            out.append("  • total within tolerance: \(fmt(tolAmt))")
+            out.append("  • total misaligned: \(fmt(misalignedAmt))")
+            out.append("     ├─ total deficits: \(fmt(deficits))")
+            out.append("     └─ total surplus:  \(fmt(surplus))")
+
+            // === Amount totals PER PERIOD ===
+            struct _PKey: Hashable { let s: Date; let e: Date }
+            var byPeriod: [_PKey: [DepreciationAuditItem]] = [:]
+            for it in items {
+                byPeriod[_PKey(s: it.periodStart, e: it.periodEnd), default: []].append(it)
+            }
+
+            let _df = ISO8601DateFormatter()
+            if opts.useISODateOnly { _df.formatOptions = [.withFullDate] }
+
+            out.append("")
+            out.append("Per-period amounts:")
+            for k in byPeriod.keys.sorted(by: { $0.s < $1.s }) {
+                let bucket = byPeriod[k]!
+
+                let pExact = bucket.lazy
+                    .filter { $0.coverage == .exact }
+                    .reduce(Decimal(0)) { $0 + $1.expected }
+
+                let pTol = bucket.lazy
+                    .filter { $0.coverage == .withinTolerance }
+                    .reduce(Decimal(0)) { $0 + $1.expected }
+
+                var pDef: Decimal = 0
+                var pSur: Decimal = 0
+                for it in bucket where it.coverage == .none {
+                    if it.expected > it.actual {
+                        pDef += (it.expected - it.actual)
+                    } else if it.actual > it.expected {
+                        pSur += (it.actual - it.expected)
+                    }
+                }
+                let pMis = pDef + pSur
+
+                out.append("  \(_df.string(from: k.s)) → \(_df.string(from: k.e))")
+                out.append("    • total exact: \(fmt(pExact))")
+                out.append("    • total within tolerance: \(fmt(pTol))")
+                out.append("    • total misaligned: \(fmt(pMis))")
+                out.append("       ├─ total deficits: \(fmt(pDef))")
+                out.append("       └─ total surplus:  \(fmt(pSur))")
+            }
+            // END OF AMOUNT TOTALS
         }
 
         if opts.onlyFailures {
