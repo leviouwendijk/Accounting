@@ -1,9 +1,16 @@
 import Foundation
 
-public struct PeriodAssembleResult: Sendable {
+public struct PeriodAssembleResultPeriod: Sendable {
     public let range: PeriodWindow
-    public let current: StatementBundle
-    public let previous: StatementBundle?
+    public let bundle: StatementBundle
+}
+
+public struct PeriodAssembleResult: Sendable {
+    // public let current: StatementBundle
+    // public let previous: StatementBundle?
+
+    public let current: PeriodAssembleResultPeriod
+    public let previous: PeriodAssembleResultPeriod?
 }
 
 public enum PeriodAssembler {
@@ -39,49 +46,42 @@ public enum PeriodAssembler {
         let tbYTD  = trialBalance(eYTD)    // for BS as-of window end
         // (helper exists in your lib) :contentReference[oaicite:2]{index=2}
 
-        // 4) Assemble using split seeds
-        let current = try assembleSplitSeeds(
+        // 4) Assemble using split seeds (unchanged) -> produce StatementBundle
+        let currentBundle = try assembleSplitSeeds(
             chart: chart,
             tbIncomeWindow: tbWin,   // IS = window only
             tbBalanceYTD: tbYTD,     // BS = cumulative to window end
-            // tbOverlayForNI: tbHist,  // overlay NI computed from *historical* only
-            tbOverlayForNI: tbYTD,    // <— overlay NI as-of prev.to (balances the BS)
+            tbOverlayForNI: tbYTD,    // overlay NI as-of window end (so BS balances)
             cut: cut,
             omslag: omslag,
             entity: entity
         )
 
-        // 5) Optional previous-period comparison
-        var previous: StatementBundle? = nil
+        // wrap current with range
+        let current = PeriodAssembleResultPeriod(range: wins.window, bundle: currentBundle)
+
+        // 5) Optional previous-period comparison -> build previousPeriod if present
+        var previous: PeriodAssembleResultPeriod? = nil
         if let p = wins.previous {
-            // Slice entries for the previous window, its YTD, and its historical base
             let ePrevWin  = filterEntries(result.resolved, within: p)
             let ytdPrev   = PeriodWindow(from: nil, to: p.to)
-            // let histPrev  = PeriodWindow(
-            //     from: nil,
-            //     // p.from is a day-start; minus 1 second -> end of previous day (inclusive)
-            //     to: p.from.map { $0.addingTimeInterval(-1) }
-            // )
 
-            // Trial balances
             let tbPrevWin  = trialBalance(ePrevWin)
             let ePrevYTD   = filterEntries(result.resolved, within: ytdPrev)
-            // let ePrevHist  = filterEntries(result.resolved, within: histPrev)
             let tbPrevYTD  = trialBalance(ePrevYTD)
-            // let tbPrevHist = trialBalance(ePrevHist)
 
-            // Assemble (use `try`, assign result)
-            previous = try assembleSplitSeeds(
+            let prevBundle = try assembleSplitSeeds(
                 chart: chart,
                 tbIncomeWindow: tbPrevWin,
                 tbBalanceYTD: tbPrevYTD,
-                // tbOverlayForNI: tbPrevHist,
-                tbOverlayForNI: tbPrevYTD,
+                tbOverlayForNI: tbPrevYTD, // overlay through prev.to
                 cut: cut, omslag: omslag, entity: entity
             )
+
+            previous = PeriodAssembleResultPeriod(range: p, bundle: prevBundle)
         }
 
-        return .init(range: wins.window, current: current, previous: previous)
+        return .init(current: current, previous: previous)
     }
 
     // /// Core: do exactly what your RGSAssembler does, but with
