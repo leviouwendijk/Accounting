@@ -69,9 +69,8 @@ public extension PeriodAssembler {
             seedBalance[resolved.equity.id, default: 0] += ( niOverlay)
         }
 
-        // Roll up (sorting-key climb) and put current-window NI on IS NI line
-        var totalsIncome  = RGSAssembler.rollupBySortingKey(seedIncome,  idToKey: maps.sortKeyById, keyToId: maps.keyToId)
-        let totalsBalance = RGSAssembler.rollupBySortingKey(seedBalance, idToKey: maps.sortKeyById, keyToId: maps.keyToId)
+        var totalsIncome  = RGSAssembler.rollupAmounts(seedIncome,  parentById: maps.parentById)
+        let totalsBalance = RGSAssembler.rollupAmounts(seedBalance, parentById: maps.parentById)
 
         let niWindow = seedIncome.reduce(into: Decimal(0)) { acc, kv in
             if maps.kindById[kv.key] == .income { acc += kv.value }
