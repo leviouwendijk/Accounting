@@ -28,12 +28,12 @@ public enum PeriodAssembler {
         let wins = PeriodSlicer.resolve(shape: shape, anchor: anchor, tz: tz, calendar: calendar)
 
         // 2) Slice entries
-        // let eHist = filterEntries(result.resolved, within: wins.historical)
+        let eHist = filterEntries(result.resolved, within: wins.historical)
         let eWin  = filterEntries(result.resolved, within: wins.window)
         let eYTD  = filterEntries(result.resolved, within: wins.ytd)
 
         // 3) Trial balances per slice
-        // let tbHist = trialBalance(eHist)
+        let tbHist = trialBalance(eHist)
         let tbWin  = trialBalance(eWin)
         let tbYTD  = trialBalance(eYTD)    // for BS as-of window end
         // (helper exists in your lib) :contentReference[oaicite:2]{index=2}
@@ -43,8 +43,8 @@ public enum PeriodAssembler {
             chart: chart,
             tbIncomeWindow: tbWin,   // IS = window only
             tbBalanceYTD: tbYTD,     // BS = cumulative to window end
-            // tbOverlayForNI: tbHist,  // overlay NI computed from *historical* only
-            tbOverlayForNI: tbYTD,    // <— overlay NI as-of prev.to (balances the BS)
+            tbOverlayForNI: tbHist,  // overlay NI computed from *historical* only
+            // tbOverlayForNI: tbYTD,    // <— overlay NI as-of prev.to (balances the BS)
             cut: cut,
             omslag: omslag,
             entity: entity
@@ -56,25 +56,26 @@ public enum PeriodAssembler {
             // Slice entries for the previous window, its YTD, and its historical base
             let ePrevWin  = filterEntries(result.resolved, within: p)
             let ytdPrev   = PeriodWindow(from: nil, to: p.to)
-            let histPrev  = PeriodWindow(
-                from: nil,
-                // p.from is a day-start; minus 1 second -> end of previous day (inclusive)
-                to: p.from.map { $0.addingTimeInterval(-1) }
-            )
+            // let histPrev  = PeriodWindow(
+            //     from: nil,
+            //     // p.from is a day-start; minus 1 second -> end of previous day (inclusive)
+            //     to: p.from.map { $0.addingTimeInterval(-1) }
+            // )
 
             // Trial balances
             let tbPrevWin  = trialBalance(ePrevWin)
             let ePrevYTD   = filterEntries(result.resolved, within: ytdPrev)
-            let ePrevHist  = filterEntries(result.resolved, within: histPrev)
+            // let ePrevHist  = filterEntries(result.resolved, within: histPrev)
             let tbPrevYTD  = trialBalance(ePrevYTD)
-            let tbPrevHist = trialBalance(ePrevHist)
+            // let tbPrevHist = trialBalance(ePrevHist)
 
             // Assemble (use `try`, assign result)
             previous = try assembleSplitSeeds(
                 chart: chart,
                 tbIncomeWindow: tbPrevWin,
                 tbBalanceYTD: tbPrevYTD,
-                tbOverlayForNI: tbPrevHist,
+                // tbOverlayForNI: tbPrevHist,
+                tbOverlayForNI: tbPrevYTD,
                 cut: cut, omslag: omslag, entity: entity
             )
         }
