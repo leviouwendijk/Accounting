@@ -6,7 +6,8 @@ public extension PeriodAssembler {
     static func assembleSplitSeeds(
         chart: CompiledChart,
         tbIncomeWindow: [TrialBalanceRow],
-        tbBalanceYTD: [TrialBalanceRow],
+        // tbBalanceYTD: [TrialBalanceRow],
+        tbBalanceWindow: [TrialBalanceRow],
         tbOverlayForNI: [TrialBalanceRow],
         tbPreWindowForOpening: [TrialBalanceRow]?,   // ← NEW: pre-window seed for *Beg mapping
         cut: AssembleCut,
@@ -28,10 +29,12 @@ public extension PeriodAssembler {
 
         // seeds
         let seedIncome  = RGSAssembler.seedLeafs(from: tbIncomeWindow,  using: index)
-        let seedYTD     = RGSAssembler.seedLeafs(from: tbBalanceYTD,    using: index)
+        // let seedYTD     = RGSAssembler.seedLeafs(from: tbBalanceYTD,    using: index)
+        let seedWinBal  = RGSAssembler.seedLeafs(from: tbBalanceWindow, using: index)
         let seedOverlay = RGSAssembler.seedLeafs(from: tbOverlayForNI,  using: index)
         try RGSAssembler.assertSeedSumsToZero(seedIncome)
-        try RGSAssembler.assertSeedSumsToZero(seedYTD)
+        // try RGSAssembler.assertSeedSumsToZero(seedYTD)
+        try RGSAssembler.assertSeedSumsToZero(seedWinBal)
         try RGSAssembler.assertSeedSumsToZero(seedOverlay)
 
         // OpeningBeg from pre-window → map to "<L4>Beg" when present (balance accounts only)
@@ -49,13 +52,18 @@ public extension PeriodAssembler {
 
         // Base BS seed = OpeningBeg + YTD
         var seedBalance = seedOpening
-        for (k, v) in seedYTD { seedBalance[k, default: 0] += v }
+        // for (k, v) in seedYTD { seedBalance[k, default: 0] += v }
+        for (k, v) in seedWinBal { seedBalance[k, default: 0] += v }
+
 
         // NI overlay from overlay seed (normally YTD), unless manual postings exist
         let niOverlay = seedOverlay.reduce(into: Decimal(0)) { acc, kv in
             if maps.kindById[kv.key] == .income { acc += kv.value }
         }
-        let hasManual = (seedBalance[resolved.ni.id] ?? 0) != 0 || (seedBalance[resolved.equity.id] ?? 0) != 0
+
+        // let hasManual = (seedBalance[resolved.ni.id] ?? 0) != 0 || (seedBalance[resolved.equity.id] ?? 0) != 0
+        let hasManual = false
+
         if !hasManual && niOverlay != 0 {
             seedBalance[resolved.ni.id,     default: 0] += (-niOverlay)
             seedBalance[resolved.equity.id, default: 0] += ( niOverlay)

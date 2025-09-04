@@ -143,9 +143,11 @@ public enum RGSAssembler {
         let ni = seed.reduce(into: Decimal(0)) { acc, kv in
             if maps.kindById[kv.key] == .income { acc += kv.value }
         }
-        let manualAtNi     = seed[autoCloseTargets.niId] ?? 0
-        let manualAtEquity = seed[autoCloseTargets.eqId] ?? 0
-        let hasManual = (manualAtNi != 0 || manualAtEquity != 0)
+        // let manualAtNi     = seed[autoCloseTargets.niId] ?? 0
+        // let manualAtEquity = seed[autoCloseTargets.eqId] ?? 0
+
+        // let hasManual = (manualAtNi != 0 || manualAtEquity != 0)
+        let hasManual = false
 
         var seedWithAC = seed
         if !hasManual && ni != 0 {

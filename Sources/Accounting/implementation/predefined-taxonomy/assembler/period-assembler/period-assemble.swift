@@ -20,13 +20,15 @@ public enum PeriodAssembler {
 
         // 2) Current period
         let currentBundle = try buildCurrentBundle(
-            chart: chart, wins: wins, result: result, cut: cut, omslag: omslag, entity: entity
+            chart: chart, wins: wins, result: result, cut: cut, omslag: omslag, entity: entity,
+            rangeToDate: shape.rangeToDate
         )
         let current = PeriodAssembleResultPeriod(range: wins.window, bundle: currentBundle)
 
         // 3) Previous (optional)
         let previous = try buildPreviousBundle(
-            chart: chart, wins: wins, result: result, cut: cut, omslag: omslag, entity: entity
+            chart: chart, wins: wins, result: result, cut: cut, omslag: omslag, entity: entity,
+            rangeToDate: shape.rangeToDate
         ).map { PeriodAssembleResultPeriod(range: $0.range, bundle: $0.bundle) }
 
         return .init(current: current, previous: previous)
