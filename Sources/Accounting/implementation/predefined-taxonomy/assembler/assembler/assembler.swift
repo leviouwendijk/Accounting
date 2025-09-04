@@ -25,13 +25,6 @@ public enum RGSAssembler {
         try assertSeedSumsToZero(seed)
 
         if !autoClose {
-            // // ROLLING UP BY SORTINGKEY
-            // let totals = RGSAssembler.rollupBySortingKey(
-            //     seed    ,  
-            //     idToKey :  maps.sortKeyById,
-            //     keyToId :  maps.keyToId
-            // )
-            // ATTEMPT TO ROLL UP BY PARENT BY ID
             let totals = RGSAssembler.rollupAmounts(
                 seed,  
                 parentById:  maps.parentById
@@ -88,12 +81,6 @@ public enum RGSAssembler {
                 seedWithAC[resolved.equity.id, default: 0] += ( ni) // push into equity
             }
 
-            // // --- two rollups: NO overlay for IS, overlay for BS ---
-            // // ROLL UP BY SORTINGKEY
-            // var totalsIncome  = RGSAssembler.rollupBySortingKey(seed,        idToKey: maps.sortKeyById, keyToId: maps.keyToId)
-            // let totalsBalance = RGSAssembler.rollupBySortingKey(seedWithAC,  idToKey: maps.sortKeyById, keyToId: maps.keyToId)
-
-            // ATTEMPTING PARENT BY ID ROLLUP
             var totalsIncome  = RGSAssembler.rollupAmounts(seed,        parentById: maps.parentById)
             let totalsBalance = RGSAssembler.rollupAmounts(seedWithAC,  parentById: maps.parentById)
             // --- end auto-close overlay ---
@@ -141,16 +128,14 @@ public enum RGSAssembler {
         guard let index = ch.index else { throw RGSAssemblerError.missingIndex }
 
         let nodes = ch.nodes
-        // let nodeById = Dictionary(uniqueKeysWithValues: nodes.map { ($0.id, $0) })
 
-        // ORDER ONLY: SortingKey (fallback to .codes.code if key missing)
+        // sortingkey for order only 
         var sortKeyById: [Int:String] = [:]
         for n in nodes {
             let key = n.xlsx?.sorting.key ?? n.codes.code
             sortKeyById[n.id] = key
         }
 
-        // Direction + kind maps unchanged
         let directionById = Dictionary(uniqueKeysWithValues: nodes.compactMap { n in
             n.direction.map { (n.id, $0) }
         })
@@ -161,7 +146,7 @@ public enum RGSAssembler {
 
         let keyToId = index.bySortKey    // existing compiled index
 
-        // NEW: parent map by identifier-prefix + (level-1)
+        // parent by rgs identifier
         let hier = RGSIdentifierHierarchy.build(from: nodes)
         let parentById: [Int:Int] = Dictionary(uniqueKeysWithValues:
             hier.parentById.compactMap { (child, parent) in parent.map { (child, $0) } }
@@ -172,7 +157,7 @@ public enum RGSAssembler {
             kindById: kindById,
             sortKeyById: sortKeyById,
             directionById: directionById,
-            parentById: parentById,             // <- our aggregation graph
+            parentById: parentById,
             keyToId: keyToId,
             nameById: Dictionary(uniqueKeysWithValues: nodes.map{ ($0.id, $0.labels.short) })
         )
