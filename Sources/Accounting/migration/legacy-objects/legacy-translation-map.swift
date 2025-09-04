@@ -1412,7 +1412,8 @@ public enum LegacyTranslation {
         .init(
             213, 
             "Carry Forward Input VAT",
-            "BVorVbkTvo",
+            // "BVorVbkTvo",
+            "BSchBepBtwVoo",
             "carry_forward_vat"
         ),
         // .init(
