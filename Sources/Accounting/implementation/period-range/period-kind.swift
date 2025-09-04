@@ -25,7 +25,15 @@ public struct PeriodShape: Codable, Sendable {
 public struct PeriodWindow: Sendable, Equatable {
     public let from: Date?   // nil = beginning of time
     public let to: Date?     // nil = through latest (inclusive day end)
+
     public init(from: Date?, to: Date?) { self.from = from; self.to = to }
+
+    public func string() -> String {
+        let df = DateFormatter(); df.dateStyle = .medium; df.timeStyle = .none
+        let fromStr = from.map { df.string(from: $0) } ?? "beginning"
+        let toStr   = to.map   { df.string(from: $0) } ?? "latest"
+        return "Period: \(fromStr) → \(toStr)"
+    }
 }
 
 public struct PeriodWindows: Sendable {
