@@ -30,6 +30,7 @@ public enum AccountStoreError: Error, CustomStringConvertible, Sendable {
     case missingRequiredForNewAccount(code: String, missing: String, at: SourceLocation?)
     case empty(at: SourceLocation?)
     case compiledChartIndexEmpty
+    case hierarchyIssue(problem: RGSIdentifierHierarchy.Problem, at: SourceLocation?)
 
     public var description: String {
         switch self {
@@ -45,6 +46,11 @@ public enum AccountStoreError: Error, CustomStringConvertible, Sendable {
             return "Store is empty \(at.describeSuffix)"
         case .compiledChartIndexEmpty:
             return "Account Store has a CompiledChart with an empty index"
+        case let .hierarchyIssue(problem, at):
+            var s = "Invalid RGS hierarchy for '\(problem.childCode)' (level \(problem.childLevel)): \(problem)"
+            if let at { s += at.description }
+            s += " — Parent must be a proper code prefix and exactly one level above."
+            return s
         }
     }
 }

@@ -59,17 +59,17 @@ public enum RGSAssembler {
         try assertSeedSumsToZero(seed)
 
         if !autoClose {
-            // ROLLING UP BY SORTINGKEY
-            let totals = RGSAssembler.rollupBySortingKey(
-                seed    ,  
-                idToKey :  maps.sortKeyById,
-                keyToId :  maps.keyToId
-            )
-            // // ATTEMPT TO ROLL UP BY PARENT BY ID
-            // let totals = RGSAssembler.rollupAmounts(
-            //     seed,  
-            //     parentById:  maps.parentById
+            // // ROLLING UP BY SORTINGKEY
+            // let totals = RGSAssembler.rollupBySortingKey(
+            //     seed    ,  
+            //     idToKey :  maps.sortKeyById,
+            //     keyToId :  maps.keyToId
             // )
+            // ATTEMPT TO ROLL UP BY PARENT BY ID
+            let totals = RGSAssembler.rollupAmounts(
+                seed,  
+                parentById:  maps.parentById
+            )
 
             // Forced inclusions (codes → ids)
             let forcedIds = Set(cut.includeCodes.compactMap { index.byIdentifier[$0] })
@@ -122,14 +122,14 @@ public enum RGSAssembler {
                 seedWithAC[resolved.equity.id, default: 0] += ( ni) // push into equity
             }
 
-            // --- two rollups: NO overlay for IS, overlay for BS ---
-            // ROLL UP BY SORTINGKEY
-            var totalsIncome  = RGSAssembler.rollupBySortingKey(seed,        idToKey: maps.sortKeyById, keyToId: maps.keyToId)
-            let totalsBalance = RGSAssembler.rollupBySortingKey(seedWithAC,  idToKey: maps.sortKeyById, keyToId: maps.keyToId)
+            // // --- two rollups: NO overlay for IS, overlay for BS ---
+            // // ROLL UP BY SORTINGKEY
+            // var totalsIncome  = RGSAssembler.rollupBySortingKey(seed,        idToKey: maps.sortKeyById, keyToId: maps.keyToId)
+            // let totalsBalance = RGSAssembler.rollupBySortingKey(seedWithAC,  idToKey: maps.sortKeyById, keyToId: maps.keyToId)
 
-            // // ATTEMPTING PARENT BY ID ROLLUP
-            // var totalsIncome  = RGSAssembler.rollupAmounts(seed,        parentById: maps.parentById)
-            // let totalsBalance = RGSAssembler.rollupAmounts(seedWithAC,  parentById: maps.parentById)
+            // ATTEMPTING PARENT BY ID ROLLUP
+            var totalsIncome  = RGSAssembler.rollupAmounts(seed,        parentById: maps.parentById)
+            let totalsBalance = RGSAssembler.rollupAmounts(seedWithAC,  parentById: maps.parentById)
             // --- end auto-close overlay ---
 
             // place NI on the NI node for IS presentation (do NOT invert here)
@@ -171,41 +171,84 @@ public enum RGSAssembler {
         }
     }
 
-    public static func makeMaps(from chart: CompiledChart) throws -> RGSAssemblerResult {
-        let ch = try chart.ensuringIndex(enrichNodes: true, strict: false)
-        guard let idx = ch.index else { throw RGSAssemblerError.missingIndex }
+    // public static func makeMaps(from chart: CompiledChart) throws -> RGSAssemblerResult {
+    //     let ch = try chart.ensuringIndex(enrichNodes: true, strict: false)
+    //     guard let idx = ch.index else { throw RGSAssemblerError.missingIndex }
 
-        var kindById: [Int: StatementKind] = [:]
-        var sortKeyById: [Int: String] = [:]
-        var directionById: [Int: Direction] = [:]
-        var parentById: [Int: Int] = [:]
-        var nameById: [Int: String] = [:]
+    //     var kindById: [Int: StatementKind] = [:]
+    //     var sortKeyById: [Int: String] = [:]
+    //     var directionById: [Int: Direction] = [:]
+    //     var parentById: [Int: Int] = [:]
+    //     var nameById: [Int: String] = [:]
 
-        for n in ch.nodes {
-            if let x = n.xlsx {
-                let key = x.cachedSortingKey
-                sortKeyById[n.id] = key
-                if let pid = x.links.parentId { parentById[n.id] = pid }
-            }
-            directionById[n.id] = n.direction
-            nameById[n.id] = n.labels.short
-            if n.codes.code.hasPrefix("B") { kindById[n.id] = .balance }
-            else if n.codes.code.hasPrefix("W") { kindById[n.id] = .income }
+    //     for n in ch.nodes {
+    //         if let x = n.xlsx {
+    //             let key = x.cachedSortingKey
+    //             sortKeyById[n.id] = key
+    //             if let pid = x.links.parentId { parentById[n.id] = pid }
+    //         }
+    //         directionById[n.id] = n.direction
+    //         nameById[n.id] = n.labels.short
+    //         if n.codes.code.hasPrefix("B") { kindById[n.id] = .balance }
+    //         else if n.codes.code.hasPrefix("W") { kindById[n.id] = .income }
+    //     }
+
+    //     return .init(
+    //         totalsById: [:],
+    //         kindById: kindById,
+    //         sortKeyById: sortKeyById,
+    //         directionById: directionById,
+    //         parentById: parentById,
+    //         keyToId: idx.bySortKey,                 // from the index (key -> id)
+    //         nameById: nameById
+    //     )
+    // }
+
+    public static func makeMaps(from ch: CompiledChart) throws -> RGSAssemblerResult {
+        guard let index = ch.index else { throw RGSAssemblerError.missingIndex }
+
+        let nodes = ch.nodes
+        // let nodeById = Dictionary(uniqueKeysWithValues: nodes.map { ($0.id, $0) })
+
+        // ORDER ONLY: SortingKey (fallback to .codes.code if key missing)
+        var sortKeyById: [Int:String] = [:]
+        for n in nodes {
+            let key = n.xlsx?.sorting.key ?? n.codes.code
+            sortKeyById[n.id] = key
         }
 
-        return .init(
-            totalsById: [:],
+        // Direction + kind maps unchanged
+        let directionById = Dictionary(uniqueKeysWithValues: nodes.compactMap { n in
+            n.direction.map { (n.id, $0) }
+        })
+
+        let kindById: [Int: StatementKind] = Dictionary(uniqueKeysWithValues: nodes.map { n in
+            (n.id, (n.side == .balance ? .balance : .income))
+        })
+
+        let keyToId = index.bySortKey    // existing compiled index
+
+        // NEW: parent map by identifier-prefix + (level-1)
+        let hier = RGSIdentifierHierarchy.build(from: nodes)
+        let parentById: [Int:Int] = Dictionary(uniqueKeysWithValues:
+            hier.parentById.compactMap { (child, parent) in parent.map { (child, $0) } }
+        )
+
+        return RGSAssemblerResult(
+            totalsById: [:],                    // filled later
             kindById: kindById,
             sortKeyById: sortKeyById,
             directionById: directionById,
-            parentById: parentById,
-            keyToId: idx.bySortKey,                 // from the index (key -> id)
-            nameById: nameById
+            parentById: parentById,             // <- our aggregation graph
+            keyToId: keyToId,
+            nameById: Dictionary(uniqueKeysWithValues: nodes.map{ ($0.id, $0.labels.short) })
         )
     }
 
-    public static func seedLeafs(from trial: [TrialBalanceRow],
-                                 using index: RGSIndex) -> [Int: Decimal] {
+    public static func seedLeafs(
+        from trial: [TrialBalanceRow],
+        using index: RGSIndex
+    ) -> [Int: Decimal] {
         var byId: [Int: Decimal] = [:]
         for row in trial {
             if let id = index.byIdentifier[row.accountCode] {
