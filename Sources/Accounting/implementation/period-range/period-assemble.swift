@@ -1,6 +1,7 @@
 import Foundation
 
 public struct PeriodAssembleResult: Sendable {
+    public let range: PeriodWindow
     public let current: StatementBundle
     public let previous: StatementBundle?
 }
@@ -80,7 +81,7 @@ public enum PeriodAssembler {
             )
         }
 
-        return .init(current: current, previous: previous)
+        return .init(range: wins.window, current: current, previous: previous)
     }
 
     // /// Core: do exactly what your RGSAssembler does, but with
