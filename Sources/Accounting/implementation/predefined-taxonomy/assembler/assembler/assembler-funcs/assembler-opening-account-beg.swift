@@ -113,6 +113,25 @@ extension RGSAssembler {
             out[id, default: 0] += amt
         }
 
+        // return out
+
+        // === PRE-WINDOW NI INJECTION ==================================
+        // Also move *pre-window* net income into the equity opening target,
+        // so the opening balance sheet balances without explicit closing entries.
+        if let eqTarget = (equityOpeningId ?? equityAnchorId) {
+            var preNI: Decimal = 0
+            for r in tbHist {
+                guard let id = index.byIdentifier[r.accountCode] else { continue }
+                if maps.kindById[id] == .income {
+                    preNI += (r.debit - r.credit)   // same sign convention as elsewhere
+                }
+            }
+            if preNI != 0 {
+                out[eqTarget, default: 0] += preNI
+            }
+        }
+        // ===============================================================
+
         return out
     }
 }
