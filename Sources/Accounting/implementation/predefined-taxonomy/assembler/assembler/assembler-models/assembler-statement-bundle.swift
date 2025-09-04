@@ -4,14 +4,17 @@ public struct StatementBundle: Sendable {
     public let balance: [RGSPresentationLine]
     public let income:  [RGSPresentationLine]
     public let totalsById: [Int: Decimal]   // for debugging / future use
+    public let entity: EntityBreakdown?
     
     public init(
         balance: [RGSPresentationLine],
         income: [RGSPresentationLine],
-        totalsById: [Int: Decimal]   // for debugging / future use
+        totalsById: [Int: Decimal],
+        entity: EntityBreakdown? = nil
     ) {
         self.balance = balance
         self.income = income
         self.totalsById = totalsById
+        self.entity = entity
     }
 }

@@ -24,6 +24,8 @@ public enum RGSAssembler {
         let seed   = RGSAssembler.seedLeafs(from: trialRows, using: index)
         try assertSeedSumsToZero(seed)
 
+        let seedAE = RGSAssembler.seedLeafsAE(from: trialRows, using: index) // or: { $0.entityId }
+
         if !autoClose {
             let totals = RGSAssembler.rollupAmounts(
                 seed,  
