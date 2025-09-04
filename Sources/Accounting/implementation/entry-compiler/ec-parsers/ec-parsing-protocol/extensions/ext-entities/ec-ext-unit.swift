@@ -164,8 +164,11 @@ public extension EntryCompilerParsing {
                 if let o = owner {
                     return merged(baseKey.alias.appendingVariant(o), with: a)
                 } else {
-                    // back-compat path: DO NOT prefix with base alias
-                    return a
+                    // // back-compat path: DO NOT prefix with base alias
+                    // return a
+
+                    // prefix with base alias
+                    return merged(baseKey.alias, with: a)
                 }
             }()
 
