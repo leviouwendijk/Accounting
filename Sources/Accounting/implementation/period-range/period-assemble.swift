@@ -81,10 +81,81 @@ public enum PeriodAssembler {
         return .init(current: current, previous: previous)
     }
 
+    // /// Core: do exactly what your RGSAssembler does, but with
+    // /// (a) income totals from the *window* seed,
+    // /// (b) balance totals from the *YTD* seed,
+    // /// (c) NI overlay computed from the *historical* seed.
+    // private static func assembleSplitSeeds(
+    //     chart: CompiledChart,
+    //     tbIncomeWindow: [TrialBalanceRow],
+    //     tbBalanceYTD: [TrialBalanceRow],
+    //     tbOverlayForNI: [TrialBalanceRow],
+    //     cut: AssembleCut,
+    //     omslag: OmslagMode,
+    //     entity: BusinessEntity
+    // ) throws -> StatementBundle {
+    //     // maps + index
+    //     let ch  = try chart.ensuringIndex(enrichNodes: true, strict: false)
+    //     guard let index = ch.index else { throw RGSAssemblerError.missingIndex }
+
+    //     let maps = try RGSAssembler.makeMaps(from: ch)
+    //     RGSAssembler.assertEdgesMatchKeys(maps)
+
+    //     // resolve auto-close targets (NI/equity) exactly like assembler does
+    //     let targets  = AutoCloseTargets(for: entity)
+    //     let resolved = try targets.resolve(in: index, validateWith: maps) // validates kinds .income/.balance :contentReference[oaicite:3]{index=3}
+
+    //     // seeds
+    //     let seedIncome = RGSAssembler.seedLeafs(from: tbIncomeWindow, using: index)
+    //     let seedYTD    = RGSAssembler.seedLeafs(from: tbBalanceYTD, using: index)
+    //     let seedHist   = RGSAssembler.seedLeafs(from: tbOverlayForNI, using: index)
+    //     try RGSAssembler.assertSeedSumsToZero(seedIncome)
+    //     try RGSAssembler.assertSeedSumsToZero(seedYTD)
+    //     try RGSAssembler.assertSeedSumsToZero(seedHist)
+
+    //     // compute NI from historical only (sum all income-kind nodes)
+    //     let niHist = seedHist.reduce(into: Decimal(0)) { acc, kv in
+    //         if maps.kindById[kv.key] == .income { acc += kv.value }
+    //     }
+
+    //     // apply overlay onto the YTD seed ONLY (don’t touch IS seed)
+    //     var seedBalanceWithAC = seedYTD
+    //     if niHist != 0 {
+    //         seedBalanceWithAC[resolved.ni.id,     default: 0] += (-niHist)  // zero P&L
+    //         seedBalanceWithAC[resolved.equity.id, default: 0] += ( niHist)  // push to equity
+    //     }
+    //     // rollups (deterministic SortingKey climb you use everywhere) :contentReference[oaicite:4]{index=4}
+    //     var totalsIncome  = RGSAssembler.rollupBySortingKey(seedIncome,       idToKey: maps.sortKeyById, keyToId: maps.keyToId)
+    //     let totalsBalance = RGSAssembler.rollupBySortingKey(seedBalanceWithAC, idToKey: maps.sortKeyById, keyToId: maps.keyToId)
+
+    //     // put NI on the NI node for IS presentation (same behavior you have) :contentReference[oaicite:5]{index=5}
+    //     let niWin = seedIncome.reduce(into: Decimal(0)) { acc, kv in
+    //         if maps.kindById[kv.key] == .income { acc += kv.value }
+    //     }
+    //     if niWin != 0 {
+    //         totalsIncome[resolved.ni.id, default: 0] += niWin
+    //     }
+
+    //     // forced inclusions & labels (identical to your assemble()) :contentReference[oaicite:6]{index=6}
+    //     let forcedIds = Set(cut.includeCodes.compactMap { index.byIdentifier[$0] })
+    //     let forcedChain: Set<Int> = cut.includeIntermediates
+    //         ? Set(forcedIds.flatMap { chainToRoot($0, parentById: maps.parentById) })
+    //         : forcedIds
+    //     let labels = index.labelByGroupKey
+
+    //     // build presentation lines (your public helper) :contentReference[oaicite:7]{index=7}
+    //     let bs = linesFor(.balance, roll: maps, totals: totalsBalance,
+    //                       labels: labels, cut: cut, forcedIds: forcedIds, forcedChain: forcedChain, omslag: omslag)
+    //     let is_ = linesFor(.income,  roll: maps, totals: totalsIncome,
+    //                        labels: labels, cut: cut, forcedIds: forcedIds, forcedChain: forcedChain, omslag: omslag)
+
+    //     return StatementBundle(balance: bs, income: is_, totalsById: totalsBalance)
+    // }
+
     /// Core: do exactly what your RGSAssembler does, but with
     /// (a) income totals from the *window* seed,
     /// (b) balance totals from the *YTD* seed,
-    /// (c) NI overlay computed from the *historical* seed.
+    /// (c) NI overlay computed from the provided *overlay* seed (historical or YTD).
     private static func assembleSplitSeeds(
         chart: CompiledChart,
         tbIncomeWindow: [TrialBalanceRow],
@@ -103,51 +174,69 @@ public enum PeriodAssembler {
 
         // resolve auto-close targets (NI/equity) exactly like assembler does
         let targets  = AutoCloseTargets(for: entity)
-        let resolved = try targets.resolve(in: index, validateWith: maps) // validates kinds .income/.balance :contentReference[oaicite:3]{index=3}
+        let resolved = try targets.resolve(in: index, validateWith: maps)
 
         // seeds
-        let seedIncome = RGSAssembler.seedLeafs(from: tbIncomeWindow, using: index)
-        let seedYTD    = RGSAssembler.seedLeafs(from: tbBalanceYTD, using: index)
-        let seedHist   = RGSAssembler.seedLeafs(from: tbOverlayForNI, using: index)
+        let seedIncome  = RGSAssembler.seedLeafs(from: tbIncomeWindow,  using: index)
+        let seedYTD     = RGSAssembler.seedLeafs(from: tbBalanceYTD,    using: index)
+        let seedOverlay = RGSAssembler.seedLeafs(from: tbOverlayForNI,  using: index)
         try RGSAssembler.assertSeedSumsToZero(seedIncome)
         try RGSAssembler.assertSeedSumsToZero(seedYTD)
-        try RGSAssembler.assertSeedSumsToZero(seedHist)
+        try RGSAssembler.assertSeedSumsToZero(seedOverlay)
 
-        // compute NI from historical only (sum all income-kind nodes)
-        let niHist = seedHist.reduce(into: Decimal(0)) { acc, kv in
+        // overlay NI from chosen overlay seed (historical or YTD depending on caller)
+        let niOverlay = seedOverlay.reduce(into: Decimal(0)) { acc, kv in
             if maps.kindById[kv.key] == .income { acc += kv.value }
         }
+
+        // respect manual postings on YTD seed (identical rule to RGSAssembler.assemble)
+        let manualAtNi     = seedYTD[resolved.ni.id] ?? 0
+        let manualAtEquity = seedYTD[resolved.equity.id] ?? 0
+        let hasManual      = (manualAtNi != 0 || manualAtEquity != 0)
 
         // apply overlay onto the YTD seed ONLY (don’t touch IS seed)
         var seedBalanceWithAC = seedYTD
-        if niHist != 0 {
-            seedBalanceWithAC[resolved.ni.id,     default: 0] += (-niHist)  // zero P&L
-            seedBalanceWithAC[resolved.equity.id, default: 0] += ( niHist)  // push to equity
+        if !hasManual && niOverlay != 0 {
+            seedBalanceWithAC[resolved.ni.id,     default: 0] += (-niOverlay) // zero P&L
+            seedBalanceWithAC[resolved.equity.id, default: 0] += ( niOverlay) // push to equity
         }
-        // rollups (deterministic SortingKey climb you use everywhere) :contentReference[oaicite:4]{index=4}
-        var totalsIncome  = RGSAssembler.rollupBySortingKey(seedIncome,       idToKey: maps.sortKeyById, keyToId: maps.keyToId)
-        let totalsBalance = RGSAssembler.rollupBySortingKey(seedBalanceWithAC, idToKey: maps.sortKeyById, keyToId: maps.keyToId)
 
-        // put NI on the NI node for IS presentation (same behavior you have) :contentReference[oaicite:5]{index=5}
-        let niWin = seedIncome.reduce(into: Decimal(0)) { acc, kv in
+        // rollups (deterministic SortingKey climb)
+        var totalsIncome  = RGSAssembler.rollupBySortingKey(
+            seedIncome, idToKey: maps.sortKeyById, keyToId: maps.keyToId
+        )
+        let totalsBalance = RGSAssembler.rollupBySortingKey(
+            seedBalanceWithAC, idToKey: maps.sortKeyById, keyToId: maps.keyToId
+        )
+
+        // place current-window NI on the NI node for IS presentation
+        let niWindow = seedIncome.reduce(into: Decimal(0)) { acc, kv in
             if maps.kindById[kv.key] == .income { acc += kv.value }
         }
-        if niWin != 0 {
-            totalsIncome[resolved.ni.id, default: 0] += niWin
+        if niWindow != 0 {
+            totalsIncome[resolved.ni.id, default: 0] += niWindow
         }
 
-        // forced inclusions & labels (identical to your assemble()) :contentReference[oaicite:6]{index=6}
-        let forcedIds = Set(cut.includeCodes.compactMap { index.byIdentifier[$0] })
-        let forcedChain: Set<Int> = cut.includeIntermediates
+        // force NI + Equity visible (even if zero), like RGSAssembler.assemble(autoClose: true)
+        var localCut = cut
+        localCut.includeCodes.append(contentsOf: [resolved.ni.code, resolved.equity.code])
+
+        // forced inclusions & labels
+        let forcedIds = Set(localCut.includeCodes.compactMap { index.byIdentifier[$0] })
+        let forcedChain: Set<Int> = localCut.includeIntermediates
             ? Set(forcedIds.flatMap { chainToRoot($0, parentById: maps.parentById) })
             : forcedIds
         let labels = index.labelByGroupKey
 
-        // build presentation lines (your public helper) :contentReference[oaicite:7]{index=7}
-        let bs = linesFor(.balance, roll: maps, totals: totalsBalance,
-                          labels: labels, cut: cut, forcedIds: forcedIds, forcedChain: forcedChain, omslag: omslag)
-        let is_ = linesFor(.income,  roll: maps, totals: totalsIncome,
-                           labels: labels, cut: cut, forcedIds: forcedIds, forcedChain: forcedChain, omslag: omslag)
+        // build presentation lines
+        let bs = linesFor(
+            .balance, roll: maps, totals: totalsBalance, labels: labels,
+            cut: localCut, forcedIds: forcedIds, forcedChain: forcedChain, omslag: omslag
+        )
+        let is_ = linesFor(
+            .income, roll: maps, totals: totalsIncome, labels: labels,
+            cut: localCut, forcedIds: forcedIds, forcedChain: forcedChain, omslag: omslag
+        )
 
         return StatementBundle(balance: bs, income: is_, totalsById: totalsBalance)
     }
