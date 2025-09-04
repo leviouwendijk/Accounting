@@ -64,6 +64,43 @@ public extension DepreciationAuditReport {
             out.append("     ├─ total deficits: \(fmt(deficits))")
             out.append("     └─ total surplus:  \(fmt(surplus))")
 
+            // === Amount totals PER YEAR ===
+            // place this right after the “Amounts:” block and before the per-period section
+            let _cal = Calendar(identifier: .iso8601)
+            var byYear: [Int: [DepreciationAuditItem]] = [:]
+            for it in items {
+                byYear[_cal.component(.year, from: it.periodStart), default: []].append(it)
+            }
+
+            out.append("")
+            out.append("Per-year amounts:")
+            for y in byYear.keys.sorted() {
+                let bucket = byYear[y]!
+
+                let yExact = bucket.lazy
+                    .filter { $0.coverage == .exact }
+                    .reduce(Decimal(0)) { $0 + $1.expected }
+
+                let yTol = bucket.lazy
+                    .filter { $0.coverage == .withinTolerance }
+                    .reduce(Decimal(0)) { $0 + $1.expected }
+
+                var yDef: Decimal = 0
+                var ySur: Decimal = 0
+                for it in bucket where it.coverage == .none {
+                    if it.expected > it.actual { yDef += (it.expected - it.actual) }
+                    else if it.actual > it.expected { ySur += (it.actual - it.expected) }
+                }
+                let yMis = yDef + ySur
+
+                out.append("  \(y)")
+                out.append("    • total exact: \(fmt(yExact))")
+                out.append("    • total within tolerance: \(fmt(yTol))")
+                out.append("    • total misaligned: \(fmt(yMis))")
+                out.append("       ├─ total deficits: \(fmt(yDef))")
+                out.append("       └─ total surplus:  \(fmt(ySur))")
+            }
+
             // === Amount totals PER PERIOD ===
             struct _PKey: Hashable { let s: Date; let e: Date }
             var byPeriod: [_PKey: [DepreciationAuditItem]] = [:]
