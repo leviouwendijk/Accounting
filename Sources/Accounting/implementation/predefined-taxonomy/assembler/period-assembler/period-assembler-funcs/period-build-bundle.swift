@@ -12,24 +12,33 @@ public extension PeriodAssembler {
         rangeToDate: Bool
     ) throws -> StatementBundle {
 
+        // Slice entries
         let (eHist, eWin, eYTD) = entriesForWindows(result.resolved, wins: wins)
-        let (tbHist, tbWin, tbYTD) = trialBalances(hist: eHist, win: eWin, ytd: eYTD)
 
+        // Map entities -> stable ids
+        let idIndex = result.entities.idIndex
+
+        // Trial balances that **preserve entity**
+        let tbHist = trialBalance(eHist, entityId: { idIndex[$0] })
+        let tbWin  = trialBalance(eWin,  entityId: { idIndex[$0] })
+        let tbYTD  = trialBalance(eYTD,  entityId: { idIndex[$0] })
+
+        // Choose window vs YTD
         let bsBase   = rangeToDate ? tbYTD : tbWin
         let niSource = rangeToDate ? tbYTD : tbWin
 
-        // NEW: slices from EntityStore
+        // Ownership slices as of period end
         let slices = result.entities.ownershipSlices(asOf: wins.window.to ?? Date())
 
         return try assembleSplitSeeds(
             chart: chart,
-            tbIncomeWindow: tbWin,
-            tbBalanceWindow: bsBase,
-            tbOverlayForNI: niSource,
-            tbPreWindowForOpening: tbHist,
+            tbIncomeWindow: tbWin,          // IS = window
+            tbBalanceWindow: bsBase,        // BS movements = window (or YTD if rangeToDate)
+            tbOverlayForNI: niSource,       // overlay = same source you present
+            tbPreWindowForOpening: tbHist,  // openings = pre-window
             cut: cut, omslag: omslag, entity: entity,
             ownershipSlices: slices,
-            entityIdOnRow: { _ in nil } // keep nil until your rows carry an entity id
+            entityIdOnRow: { $0.entityId }  // ← IMPORTANT: plumbs entity into AE path
         )
     }
 
@@ -43,23 +52,35 @@ public extension PeriodAssembler {
         entity: BusinessEntity,
         rangeToDate: Bool
     ) throws -> (range: PeriodWindow, bundle: StatementBundle)? {
+
         guard let p = wins.previous else { return nil }
 
+        // Previous window entries
         let ePrevWin = filterEntries(result.resolved, within: p)
         let ytdPrev  = PeriodWindow(from: nil, to: p.to)
-        let histPrev = PeriodWindow(from: nil, to: p.from.map { Calendar.iso8601DayEnd($0.addingTimeInterval(-86400)) })
+        let histPrev = PeriodWindow(from: nil, to: p.from.map { d in
+            var cal = Calendar(identifier: .iso8601); cal.firstWeekday = 2
+            var comps = cal.dateComponents([.year,.month,.day], from: d.addingTimeInterval(-86400))
+            comps.hour = 23; comps.minute = 59; comps.second = 59
+            return cal.date(from: comps)!
+        })
 
         let ePrevHist = filterEntries(result.resolved, within: histPrev)
         let ePrevYTD  = filterEntries(result.resolved, within: ytdPrev)
 
-        let tbPrevWin  = trialBalance(ePrevWin)
-        let tbPrevYTD  = trialBalance(ePrevYTD)
-        let tbPrevHist = trialBalance(ePrevHist)
+        // Map entities -> stable ids
+        let idIndex = result.entities.idIndex
 
+        // TBs with entity preserved
+        let tbPrevWin  = trialBalance(ePrevWin,  entityId: { idIndex[$0] })
+        let tbPrevYTD  = trialBalance(ePrevYTD,  entityId: { idIndex[$0] })
+        let tbPrevHist = trialBalance(ePrevHist, entityId: { idIndex[$0] })
+
+        // Choose window vs YTD
         let bsBase   = rangeToDate ? tbPrevYTD : tbPrevWin
         let niSource = rangeToDate ? tbPrevYTD : tbPrevWin
 
-        // NEW: slices as of prev period end
+        // Slices as of previous period end
         let slicesPrev = result.entities.ownershipSlices(asOf: p.to ?? Date())
 
         let prevBundle = try assembleSplitSeeds(
@@ -70,7 +91,7 @@ public extension PeriodAssembler {
             tbPreWindowForOpening: tbPrevHist,
             cut: cut, omslag: omslag, entity: entity,
             ownershipSlices: slicesPrev,
-            entityIdOnRow: { _ in nil }
+            entityIdOnRow: { $0.entityId }
         )
 
         return (p, prevBundle)

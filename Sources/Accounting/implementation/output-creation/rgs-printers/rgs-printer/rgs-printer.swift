@@ -112,4 +112,66 @@ public enum RGSPrinter {
             print("Check: ( Assets ==  Equity + Liabilities )? → ( \(t.assets) == \(t.equityPlusLiabilities) )")
         }
     }
+
+    public static func printBalanceByL2Buckets(
+        _ title: String,
+        bundle: StatementBundle,
+        chart: CompiledChart,
+        equityCode: String,
+        includeOtherBucket: Bool,
+        showEntityBreakdown: Bool,
+        entities: EntityStore,
+        minAbs: Decimal = 0
+    ) throws {
+        // call the existing printer first
+        try RGSPrinter.printBalanceByL2Buckets(
+            title,
+            bundle: bundle,
+            chart: chart,
+            equityCode: equityCode,
+            includeOtherBucket: includeOtherBucket
+        )
+
+        guard showEntityBreakdown, let eb = bundle.entity?.byAccount else { return }
+
+        // id map is a PROPERTY, not a function
+        let idx = entities.idIndex
+
+        // entity id -> display name
+        var idToName: [Int?: String] = [nil: "(unassigned)"]
+        for (key, id) in idx {
+            // avoid .fullchain inference; use alias string or configured displayName
+            let name = entities.byFull[key]?.displayName ?? key.alias.string
+            idToName[id] = name
+        }
+
+        // quick maps for codes
+        let codeById: [Int:String] = Dictionary(uniqueKeysWithValues: chart.nodes.map { ($0.id, $0.codes.code) })
+
+        print("\nEntity breakdown (inline)")
+        print("———————————————————————")
+
+        // iterate the already-presented balance lines (same order)
+        for line in bundle.balance {
+            let accId = line.id
+            guard let byEnt = eb[accId], !byEnt.isEmpty else { continue }
+
+            let total = byEnt.values.reduce(Decimal(0), +)
+            // avoid Decimal.magnitude ambiguity
+            let absTotal = (total < 0 ? -total : total)
+            if minAbs > 0, absTotal < minAbs { continue }
+
+            // reconstruct label for clarity
+            let label = line.label
+            let code  = codeById[accId] ?? ""
+            print("• \(label) [\(code)]  \(total)")
+
+            for (eid, amt) in byEnt.sorted(by: { ($0.key ?? 0) < ($1.key ?? 0) }) where amt != 0 {
+                let absAmt = (amt < 0 ? -amt : amt)
+                if minAbs > 0, absAmt < minAbs { continue }
+                let nm = idToName[eid] ?? "(entity \(eid ?? -1))"
+                print("   ↳ \(nm): \(amt)")
+            }
+        }
+    }
 }
