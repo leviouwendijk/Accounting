@@ -80,10 +80,8 @@ public enum StatementHTMLRenderer {
 
         // 4a) Income Statement (P&L first)
         let plRows: [(Int,String,Decimal,Bool)] = bundle.income
-            .filter { options.omitIncomeLevel1Root ? ($0.level >= 2) : true }
             .filter { options.minAbsIncome == 0 ? true : ($0.amount.magnitude >= options.minAbsIncome) }
-            .map { (indent: max(0, Int($0.level) - (options.omitIncomeLevel1Root ? 2 : 1)),
-                    label: $0.label, amount: $0.amount, isTotal: false) }
+            .map { (indent: max(0, Int($0.level) - 1), label: $0.label, amount: $0.amount, isTotal: false) }
 
         let subtitleHTML = options.subtitle.map { "<div class=\"subtitle\">\(escape($0))</div>" } ?? ""
 
@@ -120,7 +118,8 @@ public enum StatementHTMLRenderer {
             guard let s = sec else { return [] }
             var rs = s.lines.map { (indent: $0.relativeIndent, label: $0.label, amount: $0.amount, isTotal: false) }
             if let st = s.subtotal {
-                rs.append((indent: 0, label: "Subtotal \(s.title)", amount: st, isTotal: true))
+                rs.append((indent: 0, label: "Som", amount: st, isTotal: true))
+                // rs.append((indent: 0, label: "Subtotal \(s.title)", amount: st, isTotal: true))
             }
             return rs
         }
