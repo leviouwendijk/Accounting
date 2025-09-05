@@ -7,19 +7,22 @@ public enum StatementHTMLRenderer {
         public var currencySymbol: String = "€"
         public var minAbsIncome: Decimal = 0
         public var includeOtherBucket: Bool = false
+        public var omitIncomeLevel1Root: Bool = true
 
         public init(
             title: String = "Financial Statements",
             subtitle: String? = nil,
             currencySymbol: String = "€",
             minAbsIncome: Decimal = 0,
-            includeOtherBucket: Bool = false
+            includeOtherBucket: Bool = false,
+            omitIncomeLevel1Root: Bool = true
         ) {
             self.title = title
             self.subtitle = subtitle
             self.currencySymbol = currencySymbol
             self.minAbsIncome = minAbsIncome
             self.includeOtherBucket = includeOtherBucket
+            self.omitIncomeLevel1Root = omitIncomeLevel1Root
         }
     }
 
@@ -77,8 +80,10 @@ public enum StatementHTMLRenderer {
 
         // 4a) Income Statement (P&L first)
         let plRows: [(Int,String,Decimal,Bool)] = bundle.income
+            .filter { options.omitIncomeLevel1Root ? ($0.level >= 2) : true }
             .filter { options.minAbsIncome == 0 ? true : ($0.amount.magnitude >= options.minAbsIncome) }
-            .map { (indent: max(0, Int($0.level) - 1), label: $0.label, amount: $0.amount, isTotal: false) }
+            .map { (indent: max(0, Int($0.level) - (options.omitIncomeLevel1Root ? 2 : 1)),
+                    label: $0.label, amount: $0.amount, isTotal: false) }
 
         let subtitleHTML = options.subtitle.map { "<div class=\"subtitle\">\(escape($0))</div>" } ?? ""
 
@@ -107,7 +112,8 @@ public enum StatementHTMLRenderer {
           \(subtitleHTML)
         """
 
-        html += table(for: "Income Statement", rows: plRows)
+        // html += table(for: "Income Statement", rows: plRows)
+        html += table(for: "Winst- en Verliesrekening", rows: plRows)
 
         // 4b) Balance Sheet (Assets / Equity / Liabilities in separate tables; “Other” optional)
         func rows(for sec: RGSBalanceBucketsOutput.Section?) -> [(Int,String,Decimal,Bool)] {
@@ -122,7 +128,7 @@ public enum StatementHTMLRenderer {
         // html += table(for: "Balance Sheet — Equity",      rows: rows(for: sections.equity))
         // html += table(for: "Balance Sheet — Liabilities", rows: rows(for: sections.liabilities))
 
-        html += table(for: "Balanse: Activa",      rows: rows(for: sections.assets))
+        html += table(for: "Balans: Activa",      rows: rows(for: sections.assets))
         html += table(for: "Balans: Eigen Vermogen",      rows: rows(for: sections.equity))
         html += table(for: "Balans: Passiva", rows: rows(for: sections.liabilities))
         if options.includeOtherBucket {
@@ -142,11 +148,11 @@ public enum StatementHTMLRenderer {
 
             html += """
             <div class="summary">
-                Som Activa: (\(fmt(sum.assets)))
+                Som Activa: \(fmt(sum.assets))
             </div>
 
             <div class="summary">
-                Som Eigen Vermogen, Passiva: (\(fmt(sum.assets)))
+                Som Eigen Vermogen, Passiva: \(fmt(sum.assets))
             </div>
 
             <div class="summary">
