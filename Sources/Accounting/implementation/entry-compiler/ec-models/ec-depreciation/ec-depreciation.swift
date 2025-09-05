@@ -5,12 +5,14 @@ public struct DepreciationConfig: Sendable, Codable {
     public var acquistion: AssetAcquisitionCost
     public var residual: DepreciationResidualValue
     public let account: AccountKey
+    public let contra: AccountKey
 
     public init(
         schedule: DepreciationScheduleSetting,
         acquistion: AssetAcquisitionCost,
         residualPercentage: Decimal,
-        account: AccountKey
+        account: AccountKey,
+        contra: AccountKey
     ) {
         self.schedule = schedule
         self.acquistion = acquistion
@@ -19,6 +21,7 @@ public struct DepreciationConfig: Sendable, Codable {
             acquisitionCost: acquistion
         )
         self.account = account
+        self.contra = contra
     }
     
     public init(
@@ -27,7 +30,8 @@ public struct DepreciationConfig: Sendable, Codable {
         usefulLifeYears: Decimal,
         residualPercentage: Decimal,   
         effectiveDate: Date,
-        account: AccountKey
+        account: AccountKey,
+        contra: AccountKey
     ) {
         self.schedule = DepreciationScheduleSetting(
             method: method,
@@ -40,6 +44,7 @@ public struct DepreciationConfig: Sendable, Codable {
             acquisitionCost: acquistion
         )
         self.account = account
+        self.contra = contra
     }
 
     public func depreciableBase() -> Decimal {

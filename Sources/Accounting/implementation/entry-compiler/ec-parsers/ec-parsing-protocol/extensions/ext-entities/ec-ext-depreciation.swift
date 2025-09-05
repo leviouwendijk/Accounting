@@ -17,6 +17,7 @@ public extension EntryCompilerParsing {
         var acquisition = AssetAcquisitionCost(direct: 0)
         var sawInlineAcquisition = false
         var accountRef: AccountRef?
+        var contraRef: AccountRef?
 
         while current != .rBrace && current != .eof {
             if try parseDepreciationValuation(into: &meta) { // fills dep.valuation.acquisition.direct/indirect
@@ -100,6 +101,13 @@ public extension EntryCompilerParsing {
                 // best-effort breadcrumb
                 meta["dep.account.ref"] = accountRef?.debugString ?? "<ref>"
 
+            // in parseDepreciationBlock (…) where you already handle `account`
+            case .ident("contra"), .keyword("contra"),
+                 .ident("contra_account"), .keyword("contra_account"):
+                advance(); try expect(.equals)
+                contraRef = try parseAccountRefFlexible()
+                meta["dep.account.contra.ref"] = contraRef?.debugString ?? "<ref>"
+
             case .ident("acquisition"), .keyword("acquisition"):
                 advance(); try expect(.lBrace)
                 var direct: Decimal?; var indirect: Decimal = 0
@@ -148,7 +156,8 @@ public extension EntryCompilerParsing {
             let m = method,
             let y = lifeYears,
             let eff = effective,
-            let a = accountRef
+            let a = accountRef,
+            let c = contraRef
         else {
             throw ParserError.unexpectedToken(current, expected: "complete depreciation block", at: loc())
         }
@@ -157,7 +166,8 @@ public extension EntryCompilerParsing {
             schedule: .init(method: m, usefulLifeYears: y, effectiveDate: eff),
             acquisition: acquisition,
             residualPercentage: residualPercent,
-            accountRef: a
+            accountRef: a,
+            contraRef: c
         )
     }
 }
