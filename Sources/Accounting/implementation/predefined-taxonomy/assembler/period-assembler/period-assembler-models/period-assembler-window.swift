@@ -12,6 +12,18 @@ public struct PeriodWindow: Sendable, Equatable {
         let toStr   = to.map   { df.string(from: $0) } ?? "latest"
         return "Period: \(fromStr) → \(toStr)"
     }
+
+    public func filenameSlug(timeZone: TimeZone = .current) -> String {
+        let df = DateFormatter()
+        df.timeZone = timeZone
+        df.dateFormat = "yyyy-MM-dd"
+        let fromStr = from.map { df.string(from: $0) } ?? "beginning"
+        let toStr   = to.map   { df.string(from: $0) } ?? "latest"
+        return "\(fromStr)_to_\((toStr))"
+            .replacingOccurrences(of: " ", with: "_")
+            .replacingOccurrences(of: ":", with: "-")
+            .replacingOccurrences(of: "/", with: "-")
+    }
 }
 
 public struct PeriodWindows: Sendable {
