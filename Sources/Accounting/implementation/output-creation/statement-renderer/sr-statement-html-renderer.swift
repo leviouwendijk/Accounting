@@ -118,9 +118,13 @@ public enum StatementHTMLRenderer {
             }
             return rs
         }
-        html += table(for: "Balance Sheet — Assets",      rows: rows(for: sections.assets))
-        html += table(for: "Balance Sheet — Equity",      rows: rows(for: sections.equity))
-        html += table(for: "Balance Sheet — Liabilities", rows: rows(for: sections.liabilities))
+        // html += table(for: "Balance Sheet — Assets",      rows: rows(for: sections.assets))
+        // html += table(for: "Balance Sheet — Equity",      rows: rows(for: sections.equity))
+        // html += table(for: "Balance Sheet — Liabilities", rows: rows(for: sections.liabilities))
+
+        html += table(for: "Balanse: Activa",      rows: rows(for: sections.assets))
+        html += table(for: "Balans: Eigen Vermogen",      rows: rows(for: sections.equity))
+        html += table(for: "Balans: Passiva", rows: rows(for: sections.liabilities))
         if options.includeOtherBucket {
             html += table(for: "Balance Sheet — Other", rows: rows(for: sections.other))
         }
@@ -129,10 +133,24 @@ public enum StatementHTMLRenderer {
         if let sum = sections.summary {
             let ajk = sum.equity + sum.liabilities
             let ok  = (sum.assets == ajk)
+            // html += """
+            // <div class="summary">
+            //   <strong>Check:</strong> Assets (\(fmt(sum.assets))) == Equity + Liabilities (\(fmt(ajk))) → \
+            //   <span class="\(ok ? "ok" : "warn")">\(ok ? "OK" : "DIFF: " + fmt(sum.assets - ajk))</span>
+            // </div>
+            // """
+
             html += """
             <div class="summary">
-              <strong>Check:</strong> Assets (\(fmt(sum.assets))) == Equity + Liabilities (\(fmt(ajk))) → \
-              <span class="\(ok ? "ok" : "warn")">\(ok ? "OK" : "DIFF: " + fmt(sum.assets - ajk))</span>
+                Som Activa: (\(fmt(sum.assets)))
+            </div>
+
+            <div class="summary">
+                Som Eigen Vermogen, Passiva: (\(fmt(sum.assets)))
+            </div>
+
+            <div class="summary">
+                <span class="\(ok ? "" : "warn")">\(ok ? "" : "DIFF: " + fmt(sum.assets - ajk))</span>
             </div>
             """
         }

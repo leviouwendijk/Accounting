@@ -6,11 +6,16 @@ public struct PeriodWindow: Sendable, Equatable {
 
     public init(from: Date?, to: Date?) { self.from = from; self.to = to }
 
+    // enum Language: Sendable {
+    //     case english
+    //     case dutch
+    // }
+
     public func string() -> String {
         let df = DateFormatter(); df.dateStyle = .medium; df.timeStyle = .none
         let fromStr = from.map { df.string(from: $0) } ?? "beginning"
         let toStr   = to.map   { df.string(from: $0) } ?? "latest"
-        return "Period: \(fromStr) → \(toStr)"
+        return "\(fromStr) → \(toStr)"
     }
 
     public func filenameSlug(timeZone: TimeZone = .current) -> String {
