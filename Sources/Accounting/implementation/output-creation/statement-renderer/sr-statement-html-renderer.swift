@@ -78,11 +78,6 @@ public enum StatementHTMLRenderer {
             return h
         }
 
-        // 4a) Income Statement (P&L first)
-        let plRows: [(Int,String,Decimal,Bool)] = bundle.income
-            .filter { options.minAbsIncome == 0 ? true : ($0.amount.magnitude >= options.minAbsIncome) }
-            .map { (indent: max(0, Int($0.level) - 1), label: $0.label, amount: $0.amount, isTotal: false) }
-
         let subtitleHTML = options.subtitle.map { "<div class=\"subtitle\">\(escape($0))</div>" } ?? ""
 
         var html = """
@@ -110,8 +105,61 @@ public enum StatementHTMLRenderer {
           \(subtitleHTML)
         """
 
-        // html += table(for: "Income Statement", rows: plRows)
-        html += table(for: "Winst- en Verliesrekening", rows: plRows)
+        // 4a) Winst- en verliesrekening via secties (Opbrengsten/Kosten), zonder L1 kop
+        let isSections = try RGSPrinter.incomeSections(bundle: bundle, chart: chart)
+
+        // Localize section titles
+        func nlTitle(for key: String) -> String {
+            switch key {
+            case "revenue":  return "Opbrengsten"
+            case "expenses": return "Kosten"
+            default:         return "Overig"
+            }
+        }
+
+        // Helpers
+        @inline(__always)
+        func subtotal(_ lines: [RGSPresentationLine]) -> Decimal {
+            lines.reduce(0) { $0 + $1.amount }   // amounts already sign-adjusted by .apply
+        }
+        @inline(__always)
+        func toRows(_ lines: [RGSPresentationLine]) -> [(Int,String,Decimal,Bool)] {
+            lines
+                .filter { options.minAbsIncome == 0 ? true : ($0.amount.magnitude >= options.minAbsIncome) }
+                // start indent at L2 = 0
+                .map { (indent: max(0, Int($0.level) - 2), label: $0.label, amount: $0.amount, isTotal: false) }
+        }
+
+        // Build section tables
+        let revSec = isSections.first(where: { $0.key == "revenue" })
+        let expSec = isSections.first(where: { $0.key == "expenses" })
+        let othSec = isSections.first(where: { $0.key == "other" })
+
+        if let s = revSec {
+            var rows = toRows(s.lines)
+            rows.append((0, "Subtotaal \(nlTitle(for: s.key))", subtotal(s.lines), true))
+            html += table(for: "Winst- en Verliesrekening — \(nlTitle(for: s.key))", rows: rows)
+        }
+        if let s = expSec {
+            var rows = toRows(s.lines)
+            rows.append((0, "Subtotaal \(nlTitle(for: s.key))", subtotal(s.lines), true))
+            html += table(for: "Winst- en Verliesrekening — \(nlTitle(for: s.key))", rows: rows)
+        }
+        if let s = othSec, !s.lines.isEmpty {
+            var rows = toRows(s.lines)
+            rows.append((0, "Subtotaal \(nlTitle(for: s.key))", subtotal(s.lines), true))
+            html += table(for: "Winst- en Verliesrekening — \(nlTitle(for: s.key))", rows: rows)
+        }
+
+        // Net result (expenses are negative after .apply)
+        let totalRevenue  = revSec.map { subtotal($0.lines) } ?? 0
+        let totalExpenses = expSec.map { subtotal($0.lines) } ?? 0
+        let netResult     = totalRevenue + totalExpenses
+
+        html += table(for: "Resultaat (winst/verlies)", rows: [
+            (0, "Resultaat", netResult, true)
+        ])
+
 
         // 4b) Balance Sheet (Assets / Equity / Liabilities in separate tables; “Other” optional)
         func rows(for sec: RGSBalanceBucketsOutput.Section?) -> [(Int,String,Decimal,Bool)] {
