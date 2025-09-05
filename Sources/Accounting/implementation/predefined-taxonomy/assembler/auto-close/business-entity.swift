@@ -20,7 +20,7 @@ public enum BusinessEntity: Sendable, Codable {
     }
 
     /// Defaults you can tweak later per legal form.
-    var periodOpeningRouting: PeriodOpeningRouting {
+    public var periodOpeningRouting: PeriodOpeningRouting {
         switch self {
         case .vof:
             return .init(
@@ -35,6 +35,15 @@ public enum BusinessEntity: Sendable, Codable {
         //         equityOpeningCode: "BEivKapOndBeg",
         //         exceptionKeepLeafAnchors: ["BLim"]
         //     )
+        }
+    }
+
+    public var profitShareCode: String {
+        switch self {
+        case .vof:
+            return "BEivKapOndAow"   // aandeel in overwinst (equity split)
+        // default:
+        //     return "BEivKapOndAow"
         }
     }
 }

@@ -15,3 +15,13 @@ public struct OwnerEquity: Codable, Sendable {
         return all.last(where:{ $0.date <= d })?.percentage ?? initial.percentage
     }
 }
+
+public struct OwnershipSlice: Sendable {
+    public let entityId: Int      // used in AccEntKey
+    public let percent: Decimal   // 0…1 fraction (normalized)
+
+    public init(entityId: Int, percent: Decimal) {
+        self.entityId = entityId
+        self.percent = percent
+    }
+}

@@ -156,3 +156,36 @@ public struct EntityStoreBuilder {
 //     // ...
 //     return b.freeze()
 // }
+
+public extension EntityStore {
+    var idIndex: [EntityKey: Int] {
+        var out: [EntityKey: Int] = [:]
+        var next = 1
+        for k in byFull.keys.sorted(by: {
+            $0.identifier(displaying: .fullchain) < $1.identifier(displaying: .fullchain)
+        }) {
+            out[k] = next
+            next += 1
+        }
+        return out
+    }
+
+    /// Build normalized OwnershipSlice[] *as of* a date from OwnerEquity on each EntityDef.
+    /// Accepts percentages in 0…1 or 0…100; normalizes to sum==1.
+    func ownershipSlices(asOf date: Date) -> [OwnershipSlice] {
+        var raw: [(id: Int, pct: Decimal)] = []
+
+        let idx = idIndex
+        for def in byFull.values {
+            guard let oe = def.ownerEquity, let id = idx[def.key] else { continue }
+            var p = oe.percentage(on: date)         // Decimal
+            if p > 1 { p /= 100 }                   // allow “50.0” as 50%
+            if p > 0 { raw.append((id, p)) }
+        }
+
+        let total = raw.reduce(Decimal(0)) { $0 + $1.pct }
+        guard total > 0 else { return [] }
+
+        return raw.map { OwnershipSlice(entityId: $0.id, percent: $0.pct / total) }
+    }
+}
