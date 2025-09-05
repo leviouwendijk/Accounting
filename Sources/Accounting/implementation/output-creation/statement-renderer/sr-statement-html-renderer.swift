@@ -7,7 +7,20 @@ public enum StatementHTMLRenderer {
         public var currencySymbol: String = "€"
         public var minAbsIncome: Decimal = 0
         public var includeOtherBucket: Bool = false
-        public init() {}
+
+        public init(
+            title: String = "Financial Statements",
+            subtitle: String? = nil,
+            currencySymbol: String = "€",
+            minAbsIncome: Decimal = 0,
+            includeOtherBucket: Bool = false
+        ) {
+            self.title = title
+            self.subtitle = subtitle
+            self.currencySymbol = currencySymbol
+            self.minAbsIncome = minAbsIncome
+            self.includeOtherBucket = includeOtherBucket
+        }
     }
 
     public static func render(
