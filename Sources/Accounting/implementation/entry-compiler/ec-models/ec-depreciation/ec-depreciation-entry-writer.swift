@@ -4,17 +4,41 @@ import plate // SafeFile, SafeWriteOptions
 public enum DepreciationEntryWriter {
     public struct Options: Sendable {
         public var tz: TimeZone
-        public var tolerance: Decimal      // skip if missing amount ≤ tolerance
+        public var tolerance: Decimal            // skip if rounded missing ≤ tolerance
         public var safe: SafeWriteOptions
+        public var fractionDigits: Int           // NEW: rounding/formatting scale (default 2)
 
-        public init(tz: TimeZone, tolerance: Decimal, safe: SafeWriteOptions) {
+        public init(
+            tz: TimeZone,
+            tolerance: Decimal,
+            safe: SafeWriteOptions,
+            fractionDigits: Int = 2
+        ) {
             self.tz = tz
             self.tolerance = tolerance
             self.safe = safe
+            self.fractionDigits = fractionDigits
         }
     }
 
-    /// Materialize any missing *monthly* depreciation postings for `monthStart`.
+    @inline(__always)
+    public static func roundDecimal(_ x: Decimal, scale: Int) -> Decimal {
+        var v = x, out = Decimal()
+        NSDecimalRound(&out, &v, scale, .plain) // half-up
+        return out
+    }
+
+    @inline(__always)
+    public static func fmtDecimal(_ x: Decimal, digits: Int) -> String {
+        let nf = NumberFormatter()
+        nf.locale = Locale(identifier: "en_US_POSIX")
+        nf.numberStyle = .decimal
+        nf.minimumFractionDigits = digits
+        nf.maximumFractionDigits = digits
+        nf.minimumIntegerDigits  = 1
+        return nf.string(from: x as NSDecimalNumber) ?? x.description
+    }
+
     /// - Returns: number of entries written (0 if nothing to write).
     public static func writeMissingForMonth(
         monthStart: Date,
@@ -74,6 +98,8 @@ public enum DepreciationEntryWriter {
             let monthLabel = "\(yqmMonth.year)-\(String(format: "%02d", yqmMonth.month))"
             let eid = allocID()
 
+            let amt = fmtDecimal(missing, digits: options.fractionDigits)
+
             chunks.append("""
             entry {
                 id = \(eid)
@@ -88,11 +114,11 @@ public enum DepreciationEntryWriter {
                 }
 
                 for (\(entityIdent)) in (\(debitAccount)) { 
-                    debit = \(missing) 
+                    debit = \(amt) 
                 }
 
                 for (\(entityIdent)) in (\(creditAccount)) { 
-                    credit = \(missing) 
+                    credit = \(amt) 
                 }
             }
             """)
