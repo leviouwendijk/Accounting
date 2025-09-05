@@ -60,6 +60,10 @@ public struct EntryCompilerProject: Sendable {
         )
         return dir.appendingPathComponent(filename, isDirectory: false)
     }
+
+    public func statements(_ base: Base = .statements) -> URL {
+        return url(base)
+    }
 }
 
 // include subpaths?
