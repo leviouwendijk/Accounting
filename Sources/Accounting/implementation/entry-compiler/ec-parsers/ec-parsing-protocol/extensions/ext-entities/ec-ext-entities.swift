@@ -144,10 +144,58 @@ public extension EntryCompilerParsing {
         }
 
         var defs: [EntityDef] = []
-        let base = EntityDef(key: k, displayName: displayName, metadata: metadata, depreciation: nil, depreciationDraft: dep)
+        let oe = _ownerEquityFromMeta(metadata)
+        let base = EntityDef(
+            key: k,
+            displayName: displayName,
+            metadata: metadata,
+            depreciation: nil,
+            depreciationDraft: dep,
+            ownerEquity: oe
+        )
         defs.append(base)
         defs.append(contentsOf: extraDefs)
         core.trace("  end entity → total \(defs.count) def(s)")
         return defs
+    }
+
+    @inlinable
+    func _ownerEquityFromMeta(_ meta: [String:String]) -> OwnerEquity? {
+        let iso = ISO8601DateFormatter()
+
+        // initial
+        guard
+            let d0s = meta["ownership.initial.date"], let d0 = iso.date(from: d0s),
+            let p0s = meta["ownership.initial.pct"],  let p0 = Decimal(string: p0s)
+        else {
+            return nil // require both initial date & percentage to consider it present
+        }
+
+        let initial = OwnershipPercentage(date: d0, percentage: p0, details: meta["ownership.initial.details"])
+
+        // changes: scan ownership.<idx>.(date|pct|reason)
+        var changes: [OwnershipPercentage] = []
+
+        // collect unique indices present
+        var idxs = Set<Int>()
+        for k in meta.keys where k.hasPrefix("ownership.") {
+            let rest = k.dropFirst("ownership.".count) // e.g. "3.date"
+            if let i = rest.split(separator: ".", maxSplits: 1).first, let n = Int(i) {
+                idxs.insert(n)
+            }
+        }
+
+        for i in idxs.sorted() {
+            guard
+                let ds = meta["ownership.\(i).date"], let d = iso.date(from: ds),
+                let ps = meta["ownership.\(i).pct"],  let p = Decimal(string: ps)
+            else { continue }
+            let details = meta["ownership.\(i).reason"] ?? meta["ownership.\(i).details"]
+            changes.append(OwnershipPercentage(date: d, percentage: p, details: details))
+        }
+
+        // sort just to be safe
+        changes.sort { $0.date < $1.date }
+        return OwnerEquity(initial: initial, changes: changes)
     }
 }

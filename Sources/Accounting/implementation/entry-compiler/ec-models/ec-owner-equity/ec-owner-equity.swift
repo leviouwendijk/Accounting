@@ -4,11 +4,29 @@ public struct OwnershipPercentage: Codable, Sendable {
     public let date: Date
     public let percentage: Decimal
     public let details: String?
+    
+    public init(
+        date: Date,
+        percentage: Decimal,
+        details: String?
+    ) {
+        self.date = date
+        self.percentage = percentage
+        self.details = details
+    }
 }
 
 public struct OwnerEquity: Codable, Sendable {
     public let initial: OwnershipPercentage
     public let changes: [OwnershipPercentage]
+    
+    public init(
+        initial: OwnershipPercentage,
+        changes: [OwnershipPercentage]
+    ) {
+        self.initial = initial
+        self.changes = changes
+    }
 
     public func percentage(on d: Date) -> Decimal {
         let all = ([initial] + changes).sorted{ $0.date < $1.date }
