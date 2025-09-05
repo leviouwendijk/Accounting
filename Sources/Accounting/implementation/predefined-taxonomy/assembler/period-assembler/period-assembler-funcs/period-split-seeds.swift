@@ -175,14 +175,38 @@ public extension PeriodAssembler {
         var seedBalance = seedOpeningPlain
         for (k, v) in seedWinBal { seedBalance[k, default: 0] += v }
 
+        // // NI overlay from the same source you present (typically WINDOW)
+        // let niOverlay = seedOverlay.reduce(into: Decimal(0)) { acc, kv in
+        //     if maps.kindById[kv.key] == .income { acc += kv.value }
+        // }
+
+        // // Soft suppression: only suppress if WINDOW has manual postings at NI target
+        // let manualAtNiWin = seedWinBal[niId] ?? 0
+        // if niOverlay != 0 && manualAtNiWin == 0 {
+        //     seedBalance[niId,           default: 0] += (-niOverlay) // zero P&L node
+        //     seedBalance[equityTargetId, default: 0] += ( niOverlay) // push into equity container (non-Beg)
+        // }
+
+        // replacement for equity problem
+
         // NI overlay from the same source you present (typically WINDOW)
         let niOverlay = seedOverlay.reduce(into: Decimal(0)) { acc, kv in
             if maps.kindById[kv.key] == .income { acc += kv.value }
         }
 
-        // Soft suppression: only suppress if WINDOW has manual postings at NI target
+        // Soft suppression + WARN: if WINDOW has manual postings at NI or Equity, warn & suppress
         let manualAtNiWin = seedWinBal[niId] ?? 0
-        if niOverlay != 0 && manualAtNiWin == 0 {
+        let manualAtEqWin = seedWinBal[equityTargetId] ?? 0
+
+        if niOverlay != 0 && (manualAtNiWin != 0 || manualAtEqWin != 0) {
+            let niCode = codeById[niId] ?? "#\(niId)"
+            let eqCode = codeById[equityTargetId] ?? "#\(equityTargetId)"
+            fputs("warning: auto-close NI overlay present but manual postings detected at "
+                  + "\(niCode)=\(manualAtNiWin) and/or \(eqCode)=\(manualAtEqWin); "
+                  + "overlay suppressed for this window.\n", stderr)
+        }
+
+        if niOverlay != 0 && manualAtNiWin == 0 && manualAtEqWin == 0 {
             seedBalance[niId,           default: 0] += (-niOverlay) // zero P&L node
             seedBalance[equityTargetId, default: 0] += ( niOverlay) // push into equity container (non-Beg)
         }
@@ -234,22 +258,44 @@ public extension PeriodAssembler {
 
             // NI overlay (AE) — push to equity/NI in nil-entity bucket (unless you want to apportion, later)
 
-            // --- AE NI overlay: allocate equity overlay by ownership slices (or nil-entity fallback)
-            if niOverlay != 0 && manualAtNiWin == 0 {
-                // If you did NOT already overlay the plain (non-AE) seed earlier, uncomment these two lines:
-                // seedBalance[niId,           default: 0] += (-niOverlay)
-                // seedBalance[equityTargetId, default: 0] += ( niOverlay)
+            // // --- AE NI overlay: allocate equity overlay by ownership slices (or nil-entity fallback)
+            // if niOverlay != 0 && manualAtNiWin == 0 {
+            //     // If you did NOT already overlay the plain (non-AE) seed earlier, uncomment these two lines:
+            //     // seedBalance[niId,           default: 0] += (-niOverlay)
+            //     // seedBalance[equityTargetId, default: 0] += ( niOverlay)
 
+            //     if ownershipSlices.isEmpty {
+            //         // No ownership info → dump to unassigned bucket
+            //         seedBalanceAE[AccEntKey(equityTargetId, nil), default: 0] += niOverlay
+            //     } else {
+            //         // Split overlay across owners by percentage
+            //         for s in ownershipSlices where s.percent != 0 {
+            //             seedBalanceAE[AccEntKey(equityTargetId, s.entityId), default: 0] += (niOverlay * s.percent)
+            //         }
+            //     }
+
+            //     // Zero the NI node in AE space (keep in nil-entity bucket)
+            //     seedBalanceAE[AccEntKey(niId, nil), default: 0] -= niOverlay
+            // }
+
+            // --- AE NI overlay: allocate equity overlay by ownership slices (or nil-entity fallback)
+            let manualAtEqWin = seedWinBal[equityTargetId] ?? 0
+            if niOverlay != 0 && (manualAtNiWin != 0 || manualAtEqWin != 0) {
+                let niCode = codeById[niId] ?? "#\(niId)"
+                let eqCode = codeById[equityTargetId] ?? "#\(equityTargetId)"
+                fputs("warning: auto-close NI overlay (AE) present but manual postings detected at "
+                      + "\(niCode)=\(manualAtNiWin) and/or \(eqCode)=\(manualAtEqWin); "
+                      + "AE overlay suppressed for this window.\n", stderr)
+            }
+
+            if niOverlay != 0 && manualAtNiWin == 0 && manualAtEqWin == 0 {
                 if ownershipSlices.isEmpty {
-                    // No ownership info → dump to unassigned bucket
                     seedBalanceAE[AccEntKey(equityTargetId, nil), default: 0] += niOverlay
                 } else {
-                    // Split overlay across owners by percentage
                     for s in ownershipSlices where s.percent != 0 {
                         seedBalanceAE[AccEntKey(equityTargetId, s.entityId), default: 0] += (niOverlay * s.percent)
                     }
                 }
-
                 // Zero the NI node in AE space (keep in nil-entity bucket)
                 seedBalanceAE[AccEntKey(niId, nil), default: 0] -= niOverlay
             }

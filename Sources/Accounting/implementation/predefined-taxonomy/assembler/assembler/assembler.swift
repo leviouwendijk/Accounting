@@ -139,27 +139,60 @@ public enum RGSAssembler {
         var localCut = cut
         localCut.includeCodes.append(contentsOf: [autoCloseTargets.niCode, autoCloseTargets.eqCode])
 
+        // // --- auto-close overlay ---
+        // let ni = seed.reduce(into: Decimal(0)) { acc, kv in
+        //     if maps.kindById[kv.key] == .income { acc += kv.value }
+        // }
+        // // let manualAtNi     = seed[autoCloseTargets.niId] ?? 0
+        // // let manualAtEquity = seed[autoCloseTargets.eqId] ?? 0
+
+        // // let hasManual = (manualAtNi != 0 || manualAtEquity != 0)
+        // let hasManual = false
+
+        // var seedWithAC = seed
+        // if !hasManual && ni != 0 {
+        //     seedWithAC[autoCloseTargets.niId,     default: 0] += (-ni) // zero P&L node
+        //     seedWithAC[autoCloseTargets.eqId,     default: 0] += ( ni) // push into equity
+        // }
+
+        // // // Income (IS): compute from plain seed; NI gets added to NI node for presentation
+        // // var totalsIncome = RGSAssembler.rollupAmounts(seed, parentById: maps.parentById)
+        // // if !hasManual && ni != 0 {
+        // //     totalsIncome[autoCloseTargets.niId, default: 0] += ni
+        // // }
+
+        // // Income (IS): compute from plain seed; add NI as a rolled patch so parents see it
+        // var totalsIncome = RGSAssembler.rollupAmounts(seed, parentById: maps.parentById)
+        // if !hasManual && ni != 0 {
+        //     let niPatch = RGSAssembler.rollupAmounts([autoCloseTargets.niId: ni],
+        //                                              parentById: maps.parentById)
+        //     for (k, v) in niPatch where v != 0 {
+        //         totalsIncome[k, default: 0] += v
+        //     }
+        // }
+
         // --- auto-close overlay ---
         let ni = seed.reduce(into: Decimal(0)) { acc, kv in
             if maps.kindById[kv.key] == .income { acc += kv.value }
         }
-        // let manualAtNi     = seed[autoCloseTargets.niId] ?? 0
-        // let manualAtEquity = seed[autoCloseTargets.eqId] ?? 0
 
-        // let hasManual = (manualAtNi != 0 || manualAtEquity != 0)
-        let hasManual = false
+        // Detect real (window) manual postings at NI/equity
+        let manualAtNi     = seed[autoCloseTargets.niId] ?? 0
+        let manualAtEquity = seed[autoCloseTargets.eqId] ?? 0
+        let hasManual      = (manualAtNi != 0 || manualAtEquity != 0)
+
+        // Warn (but keep existing suppression behavior)
+        if ni != 0 && hasManual {
+            fputs("warning: auto-close NI overlay present but manual postings detected at "
+                  + "\(autoCloseTargets.niCode)=\(manualAtNi) and/or \(autoCloseTargets.eqCode)=\(manualAtEquity); "
+                  + "overlay suppressed for this period.\n", stderr)
+        }
 
         var seedWithAC = seed
         if !hasManual && ni != 0 {
-            seedWithAC[autoCloseTargets.niId,     default: 0] += (-ni) // zero P&L node
-            seedWithAC[autoCloseTargets.eqId,     default: 0] += ( ni) // push into equity
+            seedWithAC[autoCloseTargets.niId, default: 0] += (-ni) // zero P&L node
+            seedWithAC[autoCloseTargets.eqId, default: 0] += ( ni) // push into equity
         }
-
-        // // Income (IS): compute from plain seed; NI gets added to NI node for presentation
-        // var totalsIncome = RGSAssembler.rollupAmounts(seed, parentById: maps.parentById)
-        // if !hasManual && ni != 0 {
-        //     totalsIncome[autoCloseTargets.niId, default: 0] += ni
-        // }
 
         // Income (IS): compute from plain seed; add NI as a rolled patch so parents see it
         var totalsIncome = RGSAssembler.rollupAmounts(seed, parentById: maps.parentById)
