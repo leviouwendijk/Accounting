@@ -170,7 +170,7 @@ public enum StatementHTMLRenderer {
             </div>
 
             <div class="summary">
-                Som Eigen Vermogen, Passiva: \(fmt(sum.assets))
+                Som Eigen Vermogen + Passiva: \(fmt(sum.assets))
             </div>
 
             <div class="summary">
