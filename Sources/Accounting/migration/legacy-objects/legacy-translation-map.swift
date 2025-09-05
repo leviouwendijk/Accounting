@@ -90,7 +90,8 @@ public enum LegacyTranslation {
             3, 
             "Dividends Shusha",
             "BEivKapProPok",
-            "owner.shusha"
+            // "owner.shusha"
+            "owner.levi"
         ),
         // .init(
         //     4, 
