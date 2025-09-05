@@ -67,7 +67,7 @@ public enum StatementHTMLRenderer {
 
         func table(for title: String, rows: [(indent: Int, label: String, amount: Decimal, isTotal: Bool)]) -> String {
             var h = "<h2>\(escape(title))</h2>\n<table class='tbl'>"
-            h += "<thead><tr><th class='col-label'>Label</th><th class='col-amt'>Amount</th></tr></thead><tbody>"
+            h += "<thead><tr><th class='col-label'>Naam</th><th class='col-amt'>Bedrag</th></tr></thead><tbody>"
             for r in rows {
                 let pad = String(repeating: "&nbsp;&nbsp;", count: max(0, r.indent))
                 let lbl = r.isTotal ? "<strong>\(escape(r.label))</strong>" : escape(r.label)
