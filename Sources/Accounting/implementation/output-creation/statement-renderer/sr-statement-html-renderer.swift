@@ -3,10 +3,24 @@ import Foundation
 public enum StatementHTMLRenderer {
     public struct Options: Sendable {
         public var title: String = "Financial Statements"
-        public var currencySymbol: String = "€"    // purely visual; values are presented already
-        public var minAbsIncome: Decimal = 0       // skip tiny P&L rows (optional)
+        public var subtitle: String? = nil  
+        public var currencySymbol: String = "€"
+        public var minAbsIncome: Decimal = 0
         public var includeOtherBucket: Bool = false
         public init() {}
+    }
+
+    public static func render(
+        period: PeriodAssembleResultPeriod,
+        chart: CompiledChart,
+        equityCode: String = "BEiv",
+        options: Options = .init()
+    ) throws -> String {
+        var opts = options
+        // PeriodWindow already provides a nice human formatter:
+        // e.g. "Period: 1 Jan 2025 → 31 Jan 2025"
+        opts.subtitle = period.range.string()   // <- uses PeriodWindow.string()
+        return try render(bundle: period.bundle, chart: chart, equityCode: equityCode, options: opts)
     }
 
     public static func render(
@@ -52,6 +66,9 @@ public enum StatementHTMLRenderer {
         let plRows: [(Int,String,Decimal,Bool)] = bundle.income
             .filter { options.minAbsIncome == 0 ? true : ($0.amount.magnitude >= options.minAbsIncome) }
             .map { (indent: max(0, Int($0.level) - 1), label: $0.label, amount: $0.amount, isTotal: false) }
+
+        let subtitleHTML = options.subtitle.map { "<div class=\"subtitle\">\(escape($0))</div>" } ?? ""
+
         var html = """
         <html>
         <head>
@@ -74,7 +91,7 @@ public enum StatementHTMLRenderer {
         </head>
         <body>
           <h1>\(escape(options.title))</h1>
-          <div class="subtitle">All amounts presented (sign-adjusted) per your RGS settings.</div>
+          \(subtitleHTML)
         """
 
         html += table(for: "Income Statement", rows: plRows)
