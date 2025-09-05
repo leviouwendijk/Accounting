@@ -335,46 +335,26 @@ public enum RGSPrinter {
 
     public static func incomeSections(
         bundle: StatementBundle,
-        chart: CompiledChart
+        chart: CompiledChart,
+        omitLevel1Root: Bool = true
     ) throws -> [RGSPresentationSection] {
-        let maps     = try RGSAssembler.makeMaps(from: chart)
-        let nodeById = Dictionary(uniqueKeysWithValues: chart.nodes.map { ($0.id, $0) })
+        // Map id -> level so we can hide only the L1 header node(s)
+        let levelById: [Int: UInt8] = Dictionary(uniqueKeysWithValues: chart.nodes.map { ($0.id, $0.level) })
 
-        var revenue: [RGSPresentationLine] = []
-        var expenses:[RGSPresentationLine] = []
-        var other:   [RGSPresentationLine] = []
-
-        for r in bundle.income {
-            // skip L1 headers entirely
-            if let n = nodeById[r.id], n.level == 1 { continue }
-
-            guard let a = l2AncestorId(of: r.id, parentById: maps.parentById, nodeById: nodeById),
-                  maps.kindById[a] == .income else {
-                other.append(r); continue
-            }
-
-            switch maps.directionById[a] {
-            case .credit: revenue.append(r)   // omzet/opbrengsten live on the credit side
-            case .debit:  expenses.append(r)  // kosten on the debit side
-            default:      other.append(r)
-            }
+        // Keep EXACT ordering and amounts from bundle.income.
+        // Only drop lines whose node.level == 1 when omitLevel1Root is true.
+        let lines: [RGSPresentationLine] = bundle.income.filter { line in
+            guard omitLevel1Root, let lvl = levelById[line.id] else { return true }
+            return lvl != 1
         }
 
-        // order by SortingKey (order only), same as balance printer
-        func byKey(_ a: RGSPresentationLine, _ b: RGSPresentationLine) -> Bool {
-            RGSNodeSortingCode(key: sortKey(for: a.id, maps)) < RGSNodeSortingCode(key: sortKey(for: b.id, maps))
-        }
-        revenue.sort(by: byKey)
-        expenses.sort(by: byKey)
-        other.sort(by: byKey)
-
-        var sections: [RGSPresentationSection] = [
-            .init(key: "revenue",  title: "Revenue",  lines: revenue),
-            .init(key: "expenses", title: "Expenses", lines: expenses)
+        // Return a single section; renderer decides indentation (e.g. L2 → indent 0).
+        return [
+            RGSPresentationSection(
+                key: "income",
+                title: "Income",
+                lines: lines
+            )
         ]
-        if !other.isEmpty {
-            sections.append(.init(key: "other", title: "Other", lines: other))
-        }
-        return sections
     }
 }
