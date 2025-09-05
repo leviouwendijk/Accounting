@@ -101,3 +101,22 @@ public enum IDScanner: Sendable {
         }.joined(separator: ", ")
     }
 }
+
+public struct IdAllocator: Sendable {
+    public var next: Int
+
+    public init(seed: Int) { self.next = seed }
+
+    public mutating func nextId() -> Int {
+        defer { next += 1 }
+        return next
+    }
+
+    public static func seededFromProject(
+        project: EntryCompilerProject,
+        settings: EntryCompilerSettings
+    ) throws -> IdAllocator {
+        let start = try IDScanner.suggestNextEntryID(project: project, settings: settings)
+        return .init(seed: start)
+    }
+}
