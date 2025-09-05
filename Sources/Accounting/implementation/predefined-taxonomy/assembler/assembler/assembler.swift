@@ -155,10 +155,20 @@ public enum RGSAssembler {
             seedWithAC[autoCloseTargets.eqId,     default: 0] += ( ni) // push into equity
         }
 
-        // Income (IS): compute from plain seed; NI gets added to NI node for presentation
+        // // Income (IS): compute from plain seed; NI gets added to NI node for presentation
+        // var totalsIncome = RGSAssembler.rollupAmounts(seed, parentById: maps.parentById)
+        // if !hasManual && ni != 0 {
+        //     totalsIncome[autoCloseTargets.niId, default: 0] += ni
+        // }
+
+        // Income (IS): compute from plain seed; add NI as a rolled patch so parents see it
         var totalsIncome = RGSAssembler.rollupAmounts(seed, parentById: maps.parentById)
         if !hasManual && ni != 0 {
-            totalsIncome[autoCloseTargets.niId, default: 0] += ni
+            let niPatch = RGSAssembler.rollupAmounts([autoCloseTargets.niId: ni],
+                                                     parentById: maps.parentById)
+            for (k, v) in niPatch where v != 0 {
+                totalsIncome[k, default: 0] += v
+            }
         }
 
         // Balance (BS): use overlayed seed
