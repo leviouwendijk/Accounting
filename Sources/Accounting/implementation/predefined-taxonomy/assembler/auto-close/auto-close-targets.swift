@@ -19,7 +19,7 @@ public struct AutoCloseTargets: Sendable, Codable {
 
     /// Resolve codes to node ids using the chart's identifier index.
     /// Throws if either code is missing.
-    func resolve(in index: RGSIndex
+    public func resolve(in index: RGSIndex
     ) throws -> (ni: (code: String, id: Int), equity: (code: String, id: Int)) {
         guard let niId = index.byIdentifier[netIncomeCode] else {
             throw AutoCloseError.codeNotFound(netIncomeCode)
@@ -32,7 +32,7 @@ public struct AutoCloseTargets: Sendable, Codable {
 
     /// Optional stricter resolver: also verifies the node kinds using assembler maps.
     /// Expectation: netIncome = .income (W*), retainedEarnings = .balance (B*).
-    func resolve(
+    public func resolve(
         in index: RGSIndex,
         validateWith maps: RGSAssemblerResult
     ) throws -> (ni: (code: String, id: Int), equity: (code: String, id: Int)) {
