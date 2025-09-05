@@ -214,7 +214,7 @@ public extension PeriodAssembler {
             }
 
             // AE WINDOW movements
-            let seedWinBalAE = RGSAssembler.seedLeafsAE(from: tbBalanceWindow, using: index)
+            let seedWinBalAE = RGSAssembler.seedLeafsAE(from: tbBalanceWindow, using: index, entityId: entityIdOnRow)
 
             // Base = Opening(AE) + WINDOW(AE)
             var seedBalanceAE = seedOpeningAE
