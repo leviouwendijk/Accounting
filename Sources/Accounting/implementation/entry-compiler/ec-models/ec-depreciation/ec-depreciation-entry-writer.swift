@@ -74,27 +74,23 @@ public enum DepreciationEntryWriter {
         chunks.reserveCapacity(report.items.count)
 
         for item in report.items {
-            // Select by *overlap* with the calendar month:
-            // [periodStart, periodEnd) overlaps [firstOfMonth, nextMonthStart)
-            let overlaps = item.periodStart < nextMonthStart && item.periodEnd > firstOfMonth
-            guard overlaps else { continue }
+            // Anchor to commission cadence: post on (periodEnd - 1 day)
+            let rawPost = cal.date(byAdding: .day, value: -1, to: item.periodEnd) ?? item.periodEnd
+            // Only write this item if its postDate falls inside the target month
+            guard rawPost >= firstOfMonth && rawPost < nextMonthStart else { continue }
 
-            // Only write true failures (not exact / within tol / aggregate covered)
-            guard item.coverage == .none else { continue }
+             // Only fill periods not covered by tol/quarter aggregation
+             guard item.coverage == .none else { continue }
 
-            // Missing amount (deficit only): expected - actual
-            // Round first, then compare to tolerance to avoid writing micro residuals.
+            // Missing amount: expected - actual → round first, then compare to tolerance
             let missingRaw = item.expected - item.actual
-            let missing = roundDecimal(missingRaw, scale: options.fractionDigits)
+            let missing    = roundDecimal(missingRaw, scale: options.fractionDigits)
             guard missing > options.tolerance else { continue }
 
-            // Entity must have a resolved depreciation config (contra is non-optional)
-            guard let cfg = entities.byFull[item.entity]?.depreciation else { continue }
+             // Pull resolved config; `contra` is non-optional in your branch
+             guard let cfg = entities.byFull[item.entity]?.depreciation else { continue }
 
-            // Post inside this month: last day within [firstOfMonth, nextMonthStart)
-            let sliceEndWithinMonth = min(item.periodEnd, nextMonthStart)
-            let postDate = cal.date(byAdding: .day, value: -1, to: sliceEndWithinMonth) ?? sliceEndWithinMonth
-            let dateStr = isoDate(postDate)
+            let dateStr = isoDate(rawPost)
 
             let entityIdent = item.entity.identifier(displaying: .fullchain)
             let debitAccount = cfg.account.code
