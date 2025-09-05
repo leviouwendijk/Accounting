@@ -221,9 +221,25 @@ public extension PeriodAssembler {
             for (k, v) in seedWinBalAE { seedBalanceAE[k, default: 0] += v }
 
             // NI overlay (AE) — push to equity/NI in nil-entity bucket (unless you want to apportion, later)
+
+            // --- AE NI overlay: allocate equity overlay by ownership slices (or nil-entity fallback)
             if niOverlay != 0 && manualAtNiWin == 0 {
-                seedBalanceAE[AccEntKey(equityTargetId, nil), default: 0] += niOverlay
-                seedBalanceAE[AccEntKey(niId,           nil), default: 0] -= niOverlay
+                // If you did NOT already overlay the plain (non-AE) seed earlier, uncomment these two lines:
+                // seedBalance[niId,           default: 0] += (-niOverlay)
+                // seedBalance[equityTargetId, default: 0] += ( niOverlay)
+
+                if ownershipSlices.isEmpty {
+                    // No ownership info → dump to unassigned bucket
+                    seedBalanceAE[AccEntKey(equityTargetId, nil), default: 0] += niOverlay
+                } else {
+                    // Split overlay across owners by percentage
+                    for s in ownershipSlices where s.percent != 0 {
+                        seedBalanceAE[AccEntKey(equityTargetId, s.entityId), default: 0] += (niOverlay * s.percent)
+                    }
+                }
+
+                // Zero the NI node in AE space (keep in nil-entity bucket)
+                seedBalanceAE[AccEntKey(niId, nil), default: 0] -= niOverlay
             }
 
             // Roll up preserving entity
