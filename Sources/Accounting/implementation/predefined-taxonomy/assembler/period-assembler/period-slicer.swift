@@ -31,6 +31,18 @@ public enum PeriodSlicer {
             let s = startOfYear(d)
             return dayEnd(cal.date(byAdding: .day, value: -1, to: cal.date(byAdding: .year, value: 1, to: s)!)!)
         }
+
+        func startOfHalf(_ d: Date) -> Date {
+            let comps = cal.dateComponents([.year, .month], from: d)
+            let m = comps.month ?? 1
+            let halfStartMonth = (m <= 6) ? 1 : 7
+            return cal.date(from: DateComponents(year: comps.year, month: halfStartMonth, day: 1))!
+        }
+        func endOfHalf(fromStart s: Date) -> Date {
+            let sixMonthsLater = cal.date(byAdding: .month, value: 6, to: s)!
+            return dayEnd(cal.date(byAdding: .day, value: -1, to: sixMonthsLater)!)
+        }
+
         func startOfQuarter(_ d: Date) -> Date {
             let comps = cal.dateComponents([.year,.month], from: d)
             let qstart = (((comps.month ?? 1) - 1)/3)*3 + 1
@@ -80,6 +92,11 @@ public enum PeriodSlicer {
                 let t = shape.rangeToDate ? dayEnd(a) : endOfYear(a)
                 return .init(from: f, to: t)
 
+            case .half: // NEW
+                let f = startOfHalf(a)
+                let t = shape.rangeToDate ? dayEnd(a) : endOfHalf(fromStart: f)
+                return .init(from: f, to: t)
+
             case .quarter:
                 let f = startOfQuarter(a)
                 let t = shape.rangeToDate ? dayEnd(a) : endOfQuarter(fromStart: f)
@@ -94,6 +111,7 @@ public enum PeriodSlicer {
                 let f = startOfISOWeek(a)
                 let t = shape.rangeToDate ? dayEnd(a) : endOfISOWeek(fromStart: f)
                 return .init(from: f, to: t)
+
             }
         }()
 
