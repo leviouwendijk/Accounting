@@ -25,6 +25,7 @@ public enum StatementHTMLRenderer {
             self.minAbsIncome = minAbsIncome
             self.includeOtherBucket = includeOtherBucket
             self.omitIncomeLevel1Root = omitIncomeLevel1Root
+            self.company = company
         }
     }
 
