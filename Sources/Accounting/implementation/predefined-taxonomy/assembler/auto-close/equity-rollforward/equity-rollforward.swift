@@ -8,7 +8,8 @@ public func runOwnerEquityRollforwardHistory(
     chart: CompiledChart,
     entities: EntityStore,
     view: ClosedRange<Int>?,                 // nil → print all
-    config cfg: EquityRollforwardConfig = .init()
+    config cfg: EquityRollforwardConfig = .init(),
+    afterEachPeriod: ((EquityPeriod, [Int], [Int: OwnerDelta], EquityRollforwardConfig) -> Void)? = nil
 ) throws {
     guard !allPeriods.isEmpty else { printHeader(title); print("(no periods)"); return }
 
@@ -78,9 +79,15 @@ public func runOwnerEquityRollforwardHistory(
             closingTotal: closeTotal
         )
 
-        // Only print when within the requested view window (but always carry forward)
+        // // Only print when within the requested view window (but always carry forward)
+        // if view == nil || view!.contains(i) {
+        //     printPeriod(label: p.label, rows: rows, entities: entities, cfg: cfg)
+        // }
+
+        // adding hook
         if view == nil || view!.contains(i) {
             printPeriod(label: p.label, rows: rows, entities: entities, cfg: cfg)
+            afterEachPeriod?(p, owners, deltas, cfg)
         }
 
         beginByOwner = endByOwner
