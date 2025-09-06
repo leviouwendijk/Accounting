@@ -15,8 +15,8 @@ import Foundation
 //     }
 // }
 
-@inlinable func 
-debugUnassignedEquity(_ p: EquityPeriod, chart: CompiledChart, cfg: EquityRollforwardConfig) {
+@inlinable 
+public func debugUnassignedEquity(_ p: EquityPeriod, chart: CompiledChart, cfg: EquityRollforwardConfig) {
     let eqPrefix = cfg.equityTotalFallback ?? "BEiv"
     var sum: Decimal = 0
     if let byAcc = p.bundle.entity?.byAccount {
