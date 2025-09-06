@@ -35,7 +35,7 @@ public enum StatementHTMLRenderer {
         public var kvk: String?
         public var rsin: String?
         public var btw: String?
-        public var address: String?
+        public var address: Address?
         public var contact: String?
 
         public init(
@@ -44,13 +44,41 @@ public enum StatementHTMLRenderer {
             kvk: String? = nil,
             rsin: String? = nil,
             btw: String? = nil,
-            address: String? = nil,
+            address: Address? = nil,
             contact: String? = nil
         ) {
             self.name = name; self.legalForm = legalForm; self.kvk = kvk
             self.rsin = rsin; self.btw = btw; self.address = address; self.contact = contact
         }
+
+        public struct Address: Sendable {
+            public var street: String? = nil
+            public var number: String? = nil
+            public var areaCode: String? = nil
+            public var city: String? = nil
+            
+            public init(
+                street: String? = nil,
+                number: String? = nil,
+                areaCode: String? = nil,
+                city: String? = nil
+            ) {
+                self.street = street
+                self.number = number
+                self.areaCode = areaCode
+                self.city = city
+            }
+
+            public var string: String {
+                if let s = street, let n = number, let ac = areaCode, let c = city {
+                    return "\(s) \(n)\n\(ac)\n\(c)"
+                } else {
+                    return ""
+                }
+            }
+        }
     }
+
 
     public static func render(
         period: PeriodAssembleResultPeriod,
@@ -113,7 +141,7 @@ public enum StatementHTMLRenderer {
           <title>\(escape(options.title))</title>
           <style>
             body { font: 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 24px; }
-            h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+            h1 { font-size: 20px; font-weight: 400; margin: 0 0 4px; }
             .subtitle { font-size: 12px; color:#666; margin: 0 0 10px; }
             h2 { font-size: 16px; font-weight: 600; margin: 12px 0 6px; }
             table.tbl { width: 100%; border-collapse: collapse; margin-top: 8px; }
@@ -177,7 +205,7 @@ public enum StatementHTMLRenderer {
 
         if let c = options.company {
             let leftLine1 = nonEmpty(c.name) ?? options.title
-            let leftLine2 = joinDot([c.legalForm, c.address])
+            let leftLine2 = joinDot([c.legalForm, c.address?.string])
             let leftLine3 = joinDot([c.contact,
                                      c.kvk.map { "KvK \($0)" },
                                      c.rsin.map { "RSIN \($0)" },
