@@ -220,8 +220,16 @@ public enum StatementHTMLRenderer {
             let titleLeft = nonEmpty(c.name) ?? options.title
             left += "<h1>\(escape(titleLeft))</h1>"
 
+
             // Legal form (own line)
-            left += addSmall(c.legalForm)
+            // left += addSmall(c.legalForm)
+
+            // Contact, then registrations each on their own line
+            // left += addSmall(c.contact)
+            left += (c.kvk  != nil) ? "<div class=\"small\">KvK \(escape(c.kvk!))</div>" : ""
+            // left += (c.rsin != nil) ? "<div class=\"small\">RSIN \(escape(c.rsin!))</div>" : ""
+            // left += (c.btw  != nil) ? "<div class=\"small\">BTW \(escape(c.btw!))</div>" : ""
+            left += "</div>"
 
             // Address (split by newlines from your Address.string)
             if let addr = c.address?.string, !addr.isEmpty {
@@ -229,13 +237,6 @@ public enum StatementHTMLRenderer {
                     left += addSmall(String(line))
                 }
             }
-
-            // Contact, then registrations each on their own line
-            left += addSmall(c.contact)
-            left += (c.kvk  != nil) ? "<div class=\"small\">KvK \(escape(c.kvk!))</div>" : ""
-            left += (c.rsin != nil) ? "<div class=\"small\">RSIN \(escape(c.rsin!))</div>" : ""
-            left += (c.btw  != nil) ? "<div class=\"small\">BTW \(escape(c.btw!))</div>" : ""
-            left += "</div>"
 
             // Right column (report title + period)
             let rightTitle    = escape(options.title)
