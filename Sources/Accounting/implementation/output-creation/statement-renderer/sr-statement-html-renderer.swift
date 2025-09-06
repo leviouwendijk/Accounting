@@ -8,6 +8,7 @@ public enum StatementHTMLRenderer {
         public var minAbsIncome: Decimal = 0
         public var includeOtherBucket: Bool = false
         public var omitIncomeLevel1Root: Bool = true
+        public var company: Company? = nil
 
         public init(
             title: String = "Financial Statements",
@@ -15,7 +16,8 @@ public enum StatementHTMLRenderer {
             currencySymbol: String = "€",
             minAbsIncome: Decimal = 0,
             includeOtherBucket: Bool = false,
-            omitIncomeLevel1Root: Bool = true
+            omitIncomeLevel1Root: Bool = true,
+            company: Company? = nil
         ) {
             self.title = title
             self.subtitle = subtitle
@@ -23,6 +25,29 @@ public enum StatementHTMLRenderer {
             self.minAbsIncome = minAbsIncome
             self.includeOtherBucket = includeOtherBucket
             self.omitIncomeLevel1Root = omitIncomeLevel1Root
+        }
+    }
+
+    public struct Company: Sendable {
+        public var name: String?
+        public var legalForm: String?
+        public var kvk: String?
+        public var rsin: String?
+        public var btw: String?
+        public var address: String?
+        public var contact: String?
+
+        public init(
+            name: String? = nil,
+            legalForm: String? = nil,
+            kvk: String? = nil,
+            rsin: String? = nil,
+            btw: String? = nil,
+            address: String? = nil,
+            contact: String? = nil
+        ) {
+            self.name = name; self.legalForm = legalForm; self.kvk = kvk
+            self.rsin = rsin; self.btw = btw; self.address = address; self.contact = contact
         }
     }
 
@@ -124,12 +149,61 @@ public enum StatementHTMLRenderer {
             .summary { margin-top: 8px; color: #444; }
             .ok    { color: #0a7a28; }
             .warn  { color: #b05a00; }
+
+            header.doc {
+              display:flex; align-items:flex-end; justify-content:space-between;
+              gap:24px; margin: 0 0 12px 0; border-bottom:1px solid #eee; padding-bottom:8px;
+            }
+            .company h1 { font-size: 20px; font-weight: 600; margin: 0 0 2px 0; }
+            .company .small { font-size: 11px; color: #666; line-height: 1.35; }
+            .meta { text-align:right; }
+            .meta .title { font-size: 14px; font-weight: 600; margin: 0 0 2px 0; }
+            .meta .subtitle { font-size: 12px; color:#666; }
+
+
           </style>
         </head>
         <body>
-          <h1>\(escape(options.title))</h1>
-          \(subtitleHTML)
         """
+
+        func nonEmpty(_ s: String?) -> String? {
+            guard let t = s?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty else { return nil }
+            return t
+        }
+        func joinDot(_ parts: [String?]) -> String {
+            parts.compactMap { nonEmpty($0).map(escape) }.joined(separator: " · ")
+        }
+
+        if let c = options.company {
+            let leftLine1 = nonEmpty(c.name) ?? options.title
+            let leftLine2 = joinDot([c.legalForm, c.address])
+            let leftLine3 = joinDot([c.contact,
+                                     c.kvk.map { "KvK \($0)" },
+                                     c.rsin.map { "RSIN \($0)" },
+                                     c.btw.map { "BTW \($0)" }])
+
+            let rightTitle = escape(options.title)
+            let rightSubtitle = options.subtitle.map { "<div class=\"subtitle\">\(escape($0))</div>" } ?? ""
+
+            html += """
+            <header class="doc">
+              <div class="company">
+                <h1>\(escape(leftLine1))</h1>
+                \(leftLine2.isEmpty ? "" : "<div class=\"small\">\(leftLine2)</div>")
+                \(leftLine3.isEmpty ? "" : "<div class=\"small\">\(leftLine3)</div>")
+              </div>
+              <div class="meta">
+                <div class="title">\(rightTitle)</div>
+                \(rightSubtitle)
+              </div>
+            </header>
+            """
+        } else {
+            html += """
+              <h1>\(escape(options.title))</h1>
+              \(subtitleHTML)
+            """
+        }
 
         // 4a) Winst- en verliesrekening (behoud volgorde/bedragen; verberg alleen L1)
         let isSections = try RGSPrinter.incomeSections(
@@ -196,7 +270,7 @@ public enum StatementHTMLRenderer {
             </div>
 
             <div class="summary">
-                Som Eigen Vermogen + Passiva: \(fmt(sum.assets))
+                Som Eigen Vermogen + Passiva: \(fmt(ajk))
             </div>
 
             <div class="summary">
