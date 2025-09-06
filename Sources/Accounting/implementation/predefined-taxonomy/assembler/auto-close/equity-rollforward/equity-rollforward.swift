@@ -458,27 +458,39 @@ public func equityClosingByOwner(
           let m  = eb[id]
     else { return [:] }
 
-    // AE map (owner -> signed amount in AE)
-    var raw: [Int: Decimal] = [:]
+    // Split assigned vs unassigned
+    var assigned: [Int: Decimal] = [:]
+    var unassigned: Decimal = 0
     for (eid, amt) in m {
-        if let oid = eid { raw[oid] = amt }
+        if let oid = eid { assigned[oid] = amt } else { unassigned = amt }
     }
 
-    // Presentation total from Balance for the same anchor
+    // Presentation total from Balance
     let presClose: Decimal = bundle.balance.first { $0.id == id }?.amount ?? 0
-    let rawSum = raw.values.reduce(0, +)
+    let sumAssigned = assigned.values.reduce(0, +)
+    let sumAll      = sumAssigned + unassigned
     let tol: Decimal = 0.01
 
-    // If AE equals the negative of presentation, flip to match presentation sign
-    if absD(rawSum + presClose) <= tol {
-        return raw.mapValues { -$0 }
+    // Prefer to match against the FULL sum (owners + unassigned)
+    if absD(sumAll + presClose) <= tol {
+        // AE is the negative of presentation → flip to presentation sign
+        return assigned.mapValues { -$0 }
     }
-    // If AE already equals presentation, keep as-is
-    if absD(rawSum - presClose) <= tol {
-        return raw
+    if absD(sumAll - presClose) <= tol {
+        // AE already matches presentation sign
+        return assigned
     }
-    // If we can’t reconcile, return raw (better to see it than hide it)
-    return raw
+
+    // Fallback: try owners-only sum (in case unassigned is zero/missing)
+    if absD(sumAssigned + presClose) <= tol {
+        return assigned.mapValues { -$0 }
+    }
+    if absD(sumAssigned - presClose) <= tol {
+        return assigned
+    }
+
+    // Couldn’t reconcile — return raw owners (better visible than hidden)
+    return assigned
 }
 
 @inline(__always)
