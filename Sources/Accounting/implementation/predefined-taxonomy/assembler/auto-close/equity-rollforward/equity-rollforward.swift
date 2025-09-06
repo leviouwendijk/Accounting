@@ -203,8 +203,6 @@ public func buildOwnerDeltas(
     return (owners, out, alloc)
 }
 
-// MARK: - Earliest opening (no guessing)
-
 public func buildEarliestBeginMap(
     earliest: EquityPeriod,
     chart: CompiledChart,
@@ -212,46 +210,45 @@ public func buildEarliestBeginMap(
     cfg: EquityRollforwardConfig,
     maps: ChartMaps
 ) throws -> [Int: Decimal] {
-    // (1) If there is an owner-tagged opening line posted, use it verbatim.
+    // 1) Owner-tagged opening present? Use verbatim (treated as presentation sign).
     if let eb = earliest.bundle.entity?.byAccount,
        let openingCode = cfg.entity.periodOpeningRouting.equityOpeningCode,
        let begId = maps.idByCode[openingCode],
        let m = eb[begId] {
-        let perOwner: [Int: Decimal] = Dictionary(uniqueKeysWithValues: m.compactMap { (eid, amt) -> (Int, Decimal)? in
+        let perOwner = Dictionary(uniqueKeysWithValues: m.compactMap { (eid, amt) -> (Int, Decimal)? in
             guard let oid = eid else { return nil }
-            return (oid, absD(amt)) // store positive begin
+            return (oid, absD(amt)) // keep positive for begin anchor
         })
         if !perOwner.isEmpty { return perOwner }
     }
 
-    // (2) Backsolve from equity closing per owner minus intra-period deltas.
-    //     This requires we can read per-owner closing (new split-seeds path).
+    // 2) Backsolve: begin = closing(normalized to presentation) − delta
     let closingByOwner = equityClosingByOwner(bundle: earliest.bundle, cfg: cfg, maps: maps)
     if !closingByOwner.isEmpty {
         let (_, deltas, _) = try buildOwnerDeltas(
-            bundle: earliest.bundle, chart: chart, entities: entities,
-            asOf: earliest.asOf, cfg: cfg, maps: maps
+            bundle: earliest.bundle,
+            chart: chart,
+            entities: entities,
+            asOf: earliest.asOf,
+            cfg: cfg,
+            maps: maps
         )
         let owners = Set(closingByOwner.keys).union(deltas.keys)
         var begin: [Int: Decimal] = [:]
         for oid in owners {
             let close = closingByOwner[oid] ?? 0
             let d = deltas[oid] ?? OwnerDelta(stort: 0, onttrek: 0, winst: 0)
-            // end = begin + delta  ⇒  begin = end − delta
             begin[oid] = close - d.delta
         }
         return begin
     }
 
-    // (3) Fallback: nothing to backsolve → BEGIN = 0 for all discovered owners (from movements)
+    // 3) Nothing to backsolve → BEGIN = 0 per owner (discover owners from movements)
     let (owners, _, _) = try buildOwnerDeltas(
-        bundle: earliest.bundle, chart: chart, entities: entities,
-        asOf: earliest.asOf, cfg: cfg, maps: maps
+        bundle: earliest.bundle, chart: chart, entities: entities, asOf: earliest.asOf, cfg: cfg, maps: maps
     )
     return Dictionary(uniqueKeysWithValues: owners.map { ($0, Decimal(0)) })
 }
-
-// MARK: - Presentation totals (for display checks)
 
 public func equityPresentationTotals(
     periodIndex i: Int,
@@ -381,26 +378,30 @@ public func runOwnerEquityRollforwardIB(
     }
 
     let maps = ChartMaps(chart: chart)
-
-    // Earliest BEGIN per owner
     let earliest = periods[0]
-    var beginByOwner = try buildEarliestBeginMap(earliest: earliest, chart: chart, entities: entities, cfg: cfg, maps: maps)
 
-    printHeader(title)
-    // Explain anchor choice
-    let hasOwnerTaggedOpening: Bool = {
-        guard let eb = earliest.bundle.entity?.byAccount,
-              let openingCode = cfg.entity.periodOpeningRouting.equityOpeningCode,
-              let begId = maps.idByCode[openingCode]
-        else { return false }
-        return eb[begId] != nil
+    // Decide & print anchor mode *before* we compute the begin map
+    let hasPostedBegin: Bool = {
+        if let eb = earliest.bundle.entity?.byAccount,
+           let code = cfg.entity.periodOpeningRouting.equityOpeningCode,
+           let id = maps.idByCode[code] { return eb[id] != nil }
+        return false
     }()
 
-    if hasOwnerTaggedOpening {
+    let hasPerOwnerClosing = !equityClosingByOwner(bundle: earliest.bundle, cfg: cfg, maps: maps).isEmpty
+
+    if hasPostedBegin {
         print("Earliest anchor: owner-tagged opening found — using posted per-owner BEGIN.")
+    } else if hasPerOwnerClosing {
+        print("Earliest anchor: backsolved from per-owner closing − movements (no % guessing).")
     } else {
-        print("Earliest anchor: none posted — anchoring BEGIN = 0 per owner (no % guessing).")
+        print("Earliest anchor: none posted and no per-owner closing — BEGIN = 0 per owner.")
     }
+
+    // Compute earliest BEGIN by the same logic
+    var beginByOwner = try buildEarliestBeginMap(
+        earliest: earliest, chart: chart, entities: entities, cfg: cfg, maps: maps
+    )
 
     for (i, p) in periods.enumerated() {
         let (moveOwners, deltas, alloc) = try buildOwnerDeltas(
@@ -408,7 +409,7 @@ public func runOwnerEquityRollforwardIB(
         )
         let closeOwners = Set(equityClosingByOwner(bundle: p.bundle, cfg: cfg, maps: maps).keys)
         var owners = Array(Set(moveOwners).union(beginByOwner.keys).union(closeOwners))
-        owners.sort() // or your preferred custom ordering
+        owners.sort()
 
         var endByOwner: [Int: Decimal] = [:]
         for oid in owners {
@@ -442,11 +443,11 @@ public func runOwnerEquityRollforwardIB(
         )
 
         printPeriod(label: p.label, rows: rows, entities: entities, cfg: cfg)
-        beginByOwner = endByOwner
+
+        beginByOwner = endByOwner // carry forward exact per-owner end
     }
 }
 
-// Per-owner equity closing (from balance-side AE)
 public func equityClosingByOwner(
     bundle: StatementBundle,
     cfg: EquityRollforwardConfig,
@@ -457,11 +458,27 @@ public func equityClosingByOwner(
           let m  = eb[id]
     else { return [:] }
 
-    // Keep signs as per your balance presentation; filter out nil owner ids.
-    return Dictionary(uniqueKeysWithValues: m.compactMap { (eid, amt) -> (Int, Decimal)? in
-        guard let oid = eid else { return nil }
-        return (oid, amt)
-    })
+    // AE map (owner -> signed amount in AE)
+    var raw: [Int: Decimal] = [:]
+    for (eid, amt) in m {
+        if let oid = eid { raw[oid] = amt }
+    }
+
+    // Presentation total from Balance for the same anchor
+    let presClose: Decimal = bundle.balance.first { $0.id == id }?.amount ?? 0
+    let rawSum = raw.values.reduce(0, +)
+    let tol: Decimal = 0.01
+
+    // If AE equals the negative of presentation, flip to match presentation sign
+    if absD(rawSum + presClose) <= tol {
+        return raw.mapValues { -$0 }
+    }
+    // If AE already equals presentation, keep as-is
+    if absD(rawSum - presClose) <= tol {
+        return raw
+    }
+    // If we can’t reconcile, return raw (better to see it than hide it)
+    return raw
 }
 
 @inline(__always)
@@ -469,16 +486,13 @@ public func equityAnchorId(
     cfg: EquityRollforwardConfig,
     maps: ChartMaps
 ) -> Int? {
-    // Primary anchor is *non-optional* String in your config
     if let id = maps.idByCode[cfg.entity.periodOpeningRouting.equityAnchorCode] {
         return id
     }
-    // Optional fallback (e.g. "BEivKap")
     if let fallback = cfg.equityTotalFallback,
        let id = maps.idByCode[fallback] {
         return id
     }
     return nil
 }
-
 
