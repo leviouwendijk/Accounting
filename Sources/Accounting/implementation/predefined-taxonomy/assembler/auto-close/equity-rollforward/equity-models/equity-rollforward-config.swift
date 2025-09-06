@@ -31,14 +31,21 @@ public struct EquityRollforwardConfig {
 
     public var defaultDrawingGroups: [DrawingsGroup] {
         [
+            .init(prefix: "BEivKapProPok", label: "Privé-opname kapitaal"),
             .init(prefix: "BEivKapProPmv", label: "Privé-gebruik MVA"),
             .init(prefix: "BEivKapProPrg", label: "Privé-verbruik goederen"),
             .init(prefix: "BEivKapProPiz", label: "Privé-aandeel zakelijke lasten"),
             .init(prefix: "BEivKapProPpr", label: "Privé-premies"),
-            // Common “shortcut” drawings outside Pro-branch; keep if you use them:
-            .init(prefix: "BEivKapPoc",     label: "Privé-opname contant"),
-            .init(prefix: "BEivKapPng",     label: "Privé (niet geboekt)"),
-            .init(prefix: "BEivKapPbe",     label: "Privébelasting")
+            .init(prefix: "BEivKapProPri", label: "Privé-belastingen"),
+            .init(prefix: "BEivKapProPer", label: "Privé-aflossingen en rente"),
+            .init(prefix: "BEivKapProPrk", label: "Privé-aftrekbare kosten"),
+            .init(prefix: "BEivKapProFor", label: "FOR (dotatie)"),
+            .init(prefix: "BEivKapProOvp", label: "Overige privé-opnamen"),
+             // Common “shortcut” drawings outside Pro-branch:
+            .init(prefix: "BEivKapPoc",     label: "Privé-onttrekking contanten"),
+            .init(prefix: "BEivKapPng",     label: "Privé-onttrekking in natura en goederen"),
+            .init(prefix: "BEivKapPbe",     label: "Privé-belastingen"),
+            .init(prefix: "BEivKapPpr",     label: "Privé-premies")
         ]
     }
 }
