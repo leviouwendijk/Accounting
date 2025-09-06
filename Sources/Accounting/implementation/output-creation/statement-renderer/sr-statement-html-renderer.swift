@@ -185,6 +185,7 @@ public enum StatementHTMLRenderer {
             }
             .company h1 { font-size: 20px; font-weight: 600; margin: 0 0 2px 0; }
             .company .small { font-size: 11px; color: #666; line-height: 1.35; }
+            .company .small + .small { margin-top: 2px; }
             .meta { text-align:right; }
             .meta .title { font-size: 14px; font-weight: 600; margin: 0 0 2px 0; }
             .meta .subtitle { font-size: 12px; color:#666; }
@@ -204,29 +205,44 @@ public enum StatementHTMLRenderer {
         }
 
         if let c = options.company {
-            let leftLine1 = nonEmpty(c.name) ?? options.title
-            let leftLine2 = joinDot([c.legalForm, c.address?.string])
-            let leftLine3 = joinDot([c.contact,
-                                     c.kvk.map { "KvK \($0)" },
-                                     c.rsin.map { "RSIN \($0)" },
-                                     c.btw.map { "BTW \($0)" }])
+            func addSmall(_ text: String?) -> String {
+                guard let t = nonEmpty(text) else { return "" }
+                return "<div class=\"small\">\(escape(t))</div>"
+            }
 
-            let rightTitle = escape(options.title)
+            // Build left column lines (each on its own line)
+            var left = "<div class=\"company\">"
+            let titleLeft = nonEmpty(c.name) ?? options.title
+            left += "<h1>\(escape(titleLeft))</h1>"
+
+            // Legal form (own line)
+            left += addSmall(c.legalForm)
+
+            // Address (split by newlines from your Address.string)
+            if let addr = c.address?.string, !addr.isEmpty {
+                for line in addr.split(separator: "\n") {
+                    left += addSmall(String(line))
+                }
+            }
+
+            // Contact, then registrations each on their own line
+            left += addSmall(c.contact)
+            left += (c.kvk  != nil) ? "<div class=\"small\">KvK \(escape(c.kvk!))</div>" : ""
+            left += (c.rsin != nil) ? "<div class=\"small\">RSIN \(escape(c.rsin!))</div>" : ""
+            left += (c.btw  != nil) ? "<div class=\"small\">BTW \(escape(c.btw!))</div>" : ""
+            left += "</div>"
+
+            // Right column (report title + period)
+            let rightTitle    = escape(options.title)
             let rightSubtitle = options.subtitle.map { "<div class=\"subtitle\">\(escape($0))</div>" } ?? ""
-
-            html += """
-            <header class="doc">
-              <div class="company">
-                <h1>\(escape(leftLine1))</h1>
-                \(leftLine2.isEmpty ? "" : "<div class=\"small\">\(leftLine2)</div>")
-                \(leftLine3.isEmpty ? "" : "<div class=\"small\">\(leftLine3)</div>")
-              </div>
-              <div class="meta">
-                <div class="title">\(rightTitle)</div>
-                \(rightSubtitle)
-              </div>
-            </header>
+            let right = """
+            <div class="meta">
+              <div class="title">\(rightTitle)</div>
+              \(rightSubtitle)
+            </div>
             """
+
+            html += "<header class=\"doc\">\(left)\(right)</header>"
         } else {
             html += """
               <h1>\(escape(options.title))</h1>
