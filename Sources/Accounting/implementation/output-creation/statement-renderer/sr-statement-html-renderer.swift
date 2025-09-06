@@ -87,30 +87,40 @@ public enum StatementHTMLRenderer {
           <title>\(escape(options.title))</title>
           <style>
             body { font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 24px; }
-            h1 { margin: 0 0 6px 0; }
-            .subtitle { color: #666; margin-bottom: 16px; }
-            h2 { margin-top: 24px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+            h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
+            .subtitle { font-size: 12px; color:#666; margin: 0 0 10px; }
+            h2 { font-size: 16px; font-weight: 600; margin: 12px 0 6px; }
             table.tbl { width: 100%; border-collapse: collapse; margin-top: 8px; }
             .tbl thead th { text-align: left; font-weight: 600; font-size: 12px; color: #666; }
             /* Slight horizontal padding for breathing room */
-            .tbl td { padding: 3px 6px; border-bottom: 1px dotted #eee; vertical-align: top; }
+            .tbl td {
+                padding: 3px 6px;
+                border-bottom: 1px dotted #eee;
+                vertical-align: top;       /* keep top-aligned when labels wrap */
+                line-height: 1.35;         /* consistent row height prevents “warping” */
+            }
 
             /* Keep amount column tight & aligned even with very long labels */
-            .tbl .col-amt, .tbl .amt {
-              text-align: right;
-              width: 1%;                 /* shrink-to-fit */
-              min-width: 8ch;            /* enough for “00.000,00” in nl_NL */
-              white-space: nowrap;       /* never wrap numbers */
-              font-variant-numeric: tabular-nums; /* better column alignment */
-              padding-left: 12px;        /* visual separation from label */
-            }
+             .tbl .col-amt, .tbl .amt {
+               text-align: right;
+               width: 1%;                 /* shrink-to-fit */
+               min-width: 8ch;            /* enough for “00.000,00” */
+               white-space: nowrap;       /* don’t wrap numbers */
+               font-variant-numeric: tabular-nums;
+               font-feature-settings: "tnum";
+               line-height: 1.35;         /* match label line-height to avoid vertical wobble */
+               padding-left: 12px;        /* visual gutter from label */
+             }
 
             /* Let labels wrap instead of pushing the amount cell away */
-            .tbl .label {
-              white-space: normal;       /* allow wrapping */
-              overflow-wrap: anywhere;   /* break long words/paths */
-              hyphens: auto;
-            }
+             .tbl .label {
+               white-space: normal;       /* allow wrap */
+               overflow-wrap: anywhere;   /* break long words/paths */
+               hyphens: auto;
+               line-height: 1.35;         /* same as amounts → no warp */
+             }
+
+             tr.total td { border-top: 1px solid #ddd; padding-top: 8px; font-weight: 600; }
             .summary { margin-top: 8px; color: #444; }
             .ok    { color: #0a7a28; }
             .warn  { color: #b05a00; }
