@@ -175,6 +175,64 @@ public enum RGSPrinter {
     //     }
     // }
 
+    public static func printBalanceByL2Buckets(
+        _ title: String,
+        bundle: StatementBundle,
+        chart: CompiledChart,
+        equityCode: String,
+        includeOtherBucket: Bool,
+        showEntityBreakdown: Bool,
+        entities: EntityStore,
+        minAbs: Decimal = 0
+    ) throws {
+        // 1) Keep your refactored balance printer exactly as-is
+        try RGSPrinter.printBalanceByL2Buckets(
+            title,
+            bundle: bundle,
+            chart: chart,
+            equityCode: equityCode,
+            includeOtherBucket: includeOtherBucket
+        )
+
+        // 2) Inline entity breakdown (unchanged behaviour)
+        guard showEntityBreakdown, let eb = bundle.entity?.byAccount else { return }
+
+        // entity id index is a PROPERTY (stable ids)
+        let idx = entities.idIndex
+
+        // entity id -> display name (prefer configured displayName, else alias string)
+        var idToName: [Int?: String] = [nil: "(unassigned)"]
+        for (key, id) in idx {
+            let name = entities.byFull[key]?.displayName ?? key.alias.string
+            idToName[id] = name
+        }
+
+        // quick map: account id -> RGS code
+        let codeById: [Int:String] = Dictionary(uniqueKeysWithValues: chart.nodes.map { ($0.id, $0.codes.code) })
+
+        print("\nEntity breakdown (inline)")
+        print("———————————————————————")
+
+        // iterate in the SAME order as the presented balance
+        for line in bundle.balance {
+            let accId = line.id
+            guard let byEnt = eb[accId], !byEnt.isEmpty else { continue }
+
+            let total = byEnt.values.reduce(Decimal(0), +)
+            let absTotal = (total < 0 ? -total : total)
+            if minAbs > 0, absTotal < minAbs { continue }
+
+            let code = codeById[accId] ?? ""
+            print("• \(line.label) [\(code)]  \(total)")
+
+            for (eid, amt) in byEnt.sorted(by: { ($0.key ?? 0) < ($1.key ?? 0) }) where amt != 0 {
+                let absAmt = (amt < 0 ? -amt : amt)
+                if minAbs > 0, absAmt < minAbs { continue }
+                let nm = idToName[eid] ?? "(entity \(eid ?? -1))"
+                print("   ↳ \(nm): \(amt)")
+            }
+        }
+    }
 
     public static func computeBalanceByL2Sections(
         bundle: StatementBundle,
@@ -356,65 +414,6 @@ public enum RGSPrinter {
                 lines: lines
             )
         ]
-    }
-}
-
-public func printBalanceByL2Buckets(
-    _ title: String,
-    bundle: StatementBundle,
-    chart: CompiledChart,
-    equityCode: String,
-    includeOtherBucket: Bool,
-    showEntityBreakdown: Bool,
-    entities: EntityStore,
-    minAbs: Decimal = 0
-) throws {
-    // 1) Keep your refactored balance printer exactly as-is
-    try RGSPrinter.printBalanceByL2Buckets(
-        title,
-        bundle: bundle,
-        chart: chart,
-        equityCode: equityCode,
-        includeOtherBucket: includeOtherBucket
-    )
-
-    // 2) Inline entity breakdown (unchanged behaviour)
-    guard showEntityBreakdown, let eb = bundle.entity?.byAccount else { return }
-
-    // entity id index is a PROPERTY (stable ids)
-    let idx = entities.idIndex
-
-    // entity id -> display name (prefer configured displayName, else alias string)
-    var idToName: [Int?: String] = [nil: "(unassigned)"]
-    for (key, id) in idx {
-        let name = entities.byFull[key]?.displayName ?? key.alias.string
-        idToName[id] = name
-    }
-
-    // quick map: account id -> RGS code
-    let codeById: [Int:String] = Dictionary(uniqueKeysWithValues: chart.nodes.map { ($0.id, $0.codes.code) })
-
-    print("\nEntity breakdown (inline)")
-    print("———————————————————————")
-
-    // iterate in the SAME order as the presented balance
-    for line in bundle.balance {
-        let accId = line.id
-        guard let byEnt = eb[accId], !byEnt.isEmpty else { continue }
-
-        let total = byEnt.values.reduce(Decimal(0), +)
-        let absTotal = (total < 0 ? -total : total)
-        if minAbs > 0, absTotal < minAbs { continue }
-
-        let code = codeById[accId] ?? ""
-        print("• \(line.label) [\(code)]  \(total)")
-
-        for (eid, amt) in byEnt.sorted(by: { ($0.key ?? 0) < ($1.key ?? 0) }) where amt != 0 {
-            let absAmt = (amt < 0 ? -amt : amt)
-            if minAbs > 0, absAmt < minAbs { continue }
-            let nm = idToName[eid] ?? "(entity \(eid ?? -1))"
-            print("   ↳ \(nm): \(amt)")
-        }
     }
 }
 
