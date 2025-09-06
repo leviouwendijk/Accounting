@@ -86,7 +86,7 @@ public enum StatementHTMLRenderer {
           <meta charset="utf-8">
           <title>\(escape(options.title))</title>
           <style>
-            body { font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 24px; }
+            body { font: 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 24px; }
             h1 { font-size: 22px; font-weight: 600; margin: 0 0 4px; }
             .subtitle { font-size: 12px; color:#666; margin: 0 0 10px; }
             h2 { font-size: 16px; font-weight: 600; margin: 12px 0 6px; }
