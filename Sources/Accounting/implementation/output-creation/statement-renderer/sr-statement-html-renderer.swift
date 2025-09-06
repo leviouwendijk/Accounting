@@ -179,16 +179,21 @@ public enum StatementHTMLRenderer {
             .ok    { color: #0a7a28; }
             .warn  { color: #b05a00; }
 
-            header.doc {
-              display:flex; align-items:flex-end; justify-content:space-between;
-              gap:24px; margin: 0 0 12px 0; border-bottom:1px solid #eee; padding-bottom:8px;
-            }
-            .company h1 { font-size: 20px; font-weight: 600; margin: 0 0 2px 0; }
-            .company .small { font-size: 11px; color: #666; line-height: 1.35; }
-            .company .small + .small { margin-top: 2px; }
-            .meta { text-align:right; }
-            .meta .title { font-size: 14px; font-weight: 600; margin: 0 0 2px 0; }
-            .meta .subtitle { font-size: 12px; color:#666; }
+             header.doc {
+               display: grid;
+               grid-template-columns: minmax(0, 1fr) auto;  /* left grows, right hugs */
+               align-items: start;                          /* top-align both columns */
+               column-gap: 32px;
+               margin: 0 0 14px 0;
+               border-bottom: 1px solid #eee;
+               padding-bottom: 10px;
+             }
+             .company h1 { font-size: 19px; font-weight: 600; margin: 0 0 3px 0; }
+             .company .small { font-size: 11px; color: #666; line-height: 1.35; }
+             .company .small + .small { margin-top: 2px; }   /* consistent stacking */
+             .meta { text-align: right; line-height: 1.3; padding-top: 2px; }
+             .meta .title { font-size: 13px; font-weight: 600; margin: 0 0 2px 0; }
+             .meta .subtitle { font-size: 11px; color:#666; }
 
 
           </style>
