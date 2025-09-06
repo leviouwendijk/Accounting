@@ -76,6 +76,14 @@ public enum StatementHTMLRenderer {
                     return ""
                 }
             }
+
+            public var stringNoReturn: String {
+                if let s = street, let n = number, let ac = areaCode, let c = city {
+                    return "\(s) \(n), \(ac) \(c)"
+                } else {
+                    return ""
+                }
+            }
         }
     }
 
@@ -215,30 +223,32 @@ public enum StatementHTMLRenderer {
                 return "<div class=\"small\">\(escape(t))</div>"
             }
 
-            // Build left column lines (each on its own line)
-            var left = "<div class=\"company\">"
+            var leftParts: [String] = []
             let titleLeft = nonEmpty(c.name) ?? options.title
-            left += "<h1>\(escape(titleLeft))</h1>"
+            leftParts.append("<h1>\(escape(titleLeft))</h1>")
 
+            // Optional: legal form on its own line
+            // leftParts.append(addSmall(c.legalForm))
 
-            // Legal form (own line)
-            // left += addSmall(c.legalForm)
-
-            // Contact, then registrations each on their own line
-            // left += addSmall(c.contact)
-            left += (c.kvk  != nil) ? "<div class=\"small\">KvK \(escape(c.kvk!))</div>" : ""
-            // left += (c.rsin != nil) ? "<div class=\"small\">RSIN \(escape(c.rsin!))</div>" : ""
-            // left += (c.btw  != nil) ? "<div class=\"small\">BTW \(escape(c.btw!))</div>" : ""
-            left += "</div>"
-
-            // Address (split by newlines from your Address.string)
+            // Address: split into multiple lines
             if let addr = c.address?.string, !addr.isEmpty {
                 for line in addr.split(separator: "\n") {
-                    left += addSmall(String(line))
+                    leftParts.append(addSmall(String(line)))
                 }
             }
 
-            // Right column (report title + period)
+            // Optional: contact line
+            // leftParts.append(addSmall(c.contact))
+
+            // Registrations each on their own line
+            if let kvk = c.kvk  { leftParts.append("<div class=\"small\">KvK \(escape(kvk))</div>") }
+            // if let rsin = c.rsin { /* leftParts.append("<div class=\"small\">RSIN \(escape(rsin))</div>") */ }
+            // if let btw = c.btw  { /* leftParts.append("<div class=\"small\">BTW \(escape(btw))</div>") */ }
+
+            // Now wrap once → a single grid item in column 1
+            let left = "<div class=\"company\">\(leftParts.joined())</div>"
+
+            // Right column (title + period)
             let rightTitle    = escape(options.title)
             let rightSubtitle = options.subtitle.map { "<div class=\"subtitle\">\(escape($0))</div>" } ?? ""
             let right = """
