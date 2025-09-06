@@ -1,5 +1,8 @@
 import Foundation
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Small utils & formatting
+
 public enum PadAlign { case left, right }
 public func pad(_ s: String, _ w: Int, _ a: PadAlign = .left) -> String {
     let len = s.count
@@ -25,23 +28,89 @@ public func fmtPct(_ p: Decimal, digits: Int = 2) -> String {
     "\(fmtDec(roundD(p * 100, digits: digits), digits: digits))%"
 }
 
-/// Knobs for the rollforward; codes are sourced from BusinessEntity defaults.
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+public func earliestPostingDate<Seq: Sequence>(
+    in entries: Seq,
+    using settings: EntryCompilerSettings
+) -> Date? where Seq.Element == Entry {
+    return entries.lazy
+        .compactMap { $0.resolvedPostingDate(using: settings) }
+        .min()
+}
+
+public func earliestAbsoluteDate(
+    entries: [Entry],
+    settings: EntryCompilerSettings
+) throws -> Date {
+    var minDate: Date?
+    for e in entries {
+        let spec = try e.date.resolved(for: e, using: settings) // returns .absolute
+        if case .absolute(let d) = spec {
+            if let cur = minDate {
+                if d < cur { minDate = d }
+            } else {
+                minDate = d
+            }
+        }
+    }
+    return minDate ?? Date.distantPast
+}
+
+public func buildHistoryFromInception(
+    entries: [Entry],
+    endAsOf: Date,
+    kind: PeriodKind,
+    calendar: Calendar,
+    settings: EntryCompilerSettings,
+    assemble: (_ periodStart: Date, _ periodEndExcl: Date) throws -> StatementBundle
+) throws -> [EquityPeriod] {
+    // Lifetime → single bucket (inception…endAsOf)
+    if kind == .lifetime {
+        let inception = try earliestAbsoluteDate(entries: entries, settings: settings)
+        let start = calendar.startOfDay(for: inception)
+        let endExcl = nextPeriodStart(after: periodStart(for: endAsOf, kind: .month, calendar: calendar), // put it in next midnight
+                                      kind: .month, calendar: calendar)
+        let b = try assemble(start, endExcl)
+        return [.init(label: "lifetime", bundle: b, asOf: endAsOf)]
+    }
+
+    // Align inception to period boundary
+    let inception = try earliestAbsoluteDate(entries: entries, settings: settings)
+    var curStart = periodStart(for: inception, kind: kind, calendar: calendar)
+
+    // End: make sure the last period contains endAsOf
+    let anchorStartForEnd = periodStart(for: endAsOf, kind: kind, calendar: calendar)
+    let hardStop = nextPeriodStart(after: anchorStartForEnd, kind: kind, calendar: calendar)
+
+    var out: [EquityPeriod] = []
+    while curStart < hardStop {
+        let nextStart = nextPeriodStart(after: curStart, kind: kind, calendar: calendar)
+        let endExcl = min(nextStart, hardStop)
+        let bundle = try assemble(curStart, endExcl)
+        out.append(.init(
+            label: labelForPeriodStart(curStart, kind: kind, calendar: calendar),
+            bundle: bundle,
+            asOf: calendar.date(byAdding: .second, value: -1, to: endExcl) ?? endExcl
+        ))
+        curStart = nextStart
+    }
+    return out
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Config & period models
+
 public struct EquityRollforwardConfig {
     public var entity: BusinessEntity = .vof
     public var fractionDigits: Int = 2
-
-    // parents for contributions/drawings (owner-tagged at parent)
-    // Not provided by BusinessEntity yet; keep overridable here.
     public var contribCode: String = "BEivKapPrs"
     public var drawingCode: String = "BEivKapPro"
-
-    // optional fallback for equity total (some charts prefer BEivKap)
     public var equityTotalFallback: String? = "BEivKap"
-
     public init() {}
 }
 
-/// One period input (label + bundle + as-of date for ownership slices)
 public struct EquityPeriod {
     public let label: String
     public let bundle: StatementBundle
@@ -51,16 +120,16 @@ public struct EquityPeriod {
     }
 }
 
-// MARK: - Chart & entity helpers
+// ─────────────────────────────────────────────────────────────────────────────
+// Chart & entity helpers
 
-/// Simple chart maps
 public struct ChartMaps {
     let idByCode: [String: Int]
     init(chart: CompiledChart) {
         idByCode = Dictionary(uniqueKeysWithValues: chart.nodes.map { ($0.codes.code, $0.id) })
     }
 }
-/// Resolve pretty names for owners
+
 public func ownerNameMap(_ entities: EntityStore) -> [Int?: String] {
     var out: [Int?: String] = [nil: "(unassigned)"]
     for (key, id) in entities.idIndex {
@@ -69,7 +138,8 @@ public func ownerNameMap(_ entities: EntityStore) -> [Int?: String] {
     }
     return out
 }
-/// AE breakdown: account code → [ownerId: amount]
+
+/// AE → owner map for a single account code
 public func aeMap(bundle: StatementBundle, code: String, maps: ChartMaps) -> [Int: Decimal] {
     guard let eb = bundle.entity?.byAccount,
           let id = maps.idByCode[code],
@@ -81,7 +151,8 @@ public func aeMap(bundle: StatementBundle, code: String, maps: ChartMaps) -> [In
     })
 }
 
-// MARK: - Profit allocation (posted AOW vs slices)
+// ─────────────────────────────────────────────────────────────────────────────
+// Profit allocation (posted AOW vs slices)
 
 public enum WinstSource: CustomStringConvertible {
     case postedAOW
@@ -102,23 +173,11 @@ public struct ProfitAllocation {
     public let usedAmounts: [Int: Decimal]        // per owner
     public let effectivePercents: [Int: Decimal]  // 0…1
     public let source: WinstSource
-    
-    public init(
-        niTotal: Decimal,
-        usePosted: Bool,
-        usedAmounts: [Int: Decimal],        // per owner,
-        effectivePercents: [Int: Decimal],  // 0…1,
-        source: WinstSource
-    ) {
-        self.niTotal = niTotal
-        self.usePosted = usePosted
-        self.usedAmounts = usedAmounts
-        self.effectivePercents = effectivePercents
-        self.source = source
+    public init(niTotal: Decimal, usePosted: Bool, usedAmounts: [Int: Decimal], effectivePercents: [Int: Decimal], source: WinstSource) {
+        self.niTotal = niTotal; self.usePosted = usePosted; self.usedAmounts = usedAmounts; self.effectivePercents = effectivePercents; self.source = source
     }
 }
 
-/// Decide how to allocate NI this period using BusinessEntity defaults.
 public func allocateProfitForPeriod(
     bundle: StatementBundle,
     chart: CompiledChart,
@@ -127,59 +186,50 @@ public func allocateProfitForPeriod(
     cfg: EquityRollforwardConfig,
     maps: ChartMaps
 ) throws -> ProfitAllocation {
-    // NI total via autoCloseTargets()
+    // NI total via BusinessEntity defaults
     let ch = try chart.ensuringIndex(enrichNodes: true, strict: false)
-    let targets = cfg.entity.autoCloseTargets()
-    let resolved = try targets.resolve(in: ch.index!, validateWith: RGSAssembler.makeMaps(from: ch))
+    let resolved = try cfg.entity.autoCloseTargets().resolve(in: ch.index!, validateWith: RGSAssembler.makeMaps(from: ch))
     let niId = resolved.ni.id
     let niTotal = bundle.income.first(where: { $0.id == niId })?.amount ?? 0
 
-    // Posted AOW (BusinessEntity.profitShareCode)
+    // Posted AOW
     let aow = aeMap(bundle: bundle, code: cfg.entity.profitShareCode, maps: maps).mapValues(absD)
     let aowSum = aow.values.reduce(0, +)
     let usePosted = absD(aowSum - niTotal) <= 0.01
 
-    // Ownership slices
+    // Ownership slices (ONLY for NI allocation fallback)
     let weights = Dictionary(uniqueKeysWithValues: entities.ownershipSlices(asOf: asOf).map { ($0.entityId, $0.percent) })
     let ownerIds = Set(aow.keys).union(weights.keys)
 
-    var usedAmounts: [Int: Decimal] = [:]
-    var effPct: [Int: Decimal] = [:]
-
+    var used: [Int: Decimal] = [:], eff: [Int: Decimal] = [:]
     if usePosted {
         for oid in ownerIds {
             let amt = aow[oid] ?? 0
-            usedAmounts[oid] = amt
-            effPct[oid] = (niTotal == 0) ? 0 : (amt / niTotal)
+            used[oid] = amt
+            eff[oid] = (niTotal == 0) ? 0 : (amt / niTotal)
         }
-        return ProfitAllocation(niTotal: niTotal, usePosted: true, usedAmounts: usedAmounts, effectivePercents: effPct, source: .postedAOW)
+        return .init(niTotal: niTotal, usePosted: true, usedAmounts: used, effectivePercents: eff, source: .postedAOW)
     } else {
         for oid in ownerIds {
             let p = weights[oid] ?? 0
             let amt = niTotal * p
-            usedAmounts[oid] = amt
-            effPct[oid] = p
+            used[oid] = amt
+            eff[oid] = p
         }
-        return ProfitAllocation(niTotal: niTotal, usePosted: false, usedAmounts: usedAmounts, effectivePercents: effPct, source: .slices(asOf: asOf))
+        return .init(niTotal: niTotal, usePosted: false, usedAmounts: used, effectivePercents: eff, source: .slices(asOf: asOf))
     }
 }
 
-// MARK: - Movements per period
+// ─────────────────────────────────────────────────────────────────────────────
+// Movements per period
 
 public struct OwnerDelta {
     public let stort: Decimal
     public let onttrek: Decimal
     public let winst: Decimal
     public var delta: Decimal { stort - onttrek + winst }
-    
-    public init(
-        stort: Decimal,
-        onttrek: Decimal,
-        winst: Decimal,
-    ) {
-        self.stort = stort
-        self.onttrek = onttrek
-        self.winst = winst
+    public init(stort: Decimal, onttrek: Decimal, winst: Decimal) {
+        self.stort = stort; self.onttrek = onttrek; self.winst = winst
     }
 }
 
@@ -203,6 +253,46 @@ public func buildOwnerDeltas(
     return (owners, out, alloc)
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Owner-tagged closing & earliest opening
+
+@inline(__always)
+public func equityAnchorId(cfg: EquityRollforwardConfig, maps: ChartMaps) -> Int? {
+    if let id = maps.idByCode[cfg.entity.periodOpeningRouting.equityAnchorCode] { return id }
+    if let fallback = cfg.equityTotalFallback, let id = maps.idByCode[fallback] { return id }
+    return nil
+}
+
+/// Return per-owner closing for the anchor (presentation sign if reconcilable).
+public func equityClosingByOwner(
+    bundle: StatementBundle,
+    cfg: EquityRollforwardConfig,
+    maps: ChartMaps
+) -> [Int: Decimal] {
+    guard let id = equityAnchorId(cfg: cfg, maps: maps),
+          let eb = bundle.entity?.byAccount,
+          let m  = eb[id]
+    else { return [:] }
+
+    var assigned: [Int: Decimal] = [:]
+    var unassigned: Decimal = 0
+    for (eid, amt) in m {
+        if let oid = eid { assigned[oid] = amt } else { unassigned = amt }
+    }
+
+    let presClose: Decimal = bundle.balance.first { $0.id == id }?.amount ?? 0
+    let sumAssigned = assigned.values.reduce(0, +)
+    let sumAll = sumAssigned + unassigned
+    let tol: Decimal = 0.01
+
+    if absD(sumAll + presClose) <= tol { return assigned.mapValues { -$0 } } // flip to match presentation
+    if absD(sumAll - presClose) <= tol { return assigned }                    // already matches
+    if absD(sumAssigned + presClose) <= tol { return assigned.mapValues { -$0 } }
+    if absD(sumAssigned - presClose) <= tol { return assigned }
+    return assigned // show raw owners if irreconcilable
+}
+
+/// Earliest BEGIN: posted opening → else backsolve from per-owner closing − delta → else 0.
 public func buildEarliestBeginMap(
     earliest: EquityPeriod,
     chart: CompiledChart,
@@ -210,7 +300,7 @@ public func buildEarliestBeginMap(
     cfg: EquityRollforwardConfig,
     maps: ChartMaps
 ) throws -> [Int: Decimal] {
-    // 1) Owner-tagged opening present? Use verbatim (treated as presentation sign).
+    // 1) owner-tagged opening posted?
     if let eb = earliest.bundle.entity?.byAccount,
        let openingCode = cfg.entity.periodOpeningRouting.equityOpeningCode,
        let begId = maps.idByCode[openingCode],
@@ -222,47 +312,26 @@ public func buildEarliestBeginMap(
         if !perOwner.isEmpty { return perOwner }
     }
 
-    // 2) Backsolve: begin = closing(normalized to presentation) − delta
+    // 2) backsolve from earliest per-owner closing
     let closingByOwner = equityClosingByOwner(bundle: earliest.bundle, cfg: cfg, maps: maps)
     if !closingByOwner.isEmpty {
-        let (_, deltas, _) = try buildOwnerDeltas(
-            bundle: earliest.bundle,
-            chart: chart,
-            entities: entities,
-            asOf: earliest.asOf,
-            cfg: cfg,
-            maps: maps
-        )
+        let (_, deltas, _) = try buildOwnerDeltas(bundle: earliest.bundle, chart: chart, entities: entities, asOf: earliest.asOf, cfg: cfg, maps: maps)
         let owners = Set(closingByOwner.keys).union(deltas.keys)
-        // var begin: [Int: Decimal] = [:]
-        // for oid in owners {
-        //     let close = closingByOwner[oid] ?? 0
-        //     let d = deltas[oid] ?? OwnerDelta(stort: 0, onttrek: 0, winst: 0)
-        //     begin[oid] = close - d.delta
-        // }
-        // Right after you get closingByOwner & deltas
-        rfDumpOwnerMap("earliest CLOSE (per-owner, presentation-sign)", map: closingByOwner)
-        let totalClose = closingByOwner.values.reduce(0, +)
-        let totalDelta = deltas.values.reduce(Decimal(0)) { $0 + $1.delta }
-        rfDbg("earliest totals: closeSum=\(fmtDec(roundD(totalClose), digits: 2))  deltaSum=\(fmtDec(roundD(totalDelta), digits: 2))")
-
-        // After filling 'begin'
-        let begin = owners.reduce(into: [Int:Decimal]()) { acc, oid in
+        var begin: [Int: Decimal] = [:]
+        for oid in owners {
             let close = closingByOwner[oid] ?? 0
             let d = deltas[oid] ?? OwnerDelta(stort: 0, onttrek: 0, winst: 0)
-            acc[oid] = close - d.delta
+            begin[oid] = close - d.delta
         }
-        rfDumpOwnerMap("computed earliest BEGIN (backsolved)", map: begin)
         return begin
     }
 
-    // 3) Nothing to backsolve → BEGIN = 0 per owner (discover owners from movements)
-    let (owners, _, _) = try buildOwnerDeltas(
-        bundle: earliest.bundle, chart: chart, entities: entities, asOf: earliest.asOf, cfg: cfg, maps: maps
-    )
+    // 3) nothing to backsolve → BEGIN = 0 per owner (owners discovered from movements)
+    let (owners, _, _) = try buildOwnerDeltas(bundle: earliest.bundle, chart: chart, entities: entities, asOf: earliest.asOf, cfg: cfg, maps: maps)
     return Dictionary(uniqueKeysWithValues: owners.map { ($0, Decimal(0)) })
 }
 
+// Presentation totals for display (not used for per-owner math)
 public func equityPresentationTotals(
     periodIndex i: Int,
     periods: [EquityPeriod],
@@ -270,33 +339,42 @@ public func equityPresentationTotals(
     cfg: EquityRollforwardConfig,
     maps: ChartMaps
 ) -> (opening: Decimal, closing: Decimal) {
-    // Primary equity total id (use BusinessEntity anchor code; fallback if provided)
     let eqId = equityAnchorId(cfg: cfg, maps: maps)
-
     let opening: Decimal = {
         if i == 0 {
-            // Only use the opening begin line if we actually have a code configured & mapped
             if let openingCode = cfg.entity.periodOpeningRouting.equityOpeningCode,
                let begId = maps.idByCode[openingCode] {
                 return periods[i].bundle.balance.first { $0.id == begId }?.amount ?? 0
-            } else {
-                return 0
-            }
+            } else { return 0 }
         } else {
             guard let eid = eqId else { return 0 }
             return periods[i - 1].bundle.balance.first { $0.id == eid }?.amount ?? 0
         }
     }()
-
     let closing: Decimal = {
         guard let eid = eqId else { return 0 }
         return periods[i].bundle.balance.first { $0.id == eid }?.amount ?? 0
     }()
-
     return (opening, closing)
 }
 
-// MARK: - Printer
+// ─────────────────────────────────────────────────────────────────────────────
+@inline(__always) private func rfDbg(_ s: @autoclosure () -> String) {
+    print("[DEBUG] \(s())")
+}
+public func rfDumpOwnerMap(_ tag: String, map: [Int: Decimal], entities: EntityStore? = nil, digits: Int = 2) {
+    let names: [Int?:String] = entities.map { ownerNameMap($0) } ?? [:]
+    let total = map.values.reduce(0, +)
+    print("[RF-DBG] \(tag): total=\(fmtDec(roundD(total, digits: digits), digits: digits))  owners=\(map.count)")
+    for oid in map.keys.sorted() {
+        let nm = names[Int?(oid)] ?? "owner#\(oid)"
+        let amt = map[oid] ?? 0
+        print("         - \(nm): \(fmtDec(roundD(amt, digits: digits), digits: digits))")
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Period rows & printing
 
 public struct PeriodRollforward {
     let owners: [Int]
@@ -305,7 +383,7 @@ public struct PeriodRollforward {
     let endByOwner: [Int: Decimal]
     let niTotal: Decimal
     let winstSource: WinstSource
-    let allocationNote: [Int: (percent: Decimal, amount: Decimal)] // percent 0…1
+    let allocationNote: [Int: (percent: Decimal, amount: Decimal)] // 0…1
     let openingTotal: Decimal
     let closingTotal: Decimal
 }
@@ -315,12 +393,7 @@ public func printHeader(_ title: String) {
     print(String(repeating: "—", count: title.count))
 }
 
-public func printPeriod(
-    label: String,
-    rows: PeriodRollforward,
-    entities: EntityStore,
-    cfg: EquityRollforwardConfig
-) {
+public func printPeriod(label: String, rows: PeriodRollforward, entities: EntityStore, cfg: EquityRollforwardConfig) {
     let names = ownerNameMap(entities)
     let d = cfg.fractionDigits
 
@@ -334,7 +407,7 @@ public func printPeriod(
     for oid in rows.owners {
         let nm = names[Int?(oid)] ?? "owner#\(oid)"
         let b  = rows.beginByOwner[oid] ?? 0
-        let dlt = rows.deltas[oid]!
+        let dlt = rows.deltas[oid] ?? OwnerDelta(stort: 0, onttrek: 0, winst: 0)
         let e  = rows.endByOwner[oid] ?? (b + dlt.delta)
 
         tBegin += b; tStort += dlt.stort; tOnt += dlt.onttrek; tWinst += dlt.winst; tEnd += e
@@ -358,7 +431,6 @@ public func printPeriod(
     print("Check totals → Opening: \(fmtDec(roundD(rows.openingTotal, digits: d), digits: d)) | Closing: \(fmtDec(roundD(rows.closingTotal, digits: d), digits: d))")
     print("Identity check: Begin + Stort − Onttrek + Winst = \(fmtDec(roundD(tBegin + tStort - tOnt + tWinst, digits: d), digits: d))")
 
-    // Allocation note: % and € per owner used for NI this period
     if !rows.allocationNote.isEmpty {
         print("NI allocation (used): \(rows.winstSource)")
         for oid in rows.owners {
@@ -370,37 +442,29 @@ public func printPeriod(
     }
 }
 
-// MARK: - Orchestrator
+// ─────────────────────────────────────────────────────────────────────────────
+// GLOBAL backsolve
 
-/// Main entry (drop-in). Never guesses opening by %; carries ends forward across periods.
-public func runOwnerEquityRollforwardIB(
-    title: String = "IB equity rollforward (owner split, backsolved)",
-    current cur: StatementBundle,
-    previous prv: StatementBundle?,            // pass if you compiled with --compare
+/// Build the entire global rollforward once (earliest → latest), carrying END → next BEGIN.
+/// Never infers BEGIN by %. Only the earliest BEGIN is anchored (posted/opening or backsolved or 0).
+public func buildGlobalRollforward(
+    history: [EquityPeriod],           // FULL chronological history you want to solve
     chart: CompiledChart,
     entities: EntityStore,
-    asOfCurrent: Date,
-    asOfPrevious: Date?,                      // usually assembled.previous?.range.to
-    config cfg: EquityRollforwardConfig = EquityRollforwardConfig()
-) throws {
-    var periods: [EquityPeriod] = []
-    if let p = prv, let pd = asOfPrevious { periods.append(.init(label: "Previous", bundle: p, asOf: pd)) }
-    periods.append(.init(label: "Current", bundle: cur, asOf: asOfCurrent))
-    guard !periods.isEmpty else {
-        printHeader(title); print("(no periods)"); return
-    }
+    cfg: EquityRollforwardConfig
+) throws -> [PeriodRollforward] {
+    precondition(!history.isEmpty, "history must not be empty")
 
     let maps = ChartMaps(chart: chart)
-    let earliest = periods[0]
 
-    // Decide & print anchor mode *before* we compute the begin map
+    // Explain anchor choice
+    let earliest = history[0]
     let hasPostedBegin: Bool = {
         if let eb = earliest.bundle.entity?.byAccount,
            let code = cfg.entity.periodOpeningRouting.equityOpeningCode,
            let id = maps.idByCode[code] { return eb[id] != nil }
         return false
     }()
-
     let hasPerOwnerClosing = !equityClosingByOwner(bundle: earliest.bundle, cfg: cfg, maps: maps).isEmpty
 
     if hasPostedBegin {
@@ -410,17 +474,163 @@ public func runOwnerEquityRollforwardIB(
     } else {
         print("Earliest anchor: none posted and no per-owner closing — BEGIN = 0 per owner.")
     }
-    
-    rfDbg("anchorMode: postedBegin=\(hasPostedBegin) perOwnerClosing=\(hasPerOwnerClosing)")
 
-    // Compute earliest BEGIN by the same logic
+    // Earliest BEGIN per owner
+    var beginByOwner = try buildEarliestBeginMap(earliest: earliest, chart: chart, entities: entities, cfg: cfg, maps: maps)
+    rfDumpOwnerMap("BEGIN map for earliest period", map: beginByOwner, entities: entities)
+
+    var out: [PeriodRollforward] = []
+
+    // Forward pass across the entire history
+    for i in history.indices {
+        let p = history[i]
+        let (moveOwners, deltas, alloc) = try buildOwnerDeltas(bundle: p.bundle, chart: chart, entities: entities, asOf: p.asOf, cfg: cfg, maps: maps)
+        let closeOwners = Set(equityClosingByOwner(bundle: p.bundle, cfg: cfg, maps: maps).keys)
+        var owners = Array(Set(moveOwners).union(beginByOwner.keys).union(closeOwners))
+        owners.sort()
+
+        // Compute per-owner END and carry forward
+        var endByOwner: [Int: Decimal] = [:]
+        for oid in owners {
+            let d = deltas[oid] ?? OwnerDelta(stort: 0, onttrek: 0, winst: 0)
+            endByOwner[oid] = (beginByOwner[oid] ?? 0) + d.delta
+        }
+
+        // Presentation totals (display only)
+        let (openTotal, closeTotal) = equityPresentationTotals(periodIndex: i, periods: history, chart: chart, cfg: cfg, maps: maps)
+
+        // Allocation note
+        var note: [Int: (Decimal, Decimal)] = [:]
+        for oid in owners {
+            let amt = alloc.usedAmounts[oid] ?? 0
+            let pct = alloc.usePosted
+                ? ((alloc.niTotal == 0) ? 0 : (amt / alloc.niTotal))
+                : (alloc.effectivePercents[oid] ?? 0)
+            note[oid] = (pct, amt)
+        }
+
+        // Pack a row
+        let row = PeriodRollforward(
+            owners: owners,
+            beginByOwner: beginByOwner,
+            deltas: deltas,
+            endByOwner: endByOwner,
+            niTotal: alloc.niTotal,
+            winstSource: alloc.source,
+            allocationNote: note,
+            openingTotal: openTotal,
+            closingTotal: closeTotal
+        )
+        out.append(row)
+
+        // Debug reconciliation against AE closing for this period
+        let perOwnerClose = equityClosingByOwner(bundle: p.bundle, cfg: cfg, maps: maps)
+        if !perOwnerClose.isEmpty {
+            let endSum = endByOwner.values.reduce(0, +)
+            let closeSum = perOwnerClose.values.reduce(0, +)
+            if absD(endSum - closeSum) > 0.01 {
+                rfDbg("[\(p.label)] WARNING: per-owner END sum \(fmtDec(endSum)) ≠ AE closing \(fmtDec(closeSum)); Δ=\(fmtDec(endSum - closeSum))")
+                rfDumpOwnerMap("[\(p.label)] per-owner (END − CLOSING)", map: owners.reduce(into: [Int:Decimal]()) { acc, oid in acc[oid] = (endByOwner[oid] ?? 0) - (perOwnerClose[oid] ?? 0) })
+            }
+        }
+
+        // Carry forward to next period
+        beginByOwner = endByOwner
+    }
+
+    return out
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Runners
+
+/// Global runner: give me the FULL history; I’ll compute and optionally print a window.
+public func runOwnerEquityRollforwardIB_Global(
+    title: String = "IB equity rollforward (owner split, backsolved)",
+    history: [EquityPeriod],                  // full chronological history
+    chart: CompiledChart,
+    entities: EntityStore,
+    printWindow: Range<Int>? = nil,           // which solved periods to print (default: all)
+    config cfg: EquityRollforwardConfig = EquityRollforwardConfig()
+) throws {
+    guard !history.isEmpty else { printHeader(title); print("(no periods)"); return }
+    let solved = try buildGlobalRollforward(history: history, chart: chart, entities: entities, cfg: cfg)
+
+    printHeader(title)
+
+    let window = printWindow ?? history.indices
+    for i in window {
+        printPeriod(label: history[i].label, rows: solved[i], entities: entities, cfg: cfg)
+    }
+}
+
+/// Thin wrapper (keeps your current call pattern working).
+/// If you can provide full history from the call site, prefer `runOwnerEquityRollforwardIB_Global(...)`.
+public func runOwnerEquityRollforwardIB(
+    title: String = "IB equity rollforward (owner split, backsolved)",
+    current cur: StatementBundle,
+    previous prv: StatementBundle?,
+    chart: CompiledChart,
+    entities: EntityStore,
+    asOfCurrent: Date,
+    asOfPrevious: Date?,
+    history: [EquityPeriod]? = nil,           // ← pass full history here if you have it
+    config cfg: EquityRollforwardConfig = EquityRollforwardConfig()
+) throws {
+    // If caller already built full history, use it
+    if let hist = history, !hist.isEmpty {
+        try runOwnerEquityRollforwardIB_Global(title: title, history: hist, chart: chart, entities: entities, printWindow: nil, config: cfg)
+        return
+    }
+
+    // Otherwise, fall back to the two-period window (still solved globally over these)
+    var periods: [EquityPeriod] = []
+    if let p = prv, let pd = asOfPrevious { periods.append(.init(label: "Previous", bundle: p, asOf: pd)) }
+    periods.append(.init(label: "Current", bundle: cur, asOf: asOfCurrent))
+
+    try runOwnerEquityRollforwardIB_Global(title: title, history: periods, chart: chart, entities: entities, printWindow: nil, config: cfg)
+}
+
+/// Print owner equity rollforward using *global* backsolve across `allPeriods`,
+/// but only render rows for indices in `view` (e.g. previous+current).
+public func runOwnerEquityRollforwardHistory(
+    title: String = "IB equity rollforward (owner split, backsolved)",
+    allPeriods: [EquityPeriod],
+    chart: CompiledChart,
+    entities: EntityStore,
+    view: ClosedRange<Int>?,                 // nil → print all
+    config cfg: EquityRollforwardConfig = .init()
+) throws {
+    guard !allPeriods.isEmpty else { printHeader(title); print("(no periods)"); return }
+
+    let maps = ChartMaps(chart: chart)
+    let earliest = allPeriods[0]
+
+    // Announce anchor mode once (same logic you already have)
+    let hasPostedBegin: Bool = {
+        if let eb = earliest.bundle.entity?.byAccount,
+           let code = cfg.entity.periodOpeningRouting.equityOpeningCode,
+           let id = maps.idByCode[code] { return eb[id] != nil }
+        return false
+    }()
+    let hasPerOwnerClosing = !equityClosingByOwner(bundle: earliest.bundle, cfg: cfg, maps: maps).isEmpty
+
+    printHeader(title)
+    if hasPostedBegin {
+        print("Earliest anchor: owner-tagged opening found — using posted per-owner BEGIN.")
+    } else if hasPerOwnerClosing {
+        print("Earliest anchor: backsolved from per-owner closing − movements (no % guessing).")
+    } else {
+        print("Earliest anchor: none posted and no per-owner closing — BEGIN = 0 per owner.")
+    }
+
+    // Compute earliest BEGIN
     var beginByOwner = try buildEarliestBeginMap(
         earliest: earliest, chart: chart, entities: entities, cfg: cfg, maps: maps
     )
 
-    rfDumpOwnerMap("BEGIN map for earliest period", map: beginByOwner, entities: entities)
-
-    for (i, p) in periods.enumerated() {
+    // Walk *all* periods to keep the math globally correct.
+    for (i, p) in allPeriods.enumerated() {
         let (moveOwners, deltas, alloc) = try buildOwnerDeltas(
             bundle: p.bundle, chart: chart, entities: entities, asOf: p.asOf, cfg: cfg, maps: maps
         )
@@ -435,7 +645,7 @@ public func runOwnerEquityRollforwardIB(
         }
 
         let (openTotal, closeTotal) = equityPresentationTotals(
-            periodIndex: i, periods: periods, chart: chart, cfg: cfg, maps: maps
+            periodIndex: i, periods: allPeriods, chart: chart, cfg: cfg, maps: maps
         )
 
         var note: [Int: (Decimal, Decimal)] = [:]
@@ -445,48 +655,6 @@ public func runOwnerEquityRollforwardIB(
                 ? ((alloc.niTotal == 0) ? 0 : (amt / alloc.niTotal))
                 : (alloc.effectivePercents[oid] ?? 0)
             note[oid] = (pct, amt)
-        }
-
-        // Owners sets
-        let beginOwners = Array(beginByOwner.keys).sorted()
-        rfDbg("[\(p.label)] owners.move=\(moveOwners)")
-        rfDbg("[\(p.label)] owners.begin=\(beginOwners)")
-        rfDbg("[\(p.label)] owners.close=\(Array(closeOwners).sorted())")
-
-        // Per-owner closing (post sign-normalization)
-        let closingMap = equityClosingByOwner(bundle: p.bundle, cfg: cfg, maps: maps)
-        rfDumpOwnerMap("[\(p.label)] per-owner CLOSING (presentation sign)", map: closingMap, entities: entities)
-
-        // Per-owner deltas detail
-        rfDumpDeltas("[\(p.label)] per-owner MOVEMENTS (stort/pro/winst)", owners: moveOwners, deltas: deltas, entities: entities)
-
-        // Dump begin/end per owner
-        rfDumpOwnerMap("[\(p.label)] per-owner BEGIN (carried in)", map: beginByOwner, entities: entities)
-        rfDumpOwnerMap("[\(p.label)] per-owner END (computed)", map: endByOwner, entities: entities)
-
-        // Totals identity check (begin + Δ = end)
-        let tBegin = beginByOwner.values.reduce(0,+)
-        let tDelta = deltas.values.reduce(Decimal(0)) { $0 + $1.delta }
-        let tEnd   = endByOwner.values.reduce(0,+)
-        rfDbg("[\(p.label)] totals: begin=\(fmtDec(roundD(tBegin), digits: 2))  delta=\(fmtDec(roundD(tDelta), digits: 2))  end=\(fmtDec(roundD(tEnd), digits: 2))")
-        if !rfApproxEq(tBegin + tDelta, tEnd) {
-            rfDbg("[\(p.label)] WARNING: begin + delta != end by \(fmtDec(roundD((tBegin + tDelta) - tEnd), digits: 2))")
-        }
-
-        // Compare end totals vs Balance closing
-        let presClose = closeTotal
-        if !rfApproxEq(tEnd, presClose) {
-            rfDbg("[\(p.label)] WARNING: per-owner END sum \(fmtDec(roundD(tEnd), digits: 2)) " +
-                  "≠ presentation closing \(fmtDec(roundD(presClose), digits: 2)); Δ=\(fmtDec(roundD(tEnd - presClose), digits: 2))")
-            // Optional: show per-owner gap vs CLOSING map if you want 1:1 reconciliation
-            if !closingMap.isEmpty {
-                let ownersUnion = Set(endByOwner.keys).union(closingMap.keys)
-                var diff: [Int:Decimal] = [:]
-                for oid in ownersUnion {
-                    diff[oid] = (endByOwner[oid] ?? 0) - (closingMap[oid] ?? 0)
-                }
-                rfDumpOwnerMap("[\(p.label)] per-owner (END − CLOSING)", map: diff, entities: entities)
-            }
         }
 
         let rows = PeriodRollforward(
@@ -501,135 +669,12 @@ public func runOwnerEquityRollforwardIB(
             closingTotal: closeTotal
         )
 
-        printPeriod(label: p.label, rows: rows, entities: entities, cfg: cfg)
+        // Only print when within the requested view window (but always carry forward)
+        if view == nil || view!.contains(i) {
+            printPeriod(label: p.label, rows: rows, entities: entities, cfg: cfg)
+        }
 
-        rfDumpOwnerMap("[\(p.label)] CARRY-FORWARD (becomes next BEGIN)", map: endByOwner, entities: entities)
-
-        beginByOwner = endByOwner // carry forward exact per-owner end
+        beginByOwner = endByOwner
     }
-}
-
-public func equityClosingByOwner(
-    bundle: StatementBundle,
-    cfg: EquityRollforwardConfig,
-    maps: ChartMaps
-) -> [Int: Decimal] {
-    guard let id = equityAnchorId(cfg: cfg, maps: maps),
-          let eb = bundle.entity?.byAccount,
-          let m  = eb[id]
-    else { return [:] }
-
-    // Split assigned vs unassigned
-    var assigned: [Int: Decimal] = [:]
-    var unassigned: Decimal = 0
-    for (eid, amt) in m {
-        if let oid = eid { assigned[oid] = amt } else { unassigned = amt }
-    }
-
-    // Presentation total from Balance
-    let presClose: Decimal = bundle.balance.first { $0.id == id }?.amount ?? 0
-    let sumAssigned = assigned.values.reduce(0, +)
-    let sumAll      = sumAssigned + unassigned
-    let tol: Decimal = 0.01
-
-    rfDbg("equityClosingByOwner: anchorId=\(id)")
-    rfDbg("  presClose(BS) = \(fmtDec(roundD(presClose), digits: 2))")
-    rfDbg("  ownersSum(AE) = \(fmtDec(roundD(sumAssigned), digits: 2))")
-    rfDbg("  unassigned(AE)= \(fmtDec(roundD(unassigned), digits: 2))")
-    rfDbg("  sumAll(AE)    = \(fmtDec(roundD(sumAll), digits: 2))")
-
-
-    if absD(sumAll + presClose) <= tol {
-        let flipped = assigned.mapValues { -$0 }
-        rfDbg("  DECISION: flip to presentation (sumAll + presClose ≈ 0)")
-        rfDumpOwnerMap("  returning per-owner (flipped)", map: flipped)
-        return flipped
-    }
-    if absD(sumAll - presClose) <= tol {
-        rfDbg("  DECISION: keep as-is (sumAll == presClose)")
-        rfDumpOwnerMap("  returning per-owner (as-is)", map: assigned)
-        return assigned
-    }
-    if absD(sumAssigned + presClose) <= tol {
-        let flipped = assigned.mapValues { -$0 }
-        rfDbg("  DECISION: flip (owners-only + presClose ≈ 0)")
-        rfDumpOwnerMap("  returning per-owner (flipped owners-only)", map: flipped)
-        return flipped
-    }
-    if absD(sumAssigned - presClose) <= tol {
-        rfDbg("  DECISION: keep as-is (owners-only == presClose)")
-        rfDumpOwnerMap("  returning per-owner (as-is owners-only)", map: assigned)
-        return assigned
-    }
-
-    rfDbg("  DECISION: no reconciliation — return raw owners")
-    rfDumpOwnerMap("  returning per-owner (RAW)", map: assigned)
-    return assigned
-}
-
-@inline(__always)
-public func equityAnchorId(
-    cfg: EquityRollforwardConfig,
-    maps: ChartMaps
-) -> Int? {
-    if let id = maps.idByCode[cfg.entity.periodOpeningRouting.equityAnchorCode] {
-        return id
-    }
-    if let fallback = cfg.equityTotalFallback,
-       let id = maps.idByCode[fallback] {
-        return id
-    }
-    return nil
-}
-
-
-
-@inline(__always) public func rfDbg(_ s: @autoclosure () -> String) {
-    print("[DEBUG] \(s())")
-}
-
-public func rfDumpOwnerMap(
-    _ tag: String,
-    map: [Int: Decimal],
-    entities: EntityStore? = nil,
-    digits: Int = 2
-) {
-    let names: [Int?:String] = entities.map { ownerNameMap($0) } ?? [:]
-    let total = map.values.reduce(0, +)
-    print("[RF-DBG] \(tag): total=\(fmtDec(roundD(total, digits: digits), digits: digits))  owners=\(map.count)")
-    for oid in map.keys.sorted() {
-        let nm = names[Int?(oid)] ?? "owner#\(oid)"
-        let amt = map[oid] ?? 0
-        print("         - \(nm): \(fmtDec(roundD(amt, digits: digits), digits: digits))")
-    }
-}
-
-public func rfApproxEq(_ a: Decimal, _ b: Decimal, tol: Decimal = 0.01) -> Bool {
-    return absD(a - b) <= tol
-}
-
-private func rfDumpDeltas(
-    _ tag: String,
-    owners: [Int],
-    deltas: [Int: OwnerDelta],
-    entities: EntityStore? = nil,
-    digits: Int = 2
-) {
-    let names = entities.map(ownerNameMap) ?? [:]
-    var s = Decimal(0), o = Decimal(0), w = Decimal(0)
-    print("[RF-DBG] \(tag):")
-    for oid in owners {
-        let d = deltas[oid] ?? OwnerDelta(stort: 0, onttrek: 0, winst: 0)
-        s += d.stort; o += d.onttrek; w += d.winst
-        let nm = names[Int?(oid)] ?? "owner#\(oid)"
-        print("   - \(nm): stort=\(fmtDec(roundD(d.stort, digits: digits), digits: digits))  " +
-              "onttrek=\(fmtDec(roundD(d.onttrek, digits: digits), digits: digits))  " +
-              "winst=\(fmtDec(roundD(d.winst, digits: digits), digits: digits))  " +
-              "Δ=\(fmtDec(roundD(d.delta, digits: digits), digits: digits))")
-    }
-    print("   totals: stort=\(fmtDec(roundD(s, digits: digits), digits: digits))  " +
-          "onttrek=\(fmtDec(roundD(o, digits: digits), digits: digits))  " +
-          "winst=\(fmtDec(roundD(w, digits: digits), digits: digits))  " +
-          "Δ=\(fmtDec(roundD(s - o + w, digits: digits), digits: digits))")
 }
 

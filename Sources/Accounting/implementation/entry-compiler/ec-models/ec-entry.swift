@@ -122,4 +122,11 @@ public struct Entry: Hashable, Codable, Sendable {
         }
         return out.joined(separator: "\n")
     }
+
+    public func resolvedPostingDate(using settings: EntryCompilerSettings) -> Date? {
+        guard case let .absolute(d) = (try? date.resolved(for: self, using: settings)) else {
+            return nil
+        }
+        return d
+    }
 }
