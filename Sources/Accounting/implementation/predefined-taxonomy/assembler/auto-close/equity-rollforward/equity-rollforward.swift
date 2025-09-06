@@ -234,12 +234,25 @@ public func buildEarliestBeginMap(
             maps: maps
         )
         let owners = Set(closingByOwner.keys).union(deltas.keys)
-        var begin: [Int: Decimal] = [:]
-        for oid in owners {
+        // var begin: [Int: Decimal] = [:]
+        // for oid in owners {
+        //     let close = closingByOwner[oid] ?? 0
+        //     let d = deltas[oid] ?? OwnerDelta(stort: 0, onttrek: 0, winst: 0)
+        //     begin[oid] = close - d.delta
+        // }
+        // Right after you get closingByOwner & deltas
+        rfDumpOwnerMap("earliest CLOSE (per-owner, presentation-sign)", map: closingByOwner)
+        let totalClose = closingByOwner.values.reduce(0, +)
+        let totalDelta = deltas.values.reduce(Decimal(0)) { $0 + $1.delta }
+        rfDbg("earliest totals: closeSum=\(fmtDec(roundD(totalClose), digits: 2))  deltaSum=\(fmtDec(roundD(totalDelta), digits: 2))")
+
+        // After filling 'begin'
+        let begin = owners.reduce(into: [Int:Decimal]()) { acc, oid in
             let close = closingByOwner[oid] ?? 0
             let d = deltas[oid] ?? OwnerDelta(stort: 0, onttrek: 0, winst: 0)
-            begin[oid] = close - d.delta
+            acc[oid] = close - d.delta
         }
+        rfDumpOwnerMap("computed earliest BEGIN (backsolved)", map: begin)
         return begin
     }
 
@@ -397,11 +410,15 @@ public func runOwnerEquityRollforwardIB(
     } else {
         print("Earliest anchor: none posted and no per-owner closing — BEGIN = 0 per owner.")
     }
+    
+    rfDbg("anchorMode: postedBegin=\(hasPostedBegin) perOwnerClosing=\(hasPerOwnerClosing)")
 
     // Compute earliest BEGIN by the same logic
     var beginByOwner = try buildEarliestBeginMap(
         earliest: earliest, chart: chart, entities: entities, cfg: cfg, maps: maps
     )
+
+    rfDumpOwnerMap("BEGIN map for earliest period", map: beginByOwner, entities: entities)
 
     for (i, p) in periods.enumerated() {
         let (moveOwners, deltas, alloc) = try buildOwnerDeltas(
@@ -430,6 +447,48 @@ public func runOwnerEquityRollforwardIB(
             note[oid] = (pct, amt)
         }
 
+        // Owners sets
+        let beginOwners = Array(beginByOwner.keys).sorted()
+        rfDbg("[\(p.label)] owners.move=\(moveOwners)")
+        rfDbg("[\(p.label)] owners.begin=\(beginOwners)")
+        rfDbg("[\(p.label)] owners.close=\(Array(closeOwners).sorted())")
+
+        // Per-owner closing (post sign-normalization)
+        let closingMap = equityClosingByOwner(bundle: p.bundle, cfg: cfg, maps: maps)
+        rfDumpOwnerMap("[\(p.label)] per-owner CLOSING (presentation sign)", map: closingMap, entities: entities)
+
+        // Per-owner deltas detail
+        rfDumpDeltas("[\(p.label)] per-owner MOVEMENTS (stort/pro/winst)", owners: moveOwners, deltas: deltas, entities: entities)
+
+        // Dump begin/end per owner
+        rfDumpOwnerMap("[\(p.label)] per-owner BEGIN (carried in)", map: beginByOwner, entities: entities)
+        rfDumpOwnerMap("[\(p.label)] per-owner END (computed)", map: endByOwner, entities: entities)
+
+        // Totals identity check (begin + Δ = end)
+        let tBegin = beginByOwner.values.reduce(0,+)
+        let tDelta = deltas.values.reduce(Decimal(0)) { $0 + $1.delta }
+        let tEnd   = endByOwner.values.reduce(0,+)
+        rfDbg("[\(p.label)] totals: begin=\(fmtDec(roundD(tBegin), digits: 2))  delta=\(fmtDec(roundD(tDelta), digits: 2))  end=\(fmtDec(roundD(tEnd), digits: 2))")
+        if !rfApproxEq(tBegin + tDelta, tEnd) {
+            rfDbg("[\(p.label)] WARNING: begin + delta != end by \(fmtDec(roundD((tBegin + tDelta) - tEnd), digits: 2))")
+        }
+
+        // Compare end totals vs Balance closing
+        let presClose = closeTotal
+        if !rfApproxEq(tEnd, presClose) {
+            rfDbg("[\(p.label)] WARNING: per-owner END sum \(fmtDec(roundD(tEnd), digits: 2)) " +
+                  "≠ presentation closing \(fmtDec(roundD(presClose), digits: 2)); Δ=\(fmtDec(roundD(tEnd - presClose), digits: 2))")
+            // Optional: show per-owner gap vs CLOSING map if you want 1:1 reconciliation
+            if !closingMap.isEmpty {
+                let ownersUnion = Set(endByOwner.keys).union(closingMap.keys)
+                var diff: [Int:Decimal] = [:]
+                for oid in ownersUnion {
+                    diff[oid] = (endByOwner[oid] ?? 0) - (closingMap[oid] ?? 0)
+                }
+                rfDumpOwnerMap("[\(p.label)] per-owner (END − CLOSING)", map: diff, entities: entities)
+            }
+        }
+
         let rows = PeriodRollforward(
             owners: owners,
             beginByOwner: beginByOwner,
@@ -443,6 +502,8 @@ public func runOwnerEquityRollforwardIB(
         )
 
         printPeriod(label: p.label, rows: rows, entities: entities, cfg: cfg)
+
+        rfDumpOwnerMap("[\(p.label)] CARRY-FORWARD (becomes next BEGIN)", map: endByOwner, entities: entities)
 
         beginByOwner = endByOwner // carry forward exact per-owner end
     }
@@ -471,25 +532,38 @@ public func equityClosingByOwner(
     let sumAll      = sumAssigned + unassigned
     let tol: Decimal = 0.01
 
-    // Prefer to match against the FULL sum (owners + unassigned)
+    rfDbg("equityClosingByOwner: anchorId=\(id)")
+    rfDbg("  presClose(BS) = \(fmtDec(roundD(presClose), digits: 2))")
+    rfDbg("  ownersSum(AE) = \(fmtDec(roundD(sumAssigned), digits: 2))")
+    rfDbg("  unassigned(AE)= \(fmtDec(roundD(unassigned), digits: 2))")
+    rfDbg("  sumAll(AE)    = \(fmtDec(roundD(sumAll), digits: 2))")
+
+
     if absD(sumAll + presClose) <= tol {
-        // AE is the negative of presentation → flip to presentation sign
-        return assigned.mapValues { -$0 }
+        let flipped = assigned.mapValues { -$0 }
+        rfDbg("  DECISION: flip to presentation (sumAll + presClose ≈ 0)")
+        rfDumpOwnerMap("  returning per-owner (flipped)", map: flipped)
+        return flipped
     }
     if absD(sumAll - presClose) <= tol {
-        // AE already matches presentation sign
+        rfDbg("  DECISION: keep as-is (sumAll == presClose)")
+        rfDumpOwnerMap("  returning per-owner (as-is)", map: assigned)
         return assigned
     }
-
-    // Fallback: try owners-only sum (in case unassigned is zero/missing)
     if absD(sumAssigned + presClose) <= tol {
-        return assigned.mapValues { -$0 }
+        let flipped = assigned.mapValues { -$0 }
+        rfDbg("  DECISION: flip (owners-only + presClose ≈ 0)")
+        rfDumpOwnerMap("  returning per-owner (flipped owners-only)", map: flipped)
+        return flipped
     }
     if absD(sumAssigned - presClose) <= tol {
+        rfDbg("  DECISION: keep as-is (owners-only == presClose)")
+        rfDumpOwnerMap("  returning per-owner (as-is owners-only)", map: assigned)
         return assigned
     }
 
-    // Couldn’t reconcile — return raw owners (better visible than hidden)
+    rfDbg("  DECISION: no reconciliation — return raw owners")
+    rfDumpOwnerMap("  returning per-owner (RAW)", map: assigned)
     return assigned
 }
 
@@ -506,5 +580,56 @@ public func equityAnchorId(
         return id
     }
     return nil
+}
+
+
+
+@inline(__always) public func rfDbg(_ s: @autoclosure () -> String) {
+    print("[DEBUG] \(s())")
+}
+
+public func rfDumpOwnerMap(
+    _ tag: String,
+    map: [Int: Decimal],
+    entities: EntityStore? = nil,
+    digits: Int = 2
+) {
+    let names: [Int?:String] = entities.map { ownerNameMap($0) } ?? [:]
+    let total = map.values.reduce(0, +)
+    print("[RF-DBG] \(tag): total=\(fmtDec(roundD(total, digits: digits), digits: digits))  owners=\(map.count)")
+    for oid in map.keys.sorted() {
+        let nm = names[Int?(oid)] ?? "owner#\(oid)"
+        let amt = map[oid] ?? 0
+        print("         - \(nm): \(fmtDec(roundD(amt, digits: digits), digits: digits))")
+    }
+}
+
+public func rfApproxEq(_ a: Decimal, _ b: Decimal, tol: Decimal = 0.01) -> Bool {
+    return absD(a - b) <= tol
+}
+
+private func rfDumpDeltas(
+    _ tag: String,
+    owners: [Int],
+    deltas: [Int: OwnerDelta],
+    entities: EntityStore? = nil,
+    digits: Int = 2
+) {
+    let names = entities.map(ownerNameMap) ?? [:]
+    var s = Decimal(0), o = Decimal(0), w = Decimal(0)
+    print("[RF-DBG] \(tag):")
+    for oid in owners {
+        let d = deltas[oid] ?? OwnerDelta(stort: 0, onttrek: 0, winst: 0)
+        s += d.stort; o += d.onttrek; w += d.winst
+        let nm = names[Int?(oid)] ?? "owner#\(oid)"
+        print("   - \(nm): stort=\(fmtDec(roundD(d.stort, digits: digits), digits: digits))  " +
+              "onttrek=\(fmtDec(roundD(d.onttrek, digits: digits), digits: digits))  " +
+              "winst=\(fmtDec(roundD(d.winst, digits: digits), digits: digits))  " +
+              "Δ=\(fmtDec(roundD(d.delta, digits: digits), digits: digits))")
+    }
+    print("   totals: stort=\(fmtDec(roundD(s, digits: digits), digits: digits))  " +
+          "onttrek=\(fmtDec(roundD(o, digits: digits), digits: digits))  " +
+          "winst=\(fmtDec(roundD(w, digits: digits), digits: digits))  " +
+          "Δ=\(fmtDec(roundD(s - o + w, digits: digits), digits: digits))")
 }
 
