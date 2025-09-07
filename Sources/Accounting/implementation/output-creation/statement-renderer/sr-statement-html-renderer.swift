@@ -230,6 +230,8 @@ public enum StatementHTMLRenderer {
             // Optional: legal form on its own line
             // leftParts.append(addSmall(c.legalForm))
 
+            if let kvk = c.kvk  { leftParts.append("<div class=\"small\"> \(escape(kvk))</div>") }
+
             // Address: split into multiple lines
             if let addr = c.address?.string, !addr.isEmpty {
                 for line in addr.split(separator: "\n") {
@@ -241,7 +243,6 @@ public enum StatementHTMLRenderer {
             // leftParts.append(addSmall(c.contact))
 
             // Registrations each on their own line
-            if let kvk = c.kvk  { leftParts.append("<div class=\"small\">\(escape(kvk))</div>") }
             // if let kvk = c.kvk  { leftParts.append("<div class=\"small\">KvK \(escape(kvk))</div>") }
             // if let rsin = c.rsin { /* leftParts.append("<div class=\"small\">RSIN \(escape(rsin))</div>") */ }
             // if let btw = c.btw  { /* leftParts.append("<div class=\"small\">BTW \(escape(btw))</div>") */ }
