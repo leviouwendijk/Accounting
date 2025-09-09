@@ -21,6 +21,9 @@ public extension RGSPrinter {
         // Column widths (same footprint as your other printers)
         let labelCol = 60
         let codeCol  = 25
+        let gapSpace = 2
+        let gap = String(repeating: " ", count: gapSpace)
+        let labelWidth = labelCol - gapSpace
 
         @inline(__always)
         func shownAmount(for id: Int) -> Decimal {
@@ -94,23 +97,25 @@ public extension RGSPrinter {
             guard !rows.isEmpty else { return }
 
             printHeader("\n\(heading)")
-            print(pad("Label", labelCol) + pad("Code", codeCol) + "Amount")
+            // header with gap
+            print(pad("Label", labelWidth) + gap + pad("Code", codeCol) + "Amount")
 
             // Align indent relative to the shallowest level in this table
             let baseLevel = rows.map { $0.level }.min() ?? 3
 
             for r in rows {
                 let indentSpaces = max(0, (r.level - baseLevel) * 2)  // 2 spaces per level step
-                let wrapped = wrapLabel(r.label, indent: indentSpaces, width: labelCol)
+                // wrap to labelWidth (not labelCol)
+                let wrapped = wrapLabel(r.label, indent: indentSpaces, width: labelWidth)
 
                 // First physical line: full row with Code & Amount
                 if let first = wrapped.first {
-                    print(pad(first, labelCol) + pad(r.code, codeCol) + fmtDec(r.amount))
+                    print(pad(first, labelWidth) + gap + pad(r.code, codeCol) + fmtDec(r.amount))
                 }
 
                 // Continuation lines: label only (skip Code/Amount columns)
                 for cont in wrapped.dropFirst() {
-                    print(pad(cont, labelCol))
+                    print(pad(cont, labelWidth))
                 }
             }
         }
@@ -130,10 +135,12 @@ public extension RGSPrinter {
 
         // Summary (parents only to avoid double count)
         if let btwId = idByCode["BSchBepBtw"] {
-            print(pad("Saldo BTW op balans (te betalen)", labelCol) + pad("BSchBepBtw", codeCol) + fmtDec(shownAmount(for: btwId)))
+            print(pad("Saldo BTW op balans (te betalen)", labelWidth) + gap
+                  + pad("BSchBepBtw", codeCol) + fmtDec(shownAmount(for: btwId)))
         }
         if let euId = idByCode["BSchBepEob"] {
-            print(pad("Te betalen EU OB", labelCol) + pad("BSchBepEob", codeCol) + fmtDec(shownAmount(for: euId)))
+            print(pad("Te betalen EU OB", labelWidth) + gap
+                  + pad("BSchBepEob", codeCol) + fmtDec(shownAmount(for: euId)))
         }
 
         // ====== 2) Vorderingen (tax receivables) ======
@@ -141,13 +148,15 @@ public extension RGSPrinter {
         printTable("\nVorderingen uit hoofde van belastingen", codes: receivables)
 
         if let tvoId = idByCode["BVorVbkTvo"] {
-            print(pad("Te vorderen BTW", labelCol) + pad("BVorVbkTvo", codeCol) + fmtDec(shownAmount(for: tvoId)))
+            print(pad("Te vorderen BTW", labelWidth) + gap
+                  + pad("BVorVbkTvo", codeCol) + fmtDec(shownAmount(for: tvoId)))
         }
 
         // Net position hint: (Te betalen BTW) − (Te vorderen BTW)
         if let btw = idByCode["BSchBepBtw"], let tvo = idByCode["BVorVbkTvo"] {
             let net = shownAmount(for: btw) - shownAmount(for: tvo)
-            print(pad("Netto BTW-positie (te betalen − te vorderen)", labelCol) + pad("—", codeCol) + fmtDec(net))
+            print(pad("Netto BTW-positie (te betalen − te vorderen)", labelWidth) + gap
+                  + pad("—", codeCol) + fmtDec(net))
         }
 
         // ====== 3) Corrections (P&L, yearly) ======
