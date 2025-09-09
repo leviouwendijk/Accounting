@@ -46,9 +46,9 @@ public extension StatementHTMLRenderer {
               --neg: #b00020;
               --indent-step: 16px; /* per level step */
             }
-            body { font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; margin: var(--pad); }
-            h1 { font-size: 24px; margin: 0 0 8px; }
-            h2 { font-size: 18px; margin: 24px 0 8px; }
+            body { font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; margin: var(--pad); font-size: 12px; }
+            h1 { font-size: 20px; margin: 0 0 8px; }
+            h2 { font-size: 16px; margin: 24px 0 8px; }
             .sub { color: var(--muted); margin: 0 0 24px; }
             table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; }
             th, td { padding: var(--row-pad); border-bottom: 1px solid var(--border); }
@@ -59,7 +59,7 @@ public extension StatementHTMLRenderer {
             .neg { color: var(--neg); }
             .summary { margin-top: 12px; }
             .summary table { margin-top: 4px; }
-            .note { color: var(--muted); font-size: 12px; margin-top: 6px; }
+            .note { color: var(--muted); font-size: 11px; margin-top: 6px; }
           </style>
         </head>
         <body>
