@@ -1,178 +1,154 @@
 import Foundation
 
 public extension StatementHTMLRenderer {
-    /// Convenience: build + render from periods.
-    static func renderEquityOverviewHTML(
-        title: String = "Eigen Vermogen – Overzicht (per eigenaar)",
-        allPeriods: [EquityPeriod],
-        chart: CompiledChart,
-        entities: EntityStore,
-        view: ClosedRange<Int>? = nil,
-        options: Options = .init(title: "Eigen Vermogen – Overzicht"),
-        config: EquityRollforwardConfig = .init()
-    ) throws -> String {
-        let periods = try RGSPrinter.buildOwnerEquityRollforwardHistoryData(
-            allPeriods: allPeriods,
-            chart: chart,
-            entities: entities,
-            view: view,
-            config: config
-        )
-        return renderEquityOverviewHTML(
-            title: title,
-            periods: periods,
-            periodLabels: allPeriods.map(\.label),
-            entities: entities,
-            options: options
-        )
+    @inline(__always)
+    static func escape(_ s: String) -> String {
+        var out = String()
+        out.reserveCapacity(s.count)
+        for ch in s {
+            switch ch {
+            case "&": out += "&amp;"
+            case "<": out += "&lt;"
+            case ">": out += "&gt;"
+            case "\"": out += "&quot;"
+            case "'": out += "&#39;"
+            default: out.append(ch)
+            }
+        }
+        return out
     }
 
-    /// Core: render an already-built rollforward history.
     static func renderEquityOverviewHTML(
         title: String,
-        periods: [PeriodRollforward],
-        periodLabels: [String],
+        history: [EquityPeriod],           // full history from inception
+        chart: CompiledChart,
         entities: EntityStore,
-        options: Options = .init(title: "Eigen Vermogen – Overzicht")
-    ) -> String {
-        // Owner id → display name
-        let idx = entities.idIndex
-        var idToName: [Int: String] = [:]
-        for (key, id) in idx {
-            idToName[id] = entities.byFull[key]?.displayName
-                ?? key.identifier(displaying: .fullchain)
+        view: ClosedRange<Int>? = nil,     // which periods to show
+        options: Options = .init()         // re-use existing StatementHTMLRenderer.Options
+    ) throws -> String {
+        let cfg = EquityRollforwardConfig()
+
+        // 1) Build the rollforward over the *entire* history (keeps math correct),
+        // then slice to the requested window.
+        let roll = try buildGlobalRollforward(history: history, chart: chart, entities: entities, cfg: cfg)
+        guard !roll.isEmpty else {
+            return """
+            <html><head><meta charset="utf-8"><style>
+              body{font-family:-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;margin:24px}
+              .sub{color:#666;margin-top:-8px;margin-bottom:16px}
+              table{border-collapse:collapse;width:100%;margin:16px 0}
+              th,td{border-bottom:1px solid #ddd;padding:6px 8px;text-align:right;white-space:nowrap}
+              th.left,td.left{text-align:left}
+              td.amount.neg{color:#b00}
+              .period{margin-top:28px}
+              .summary{margin:8px 0;color:#444}
+            </style></head>
+            <body>
+              <h1>\(escape(title))</h1>
+              \(options.subtitle.map { "<div class=\"sub\">\(escape($0))</div>" } ?? "")
+              <p>Geen periodes.</p>
+            </body></html>
+            """
         }
 
-        func fmtCurrency(_ x: Decimal) -> String {
-            let nf = NumberFormatter()
-            nf.locale = Locale(identifier: "nl_NL")
-            nf.numberStyle = .currency
-            nf.currencySymbol = options.currencySymbol
-            nf.minimumFractionDigits = 2
-            nf.maximumFractionDigits = 2
-            return nf.string(from: x as NSDecimalNumber) ?? x.description
-        }
-        func fmtPercent(_ x: Decimal) -> String {
-            let nf = NumberFormatter()
-            nf.locale = Locale(identifier: "nl_NL")
-            nf.numberStyle = .percent
-            nf.minimumFractionDigits = 0
-            nf.maximumFractionDigits = 2
-            return nf.string(from: x as NSDecimalNumber) ?? "\(x * 100)%"
+        let lo0 = view?.lowerBound ?? 0
+        let hi0 = view?.upperBound ?? (roll.count - 1)
+        let lo = max(0, min(lo0, roll.count - 1))
+        let hi = max(lo, min(hi0, roll.count - 1))
+        let shown = Array(roll[lo...hi])
+        let shownLabels = Array(history[lo...hi].map { $0.label })
+
+        let names = ownerNameMap(entities) // id -> display name  :contentReference[oaicite:2]{index=2}
+        @inline(__always) func fmt(_ x: Decimal) -> String {
+            fmtDec(roundD(x, digits: cfg.fractionDigits), digits: cfg.fractionDigits) // :contentReference[oaicite:3]{index=3}
         }
 
-        var html: [String] = []
-        html.append("""
-        <!doctype html>
-        <html lang="nl">
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1">
-          <title>\(title)</title>
-          <style>
-            :root {
-              --pad: 48px;
-              --row-pad: 10px 12px;
-              --border: #eee;
-              --muted: #666;
-              --neg: #b00020;
-            }
-            body { font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif; margin: var(--pad); }
-            h1 { font-size: 24px; margin: 0 0 8px; }
-            h2 { font-size: 18px; margin: 24px 0 8px; }
-            .sub { color: var(--muted); margin: 0 0 24px; }
-            table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; }
-            th, td { padding: var(--row-pad); border-bottom: 1px solid var(--border); }
-            th { text-align: right; font-weight: 600; }
-            th:first-child, td:first-child { text-align: left; }
-            td.amount { text-align: right; white-space: nowrap; }
-            .neg { color: var(--neg); }
-            .note { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
-          </style>
-        </head>
+        var html = """
+        <html><head><meta charset="utf-8"><style>
+          body{font-family:-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;margin:24px}
+          .sub{color:#666;margin-top:-8px;margin-bottom:16px}
+          table{border-collapse:collapse;width:100%;margin:16px 0}
+          th,td{border-bottom:1px solid #ddd;padding:6px 8px;text-align:right;white-space:nowrap}
+          th.left,td.left{text-align:left}
+          td.amount.neg{color:#b00}
+          .period{margin-top:28px}
+          .summary{margin:8px 0;color:#444}
+        </style></head>
         <body>
-          <h1>\(title)</h1>
-          \(options.subtitle.map { "<div class='sub'>\($0)</div>" } ?? "")
-        """)
+          <h1>\(escape(title))</h1>
+          \(options.subtitle.map { "<div class=\"sub\">\(escape($0))</div>" } ?? "")
+        """
 
-        for (i, p) in periods.enumerated() {
-            // Period label (fallback if not provided)
-            let heading = (i < periodLabels.count) ? periodLabels[i] : "Periode \(i+1)"
-            html.append("<h2>\(heading)</h2>")
+        for (idx, period) in shown.enumerated() {
+            let label = shownLabels[idx]
+            html += """
+            <div class="period">
+              <h2>\(escape(label))</h2>
+              <div class="summary">Winst bron: \(escape(period.winstSource.description))</div>
+              <div class="summary">• Nettowinst (totaal, geïnjecteerd): \(fmt(period.niTotal))</div>
 
-            // Column headers: owners + total
-            var owners = p.owners
-            owners.sort()
-            let ownerNames = owners.map { idToName[$0] ?? "#\($0)" }
+              <table>
+                <thead>
+                  <tr>
+                    <th class="left">Eigenaar</th>
+                    <th>Beginvermogen</th>
+                    <th>Stortingen</th>
+                    <th>Onttrekkingen</th>
+                    <th>Winstaandeel</th>
+                    <th>Eindvermogen</th>
+                  </tr>
+                </thead>
+                <tbody>
+            """
 
-            html.append("<table><thead><tr>")
-            html.append("<th>Post</th>")
-            for n in ownerNames { html.append("<th>\(n)</th>") }
-            html.append("<th>Totaal</th>")
-            html.append("</tr></thead><tbody>")
+            var tBegin: Decimal = 0, tStort: Decimal = 0, tOnt: Decimal = 0, tWinst: Decimal = 0, tEnd: Decimal = 0
 
-            // Row helper
-            @inline(__always)
-            func line(_ label: String, _ perOwner: (Int) -> Decimal) {
-                var total: Decimal = 0
-                html.append("<tr>")
-                html.append("<td>\(label)</td>")
-                for oid in owners {
-                    let v = perOwner(oid)
-                    total += v
-                    let cls = v < 0 ? " class='amount neg'" : " class='amount'"
-                    html.append("<td\(cls)>\(fmtCurrency(v))</td>")
-                }
-                let tcls = total < 0 ? " class='amount neg'" : " class='amount'"
-                html.append("<td\(tcls)>\(fmtCurrency(total))</td>")
-                html.append("</tr>")
+            for oid in period.owners {
+                let nm    = names[Int?(oid)] ?? "owner#\(oid)"
+                let begin = period.beginByOwner[oid] ?? 0
+                let dlt   = period.deltas[oid] ?? OwnerDelta(stort: 0, onttrek: 0, winst: 0)
+                let end   = period.endByOwner[oid] ?? (begin + dlt.delta)
+
+                tBegin += begin; tStort += dlt.stort; tOnt += dlt.onttrek; tWinst += dlt.winst; tEnd += end
+
+                let clsEnd  = end   < 0 ? " class=\"amount neg\"" : " class=\"amount\""
+                let clsBeg  = begin < 0 ? " class=\"amount neg\"" : " class=\"amount\""
+                let clsSto  = dlt.stort   < 0 ? " class=\"amount neg\"" : " class=\"amount\""
+                let clsOnt  = dlt.onttrek < 0 ? " class=\"amount neg\"" : " class=\"amount\""
+                let clsWin  = dlt.winst   < 0 ? " class=\"amount neg\"" : " class=\"amount\""
+
+                html += """
+                  <tr>
+                    <td class="left">\(escape(nm))</td>
+                    <td\(clsBeg)>\(fmt(begin))</td>
+                    <td\(clsSto)>\(fmt(dlt.stort))</td>
+                    <td\(clsOnt)>\(fmt(dlt.onttrek))</td>
+                    <td\(clsWin)>\(fmt(dlt.winst))</td>
+                    <td\(clsEnd)>\(fmt(end))</td>
+                  </tr>
+                """
             }
 
-            // BEGIN
-            line("Beginvermogen", { p.beginByOwner[$0] ?? 0 })
-
-            // Movements
-            line("Stortingen",    { p.deltas[$0]?.stort   ?? 0 })
-            line("Onttrekkingen", { p.deltas[$0]?.onttrek ?? 0 })
-            line("Winstaandeel",  { p.deltas[$0]?.winst   ?? 0 })
-
-            // END
-            line("Eindvermogen",  { p.endByOwner[$0] ?? 0 })
-
-            html.append("</tbody></table>")
-
-            // Allocation note / metadata (same info as console)
-            var notes: [String] = []
-            switch p.winstSource {
-            case .postedAOW:
-                notes.append("Winstverdeling: geposteerd (AOW).")
-            case .slices(let d):
-                let df = DateFormatter()
-                df.locale = Locale(identifier: "nl_NL")
-                df.dateFormat = "yyyy-MM-dd"
-                notes.append("Winstverdeling: eigenaarspercentages op \(df.string(from: d)).")
-            }
-
-            if !p.allocationNote.isEmpty {
-                let parts = owners.map { oid -> String in
-                    let (pct, amt) = (p.allocationNote[oid]?.percent ?? 0, p.allocationNote[oid]?.amount ?? 0)
-                    return "\(idToName[oid] ?? "#\(oid)") \(fmtPercent(pct)) · \(fmtCurrency(amt))"
-                }
-                notes.append("Allocatie: " + parts.joined(separator: " · "))
-            }
-
-            // Optional opening/closing totals, if you want them visible:
-            // notes.append("Opening totaal: \(fmtCurrency(p.openingTotal)) · Sluiting totaal: \(fmtCurrency(p.closingTotal))")
-
-            if !notes.isEmpty {
-                html.append("<div class='note'>\(notes.joined(separator: "<br>"))</div>")
-            }
+            html += """
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <th class="left">TOTAAL</th>
+                    <th>\(fmt(tBegin))</th>
+                    <th>\(fmt(tStort))</th>
+                    <th>\(fmt(tOnt))</th>
+                    <th>\(fmt(tWinst))</th>
+                    <th>\(fmt(tEnd))</th>
+                  </tr>
+                </tfoot>
+              </table>
+              <div class="summary">Check totals → Opening: \(fmt(period.openingTotal)) | Closing: \(fmt(period.closingTotal))</div>
+              <div class="summary">Identity: Begin + Stort − Onttrek + Winst = \(fmt(tEnd))</div>
+            </div>
+            """
         }
 
-        html.append("""
-          </body>
-        </html>
-        """)
-        return html.joined()
+        html += "</body></html>"
+        return html
     }
 }
