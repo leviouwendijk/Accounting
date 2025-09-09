@@ -19,8 +19,8 @@ public extension RGSPrinter {
         let totals  = bundle.totalsById
 
         // Column widths (same footprint as your other printers)
-        let labelCol = 56
-        let codeCol  = 13
+        let labelCol = 60
+        let codeCol  = 25
 
         @inline(__always)
         func shownAmount(for id: Int) -> Decimal {
