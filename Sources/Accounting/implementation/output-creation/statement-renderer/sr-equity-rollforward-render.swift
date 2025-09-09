@@ -31,24 +31,47 @@ public extension StatementHTMLRenderer {
         // 1) Build the rollforward over the *entire* history (keeps math correct),
         // then slice to the requested window.
         let roll = try buildGlobalRollforward(history: history, chart: chart, entities: entities, cfg: cfg)
+
+        var html = """
+        <html><head><meta charset="utf-8"><style>
+          :root{
+            --fs-base: 12px;   /* change me to scale everything */
+            --fs-small: 12px;
+            --fs-h1:   22px;
+            --fs-h2:   16px;
+            --muted:   #666;
+            --neg:     #b00;
+            --border:  #ddd;
+          }
+          body{
+            font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+            font-size:var(--fs-base);
+            line-height:1.4;
+            margin:24px;
+          }
+          h1{ font-size:var(--fs-h1); margin:0 0 8px; }
+          h2{ font-size:var(--fs-h2); margin:24px 0 8px; }
+          .sub{ color:var(--muted); font-size:var(--fs-small); margin:-6px 0 16px; }
+          table{ border-collapse:collapse; width:100%; margin:16px 0; font-size:var(--fs-base); }
+          th,td{ border-bottom:1px solid var(--border); padding:6px 8px; text-align:right; white-space:nowrap; }
+          th.left,td.left{ text-align:left; }
+          td.amount.neg{ color:var(--neg); }
+          .period{ margin-top:28px; }
+          .summary{ margin:8px 0; color:#444; font-size:var(--fs-small); }
+        </style></head>
+        <body>
+          <h1>\(escape(title))</h1>
+          \(options.subtitle.map { "<div class=\"sub\">\(escape($0))</div>" } ?? "")
+        """
+
+
         guard !roll.isEmpty else {
-            return """
-            <html><head><meta charset="utf-8"><style>
-              body{font-family:-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;margin:24px}
-              .sub{color:#666;margin-top:-8px;margin-bottom:16px}
-              table{border-collapse:collapse;width:100%;margin:16px 0}
-              th,td{border-bottom:1px solid #ddd;padding:6px 8px;text-align:right;white-space:nowrap}
-              th.left,td.left{text-align:left}
-              td.amount.neg{color:#b00}
-              .period{margin-top:28px}
-              .summary{margin:8px 0;color:#444}
-            </style></head>
-            <body>
-              <h1>\(escape(title))</h1>
-              \(options.subtitle.map { "<div class=\"sub\">\(escape($0))</div>" } ?? "")
+            html += """
               <p>Geen periodes.</p>
             </body></html>
             """
+
+            return html
         }
 
         let lo0 = view?.lowerBound ?? 0
@@ -62,22 +85,6 @@ public extension StatementHTMLRenderer {
         @inline(__always) func fmt(_ x: Decimal) -> String {
             fmtDec(roundD(x, digits: cfg.fractionDigits), digits: cfg.fractionDigits) // :contentReference[oaicite:3]{index=3}
         }
-
-        var html = """
-        <html><head><meta charset="utf-8"><style>
-          body{font-family:-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;margin:24px}
-          .sub{color:#666;margin-top:-8px;margin-bottom:16px}
-          table{border-collapse:collapse;width:100%;margin:16px 0}
-          th,td{border-bottom:1px solid #ddd;padding:6px 8px;text-align:right;white-space:nowrap}
-          th.left,td.left{text-align:left}
-          td.amount.neg{color:#b00}
-          .period{margin-top:28px}
-          .summary{margin:8px 0;color:#444}
-        </style></head>
-        <body>
-          <h1>\(escape(title))</h1>
-          \(options.subtitle.map { "<div class=\"sub\">\(escape($0))</div>" } ?? "")
-        """
 
         for (idx, period) in shown.enumerated() {
             let label = shownLabels[idx]
