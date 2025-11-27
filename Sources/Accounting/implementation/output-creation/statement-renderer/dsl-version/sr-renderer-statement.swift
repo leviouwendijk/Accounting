@@ -178,7 +178,7 @@ extension StatementHTMLRenderer {
         }
 
         // CSS from DSL
-        let css = StatementTheme.base().render()
+        let css = StatementStyleCSS.base().render()
 
         // RENDER STEP: build HTMLDocument via Constructors.
         let doc = HTML.document {

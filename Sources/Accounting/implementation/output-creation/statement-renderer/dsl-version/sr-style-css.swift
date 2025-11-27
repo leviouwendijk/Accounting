@@ -1,14 +1,16 @@
 import Foundation
 import Constructors
 
-public enum StatementTheme {
+public enum StatementStyleCSS {
     public static func base() -> CSSStyleSheet {
         CSSStyleSheet(
             rules: [
-                // Layout / base
+                // ------------------------------------------------------------
+                // Base layout used by main statements renderer
+                // ------------------------------------------------------------
                 CSS.rule(
                     "body",
-                    CSS.decl("font", "12px -apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif"),
+                    CSS.decl("font", "12px -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif"),
                     CSS.decl("margin", "24px")
                 ),
                 CSS.rule(
@@ -30,7 +32,7 @@ public enum StatementTheme {
                     CSS.decl("margin", "12px 0 6px")
                 ),
 
-                // Tables
+                // Tables (main statement)
                 CSS.rule(
                     "table.tbl",
                     CSS.decl("width", "100%"),
@@ -76,7 +78,7 @@ public enum StatementTheme {
                     CSS.decl("font-weight", "600")
                 ),
 
-                // Summary
+                // Summary + status
                 CSS.rule(
                     ".summary",
                     CSS.decl("margin-top", "8px"),
@@ -91,7 +93,7 @@ public enum StatementTheme {
                     CSS.decl("color", "#b05a00")
                 ),
 
-                // Header layout
+                // Header layout for main statements
                 CSS.rule(
                     "header.doc",
                     CSS.decl("display", "grid"),
@@ -134,6 +136,138 @@ public enum StatementTheme {
                     ".meta .subtitle",
                     CSS.decl("font-size", "11px"),
                     CSS.decl("color", "#666")
+                ),
+
+                // ------------------------------------------------------------
+                // Equity rollforward (scoped under body.sr-eq)
+                // ------------------------------------------------------------
+                CSS.rule(
+                    "body.sr-eq",
+                    CSS.decl("font-family", "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif"),
+                    CSS.decl("font-size", "12px"),
+                    CSS.decl("line-height", "1.4"),
+                    CSS.decl("margin", "24px")
+                ),
+                CSS.rule(
+                    "body.sr-eq h1",
+                    CSS.decl("font-size", "22px"),
+                    CSS.decl("margin", "0 0 8px")
+                ),
+                CSS.rule(
+                    "body.sr-eq h2",
+                    CSS.decl("font-size", "16px"),
+                    CSS.decl("margin", "24px 0 8px")
+                ),
+                CSS.rule(
+                    "body.sr-eq .sr-eq-sub",
+                    CSS.decl("color", "#666"),
+                    CSS.decl("font-size", "12px"),
+                    CSS.decl("margin", "-6px 0 16px")
+                ),
+                CSS.rule(
+                    "body.sr-eq table.sr-eq-table",
+                    CSS.decl("border-collapse", "collapse"),
+                    CSS.decl("width", "100%"),
+                    CSS.decl("margin", "16px 0"),
+                    CSS.decl("font-size", "12px")
+                ),
+                CSS.rule(
+                    "body.sr-eq table.sr-eq-table th, body.sr-eq table.sr-eq-table td",
+                    CSS.decl("border-bottom", "1px solid #ddd"),
+                    CSS.decl("padding", "6px 8px"),
+                    CSS.decl("text-align", "right"),
+                    CSS.decl("white-space", "nowrap")
+                ),
+                CSS.rule(
+                    "body.sr-eq table.sr-eq-table th.sr-eq-left, body.sr-eq table.sr-eq-table td.sr-eq-left",
+                    CSS.decl("text-align", "left")
+                ),
+                CSS.rule(
+                    "body.sr-eq td.sr-eq-amount.sr-eq-neg",
+                    CSS.decl("color", "#b00")
+                ),
+                CSS.rule(
+                    "body.sr-eq .sr-eq-period",
+                    CSS.decl("margin-top", "28px")
+                ),
+                CSS.rule(
+                    "body.sr-eq .sr-eq-summary",
+                    CSS.decl("margin", "8px 0"),
+                    CSS.decl("color", "#444"),
+                    CSS.decl("font-size", "12px")
+                ),
+
+                // ------------------------------------------------------------
+                // VAT overview (scoped under body.sr-vat)
+                // ------------------------------------------------------------
+                CSS.rule(
+                    "body.sr-vat",
+                    CSS.decl("font-family", "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif"),
+                    CSS.decl("margin", "48px"),
+                    CSS.decl("font-size", "12px")
+                ),
+                CSS.rule(
+                    "body.sr-vat h1",
+                    CSS.decl("font-size", "20px"),
+                    CSS.decl("margin", "0 0 8px")
+                ),
+                CSS.rule(
+                    "body.sr-vat h2",
+                    CSS.decl("font-size", "16px"),
+                    CSS.decl("margin", "24px 0 8px")
+                ),
+                CSS.rule(
+                    "body.sr-vat .sr-vat-sub",
+                    CSS.decl("color", "#666"),
+                    CSS.decl("margin", "0 0 24px")
+                ),
+                CSS.rule(
+                    "body.sr-vat table.sr-vat-table",
+                    CSS.decl("width", "100%"),
+                    CSS.decl("border-collapse", "collapse"),
+                    CSS.decl("margin", "8px 0 16px")
+                ),
+                CSS.rule(
+                    "body.sr-vat table.sr-vat-table th, body.sr-vat table.sr-vat-table td",
+                    CSS.decl("padding", "10px 12px"),
+                    CSS.decl("border-bottom", "1px solid #eee")
+                ),
+                CSS.rule(
+                    "body.sr-vat table.sr-vat-table th",
+                    CSS.decl("text-align", "left"),
+                    CSS.decl("font-weight", "600")
+                ),
+                CSS.rule(
+                    "body.sr-vat th.sr-vat-amount, body.sr-vat td.sr-vat-amount",
+                    CSS.decl("text-align", "right"),
+                    CSS.decl("white-space", "nowrap")
+                ),
+                CSS.rule(
+                    "body.sr-vat td.sr-vat-label",
+                    CSS.decl("width", "60%")
+                ),
+                CSS.rule(
+                    "body.sr-vat td.sr-vat-code",
+                    CSS.decl("width", "20%"),
+                    CSS.decl("color", "#666")
+                ),
+                CSS.rule(
+                    "body.sr-vat .sr-vat-neg",
+                    CSS.decl("color", "#b00020")
+                ),
+                CSS.rule(
+                    "body.sr-vat .sr-vat-summary",
+                    CSS.decl("margin-top", "12px")
+                ),
+                CSS.rule(
+                    "body.sr-vat .sr-vat-summary table",
+                    CSS.decl("margin-top", "4px")
+                ),
+                CSS.rule(
+                    "body.sr-vat .sr-vat-note",
+                    CSS.decl("color", "#666"),
+                    CSS.decl("font-size", "11px"),
+                    CSS.decl("margin-top", "6px")
                 )
             ]
         )
