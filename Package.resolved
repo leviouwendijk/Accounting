@@ -1,13 +1,22 @@
 {
-  "originHash" : "e4e4470e74862a0f342f7598f822ca1eabae4617e8ff5a8b9519b24ac536c109",
+  "originHash" : "9ea158df2d68871401a02aecfd29832fff23bc94a55596dcd08e96e868246d37",
   "pins" : [
+    {
+      "identity" : "constructors",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/Constructors.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "05b5b3cfd988a5cae7d38c5202eea61e1a038530"
+      }
+    },
     {
       "identity" : "extensions",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/leviouwendijk/Extensions.git",
       "state" : {
         "branch" : "master",
-        "revision" : "3310d463b1bc509cccd8e75f0acc221e153f5dff"
+        "revision" : "2670525e08c06638511e3b6a58093efbcc0d78f3"
       }
     },
     {
@@ -16,7 +25,7 @@
       "location" : "https://github.com/leviouwendijk/plate.git",
       "state" : {
         "branch" : "master",
-        "revision" : "7c0f586518e8c5de3e60353a4c0aa2931e5f204f"
+        "revision" : "c79b2e37d1502d3046b1429dedf018e1b8fc2cf4"
       }
     },
     {
@@ -25,7 +34,7 @@
       "location" : "https://github.com/leviouwendijk/Structures.git",
       "state" : {
         "branch" : "master",
-        "revision" : "5a61a7752b155a37b67b1a46b211b845e22b4390"
+        "revision" : "1e32ad705aa4c84c2c680e61e8de2b18565470e6"
       }
     }
   ],

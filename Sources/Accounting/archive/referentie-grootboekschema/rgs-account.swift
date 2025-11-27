@@ -135,7 +135,8 @@ public struct RGSAccount: Codable, Sendable {
     }
 }
 
-extension Array: Sendable where Element == RGSAccount {} 
+// extension Array: Sendable where Element == RGSAccount {} 
+// deprecation in swift-tools 6.2?
 
 extension Array where Element == RGSAccount {
     public func ec() -> String {
