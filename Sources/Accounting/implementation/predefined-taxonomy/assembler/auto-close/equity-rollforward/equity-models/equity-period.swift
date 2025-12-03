@@ -1,6 +1,6 @@
 import Foundation
 
-public struct EquityPeriod {
+public struct EquityPeriod: Sendable {
     public let label: String
     public let bundle: StatementBundle
     public let asOf: Date

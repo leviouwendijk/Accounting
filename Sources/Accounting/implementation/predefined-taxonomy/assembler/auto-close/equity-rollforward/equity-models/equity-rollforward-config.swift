@@ -6,7 +6,7 @@ public struct DrawingsGroup: Sendable {
     public init(prefix: String, label: String) { self.prefix = prefix; self.label = label }
 }
 
-public struct EquityRollforwardConfig {
+public struct EquityRollforwardConfig: Sendable {
     public var entity: BusinessEntity = .vof
     public var fractionDigits: Int = 2
     public var contribCode: String = "BEivKapPrs"

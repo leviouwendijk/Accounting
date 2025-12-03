@@ -12,8 +12,8 @@ public extension PeriodAssembler {
         rangeToDate: Bool
     ) throws -> StatementBundle {
 
-        // Slice entries
-        let (eHist, eWin, eYTD) = entriesForWindows(result.resolved, wins: wins)
+        // let (eHist, eWin, eYTD) = entriesForWindows(result.resolved, wins: wins)
+        let (eHist, eWin, eYTD) = entriesForWindows(result.resolved, wins)
 
         // Map entities -> stable ids
         let idIndex = result.entities.idIndex
@@ -107,82 +107,113 @@ public extension Calendar {
     }
 }
 
+extension PeriodAssembler {
+    /// Async variant: same semantics, but computes TBs in parallel.
+    public static func buildCurrentBundleConcurrent(
+        chart: CompiledChart,
+        wins: PeriodWindows,
+        result: EntryCompileDriver.Result,
+        cut: AssembleCut,
+        omslag: OmslagMode,
+        entity: BusinessEntity,
+        rangeToDate: Bool
+    ) async throws -> StatementBundle {
 
-// public extension PeriodAssembler {
-//     @inline(__always)
-//     static func buildCurrentBundle(
-//         chart: CompiledChart,
-//         wins: PeriodWindows,
-//         result: EntryCompileDriver.Result,
-//         cut: AssembleCut,
-//         omslag: OmslagMode,
-//         entity: BusinessEntity,
-//         rangeToDate: Bool                  // ← NEW
-//     ) throws -> StatementBundle {
+        let (eHist, eWin, eYTD) = entriesForWindows(result.resolved, wins)
+        let idIndex = result.entities.idIndex
 
-//         let (eHist, eWin, eYTD) = entriesForWindows(result.resolved, wins: wins)
-//         let (tbHist, tbWin, tbYTD) = trialBalances(hist: eHist, win: eWin, ytd: eYTD)
+        async let tbHistTask: [TrialBalanceRow] = trialBalance(eHist, entityId: { idIndex[$0] })
+        async let tbWinTask:  [TrialBalanceRow] = trialBalance(eWin,  entityId: { idIndex[$0] })
+        async let tbYTDTask:  [TrialBalanceRow] = trialBalance(eYTD,  entityId: { idIndex[$0] })
 
-//         // IS always = window
-//         // BS movements + NI overlay = window, unless range-to-date requested
-//         let bsBase   = rangeToDate ? tbYTD : tbWin
-//         let niSource = rangeToDate ? tbYTD : tbWin
+        let tbHist = await tbHistTask
+        let tbWin  = await tbWinTask
+        let tbYTD  = await tbYTDTask
 
-//         return try assembleSplitSeeds(
-//             chart: chart,
-//             tbIncomeWindow: tbWin,
-//             tbBalanceWindow: bsBase,        // ← was tbBalanceYTD
-//             tbOverlayForNI: niSource,       // ← was tbYTD
-//             tbPreWindowForOpening: tbHist,
-//             cut: cut, omslag: omslag, entity: entity
-//         )
-//     }
+        let bsBase   = rangeToDate ? tbYTD : tbWin
+        let niSource = rangeToDate ? tbYTD : tbWin
+        let slices   = result.entities.ownershipSlices(asOf: wins.window.to ?? Date())
 
-//     @inline(__always)
-//     static func buildPreviousBundle(
-//         chart: CompiledChart,
-//         wins: PeriodWindows,
-//         result: EntryCompileDriver.Result,
-//         cut: AssembleCut,
-//         omslag: OmslagMode,
-//         entity: BusinessEntity,
-//         rangeToDate: Bool                  // ← NEW
-//     ) throws -> (range: PeriodWindow, bundle: StatementBundle)? {
+        return try assembleSplitSeeds(
+            chart: chart,
+            tbIncomeWindow: tbWin,
+            tbBalanceWindow: bsBase,
+            tbOverlayForNI: niSource,
+            tbPreWindowForOpening: tbHist,
+            cut: cut, omslag: omslag, entity: entity,
+            ownershipSlices: slices,
+            entityIdOnRow: { $0.entityId }
+        )
+    }
 
-//         guard let p = wins.previous else { return nil }
+    public static func buildPreviousBundleConcurrent(
+        chart: CompiledChart,
+        wins: PeriodWindows,
+        result: EntryCompileDriver.Result,
+        cut: AssembleCut,
+        omslag: OmslagMode,
+        entity: BusinessEntity,
+        rangeToDate: Bool
+    ) async throws -> (range: PeriodWindow, bundle: StatementBundle)? {
+        guard let p = wins.previous else { return nil }
 
-//         // Slice prev window + its YTD (through p.to) and hist (pre p.from)
-//         let ePrevWin = filterEntries(result.resolved, within: p)
-//         let ytdPrev  = PeriodWindow(from: nil, to: p.to)
-//         let histPrev = PeriodWindow(from: nil, to: p.from.map { d in
-//             var cal = Calendar(identifier: .iso8601); cal.firstWeekday = 2
-//             let dayEnd = { (x: Date) -> Date in
-//                 var c = cal.dateComponents([.year,.month,.day], from: x)
-//                 c.hour = 23; c.minute = 59; c.second = 59
-//                 return cal.date(from: c)!
-//             }
-//             return dayEnd(cal.date(byAdding: .day, value: -1, to: d)!)
-//         })
+        // Windows for previous period
+        let prevWin  = p
+        let ytdPrev  = PeriodWindow(from: nil, to: p.to)
+        let histPrev = PeriodWindow(
+            from: nil,
+            to: p.from.map { d in
+                Calendar.iso8601DayEnd(d.addingTimeInterval(-86400))
+            }
+        )
 
-//         let ePrevHist = filterEntries(result.resolved, within: histPrev)
-//         let ePrevYTD  = filterEntries(result.resolved, within: ytdPrev)
+        // Single pass over resolved entries for all three windows
+        var ePrevWin:  [ResolvedEntry] = []
+        var ePrevHist: [ResolvedEntry] = []
+        var ePrevYTD:  [ResolvedEntry] = []
 
-//         let tbPrevWin  = trialBalance(ePrevWin)
-//         let tbPrevYTD  = trialBalance(ePrevYTD)
-//         let tbPrevHist = trialBalance(ePrevHist)
+        ePrevWin.reserveCapacity(result.resolved.count)
+        ePrevHist.reserveCapacity(result.resolved.count)
+        ePrevYTD.reserveCapacity(result.resolved.count)
 
-//         let bsBase   = rangeToDate ? tbPrevYTD : tbPrevWin
-//         let niSource = rangeToDate ? tbPrevYTD : tbPrevWin
+        for re in result.resolved {
+            guard let d = absDate(re.date) else { continue }
 
-//         let prevBundle = try assembleSplitSeeds(
-//             chart: chart,
-//             tbIncomeWindow: tbPrevWin,
-//             tbBalanceWindow: bsBase,        // ← was tbBalanceYTD
-//             tbOverlayForNI: niSource,       // ← was tbPrevYTD
-//             tbPreWindowForOpening: tbPrevHist,
-//             cut: cut, omslag: omslag, entity: entity
-//         )
+            if within(d, window: prevWin)   { ePrevWin.append(re) }
+            if within(d, window: histPrev)  { ePrevHist.append(re) }
+            if within(d, window: ytdPrev)   { ePrevYTD.append(re) }
+        }
 
-//         return (p, prevBundle)
-//     }
-// }
+        // Map entities -> stable ids
+        let idIndex = result.entities.idIndex
+
+        // TBs with entity preserved – run in parallel
+        async let tbPrevWinTask:  [TrialBalanceRow] = trialBalance(ePrevWin,  entityId: { idIndex[$0] })
+        async let tbPrevYTDTask:  [TrialBalanceRow] = trialBalance(ePrevYTD,  entityId: { idIndex[$0] })
+        async let tbPrevHistTask: [TrialBalanceRow] = trialBalance(ePrevHist, entityId: { idIndex[$0] })
+
+        let tbPrevWin  = await tbPrevWinTask
+        let tbPrevYTD  = await tbPrevYTDTask
+        let tbPrevHist = await tbPrevHistTask
+
+        // Choose window vs YTD
+        let bsBase   = rangeToDate ? tbPrevYTD : tbPrevWin
+        let niSource = rangeToDate ? tbPrevYTD : tbPrevWin
+
+        // Slices as of previous period end
+        let slicesPrev = result.entities.ownershipSlices(asOf: p.to ?? Date())
+
+        let prevBundle = try assembleSplitSeeds(
+            chart: chart,
+            tbIncomeWindow: tbPrevWin,
+            tbBalanceWindow: bsBase,
+            tbOverlayForNI: niSource,
+            tbPreWindowForOpening: tbPrevHist,
+            cut: cut, omslag: omslag, entity: entity,
+            ownershipSlices: slicesPrev,
+            entityIdOnRow: { $0.entityId }
+        )
+
+        return (p, prevBundle)
+    }
+}

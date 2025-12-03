@@ -54,7 +54,7 @@ public struct CompileDriveSetting {
 }
 
 public struct EntryCompileDriver {
-    public struct Result {
+    public struct Result: Sendable {
         public let entities: EntityStore
         public let accounts: AccountStore
         public let transactions: TransactionStore

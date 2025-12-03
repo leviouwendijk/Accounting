@@ -1,6 +1,6 @@
 import Foundation
 
-public struct OwnerDelta {
+public struct OwnerDelta: Sendable {
     public let stort: Decimal
     public let onttrek: Decimal
     public let winst: Decimal

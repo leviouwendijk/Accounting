@@ -1,6 +1,6 @@
 import Foundation
 
-public struct PeriodRollforward {
+public struct PeriodRollforward: Sendable {
     public let owners: [Int]
     public let beginByOwner: [Int: Decimal]
     public let deltas: [Int: OwnerDelta]

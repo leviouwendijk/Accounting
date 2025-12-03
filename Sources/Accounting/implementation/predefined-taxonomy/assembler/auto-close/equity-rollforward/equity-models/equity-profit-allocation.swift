@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ProfitAllocation {
+public struct ProfitAllocation: Sendable {
     public let niTotal: Decimal
     public let usePosted: Bool
     public let usedAmounts: [Int: Decimal]        // per owner

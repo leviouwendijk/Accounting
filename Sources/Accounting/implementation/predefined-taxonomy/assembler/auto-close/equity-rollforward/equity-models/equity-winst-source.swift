@@ -1,6 +1,6 @@
 import Foundation
 
-public enum WinstSource: CustomStringConvertible {
+public enum WinstSource: Sendable, CustomStringConvertible {
     case postedAOW
     case slices(asOf: Date)
     public var description: String {
