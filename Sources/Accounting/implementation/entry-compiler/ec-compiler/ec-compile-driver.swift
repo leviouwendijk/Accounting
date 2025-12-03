@@ -166,7 +166,7 @@ public struct EntryCompileDriver {
 
 extension EntryCompileDriver {
     // async overload for parallel perf
-    public static func compile_parallel(
+    public static func compile(
         projectRoot: URL,
         setting: CompileDriveSetting = CompileDriveSetting(),
         verbose: Bool = false
