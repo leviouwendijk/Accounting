@@ -30,19 +30,22 @@ public struct CompileDriveSetting {
     public let transactions: Bool
     public let entries: Bool
     public let assertion: Bool
+    public let loc_trace: Bool
     
     public init(
         entities: Bool = true,
         accounts: Bool = true,
         transactions: Bool = true,
         entries: Bool = true,
-        assertion: Bool = true
+        assertion: Bool = true,
+        loc_trace: Bool = true
     ) {
         self.entities = entities
         self.accounts = accounts
         self.transactions = transactions
         self.entries = entries
         self.assertion = assertion
+        self.loc_trace = loc_trace
     }
     
     public var precondition: Bool {

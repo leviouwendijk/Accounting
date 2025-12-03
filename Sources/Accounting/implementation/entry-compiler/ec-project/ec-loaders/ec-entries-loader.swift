@@ -6,7 +6,8 @@ public enum EntryCompilerEntriesLoader {
         // defaultTZ: TimeZone
         settings: EntryCompilerSettings,
         allowCollisions: Bool = false,
-        onCollision: ((Int, String, String) -> Void)? = nil
+        onCollision: ((Int, String, String) -> Void)? = nil,
+        trace: Bool = true
     ) throws -> [Entry] {
         let root = project.url(.entries)
         var out: [Entry] = []
@@ -17,7 +18,17 @@ public enum EntryCompilerEntriesLoader {
             for case let url as URL in e where url.pathExtension == "ec" {
                 let src = try String(contentsOf: url, encoding: .utf8)
                 var lx = EntryCompilerLexer(source: src, flavor: .entries)
-                let (toks, lineMap) = lx.collectAllTokensWithLineMap()
+
+                let toks: [EntryCompilerToken]
+                let lineMap: [Int]?
+
+                if trace {
+                    (toks, lineMap) = lx.collectAllTokensWithLineMap()
+                } else {
+                    toks = lx.collectAllTokens()
+                    lineMap = nil
+                }
+
                 let parser = EntryCompilerEntriesParser(
                     tokens: toks,
                     defaultTimeZone: settings.entry.defaultTimezone,

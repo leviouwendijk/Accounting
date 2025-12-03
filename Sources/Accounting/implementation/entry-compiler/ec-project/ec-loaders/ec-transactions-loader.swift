@@ -3,7 +3,8 @@ import Foundation
 public enum EntryCompilerTransactionsLoader {
     public static func load(
         from project: EntryCompilerProject,
-        verbose: Bool = false
+        verbose: Bool = false,
+        trace: Bool = true
     ) throws -> TransactionStore {
         let root = project.url(.transactions)
         var txs: [Transaction] = []
@@ -13,7 +14,16 @@ public enum EntryCompilerTransactionsLoader {
             for case let url as URL in e where url.pathExtension == "ec" {
                 let src = try String(contentsOf: url, encoding: .utf8)
                 var lx = EntryCompilerLexer(source: src, flavor: .transactions)
-                let (toks, lineMap) = lx.collectAllTokensWithLineMap()
+
+                let toks: [EntryCompilerToken]
+                let lineMap: [Int]?
+
+                if trace {
+                    (toks, lineMap) = lx.collectAllTokensWithLineMap()
+                } else {
+                    toks = lx.collectAllTokens()
+                    lineMap = nil
+                }
 
                 let parser = EntryCompilerTransactionsFileParser(
                     core: .init(

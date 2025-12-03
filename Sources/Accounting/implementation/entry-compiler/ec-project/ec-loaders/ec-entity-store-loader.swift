@@ -5,7 +5,8 @@ public enum EntityStoreLoader {
         from project: EntryCompilerProject,
         // defaultTZ: TimeZone,
         settings: EntryCompilerSettings,
-        verbose: Bool = false
+        verbose: Bool = false,
+        trace: Bool = true
     ) throws -> EntityStore {
         let root = project.url(.config).appendingPathComponent("entities", isDirectory: true)
         var builder = EntityStoreBuilder()
@@ -15,7 +16,17 @@ public enum EntityStoreLoader {
             for case let url as URL in e where url.pathExtension == "ec" {
                 let src = try String(contentsOf: url, encoding: .utf8)
                 var lx = EntryCompilerLexer(source: src, flavor: .entities)
-                let (toks, lineMap) = lx.collectAllTokensWithLineMap()
+
+                let toks: [EntryCompilerToken]
+                let lineMap: [Int]?
+
+                if trace {
+                    (toks, lineMap) = lx.collectAllTokensWithLineMap()
+                } else {
+                    toks = lx.collectAllTokens()
+                    lineMap = nil
+                }
+
                 let defs = try EntryCompilerEntitiesFileParser(
                     tokens: toks, 
                     defaultTZ: settings.entry.defaultTimezone,
