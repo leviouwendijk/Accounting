@@ -94,6 +94,54 @@ public func runOwnerEquityRollforwardHistory(
     }
 }
 
+/// Async variant: uses `buildGlobalRollforwardConcurrent` to compute the
+/// global backsolve in parallel, then prints/handles only the requested view.
+public func runOwnerEquityRollforwardHistoryAsync(
+    title: String = "IB equity rollforward (owner split, backsolved)",
+    allPeriods: [EquityPeriod],
+    chart: CompiledChart,
+    entities: EntityStore,
+    view: ClosedRange<Int>?,                 // nil → print all
+    config cfg: EquityRollforwardConfig = .init(),
+    afterEachPeriod: ((EquityPeriod, [Int], [Int: OwnerDelta], EquityRollforwardConfig) -> Void)? = nil
+) async throws {
+    guard !allPeriods.isEmpty else {
+        printHeader(title)
+        print("(no periods)")
+        return
+    }
+
+    // Header; anchor diagnostics are printed by `buildGlobalRollforwardConcurrent`
+    printHeader(title)
+
+    // Compute full global rollforward concurrently over all periods
+    let solved = try await buildGlobalRollforwardConcurrent(
+        history: allPeriods,
+        chart: chart,
+        entities: entities,
+        cfg: cfg
+    )
+
+    // Decide which indices to render
+    let indices: [Int]
+    if let viewRange = view {
+        let clampedLower = max(viewRange.lowerBound, allPeriods.startIndex)
+        let clampedUpper = min(viewRange.upperBound, allPeriods.endIndex - 1)
+        indices = Array(clampedLower...clampedUpper)
+    } else {
+        indices = Array(allPeriods.indices)
+    }
+
+    // Print only the requested window, but use the globally solved rows
+    for i in indices {
+        let period = allPeriods[i]
+        let rows   = solved[i]
+
+        printPeriod(label: period.label, rows: rows, entities: entities, cfg: cfg)
+        afterEachPeriod?(period, rows.owners, rows.deltas, cfg)
+    }
+}
+
 // public func runOwnerEquityRollforwardIB_Global(
 //     title: String = "IB equity rollforward (owner split, backsolved)",
 //     history: [EquityPeriod],                  // full chronological history
