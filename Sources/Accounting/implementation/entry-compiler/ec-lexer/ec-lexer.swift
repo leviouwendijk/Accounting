@@ -18,9 +18,11 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
         flavor: EntryCompilerLexingFlavor
     ) {
         self.scalars = Array(source.unicodeScalars)
-        self.lexingSets = aggregateLexingSets(flavor: flavor)
+        // self.lexingSets = aggregateLexingSets(flavor: flavor)
+        self.lexingSets = EntryCompilerLexingSetsCache.pointer(for: flavor)
 
-        self.stringKeywordSet = aggregateLexingSets(flavor: .string).keywords
+        // self.stringKeywordSet = aggregateLexingSets(flavor: .string).keywords
+        self.stringKeywordSet = EntryCompilerLexingSetsCache.string.keywords
     }
 
     public mutating func nextToken() -> EntryCompilerToken {
