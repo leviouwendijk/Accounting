@@ -7,7 +7,7 @@
       "location" : "https://github.com/leviouwendijk/Constructors.git",
       "state" : {
         "branch" : "master",
-        "revision" : "6be267f87f87c8ed3c00f19fe8fce1726f141322"
+        "revision" : "fae76b4e292f486d63ece67d8ae8dff2322189ff"
       }
     },
     {
@@ -20,12 +20,21 @@
       }
     },
     {
+      "identity" : "methods",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/Methods.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "bddfab93235482cdd8b2deed7b38859531adece1"
+      }
+    },
+    {
       "identity" : "plate",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/leviouwendijk/plate.git",
       "state" : {
         "branch" : "master",
-        "revision" : "9ae5f434b645b94adca307881598c635265527c3"
+        "revision" : "f531a9b03635a8154537fc9b4ab9320793e6b610"
       }
     },
     {
