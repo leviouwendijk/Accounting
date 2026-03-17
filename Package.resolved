@@ -1,5 +1,5 @@
 {
-  "originHash" : "9ea158df2d68871401a02aecfd29832fff23bc94a55596dcd08e96e868246d37",
+  "originHash" : "c72dfb1970b3ea24b255dcae248c3cc9ae5f84e91a69ed6d7da8902d03c7f2cc",
   "pins" : [
     {
       "identity" : "constructors",
@@ -160,7 +160,7 @@
       "location" : "https://github.com/leviouwendijk/Writers.git",
       "state" : {
         "branch" : "master",
-        "revision" : "6084ab52b34ab2433000ad865cfa13bd6fe3b804"
+        "revision" : "9ca4af44858344f62e66fc11be70a93d1ab01bad"
       }
     }
   ],
