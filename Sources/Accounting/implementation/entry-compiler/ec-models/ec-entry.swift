@@ -45,7 +45,8 @@ public struct Entry: Hashable, Codable, Sendable {
         self.mistake = mistake
         self.verbose = verbose
 
-        printPlaceholderWarning(verbose: verbose)
+        // printPlaceholderWarning(verbose: verbose)
+        // move this to ../ec-ext-entry.swift -> in parseEntry()
     }
 
     public func printPlaceholderWarning(verbose: Bool = false) {

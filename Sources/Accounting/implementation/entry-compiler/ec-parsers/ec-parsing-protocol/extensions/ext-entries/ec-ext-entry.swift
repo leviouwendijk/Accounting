@@ -71,6 +71,8 @@ public extension EntryCompilerParsing {
         }
 
         try expect(.rBrace)
+
+        entry.printPlaceholderWarning(verbose: core.verbose)
         return entry
     }
 }
