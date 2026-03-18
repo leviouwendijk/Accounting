@@ -22,7 +22,7 @@ public extension EntryCompilerParsing {
         if current == .lPar {
             return try parseEntityRefInParens()
         }
-        if current == .ident("placeholder") {
+        if current == .keyword("placeholder") {
             return try parsePlaceholderEntityRef()
         }
         return try makeEntityRef(from: readFlatSegments())
@@ -57,7 +57,7 @@ public extension EntryCompilerParsing {
 public extension EntryCompilerParsing {
     @inline(__always)
     func parsePlaceholderEntityRef() throws -> EntityRef {
-        try expect(.ident("placeholder"))
+        try expect(.keyword("placeholder"))
         try expect(.lPar)
 
         guard case let .ident(rawKind) = current else {
@@ -67,7 +67,7 @@ public extension EntryCompilerParsing {
 
         guard let kind = EntityPlaceholderKind(rawValue: rawKind) else {
             throw ParserError.unexpectedToken(
-                .ident(rawKind),
+                .keyword(rawKind),
                 expected: EntityPlaceholderKind.allCases.map(\.rawValue).joined(separator: "|"),
                 at: loc()
             )
