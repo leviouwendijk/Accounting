@@ -195,7 +195,7 @@ extension EntryCompileDriver {
                 from: project,
                 settings: settings,
                 verbose: verbose,
-                trace: setting.loc_trace
+                trace: setting.loc_trace,
             )
             vprint(verbose, "  ✓ \(entities.byFull.count) entities")
         }
@@ -228,7 +228,9 @@ extension EntryCompileDriver {
                 settings: settings,
                 allowCollisions: false,
                 onCollision: nil,
-                trace: setting.loc_trace
+                trace: setting.loc_trace,
+
+                verbose: verbose
             )
             vprint(verbose, "  ✓ \(entries.count) entries")
         }

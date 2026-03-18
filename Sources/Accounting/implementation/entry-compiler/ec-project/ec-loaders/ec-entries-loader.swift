@@ -66,7 +66,9 @@ public enum EntryCompilerEntriesLoader {
         settings: EntryCompilerSettings,
         allowCollisions: Bool = false,
         onCollision: ((Int, String, String) -> Void)? = nil,
-        trace: Bool = true
+        trace: Bool = true,
+
+        verbose: Bool = false
     ) async throws -> [Entry] {
         let root = project.url(.entries)
         let urls = ecFiles(at: root)
@@ -102,7 +104,9 @@ public enum EntryCompilerEntriesLoader {
                         tokens: toks,
                         defaultTimeZone: settings.entry.defaultTimezone,
                         fileURL: url,
-                        lineMap: lineMap
+                        lineMap: lineMap,
+
+                        verbose: verbose
                     )
                     let entries = try parser.parseEntries()
                     return FileEntries(file: url, entries: entries)
