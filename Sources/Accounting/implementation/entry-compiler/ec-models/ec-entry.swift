@@ -70,12 +70,18 @@ public struct Entry: Hashable, Codable, Sendable {
         var matches: [String] = []
 
         func record(
-            value: String,
+            kind: String? = nil,
+            value: String? = nil,
             loweredAlias: String? = nil,
             at location: SourceLocation? = nil
         ) {
             matches.append("! WARNING: Placeholder detected")
-            matches.append("    value: \"\(value)\"")
+            if let kind {
+                matches.append("    kind: \"\(kind)\"")
+            }
+            if let value {
+                matches.append("    value: \"\(value)\"")
+            }
             if let loweredAlias {
                 matches.append("    lowered alias: \"\(loweredAlias)\"")
             }
@@ -88,7 +94,7 @@ public struct Entry: Hashable, Codable, Sendable {
             if let placeholder = l.entity.placeholder {
                 count += 1
                 record(
-                    value: "placeholder(\(placeholder.kind.rawValue))",
+                    kind: placeholder.kind.rawValue,
                     loweredAlias: placeholder.loweredAlias,
                     at: l.location
                 )
@@ -98,7 +104,10 @@ public struct Entry: Hashable, Codable, Sendable {
             let alias = l.entity.alias.name
             if alias.hasSuffix("_placeholder") {
                 count += 1
-                record(value: alias, at: l.location)
+                record(
+                    value: alias,
+                    at: l.location
+                )
             }
         }
 
