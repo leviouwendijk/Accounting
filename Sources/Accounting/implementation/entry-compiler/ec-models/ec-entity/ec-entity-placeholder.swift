@@ -1,9 +1,15 @@
 public enum EntityPlaceholderKind: String, Codable, Sendable, CaseIterable {
     case asset
     case inventory
+
     case liability
+
     case equity
+
     case revenue
+    case service
+    case product
+
     case expense
 }
 
