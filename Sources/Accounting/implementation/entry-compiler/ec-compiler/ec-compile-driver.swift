@@ -120,7 +120,9 @@ public struct EntryCompileDriver {
                 settings: settings,
                 allowCollisions: false,
                 onCollision: nil,
-                trace: setting.loc_trace
+                trace: setting.loc_trace,
+
+                verbose: verbose,
             )
             vprint(verbose, "  ✓ \(entries.count) entries")
         }

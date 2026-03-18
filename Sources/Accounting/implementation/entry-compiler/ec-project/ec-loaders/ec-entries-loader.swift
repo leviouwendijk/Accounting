@@ -7,7 +7,9 @@ public enum EntryCompilerEntriesLoader {
         settings: EntryCompilerSettings,
         allowCollisions: Bool = false,
         onCollision: ((Int, String, String) -> Void)? = nil,
-        trace: Bool = true
+        trace: Bool = true,
+
+        verbose: Bool = false
     ) throws -> [Entry] {
         let root = project.url(.entries)
         var out: [Entry] = []
@@ -33,7 +35,9 @@ public enum EntryCompilerEntriesLoader {
                     tokens: toks,
                     defaultTimeZone: settings.entry.defaultTimezone,
                     fileURL: url,
-                    lineMap: lineMap
+                    lineMap: lineMap,
+
+                    verbose: verbose
                 )
                 let entries = try parser.parseEntries()
                 
