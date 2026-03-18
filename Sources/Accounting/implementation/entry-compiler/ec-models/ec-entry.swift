@@ -63,7 +63,8 @@ public struct Entry: Hashable, Codable, Sendable {
 
         print(report)
         print()
-        print("\(count)".ansi(.red, .bold))
+        // print("\(count)".ansi(.red, .bold))
+        print("placeholders in entry (id: \(self.id, default: "unknown")): \(count)".ansi(.red, .bold))
     }
 
     // public func printPlaceholderWarning(verbose: Bool = false) {
