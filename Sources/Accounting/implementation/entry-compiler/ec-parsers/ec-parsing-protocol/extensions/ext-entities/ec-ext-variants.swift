@@ -42,7 +42,7 @@ public extension EntryCompilerParsing {
                 case .ident("details"):
                     vDetails = try parseFreeTextBlock(named: "details")
 
-                case .keyword("subvariant"), .keyword("subvariant"):
+                case .keyword("subvariant"), .ident("subvariant"):
                     guard let v = vName else {
                         throw ParserError.unexpectedToken(current, expected: "variant alias before subvariant", at: loc())
                     }
