@@ -96,8 +96,25 @@ public extension EntryCompilerParsing {
                 case .ident("details"):
                     details = try parseFreeTextBlock(named: "details")
 
+                case .keyword("trait"), .ident("trait"):
+                    guard let sv = name else {
+                        throw ParserError.unexpectedToken(
+                            current,
+                            expected: "subvariant alias before trait",
+                            at: loc()
+                        )
+                    }
+
+                    let childParent = EntityKey(
+                        class: parentKey.class,
+                        family: parentKey.family,
+                        alias: parentKey.alias.appendingVariant(sv)
+                    )
+
+                    defs.append(contentsOf: try parseTraitBlocks(parentKey: childParent))
+
                 default:
-                    throw ParserError.unexpectedToken(current, expected: "use alias / metadata / details", at: loc())
+                    throw ParserError.unexpectedToken(current, expected: "use alias / metadata / details / trait", at: loc())
                 }
             }
             try expect(.rBrace)
@@ -108,6 +125,72 @@ public extension EntryCompilerParsing {
                 defs.append(EntityDef(key: k, displayName: details, metadata: meta, depreciation: nil))
             }
         }
+        return defs
+    }
+
+    @inlinable
+    func parseTraitBlocks(parentKey: EntityKey) throws -> [EntityDef] {
+        var defs: [EntityDef] = []
+
+        while current == .keyword("trait") || current == .ident("trait") {
+            advance()
+
+            var name: String? = nil
+            if current != .lBrace {
+                name = try readSingleAliasFlexible()
+            }
+
+            try expect(.lBrace)
+            var meta: [String:String] = [:]
+            var details: String?
+
+            while current != .rBrace && current != .eof {
+                switch current {
+                case .keyword("use"):
+                    guard name == nil else {
+                        throw ParserError.unexpectedToken(
+                            current,
+                            expected: "metadata/details",
+                            at: loc()
+                        )
+                    }
+                    advance()
+                    try expect(.keyword("alias"))
+                    name = try readSingleAliasFlexible()
+
+                case .keyword("metadata"), .ident("metadata"):
+                    meta = try parseStringMapBlock(named: "metadata")
+
+                case .keyword("details"), .ident("details"):
+                    details = try parseFreeTextBlock(named: "details")
+
+                default:
+                    throw ParserError.unexpectedToken(
+                        current,
+                        expected: "use alias / metadata / details",
+                        at: loc()
+                    )
+                }
+            }
+
+            try expect(.rBrace)
+
+            if let t = name {
+                let k = EntityKey(
+                    class: parentKey.class,
+                    family: parentKey.family,
+                    alias: parentKey.alias.appendingVariant(t)
+                )
+
+                defs.append(EntityDef(
+                    key: k,
+                    displayName: details,
+                    metadata: meta,
+                    depreciation: nil
+                ))
+            }
+        }
+
         return defs
     }
 }

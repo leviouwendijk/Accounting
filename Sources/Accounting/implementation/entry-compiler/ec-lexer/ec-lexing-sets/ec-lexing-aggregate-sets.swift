@@ -75,7 +75,7 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
         // "entity", // place as ident
         "domain",
         "content",
-        "variant", "subvariant",
+        "variant", "subvariant", "trait"
     ]
     
     let ownership: Set<String> = [
