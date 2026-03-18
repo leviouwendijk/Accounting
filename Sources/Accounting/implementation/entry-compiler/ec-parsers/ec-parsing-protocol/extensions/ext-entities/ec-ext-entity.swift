@@ -60,10 +60,14 @@ public extension EntryCompilerParsing {
         try expect(.keyword("placeholder"))
         try expect(.lPar)
 
-        guard case let .ident(rawKind) = current else {
+        let rawKind: String
+        switch current {
+        case let .ident(s), let .keyword(s):
+            rawKind = s
+            advance()
+        default:
             throw ParserError.unexpectedToken(current, expected: "placeholder kind", at: loc())
         }
-        advance()
 
         guard let kind = EntityPlaceholderKind(rawValue: rawKind) else {
             throw ParserError.unexpectedToken(
