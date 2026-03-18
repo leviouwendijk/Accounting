@@ -52,8 +52,6 @@ public struct Entry: Hashable, Codable, Sendable {
     public func printPlaceholderWarning(verbose: Bool = false) {
         let (count, report) = entityPlaceholderWarning()
 
-        // print("ENTRY INIT PLACEHOLDER DEBUG:", lines.map { ($0.entity.printable, $0.entity.placeholder) })
-
         if count == 0 {
             if verbose {
                 print("0")
@@ -62,22 +60,10 @@ public struct Entry: Hashable, Codable, Sendable {
         }
 
         print(report)
-        print()
         // print("\(count)".ansi(.red, .bold))
         print("placeholders in entry (id: \(self.id, default: "unknown")): \(count)".ansi(.red, .bold))
+        print()
     }
-
-    // public func printPlaceholderWarning(verbose: Bool = false) {
-    //     let (placeholders, report) = entityPlaceholderWarning()
-    //     if placeholders == 0, !verbose { 
-    //         return 
-    //     }
-    //     print(report)
-    //     print()
-    //     let str = (placeholders > 0) ? "\(placeholders)".ansi(.red, .bold) : "\(placeholders)".ansi(.green)
-    //     print(str)
-    // }
-
 
     public func entityPlaceholderWarning() -> (Int, String) {
         var count = 0
