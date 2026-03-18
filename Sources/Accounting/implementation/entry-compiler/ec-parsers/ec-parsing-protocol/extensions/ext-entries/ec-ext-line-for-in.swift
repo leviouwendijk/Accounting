@@ -170,8 +170,13 @@ public extension EntryCompilerParsing {
         try expect(.lPar)
         var out: [EntityRef] = []
         while current != .rPar && current != .eof {
-            let segs = readFlatSegments()
-            out.append(try makeEntityRef(from: segs))
+
+            // let segs = readFlatSegments()
+            // out.append(try makeEntityRef(from: segs))
+            //
+            // using the new method to include placeholder() parsing:
+            out.append(try parseEntityRefFlexible())
+
             if current == .comma { advance(); continue }
             break
         }
