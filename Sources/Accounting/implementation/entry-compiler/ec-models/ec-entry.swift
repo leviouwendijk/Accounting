@@ -51,7 +51,7 @@ public struct Entry: Hashable, Codable, Sendable {
     public func printPlaceholderWarning(verbose: Bool = false) {
         let (count, report) = entityPlaceholderWarning()
 
-        print("ENTRY INIT PLACEHOLDER DEBUG:", lines.map { ($0.entity.printable, $0.entity.placeholder) })
+        // print("ENTRY INIT PLACEHOLDER DEBUG:", lines.map { ($0.entity.printable, $0.entity.placeholder) })
 
         if count == 0 {
             if verbose {
