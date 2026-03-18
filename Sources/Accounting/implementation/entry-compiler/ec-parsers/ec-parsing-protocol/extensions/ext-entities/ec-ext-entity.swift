@@ -22,6 +22,9 @@ public extension EntryCompilerParsing {
         if current == .lPar {
             return try parseEntityRefInParens()
         }
+        if current == .ident("placeholder") {
+            return try parsePlaceholderEntityRef()
+        }
         return try makeEntityRef(from: readFlatSegments())
     }
 
@@ -38,13 +41,39 @@ public extension EntryCompilerParsing {
     /// Use this in your `for … in …` parsing once the EntityStore is built.
     @inline(__always)
     func parseAndResolveEntityRefFlexible(using store: EntityStore) throws -> EntityDef {
+        let start_pos = loc()
         let ref = try parseEntityRefFlexible()
-        return try store.resolve(ref, at: loc())
+        return try store.resolve(ref, at: start_pos)
     }
 
     @inline(__always)
     func parseAndResolveEntityRefInParens(using store: EntityStore) throws -> EntityDef {
+        let start_pos = loc()
         let ref = try parseEntityRefInParens()
-        return try store.resolve(ref, at: loc())
+        return try store.resolve(ref, at: start_pos)
+    }
+}
+
+public extension EntryCompilerParsing {
+    @inline(__always)
+    func parsePlaceholderEntityRef() throws -> EntityRef {
+        try expect(.ident("placeholder"))
+        try expect(.lPar)
+
+        guard case let .ident(rawKind) = current else {
+            throw ParserError.unexpectedToken(current, expected: "placeholder kind", at: loc())
+        }
+        advance()
+
+        guard let kind = EntityPlaceholderKind(rawValue: rawKind) else {
+            throw ParserError.unexpectedToken(
+                .ident(rawKind),
+                expected: EntityPlaceholderKind.allCases.map(\.rawValue).joined(separator: "|"),
+                at: loc()
+            )
+        }
+
+        try expect(.rPar)
+        return EntityRef(placeholder: EntityPlaceholder(kind))
     }
 }
