@@ -3,7 +3,10 @@ import Foundation
 public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompilerLexingSets {
     let baseIdents: Set<String> = [
         "account",
-        "entity"
+        "entity",
+
+        "reconcile",
+        "pending",
     ]
 
     let global: Set<String> = [
@@ -13,7 +16,9 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
         "infer",
         "timezone",
         "true", "false",
-        "reference"
+        "reference",
+
+        "placeholder",
     ]
 
     let shared: Set<String> = [
