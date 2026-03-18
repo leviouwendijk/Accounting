@@ -49,42 +49,98 @@ public struct Entry: Hashable, Codable, Sendable {
     }
 
     public func printPlaceholderWarning(verbose: Bool = false) {
-        let (placeholders, report) = entityPlaceholderWarning()
-        if placeholders == 0, !verbose { 
-            return 
+        let (count, report) = entityPlaceholderWarning()
+
+        if count == 0 {
+            if verbose {
+                print("0")
+            }
+            return
         }
+
         print(report)
         print()
-        let str = (placeholders > 0) ? "\(placeholders)".ansi(.red, .bold) : "\(placeholders)".ansi(.green)
-        print(str)
+        print("\(count)".ansi(.red, .bold))
     }
 
-    public func entityPlaceholderWarning(
-        for values: [String] = ["asset_placeholder"]
-    ) -> (Int, String) {
+    // public func printPlaceholderWarning(verbose: Bool = false) {
+    //     let (placeholders, report) = entityPlaceholderWarning()
+    //     if placeholders == 0, !verbose { 
+    //         return 
+    //     }
+    //     print(report)
+    //     print()
+    //     let str = (placeholders > 0) ? "\(placeholders)".ansi(.red, .bold) : "\(placeholders)".ansi(.green)
+    //     print(str)
+    // }
+
+
+    public func entityPlaceholderWarning() -> (Int, String) {
         var count = 0
         var matches: [String] = []
 
-        func match(_ match: String, at location: SourceLocation? = nil) {
-            matches.append("! WARNING: Placeholder detected\n")
-            matches.append("    value: \"match\"\n")
-            if let l = location {
-                matches.append("    at: \(l.description)\n")
+        func record(
+            value: String,
+            loweredAlias: String? = nil,
+            at location: SourceLocation? = nil
+        ) {
+            matches.append("! WARNING: Placeholder detected")
+            matches.append("    value: \"\(value)\"")
+            if let loweredAlias {
+                matches.append("    lowered alias: \"\(loweredAlias)\"")
+            }
+            if let location {
+                matches.append("    at: \(location.description)")
             }
         }
 
         for l in lines {
-            for v in values {
-                if l.entity.alias.name.contains(v) {
-                    count += 1
-                    match(v, at: l.location)
-                }
+            if let placeholder = l.entity.placeholder {
+                count += 1
+                record(
+                    value: "placeholder(\(placeholder.kind.rawValue))",
+                    loweredAlias: placeholder.loweredAlias,
+                    at: l.location
+                )
+                continue
             }
-            
+
+            let alias = l.entity.alias.name
+            if alias.hasSuffix("_placeholder") {
+                count += 1
+                record(value: alias, at: l.location)
+            }
         }
-        let result = matches.joined(separator: "\n")
-        return (count, result)
+
+        return (count, matches.joined(separator: "\n"))
     }
+
+    // public func entityPlaceholderWarning(
+    //     for values: [String] = ["asset_placeholder"]
+    // ) -> (Int, String) {
+    //     var count = 0
+    //     var matches: [String] = []
+
+    //     func match(_ match: String, at location: SourceLocation? = nil) {
+    //         matches.append("! WARNING: Placeholder detected\n")
+    //         matches.append("    value: \"match\"\n")
+    //         if let l = location {
+    //             matches.append("    at: \(l.description)\n")
+    //         }
+    //     }
+
+    //     for l in lines {
+    //         for v in values {
+    //             if l.entity.alias.name.contains(v) {
+    //                 count += 1
+    //                 match(v, at: l.location)
+    //             }
+    //         }
+            
+    //     }
+    //     let result = matches.joined(separator: "\n")
+    //     return (count, result)
+    // }
 
     public var viewableString: String {
         let fmt = DateFormatter()
