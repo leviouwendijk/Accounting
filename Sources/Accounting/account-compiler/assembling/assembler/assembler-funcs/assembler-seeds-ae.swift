@@ -107,14 +107,24 @@ public extension RGSAssembler {
                 }
             }
 
+            // // Priority 2: Equity subtree fallback
+            // if let eqRoot = equityAnchorId, isDescendant(of: eqRoot, id: id) {
+            //     // Special-case: profit-share → split by ownership if provided
+            //     if let psId = profitShareId, !ownershipSlices.isEmpty {
+            //         for s in ownershipSlices where s.percent != 0 {
+            //             push(psId, s.entityId, amt * s.percent)
+            //         }
+            //     } else if let eqBeg = equityOpeningId {
+            //         push(eqBeg, eid, amt)
+            //     } else {
+            //         push(eqRoot, eid, amt)
+            //     }
+            //     continue entries
+            // }
+
             // Priority 2: Equity subtree fallback
             if let eqRoot = equityAnchorId, isDescendant(of: eqRoot, id: id) {
-                // Special-case: profit-share → split by ownership if provided
-                if let psId = profitShareId, !ownershipSlices.isEmpty {
-                    for s in ownershipSlices where s.percent != 0 {
-                        push(psId, s.entityId, amt * s.percent)
-                    }
-                } else if let eqBeg = equityOpeningId {
+                if let eqBeg = equityOpeningId {
                     push(eqBeg, eid, amt)
                 } else {
                     push(eqRoot, eid, amt)
@@ -126,6 +136,34 @@ public extension RGSAssembler {
             push(id, eid, amt)
         }
 
+        // return out
+
+        // === PRE-WINDOW NI INJECTION (AE) ===============================
+        // Mirror plain opening semantics:
+        // - historical balance-sheet equity stays in equity opening
+        // - historical net income is injected separately
+        // - only that NI injection may be ownership-split
+        if let eqTarget = (equityOpeningId ?? equityAnchorId) {
+            var preNI: Decimal = 0
+            for r in tbHist {
+                guard let id = index.byIdentifier[r.accountCode] else { continue }
+                if maps.kindById[id] == .income {
+                    preNI += (r.debit - r.credit)
+                }
+            }
+
+            if preNI != 0 {
+                if !ownershipSlices.isEmpty {
+                    let target = profitShareId ?? eqTarget
+                    for s in ownershipSlices where s.percent != 0 {
+                        push(target, s.entityId, preNI * s.percent)
+                    }
+                } else {
+                    push(eqTarget, nil, preNI)
+                }
+            }
+        }
+        // ===============================================================
         return out
     }
 }
