@@ -17,7 +17,8 @@ public struct EquityPresentation: Presentation {
     }
 
     public func build(from input: Input) throws -> Output {
-        try buildOwnerEquityRollforwardReport(
+        // try buildOwnerEquityRollforwardReport(
+        try OwnerEquity.Rollforward.report(
             title: reportTitle,
             allPeriods: input.history,
             chart: input.chart,

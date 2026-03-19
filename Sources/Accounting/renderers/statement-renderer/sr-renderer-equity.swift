@@ -13,7 +13,8 @@ public extension StatementHTMLRenderer {
         let cfg = EquityRollforwardConfig()
 
         // 1) Build full history rollforward, then slice window.
-        let roll = try buildGlobalRollforward(
+        // let roll = try buildGlobalRollforward(
+        let roll = try OwnerEquity.Rollforward.global_rollforward(
             history: history,
             chart: chart,
             entities: entities,
