@@ -21,11 +21,17 @@ public enum RGSAssembler {
         let resolved = try targets.resolve(in: index, validateWith: maps)
 
         // Seed + roll-up
-        let seed   = RGSAssembler.seedLeafs(from: trialRows, using: index)
+        let seed   = RGSAssembler.seedLeafs(
+            from: trialRows,
+            using: index
+        )
         try assertSeedSumsToZero(seed)
 
         // Entity-aware seed (entity dimension preserved)
-        let seedAE = RGSAssembler.seedLeafsAE(from: trialRows, using: index) // or: { $0.entityId }
+        let seedAE = RGSAssembler.seedLeafsAE(
+            from: trialRows,
+            using: index
+        ) // or: { $0.entityId }
 
         if !autoClose {
             return try assembleNoAutoClose(
@@ -38,8 +44,12 @@ public enum RGSAssembler {
                 seedAE: seedAE
             )
         } else {
-            let ac = (niId: resolved.ni.id, niCode: resolved.ni.code,
-                      eqId: resolved.equity.id, eqCode: resolved.equity.code)
+            let ac = (
+                niId: resolved.ni.id,
+                niCode: resolved.ni.code,
+                eqId: resolved.equity.id,
+                eqCode: resolved.equity.code
+            )
             return try assembleWithAutoClose(
                 chart: ch,
                 index: index,
@@ -137,39 +147,13 @@ public enum RGSAssembler {
     ) throws -> StatementBundle {
         // Make sure these codes are included in the presentation even if zero
         var localCut = cut
-        localCut.includeCodes.append(contentsOf: [autoCloseTargets.niCode, autoCloseTargets.eqCode])
 
-        // // --- auto-close overlay ---
-        // let ni = seed.reduce(into: Decimal(0)) { acc, kv in
-        //     if maps.kindById[kv.key] == .income { acc += kv.value }
-        // }
-        // // let manualAtNi     = seed[autoCloseTargets.niId] ?? 0
-        // // let manualAtEquity = seed[autoCloseTargets.eqId] ?? 0
-
-        // // let hasManual = (manualAtNi != 0 || manualAtEquity != 0)
-        // let hasManual = false
-
-        // var seedWithAC = seed
-        // if !hasManual && ni != 0 {
-        //     seedWithAC[autoCloseTargets.niId,     default: 0] += (-ni) // zero P&L node
-        //     seedWithAC[autoCloseTargets.eqId,     default: 0] += ( ni) // push into equity
-        // }
-
-        // // // Income (IS): compute from plain seed; NI gets added to NI node for presentation
-        // // var totalsIncome = RGSAssembler.rollupAmounts(seed, parentById: maps.parentById)
-        // // if !hasManual && ni != 0 {
-        // //     totalsIncome[autoCloseTargets.niId, default: 0] += ni
-        // // }
-
-        // // Income (IS): compute from plain seed; add NI as a rolled patch so parents see it
-        // var totalsIncome = RGSAssembler.rollupAmounts(seed, parentById: maps.parentById)
-        // if !hasManual && ni != 0 {
-        //     let niPatch = RGSAssembler.rollupAmounts([autoCloseTargets.niId: ni],
-        //                                              parentById: maps.parentById)
-        //     for (k, v) in niPatch where v != 0 {
-        //         totalsIncome[k, default: 0] += v
-        //     }
-        // }
+        localCut.includeCodes.append(
+            contentsOf: [
+                autoCloseTargets.niCode,
+                autoCloseTargets.eqCode
+            ]
+        )
 
         // --- auto-close overlay ---
         let ni = seed.reduce(into: Decimal(0)) { acc, kv in
@@ -183,9 +167,12 @@ public enum RGSAssembler {
 
         // Warn (but keep existing suppression behavior)
         if ni != 0 && hasManual {
-            fputs("warning: auto-close NI overlay present but manual postings detected at "
-                  + "\(autoCloseTargets.niCode)=\(manualAtNi) and/or \(autoCloseTargets.eqCode)=\(manualAtEquity); "
-                  + "overlay suppressed for this period.\n", stderr)
+            fputs(
+                "warning: auto-close NI overlay present but manual postings detected at "
+                    + "\(autoCloseTargets.niCode)=\(manualAtNi) and/or \(autoCloseTargets.eqCode)=\(manualAtEquity); "
+                    + "overlay suppressed for this period.\n",
+                stderr
+            )
         }
 
         var seedWithAC = seed
@@ -195,21 +182,34 @@ public enum RGSAssembler {
         }
 
         // Income (IS): compute from plain seed; add NI as a rolled patch so parents see it
-        var totalsIncome = RGSAssembler.rollupAmounts(seed, parentById: maps.parentById)
+        var totalsIncome = RGSAssembler.rollupAmounts(
+            seed,
+            parentById: maps.parentById
+        )
+
         if !hasManual && ni != 0 {
-            let niPatch = RGSAssembler.rollupAmounts([autoCloseTargets.niId: ni],
-                                                     parentById: maps.parentById)
+            let niPatch = RGSAssembler.rollupAmounts(
+                [autoCloseTargets.niId: ni],
+                parentById: maps.parentById
+            )
             for (k, v) in niPatch where v != 0 {
                 totalsIncome[k, default: 0] += v
             }
         }
 
         // Balance (BS): use overlayed seed
-        let totalsBalance = RGSAssembler.rollupAmounts(seedWithAC, parentById: maps.parentById)
+        let totalsBalance = RGSAssembler.rollupAmounts(
+            seedWithAC,
+            parentById: maps.parentById
+        )
         // --- end auto-close overlay ---
 
         // Forced inclusions (codes → ids)
-        let (forcedIds, forcedChain) = makeForcedSets(index: index, cut: localCut, parentById: maps.parentById)
+        let (forcedIds, forcedChain) = makeForcedSets(
+            index: index,
+            cut: localCut,
+            parentById: maps.parentById
+        )
 
         // Labels by sort-key prefix
         let labels = index.labelByGroupKey
@@ -240,7 +240,10 @@ public enum RGSAssembler {
         // Optional entity breakdown for IS (from entity-preserving rollup)
         var breakdown: EntityBreakdown? = nil
         do {
-            let totalsAE_Income = RGSAssembler.rollupByAccountPreservingEntity(seedAE, parentById: maps.parentById)
+            let totalsAE_Income = RGSAssembler.rollupByAccountPreservingEntity(
+                seedAE, 
+                parentById: maps.parentById
+            )
             var byAccount: [Int: [Int?: Decimal]] = [:]
             for (k, v) in totalsAE_Income where v != 0 {
                 byAccount[k.accountId, default: [:]][k.entityId, default: 0] += v
@@ -255,7 +258,12 @@ public enum RGSAssembler {
             totalsById: totalsBalance,
             entity: breakdown
         )
-        let analytics = try makeAnalytics(chart: chart, bundle: bundle, omslag: omslag)
+
+        let analytics = try makeAnalytics(
+            chart: chart,
+            bundle: bundle,
+            omslag: omslag
+        )
 
         return StatementBundle(
             balance: bs,
