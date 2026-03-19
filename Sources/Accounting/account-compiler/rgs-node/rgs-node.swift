@@ -1,5 +1,5 @@
 import Foundation
-import plate
+import Primitives
 
 public struct RGSNode: Sendable, Codable, JSONWritable {
     // COMMON

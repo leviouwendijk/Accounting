@@ -1,6 +1,5 @@
 import Foundation
 import Writers
-// import plate
 
 public extension LegacyAssetItem {
     @discardableResult

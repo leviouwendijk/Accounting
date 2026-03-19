@@ -1,6 +1,5 @@
 import Foundation
 import Writers
-// import plate
 
 public struct MonthlyWriteResult: Sendable, CustomStringConvertible, CustomDebugStringConvertible {
     public let yqm: YQM

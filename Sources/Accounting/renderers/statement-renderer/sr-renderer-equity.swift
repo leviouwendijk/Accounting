@@ -1,6 +1,5 @@
 import Foundation
 import HTML
-// import Constructors
 
 public extension StatementHTMLRenderer {
     static func renderEquityOverviewHTML(

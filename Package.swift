@@ -16,8 +16,9 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/leviouwendijk/plate.git", branch: "master"),
-        .package(url: "https://github.com/leviouwendijk/Extensions.git", branch: "master"),
-        .package(url: "https://github.com/leviouwendijk/Constructors.git", branch: "master"),
+        // .package(url: "https://github.com/leviouwendijk/Extensions.git", branch: "master"),
+        // .package(url: "https://github.com/leviouwendijk/Constructors.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Primitives.git", branch: "master"),
 
         .package(url: "https://github.com/leviouwendijk/HTML.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/CSS.git", branch: "master"),
@@ -30,8 +31,9 @@ let package = Package(
             name: "Accounting",
             dependencies: [
                 .product(name: "plate", package: "plate"),
-                .product(name: "Extensions", package: "Extensions"),
-                .product(name: "Constructors", package: "Constructors"),
+                // .product(name: "Extensions", package: "Extensions"),
+                // .product(name: "Constructors", package: "Constructors"),
+                .product(name: "Primitives", package: "Primitives"),
 
                 .product(name: "HTML", package: "HTML"),
                 .product(name: "CSS", package: "CSS"),
@@ -43,8 +45,8 @@ let package = Package(
             dependencies: [
                 "Accounting",
                 .product(name: "plate", package: "plate"),
-                .product(name: "Extensions", package: "Extensions"),
-                .product(name: "Constructors", package: "Constructors"),
+                // .product(name: "Extensions", package: "Extensions"),
+                // .product(name: "Constructors", package: "Constructors"),
 
                 .product(name: "HTML", package: "HTML"),
                 .product(name: "CSS", package: "CSS"),

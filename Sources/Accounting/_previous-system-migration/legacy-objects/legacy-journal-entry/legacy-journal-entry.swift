@@ -1,6 +1,5 @@
 import Foundation
-import plate
-import Extensions
+import Primitives
 
 public typealias LegacyJournalEntriesPage = ExportPage<LegacyJournalEntry>
 

@@ -1,5 +1,5 @@
 import Foundation
-import plate
+import Primitives
 
 public struct ExportPage<Row: Codable & Sendable>: Codable, Sendable, JSONReadable, JSONWritable {
     public let checksum: String

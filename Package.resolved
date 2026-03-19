@@ -1,15 +1,6 @@
 {
-  "originHash" : "c72dfb1970b3ea24b255dcae248c3cc9ae5f84e91a69ed6d7da8902d03c7f2cc",
+  "originHash" : "7bcb577d119269bc4c7fe8128cb3456e2cc42f2c9c01094439225be43e499e44",
   "pins" : [
-    {
-      "identity" : "constructors",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/leviouwendijk/Constructors.git",
-      "state" : {
-        "branch" : "master",
-        "revision" : "124431fc40fb1b488ccf09b608d2aba488446c3f"
-      }
-    },
     {
       "identity" : "css",
       "kind" : "remoteSourceControl",
@@ -17,15 +8,6 @@
       "state" : {
         "branch" : "master",
         "revision" : "728d40142a7640ee4c3d0072194d39045e9afa9e"
-      }
-    },
-    {
-      "identity" : "extensions",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/leviouwendijk/Extensions.git",
-      "state" : {
-        "branch" : "master",
-        "revision" : "095eaf44e94235a56291f37dc56f36ff1674805c"
       }
     },
     {
@@ -44,15 +26,6 @@
       "state" : {
         "branch" : "master",
         "revision" : "8b85325433aa97ee19c9c77f564500be189978d6"
-      }
-    },
-    {
-      "identity" : "js",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/leviouwendijk/JS.git",
-      "state" : {
-        "branch" : "master",
-        "revision" : "96eeea629aa6ad252ec11da15da7df2a34a871e5"
       }
     },
     {
@@ -88,7 +61,7 @@
       "location" : "https://github.com/leviouwendijk/plate.git",
       "state" : {
         "branch" : "master",
-        "revision" : "b83a19b7d494bffd85d36da5733520c2b475ef80"
+        "revision" : "26a9ad356170c95f7db92d5d207d8850bf6af05b"
       }
     },
     {
@@ -97,16 +70,7 @@
       "location" : "https://github.com/leviouwendijk/Primitives.git",
       "state" : {
         "branch" : "master",
-        "revision" : "f7c2d22952ba235c3078b590ccf695ac783e87fe"
-      }
-    },
-    {
-      "identity" : "protocolcomponents",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/leviouwendijk/ProtocolComponents.git",
-      "state" : {
-        "branch" : "master",
-        "revision" : "1d300607d190d21fdf29eb19868828ef8a1791ea"
+        "revision" : "42cf1a8d38e7223c07339787a7616c0348169a85"
       }
     },
     {
@@ -116,15 +80,6 @@
       "state" : {
         "branch" : "master",
         "revision" : "86a939d7bbb3e25808f88fbcedcee4069a5a5ae1"
-      }
-    },
-    {
-      "identity" : "structures",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/leviouwendijk/Structures.git",
-      "state" : {
-        "branch" : "master",
-        "revision" : "8c82699ca9a25c36d4a26674629da6e6e44b06e4"
       }
     },
     {

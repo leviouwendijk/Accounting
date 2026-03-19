@@ -1,5 +1,4 @@
 import Foundation
-import Extensions
 
 public extension EntryCompilerParsing {
     @inlinable

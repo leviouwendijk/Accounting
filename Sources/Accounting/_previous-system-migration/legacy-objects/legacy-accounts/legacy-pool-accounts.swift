@@ -1,5 +1,5 @@
 import Foundation
-import plate
+import Primitives
 
 public typealias PoolAccountsPage    = ExportPage<PoolAccount>
 
