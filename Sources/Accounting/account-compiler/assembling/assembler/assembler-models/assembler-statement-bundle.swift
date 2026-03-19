@@ -1,11 +1,6 @@
 import Foundation
 
-public struct BundleAnalytics: Sendable {
-    public let l2Buckets: L2Buckets
-    public let l2Totals: PresentedBalanceTotals
-}
-
-public struct StatementBundle: Sendable {
+public struct StatementBundle: Sendable, PresentableOutput {
     public let balance: [StatementLine]
     public let income:  [StatementLine]
     public let totalsById: [Int: Decimal]
@@ -25,4 +20,9 @@ public struct StatementBundle: Sendable {
         self.entity = entity
         self.analytics = analytics
     }
+}
+
+public struct BundleAnalytics: Sendable {
+    public let l2Buckets: L2Buckets
+    public let l2Totals: PresentedBalanceTotals
 }

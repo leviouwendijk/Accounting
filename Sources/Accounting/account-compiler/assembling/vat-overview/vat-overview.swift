@@ -1,6 +1,6 @@
 import Foundation
 
-public struct VATOverview: Sendable {
+public struct VATOverview: Sendable, SectionedPresentableOutput {
     public struct Row: Sendable {
         public let id: Int
         public let level: Int
