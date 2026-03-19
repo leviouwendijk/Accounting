@@ -56,6 +56,7 @@ extension OwnerEquity.Rollforward {
         )
 
         var out: [PeriodRollforward] = []
+        out.reserveCapacity(history.count)
 
         // Forward pass across the entire history
         for i in history.indices {
@@ -99,16 +100,16 @@ extension OwnerEquity.Rollforward {
             )
             out.append(row)
 
-            // Debug reconciliation against AE closing for this period
-            let perOwnerClose = equityClosingByOwner(bundle: p.bundle, cfg: cfg, maps: maps)
-            if !perOwnerClose.isEmpty {
-                let endSum = endByOwner.values.reduce(0, +)
-                let closeSum = perOwnerClose.values.reduce(0, +)
-                if absD(endSum - closeSum) > 0.01 {
-                    rfDbg("[\(p.label)] WARNING: per-owner END sum \(fmtDec(endSum)) ≠ AE closing \(fmtDec(closeSum)); Δ=\(fmtDec(endSum - closeSum))")
-                    rfDumpOwnerMap("[\(p.label)] per-owner (END − CLOSING)", map: owners.reduce(into: [Int:Decimal]()) { acc, oid in acc[oid] = (endByOwner[oid] ?? 0) - (perOwnerClose[oid] ?? 0) })
-                }
-            }
+            // // Debug reconciliation against AE closing for this period
+            // let perOwnerClose = equityClosingByOwner(bundle: p.bundle, cfg: cfg, maps: maps)
+            // if !perOwnerClose.isEmpty {
+            //     let endSum = endByOwner.values.reduce(0, +)
+            //     let closeSum = perOwnerClose.values.reduce(0, +)
+            //     if absD(endSum - closeSum) > 0.01 {
+            //         rfDbg("[\(p.label)] WARNING: per-owner END sum \(fmtDec(endSum)) ≠ AE closing \(fmtDec(closeSum)); Δ=\(fmtDec(endSum - closeSum))")
+            //         rfDumpOwnerMap("[\(p.label)] per-owner (END − CLOSING)", map: owners.reduce(into: [Int:Decimal]()) { acc, oid in acc[oid] = (endByOwner[oid] ?? 0) - (perOwnerClose[oid] ?? 0) })
+            //     }
+            // }
 
             // Carry forward to next period
             beginByOwner = endByOwner
@@ -223,7 +224,8 @@ extension OwnerEquity.Rollforward {
             guard let piece = pieces[i] else {
                 fatalError("Missing precomputed equity period piece for index \(i)")
             }
-            let p = history[i]
+
+            // let p = history[i]
 
             let moveOwners = piece.moveOwners
             let deltas = piece.deltas
@@ -266,21 +268,21 @@ extension OwnerEquity.Rollforward {
                 closingTotal: closeTotal
             )
 
-            // Debug reconciliation vs AE closing (same logic, but uses precomputed closingByOwner)
-            if !closingByOwner.isEmpty {
-                let endSum = endByOwner.values.reduce(0, +)
-                let closeSum = closingByOwner.values.reduce(0, +)
-                if absD(endSum - closeSum) > 0.01 {
-                    rfDbg("[\(p.label)] WARNING: per-owner END sum \(fmtDec(endSum)) ≠ AE closing \(fmtDec(closeSum)); Δ=\(fmtDec(endSum - closeSum))")
-                    rfDumpOwnerMap(
-                        "[\(p.label)] per-owner (END − CLOSING)",
-                        map: owners.reduce(into: [Int: Decimal]()) { acc, oid in
-                            acc[oid] = (endByOwner[oid] ?? 0) - (closingByOwner[oid] ?? 0)
-                        },
-                        entities: entities
-                    )
-                }
-            }
+            // // Debug reconciliation vs AE closing (same logic, but uses precomputed closingByOwner)
+            // if !closingByOwner.isEmpty {
+            //     let endSum = endByOwner.values.reduce(0, +)
+            //     let closeSum = closingByOwner.values.reduce(0, +)
+            //     if absD(endSum - closeSum) > 0.01 {
+            //         rfDbg("[\(p.label)] WARNING: per-owner END sum \(fmtDec(endSum)) ≠ AE closing \(fmtDec(closeSum)); Δ=\(fmtDec(endSum - closeSum))")
+            //         rfDumpOwnerMap(
+            //             "[\(p.label)] per-owner (END − CLOSING)",
+            //             map: owners.reduce(into: [Int: Decimal]()) { acc, oid in
+            //                 acc[oid] = (endByOwner[oid] ?? 0) - (closingByOwner[oid] ?? 0)
+            //             },
+            //             entities: entities
+            //         )
+            //     }
+            // }
 
             out.append(row)
             beginByOwner = endByOwner

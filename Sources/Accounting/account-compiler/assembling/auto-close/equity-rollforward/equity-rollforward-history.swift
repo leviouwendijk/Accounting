@@ -32,6 +32,8 @@ extension OwnerEquity.Rollforward {
             print(msg)
         }
 
+        Self.printDiagnostics(report.diagnostics, entities: entities)
+
         let renderedPeriods: [EquityPeriod]
         if let viewRange = view {
             let clampedLower = max(viewRange.lowerBound, allPeriods.startIndex)
@@ -88,6 +90,8 @@ extension OwnerEquity.Rollforward {
         for msg in report.anchorMessages {
             print(msg)
         }
+
+        Self.printDiagnostics(report.diagnostics, entities: entities)
 
         let renderedPeriods: [EquityPeriod]
         if let viewRange = view {
