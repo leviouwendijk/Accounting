@@ -2,8 +2,8 @@ import Foundation
 
 public extension RGSAssembler {
 
-    /// AE variant: same rules as `openingBegSeed`, but preserves entity for non-equity
-    /// and supports an optional equity ownership split for the profit-share code.
+    /// AE variant: same rules as `openingBegSeed`, but preserves entity for non-equity.
+    /// Historical equity stays in the equity opening target; pre-window NI may be ownership-split via `profitShareCode`.
     static func openingBegSeedAE(
         from tbHist: [TrialBalanceRow],
         chart: CompiledChart,

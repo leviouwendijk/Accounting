@@ -236,7 +236,7 @@ public extension PeriodAssembler {
         // -------- Entity breakdown (Balance) with ownership split on profit-share --------
         var breakdown: EntityBreakdown? = nil
         do {
-            // AE Opening (routes Beg and splits “Aandeel in de overwinst” by ownershipSlices)
+            // AE Opening (routes Beg; preserves historical equity opening; splits only pre-window NI by ownershipSlices)
             var seedOpeningAE: [AccEntKey: Decimal] = [:]
             if let tbHist = tbPreWindowForOpening, !tbHist.isEmpty {
                 seedOpeningAE = RGSAssembler.openingBegSeedAE(
