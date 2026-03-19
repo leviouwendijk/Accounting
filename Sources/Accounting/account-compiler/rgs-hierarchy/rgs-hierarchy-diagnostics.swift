@@ -20,4 +20,3 @@ public enum RGSHierarchyDiagnostics {
         return .init(nodes: nodes, parentById: result.parentById, problems: result.problems)
     }
 }
-
