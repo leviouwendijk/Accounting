@@ -6,15 +6,15 @@ public struct BundleAnalytics: Sendable {
 }
 
 public struct StatementBundle: Sendable {
-    public let balance: [RGSPresentationLine]
-    public let income:  [RGSPresentationLine]
+    public let balance: [StatementLine]
+    public let income:  [StatementLine]
     public let totalsById: [Int: Decimal]
     public let entity: EntityBreakdown?
     public let analytics: BundleAnalytics?  
 
     public init(
-        balance: [RGSPresentationLine],
-        income: [RGSPresentationLine],
+        balance: [StatementLine],
+        income: [StatementLine],
         totalsById: [Int: Decimal],
         entity: EntityBreakdown? = nil,
         analytics: BundleAnalytics? = nil

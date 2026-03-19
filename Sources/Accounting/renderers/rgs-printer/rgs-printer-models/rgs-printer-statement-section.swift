@@ -1,14 +1,14 @@
 import Foundation
 
-public struct RGSPresentationSection: Sendable {
+public struct StatementSection: Sendable {
     public let key: String
     public let title: String
-    public let lines: [RGSPresentationLine]
+    public let lines: [StatementLine]
     
     public init(
         key: String,
         title: String,
-        lines: [RGSPresentationLine]
+        lines: [StatementLine]
     ) {
         self.key = key
         self.title = title

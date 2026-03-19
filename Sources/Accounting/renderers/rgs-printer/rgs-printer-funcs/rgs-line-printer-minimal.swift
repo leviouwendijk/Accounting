@@ -2,7 +2,7 @@ import Foundation
 
 public func printRGSLines(
     _ title: String,
-    _ lines: [RGSPresentationLine]
+    _ lines: [StatementLine]
 ) {
     print("\n\(title)")
     print(String(repeating: "—", count: title.count))

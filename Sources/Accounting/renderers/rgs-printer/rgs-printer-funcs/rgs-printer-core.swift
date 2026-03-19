@@ -40,7 +40,7 @@ public extension RGSPrinter {
 
     static func printLines(
         _ title: String,
-        lines: [RGSPresentationLine],
+        lines: [StatementLine],
         chart: CompiledChart
     ) throws {
         let maps = try RGSAssembler.makeMaps(from: chart)

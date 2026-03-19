@@ -221,20 +221,20 @@ public enum RGSPrinter {
         bundle: StatementBundle,
         chart: CompiledChart,
         omitLevel1Root: Bool = true
-    ) throws -> [RGSPresentationSection] {
+    ) throws -> [StatementSection] {
         // Map id -> level so we can hide only the L1 header node(s)
         let levelById: [Int: UInt8] = Dictionary(uniqueKeysWithValues: chart.nodes.map { ($0.id, $0.level) })
 
         // Keep EXACT ordering and amounts from bundle.income.
         // Only drop lines whose node.level == 1 when omitLevel1Root is true.
-        let lines: [RGSPresentationLine] = bundle.income.filter { line in
+        let lines: [StatementLine] = bundle.income.filter { line in
             guard omitLevel1Root, let lvl = levelById[line.id] else { return true }
             return lvl != 1
         }
 
         // Return a single section; renderer decides indentation (e.g. L2 → indent 0).
         return [
-            RGSPresentationSection(
+            StatementSection(
                 key: "income",
                 title: "Income",
                 lines: lines
