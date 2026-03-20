@@ -1,0 +1,15 @@
+SBR_ENTRYPOINT;http://www.nltaxonomie.nl/nt20/kvk/20251210/entrypoints/kvk-rpt-jaarverantwoording-2025-nlgaap-micro-publicatiestukken.xsd;;;
+SBR_CONNECT;SBR_LABEL;SBR_CONCEPT;SBR_AXIS[jenv-bw2-dim:BasisOfPreparationAxis];SBR_AXIS[jenv-bw2-dim:FinancialStatementsTypeAxis]
+=GROUP(BEiv*+BVrz*+BLas*+BSch*);Passiva;jenv-bw2-i_EquityAndLiabilities;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BIva*+BMva*+BVas*+BFva*);Vaste activa;jenv-bw2-i_AssetsNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BIva*+BMva*+BVas*+BFva*)+GROUP(BVrd*+BPro*+BVor*+BEff*+BLim*);Activa;jenv-bw2-i_Assets;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BIva*+BMva*+BVas*+BFva*-BIvaKou*);Overige vaste activa;jenv-bw2-i_AssetsNoncurrentOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BLas*+BSch*);Schulden;jenv-bw2-i_Liabilities;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BVrd*+BPro*+BVor*+BEff*+BLim*);Vlottende activa;jenv-bw2-i_AssetsCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BVrd*+BPro*+BVor*+BEff*+BLim*-BVorVao*);Overige vlottende activa;jenv-bw2-i_AssetsCurrentOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BEiv*;Eigen vermogen;jenv-bw2-i_Equity;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BIvaKou*;Kosten die verband houden met de oprichting en met de uitgifte van aandelen;jenv-bw2-i_CostsIncorporationShareIssue;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLas*;Schulden met een looptijd langer dan een jaar;jenv-bw2-i_LiabilitiesMaturityExceedingOneYear;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BSch*;Schulden met een looptijd van ten hoogste een jaar;jenv-bw2-i_LiabilitiesMaturityLessThanOneYear;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVorVao*;Opgevraagde stortingen van geplaatst kapitaal;jenv-bw2-i_CalledUpShareCapital;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrz*;Voorzieningen;jenv-bw2-i_Provisions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember

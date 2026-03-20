@@ -1,0 +1,28 @@
+SBR_ENTRYPOINT;http://www.nltaxonomie.nl/nt20/kvk/20251210/entrypoints/kvk-rpt-jaarverantwoording-2025-nlgaap-micro.xsd;;;
+SBR_CONNECT;SBR_LABEL;SBR_CONCEPT;SBR_AXIS[jenv-bw2-dim:BasisOfPreparationAxis];SBR_AXIS[jenv-bw2-dim:FinancialStatementsTypeAxis]
+=GROUP(BEiv*+BVrz*+BLas*+BSch*);Passiva;jenv-bw2-i_EquityAndLiabilities;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BIva*+BMva*+BVas*+BFva*);Vaste activa;jenv-bw2-i_AssetsNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BIva*+BMva*+BVas*+BFva*)+GROUP(BVrd*+BPro*+BVor*+BEff*+BLim*);Activa;jenv-bw2-i_Assets;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BIva*+BMva*+BVas*+BFva*-BIvaKou*);Overige vaste activa;jenv-bw2-i_AssetsNoncurrentOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BLas*+BSch*);Schulden;jenv-bw2-i_Liabilities;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BVrd*+BPro*+BVor*+BEff*+BLim*);Vlottende activa;jenv-bw2-i_AssetsCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BVrd*+BPro*+BVor*+BEff*+BLim*-BVorVao*);Overige vlottende activa;jenv-bw2-i_AssetsCurrentOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WAfs*+WWvi*+WBwv*+WWfa*);Afschrijvingen op en waardeverminderingen van activa;jenv-bw2-i_DepreciationAmortisationAndDecreaseInValueAssets;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WBed*+WVkf*+WAkf*);Overige bedrijfskosten;jenv-bw2-i_OperatingExpensesOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WKpr*+WPer*+WAfs*+WWvi*+WBwv*+WBed*+WVkf*+WAkf*)+GROUP(WWfa*+WFbe*-WFbeRlm*-WFbeOnn*-WFbeWnn*-WFbePol*-WFbePhp*);Lasten;jenv-bw2-i_Expenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WOmz*+WWiv*);Netto-omzet;jenv-bw2-i_NetRevenue;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WOmz*+WWiv*+WOvb*)+GROUP(WOvt*+WVhe*+WRed*+WFbeRlm*+WFbeOnn*+WFbeWnn*+WFbePol*+WFbePhp*);Baten;jenv-bw2-i_Income;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WOmz*+WWiv*+WOvb*+WVkf*+WAkf*+WKpr*+WPer*+WAfs*+WWvi*+WBwv*+WBed*+WOvt*+WVhe*+WWfa*+WFbe*+WRed*);Resultaat voor belastingen;jenv-bw2-i_ResultBeforeTax;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WOmz*+WWiv*+WOvb*+WVkf*+WAkf*+WKpr*+WPer*+WAfs*+WWvi*+WBwv*+WBed*+WOvt*+WVhe*+WWfa*+WFbe*+WRed*+WBel*);Resultaat na belastingen;jenv-bw2-i_ResultAfterTax;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WOvt*+WVhe*+WRed*)+GROUP(WFbeRlm*+WFbeOnn*+WFbeWnn*+WFbePol*+WFbePhp*);Andere baten;jenv-bw2-i_IncomeOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WPer*-WPerLes*)+GROUP(WFbe*-WFbeRlm*-WFbeOnn*-WFbeWnn*-WFbePol*-WFbePhp*);Andere lasten;jenv-bw2-i_ExpensesOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BEiv*;Eigen vermogen;jenv-bw2-i_Equity;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BIvaKou*;Kosten die verband houden met de oprichting en met de uitgifte van aandelen;jenv-bw2-i_CostsIncorporationShareIssue;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLas*;Schulden met een looptijd langer dan een jaar;jenv-bw2-i_LiabilitiesMaturityExceedingOneYear;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BSch*;Schulden met een looptijd van ten hoogste een jaar;jenv-bw2-i_LiabilitiesMaturityLessThanOneYear;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVorVao*;Opgevraagde stortingen van geplaatst kapitaal;jenv-bw2-i_CalledUpShareCapital;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrz*;Voorzieningen;jenv-bw2-i_Provisions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WBel*;Belastingen over de winst of het verlies;jenv-bw2-i_IncomeTaxExpense;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WKpr*;Kosten van grond- en hulpstoffen;jenv-bw2-i_CostsRawMaterialsConsumables;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WOvb*;Overige bedrijfsopbrengsten;jenv-bw2-i_OperatingIncomeOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WPerLes*;Lonen;jenv-bw2-i_WagesSalaries;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember

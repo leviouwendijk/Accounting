@@ -1,0 +1,281 @@
+SBR_ENTRYPOINT;https://www.sbrnexus.nl/ft20/frc/20251210/entrypoints/frc-rpt-nt-sbr-jaarrekening-natuurlijk-persoon-2025.xsd
+SBR_CONNECT;SBR_LABEL;SBR_CONCEPT;SBR_AXIS[jenv-bw2-dim:BasisOfPreparationAxis];SBR_AXIS[jenv-bw2-dim:FinancialStatementsTypeAxis];SBR_AXIS[jenv-bw2-dim:ClassesOfPropertyPlantEquipmentAxis]
+1-1-2020;Startdatum van de voorgaande periode waarop de jaarrekening betrekking heeft;jenv-bw2-i_FinancialReportingPeriodPreviousStartDate
+1-1-2021;Startdatum van de periode waarop de jaarrekening betrekking heeft;jenv-bw2-i_FinancialReportingPeriodCurrentStartDate
+31-12-2020;Einddatum van de voorgaande periode waarop de jaarrekening betrekking heeft;jenv-bw2-i_FinancialReportingPeriodPreviousEndDate
+31-12-2021;Einddatum van de periode waarop de jaarrekening betrekking heeft;jenv-bw2-i_FinancialReportingPeriodCurrentEndDate
+=GROUP(BEffAanAbe*+BEffOblObb*+BEffOveOeb*+BEffOptOpb*+BEffOpvOpb*);Beursgenoteerde effecten;rj-i_SecuritiesListed;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BEffAanAnb*+BEffOblOnb*+BEffOveOen*+BEffOptOpn*+BEffOpvOpn*+BEffDerDer*);Niet-beursgenoteerde effecten;rj-i_SecuritiesNonListed;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BEiv*+BEga*+BVrz*+BLas*+BSch*);Passiva;jenv-bw2-i_EquityAndLiabilities;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BFvaDig*+BFvaDio*+BFvaAnd*);Andere deelnemingen;jenv-bw2-i_InvestmentsInParticipatingInterestsOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BFvaOvr*-BFvaOvrHva*-BFvaOvrHvc*);Langlopende overige vorderingen;jenv-bw2-i_ReceivablesOtherNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BFvaSub*+BFvaLen*+BFvaIlg*);Overige financiële vaste activa;rj-i_FinancialAssetsOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BFvaVog*+BFvaVov*+BFvaVop*);Langlopende vorderingen op andere rechtspersonen en vennootschappen die een deelneming hebben in de rechtspersoon of waarin de rechtspersoon een deelneming heeft;jenv-bw2-i_ReceivablesShareholdersParticipatingInterestsNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BIva*+BMva*+BVas*+BFva*);Vaste activa;jenv-bw2-i_AssetsNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BIva*+BMva*+BVas*+BFva*+BVrd*+BPro*+BVor*+Beff*+BLim*);Activa;jenv-bw2-i_Assets;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BIvaOiv*+BIvaBou*);Overige immateriële vaste activa;rj-i_IntangibleAssetsOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BLasOls+BLasPar*+BLasSoh*+BLasVhz*);Langlopende overige schulden;jenv-bw2-i_PayablesOtherNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BLasSag*+BLasSap*);Langlopende schulden aan deelnemingen waarin de rechtspersoon invloed van betekenis kan uitoefenen;rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BMva*-BMva??????Beg);Mutatie van materiële vaste activa gedurende de periode;jenv-bw2-i_PropertyPlantEquipmentMovement;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+=GROUP(BMva??????Des);Som van de boekwaarden der materiële vaste activa waarover de rechtspersoon aan het einde van het boekjaar niet meer beschikt;jenv-bw2-i_PropertyPlantEquipmentDisposals;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+=GROUP(BMva??????Ina+BMvaBeg???Lie);Som van de waarden waartegen de in het boekjaar verkregen materiële vaste activa zijn te boek gesteld;jenv-bw2-i_PropertyPlantEquipmentAdditions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+=GROUP(BMva??????Ove+BMva??????Hcv);Overboekingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentTransfers;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+=GROUP(BMva???Cae*+BMva???Cuh*);Som der afschrijvingen en waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentAccumulatedDepreciationImpairments;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+=GROUP(BMva???CaeAfs+BMva???CaeHca+BMva???CaeOvm);Afschrijvingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentDepreciation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+=GROUP(BMva???CaeDca);Afschrijving op desinvesteringen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentDisposalsDepreciation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+=GROUP(BMvaMei*-BMvaMei???Beg);Mutatie van materiële vaste activa gedurende de periode;jenv-bw2-i_PropertyPlantEquipmentMovement;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+=GROUP(BMvaMei???Ove+BMvaMei???Hcv);Overboekingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentTransfers;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+=GROUP(BMvaMeiCae*+BMvaMeiCuh*);Som der afschrijvingen en waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentAccumulatedDepreciationImpairments;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+=GROUP(BMvaMeiCaeAfs+BMvaMeiCaeHca+BMvaMeiCaeOvm);Afschrijvingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentDepreciation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+=GROUP(BMvaNad*-BMvaNad???Beg);Mutatie van materiële vaste activa gedurende de periode;jenv-bw2-i_PropertyPlantEquipmentMovement;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+=GROUP(BMvaNadCae*+BMvaNadCuh*);Som der afschrijvingen en waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentAccumulatedDepreciationImpairments;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+=GROUP(BMvaObe*+BMvaBei*+BMvaTev*+BMvaHuu*+BMvaVli*+BMvaSch*+BMvaMep*+BMvaGeb*+BMvaOrz*);Andere vaste bedrijfsmiddelen;jenv-bw2-i_TangibleAssetsOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BMvaObe*+BMvaBei*+BMvaTev*+BMvaHuu*+BMvaVli*+BMvaSch*+BMvaMep*+BMvaGeb*+BMvaOrz*);Materiële vaste activa;jenv-bw2-i_PropertyPlantEquipment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObe*-BMvaObe???Beg+BMvaBei*-BMvaBei???Beg+BMvaTev*-BMvaTev???Beg+BMvaHuu*-BMvaHuu???Beg+BMvaVli*-BMvaVli???Beg+BMvaSch*-BMvaSch???Beg+BMvaMep*-BMvaMep???Beg+BMvaGeb*-BMvaGeb???Beg+BMvaOrz*-BMvaOrz???Beg);Mutatie van materiële vaste activa gedurende de periode;jenv-bw2-i_PropertyPlantEquipmentMovement;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObe???Ado+BMvaBei???Ado+BMvaTev???Ado+BMvaHuu???Ado+BMvaVli???Ado+BMvaSch???Ado+BMvaMep???Ado+BMvaGeb???Ado+BMvaOrz???Ado);Verwervingen van materiële vaste activa via fusies en overnames;rj-i_PropertyPlantEquipmentAdditionsThroughAcquisitions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObe???Dda+BMvaBei???Dda+BMvaTev???Dda+BMvaHuu???Dda+BMvaVli???Dda+BMvaSch???Dda+BMvaMep???Dda+BMvaGeb???Dda+BMvaOrz???Dda);Buitengebruikstellingen en afstotingen van materiële vaste activa;rj-i_PropertyPlantEquipmentDivestitures;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObe???Des+BMvaBei???Des+BMvaTev???Des+BMvaHuu???Des+BMvaVli???Des+BMvaSch???Des+BMvaMep???Des+BMvaGeb???Des+BMvaOrz???Des);Som van de boekwaarden der materiële vaste activa waarover de rechtspersoon aan het einde van het boekjaar niet meer beschikt;jenv-bw2-i_PropertyPlantEquipmentDisposals;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObe???Ina+BMvaBei???Ina+BMvaTev???Ina+BMvaHuu???Ina+BMvaVli???Ina+BMvaSch???Ina+BMvaMep???Ina+BMvaGeb???Ina+BMvaOrz???Ina);Som van de waarden waartegen de in het boekjaar verkregen materiële vaste activa zijn te boek gesteld;jenv-bw2-i_PropertyPlantEquipmentAdditions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObe???Omv+BMvaBei???Omv+BMvaTev???Omv+BMvaHuu???Omv+BMvaVli???Omv+BMvaSch???Omv+BMvaMep???Omv+BMvaGeb???Omv+BMvaOrz???Omv);Omrekeningsverschillen van materiële vaste activa;rj-i_PropertyPlantEquipmentExchangeDifferences;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObe???Ove+BMvaBei???Ove+BMvaTev???Ove+BMvaHuu???Ove+BMvaVli???Ove+BMvaSch???Ove+BMvaMep???Ove+BMvaGeb???Ove+BMvaOrz???Ove+BMvaOrz???Hcv);Overboekingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentTransfers;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObe???Ovm+BMvaBei???Ovm+BMvaTev???Ovm+BMvaHuu???Ovm+BMvaVli???Ovm+BMvaSch???Ovm+BMvaMep???Ovm+BMvaGeb???Ovm+BMvaOrz???Ovm);Overige mutaties van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentMovementsOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObeAkp*+BMvaBeiAkp*+BMvaTevAkp*+BMvaHuuAkp*+BMvaVliAkp*+BMvaSchAkp*+BMvaMepAkp*+BMvaGebAkp*+BMvaOrzAkp*);Actuele kostprijs van materiële vaste activa;rj-i_PropertyPlantEquipmentActualCostPrice;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObeCae*+BMvaBeiCae*+BMvaTevCae*+BMvaHuuCae*+BMvaVliCae*+BMvaSchCae*+BMvaMepCae*+BMvaGebCae*)+GROUP(BMvaObeCuh*+BMvaBeiCuh*+BMvaTevCuh*+BMvaHuuCuh*+BMvaVliCuh*+BMvaSchCuh*+BMvaMepCuh*+BMvaGebCuh*+BMvaOrzCuh*);Som der afschrijvingen en waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentAccumulatedDepreciationImpairments;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObeCaeAfs+BMvaObeCaeOvm+BMvaBeiCaeAfs+BMvaBeiCaeOvm+BMvaTevCaeAfs+BMvaTevCaeOvm+BMvaHuuCaeAfs+BMvaHuuCaeOvm+BMvaVliCaeAfs+BMvaSchCaeAfs+BMvaMepCaeAfs+BMvaGebCaeAfs+BMvaOrzCaeAfs+BMvaOrzCaeOvm);Afschrijvingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentDepreciation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObeCaeDca+BMvaBeiCaeDca+BMvaTevCaeDca+BMvaHuuCaeDca+BMvaVliCaeDca+BMvaSchCaeDca+BMvaMepCaeDca+BMvaGebCaeDca+BMvaOrzCaeDca);Afschrijving op desinvesteringen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentDisposalsDepreciation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObeCaeTvw+BMvaBeiCaeTvw+BMvaTevCaeTvw+BMvaHuuCaeTvw+BMvaVliCaeTvw+BMvaSchCaeTvw+BMvaMepCaeTvw+BMvaGebCaeTvw+BMvaOrzCaeTvw);Terugneming van waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentImpairmentReversal;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObeCaeWvr+BMvaBeiCaeWvr+BMvaTevCaeWvr+BMvaHuuCaeWvr+BMvaVliCaeWvr+BMvaSchCaeWvr+BMvaMepCaeWvr+BMvaGebCaeWvr+BMvaOrzCaeWvr);Waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentImpairment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObeCuh*+BMvaBeiCuh*+BMvaTevCuh*+BMvaHuuCuh*+BMvaVliCuh*+BMvaSchCuh*+BMvaMepCuh*+BMvaGebCuh*+BMvaOrzCuh*);Som der herwaarderingen die betrekking hebben op de materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentAccumulatedRevaluations;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaObeVvp*+BMvaBeiVvp*+BMvaTevVvp*+BMvaHuuVvp*+BMvaVliVvp*+BMvaSchVvp*+BMvaMepVvp*+BMvaGebVvp*+BMvaOrzVvp*);Historische kostprijs van materiële vaste activa;rj-i_PropertyPlantEquipmentCostPrice;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:TangibleAssetsOtherMember
+=GROUP(BMvaTer*+BMvaBeg*+BMvaVer*);Bedrijfsgebouwen en -terreinen;jenv-bw2-i_LandAndBuildings;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BMvaTer*+BMvaBeg*+BMvaVer*);Materiële vaste activa;jenv-bw2-i_PropertyPlantEquipment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTer*-BMvaTer???Beg+BMvaBeg*-BMvaBeg???Beg+BMvaVer*-BMvaVer???Beg);Mutatie van materiële vaste activa gedurende de periode;jenv-bw2-i_PropertyPlantEquipmentMovement;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTer???Ado+BMvaBeg???Ado+BMvaVer???Ado);Verwervingen van materiële vaste activa via fusies en overnames;rj-i_PropertyPlantEquipmentAdditionsThroughAcquisitions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTer???Dda+BMvaBeg???Dda+BMvaVer???Dda);Buitengebruikstellingen en afstotingen van materiële vaste activa;rj-i_PropertyPlantEquipmentDivestitures;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTer???Des+BMvaBeg???Des+BMvaVer???Des);Som van de boekwaarden der materiële vaste activa waarover de rechtspersoon aan het einde van het boekjaar niet meer beschikt;jenv-bw2-i_PropertyPlantEquipmentDisposals;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTer???Ina+BMvaBeg???Lie+BMvaVer???Ina);Som van de waarden waartegen de in het boekjaar verkregen materiële vaste activa zijn te boek gesteld;jenv-bw2-i_PropertyPlantEquipmentAdditions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTer???Omv+BMvaBeg???Omv+BMvaVer???Omv);Omrekeningsverschillen van materiële vaste activa;rj-i_PropertyPlantEquipmentExchangeDifferences;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTer???Ove+BMvaTer???Hcv+BMvaBeg???Ove+BMvaBeg???Hcv+BMvaVer???Ove+BMvaVer???Hcv);Overboekingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentTransfers;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTer???Ovm+BMvaBeg???Ovm+BMvaVer???Ovm);Overige mutaties van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentMovementsOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTerAkp*+MvaBegAkp*+BMvaVerAkp*);Actuele kostprijs van materiële vaste activa;rj-i_PropertyPlantEquipmentActualCostPrice;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTerCae*+BMvaBegCae*+BMvaVerCae*)+GROUP(BMvaTerCuh*+BMvaBegCuh*+BMvaVerCuh*);Som der afschrijvingen en waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentAccumulatedDepreciationImpairments;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTerCaeAfs+BMvaTerCaeHca+BMvaTerCaeOvm+BMvaBegCaeAfs+BMvaBegCaeHca+BMvaBegCaeOvm+BMvaVerCaeAfs+BMvaVerCaeHca+BMvaVerCaeOvm);Afschrijvingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentDepreciation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTerCaeDca+BMvaBegCaeDca+BMvaVerCaeDca);Afschrijving op desinvesteringen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentDisposalsDepreciation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTerCaeTvw+BMvaBegCaeTvw+BMvaVerCaeTvw);Terugneming van waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentImpairmentReversal;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTerCaeWvr+BMvaBegCaeWvr+BMvaVerCaeWvr);Waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentImpairment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTerCuh*+BMvaBegCuh*+BMvaVerCuh*);Som der herwaarderingen die betrekking hebben op de materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentAccumulatedRevaluations;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaTerVvp*+BMvaBegVvp*+BMvaVerVvp*);Historische kostprijs van materiële vaste activa;rj-i_PropertyPlantEquipmentCostPrice;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:LandAndBuildingsMember
+=GROUP(BMvaVbi*+BMvaVmv*);Materiële vaste bedrijfsactiva in uitvoering en vooruitbetalingen op materiële vaste activa;jenv-bw2-i_ConstructionInProgressPrepaymentsPropertyPlantEquipment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BMvaVbi*+BMvaVmv*);Materiële vaste activa;jenv-bw2-i_PropertyPlantEquipment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbi*-BMvaVbi???Beg+BMvaVmv*-BMvaVmv???Beg);Mutatie van materiële vaste activa gedurende de periode;jenv-bw2-i_PropertyPlantEquipmentMovement;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbi???Ado+BMvaVmv???Ado);Verwervingen van materiële vaste activa via fusies en overnames;rj-i_PropertyPlantEquipmentAdditionsThroughAcquisitions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbi???Dda+BMvaVmv???Dda);Buitengebruikstellingen en afstotingen van materiële vaste activa;rj-i_PropertyPlantEquipmentDivestitures;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbi???Des+BMvaVmv???Des);Som van de boekwaarden der materiële vaste activa waarover de rechtspersoon aan het einde van het boekjaar niet meer beschikt;jenv-bw2-i_PropertyPlantEquipmentDisposals;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbi???Ina+BMvaVmv???Ina);Som van de waarden waartegen de in het boekjaar verkregen materiële vaste activa zijn te boek gesteld;jenv-bw2-i_PropertyPlantEquipmentAdditions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbi???Omv+BMvaVmv???Omv);Omrekeningsverschillen van materiële vaste activa;rj-i_PropertyPlantEquipmentExchangeDifferences;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbi???Ove+BMvaVmv???Ove);Overboekingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentTransfers;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbi???Ovm+BMvaVmv???Ovm);Overige mutaties van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentMovementsOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbiAkp*+BMvaVmvAkp*);Actuele kostprijs van materiële vaste activa;rj-i_PropertyPlantEquipmentActualCostPrice;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbiCae*+BMvaVmvCae*)+GROUP(BMvaVbiCuh*+BMvaVmvCuh*);Som der afschrijvingen en waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentAccumulatedDepreciationImpairments;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbiCaeAfs+BMvaVmvCaeAfs);Afschrijvingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentDepreciation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbiCaeDca+BMvaVmvCaeDca);Afschrijving op desinvesteringen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentDisposalsDepreciation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbiCaeTvw+BMvaVmvCaeTvw);Terugneming van waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentImpairmentReversal;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbiCaeWvr+BMvaVmvCaeWvr);Waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentImpairment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbiCuh*+BMvaVmvCuh*);Som der herwaarderingen die betrekking hebben op de materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentAccumulatedRevaluations;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BMvaVbiVvp*+BMvaVmvVvp*);Historische kostprijs van materiële vaste activa;rj-i_PropertyPlantEquipmentCostPrice;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:ConstructionInProgressPrepaymentsPropertyPlantEquipmentMember
+=GROUP(BSchBep*-BSchBepVpb*);Kortlopende schulden ter zake van belastingen en premies van sociale verzekeringen;jenv-bw2-i_TaxesSocialSecurityContributionsPayableCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BSchKolAlk*+BSchKolClk*);Kortlopende converteerbare leningen;jenv-bw2-i_ConvertibleBorrowingsCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BSchKolAov*+BSchFlk*);Kortlopende financiële leaseverplichtingen;rj-i_FinanceLeaseLiabilitiesCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BSchOpa*+BSchTus*);Kortlopende overlopende passiva;jenv-bw2-i_AccrualsAndDeferredIncomeCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BSchOvs*+BSchSdn*+BSchSlc*+BSchSoh*+BSchKolDer*);Kortlopende overige schulden;jenv-bw2-i_PayablesOtherCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BSchSag*+BSchSap*);Kortlopende schulden aan deelnemingen waarin de rechtspersoon invloed van betekenis kan uitoefenen;rj-i_LiabilitiesCurrentToParticipatingInterestsExerciseSignificantInfluence;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BSchSal*-BSchSalTbv-BSchSalTvg);Schulden uit hoofde van personeelsbeloningen;rj-i_PayablesEmployeeBenefitsExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BSchShb*+BSchBepVpb*);Schulden uit hoofde van belasting naar de winst;rj-i_PayablesIncomeTaxCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BVasSvi*+BVasCvi*+BVasOzv*);Vastgoedbeleggingen in exploitatie;rj-cp-i_InvestmentPropertiesInExploitation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BVorOva*+BVorTus*);Overlopende activa;jenv-bw2-i_AccruedIncome;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BVorOvr*+BVorVlc*+BVorTsk*+BVorOvh*);Kortlopende overige vorderingen;jenv-bw2-i_ReceivablesOtherCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BVorVog*+BVorVop*+BVorVov*);Kortlopende vorderingen op andere rechtspersonen en vennootschappen die een deelneming hebben in de rechtspersoon of waarin de rechtspersoon een deelneming heeft;jenv-bw2-i_ReceivablesShareholdersParticipatingInterestsCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BVrd*+BPro*+BVor*+Beff*+BLim*);Vlottende activa;jenv-bw2-i_AssetsCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BVrdGeh*+BVrdHal*);Grond- en hulpstoffen;jenv-bw2-i_InventoryRawMaterialsConsumables;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BVrdGep*+BVrdHan*+BVrdEmb*+BVrdVas*+BVrdNig*+BVrdVoo*);Gereed product en handelsgoederen;jenv-bw2-i_InventoryFinishedTradeGoods;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(BVrzOvzOvz*+BVrzOvzOio*+BVrzOvzOiv*BVrzOvzLob*);Overige voorzieningen;jenv-bw2-i_ProvisionsOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WAfsAmv*+WAfsAfv*+WAfsDae*);Afschrijvingen op materiële vaste activa;jenv-bw2-i_DepreciationPropertyPlantEquipment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WAfsRvm*+WAfsBov*);Winsten of verliezen die ontstaan als gevolg van de buitengebruikstelling of afstoting van een materieel vast actief;rj-i_ResultSalePropertyPlantEquipment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WBedAlk*+WBedBno*+WBedLno*);Andere kosten;rj-i_UndefinedOtherExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WBedAut*+WBedTra*);Auto- en transportkosten;rj-i_CarAndTransportCosts;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WBedOrg*+WBedAss*+WBedAea*+WBedAdl*+WBedKof*+WBedKse*+WBedDvr*);Algemene kosten;rj-i_GeneralExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WBedOvp*+WBedWkr*);Overige personeelsgerelateerde kosten;rj-i_PersonnelRelatedOtherExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WFbe*+WOvt*+WWfa*);Financiële baten en lasten;rj-i_FinancialIncomeExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WFbeRls*+WFbeOrl*+WFbeKvb*+WFbeKba*+WFbeDer*+WFbeDfb*);Rentelasten en soortgelijke kosten;jenv-bw2-i_InterestExpensesRelatedExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WKpr*+WPer*+WAfs*+WWvi*+WBwv*+WBed*);Bedrijfskosten;jenv-bw2-i_OperatingExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WKpr*-WKprKuw*);Kosten van grond- en hulpstoffen;jenv-bw2-i_CostsRawMaterialsConsumables;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WOmz*+WKpr*+WWivWva*);Bruto-omzetresultaat;jenv-bw2-i_GrossOperatingResult;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WOmz*+WKpr*+WWivWva*)+GROUP(WVkf*+WAkf*);Netto-omzetresultaat;jenv-bw2-i_NetOperatingResult;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WOmz*+WWiv*+WKpr*+WOvb*)+GROUP(WVkf*+WAkf*+WPer*+WAfs*+WWvi*+WBwv*+WBed*);Bedrijfsresultaat;jenv-bw2-i_OperatingResult;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WOmz*+WWiv*+WKpr*+WOvb*)+GROUP(WVkf*+WAkf*+WPer*+WAfs*+WWvi*+WBwv*+WBed*)+WVhe*+GROUP(WFbe*+WOvt*+WWfa*)+WRed*;Totaal resultaat;frc-i_TotalResult;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WOmz*+WWiv*+WOvb*);Bedrijfsopbrengsten;jenv-bw2-i_OperatingIncome;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WOmzNoo*-WOmzNooOur-WOmzNooNdy-WOmzNooNdd-WOmzNooNdl);Opbrengsten uit overige bronnen;rj-i_RevenuesOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WOmzNop*+WOmzNoh*+WOmzAol*+WOmzAov*+WOmzOit*+WOmzKeb*+WOmzGrp*);Opbrengsten uit de verkoop van goederen;rj-i_RevenuesFromSaleOfGoods;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WPerLes*-WPerLesOnu-WPerLesLiv);Lonen;jenv-bw2-i_WagesSalaries;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WPerLesSld*+WPerLesBvc*);Bezoldiging van bestuurders en commissarissen;rj-i_RemunerationManagingSupervisoryDirectors;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WPerPen*-WPerPenAap);Pensioenpremies;rj-i_PensionPremiums;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WVkf*+WAkf*);Som der kosten;jenv-bw2-i_SumOfExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WWivWgp*+WWivWow*+WWivWav*+WWivMrv*);Wijziging in voorraden gereed product en onderhanden werk;jenv-bw2-i_ChangesInventoriesWorkInProgress;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+=GROUP(WWvi*-WWviWvb*);Waardeveranderingen van immateriële en materiële vaste activa;jenv-bw2-i_ChangesInValueIntangibleAssetsPropertyPlantEquipment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BEiv*;Eigen vermogen;jenv-bw2-i_Equity;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BEiv???Pro*;Privé opnamen natuurlijke personen;frc-i_PrivateIntakesNaturalPersons;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BEiv???Prs*;Privé stortingen natuurlijke personen;frc-i_PrivateDepositesNaturalPersons;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BFva*;Financiële vaste activa;jenv-bw2-i_FinancialAssets;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BFvaOve*;Langlopende overige effecten;jenv-bw2-i_SecuritiesOtherNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BIva*;Immateriële vaste activa;jenv-bw2-i_IntangibleAssets;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BIvaCev*;Kosten van verwerving ter zake van concessies, vergunningen en rechten van intellectuele eigendom;jenv-bw2-i_PatentsTrademarksOtherRights;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BIvaGoo*;Kosten van goodwill die van derden is verkregen;jenv-bw2-i_Goodwill;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BIvaKoo*;Kosten van ontwikkeling;jenv-bw2-i_DevelopmentCosts;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BIvaVoi*;Vooruitbetalingen op immateriële vaste activa;jenv-bw2-i_PrepaymentsIntangibleAssets;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLas*;Langlopende schulden;jenv-bw2-i_LiabilitiesNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLasAoe*;Langlopende obligatieleningen, pandbrieven en andere leningen;jenv-bw2-i_DebenturesOtherPrivateLoansNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLasBep*;Langlopende schulden ter zake van belastingen en premies van sociale verzekeringen;jenv-bw2-i_TaxesSocialSecurityContributionsPayableNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLasCol*;Langlopende converteerbare leningen;jenv-bw2-i_ConvertibleBorrowingsNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLasFlv*;Langlopende financiële leaseverplichtingen;rj-i_FinanceLeaseLiabilitiesNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLasNeg*;Negatieve goodwill;rj-i_NegativeGoodwill;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLasOdv*;Oudedagsverplichting;rj-i_OldAgeObligation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLasOvp*;Langlopende overlopende passiva;jenv-bw2-i_AccrualsAndDeferredIncomeNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLasSak*;Langlopende schulden aan banken;jenv-bw2-i_PayablesBanksNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLasSal*;Langlopende schulden aan leveranciers en handelskredieten;jenv-bw2-i_TradePayablesNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLasSap*;Langlopende schulden aan rechtspersonen en vennootschappen die een deelneming hebben in de rechtspersoon of waarin de rechtspersoon een deelneming heeft;jenv-bw2-i_PayablesShareholdersParticipatingInterestsNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLasStz*;Langlopende schulden ter zake van pensioenen;jenv-bw2-i_PensionPayablesNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLasTbw*;Langlopende te betalen wissels en cheques;jenv-bw2-i_BillsExchangeChequesPayableNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLasVob*;Langlopende ontvangen vooruitbetalingen op bestellingen voor zover niet reeds op actiefposten in mindering gebracht;jenv-bw2-i_AdvancesReceivedNoncurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BLim*;Liquide middelen;jenv-bw2-i_CashAndCashEquivalents;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BMva*;Materiële vaste activa;jenv-bw2-i_PropertyPlantEquipment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BMva*;Materiële vaste activa;jenv-bw2-i_PropertyPlantEquipment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+BMva??????Ado;Verwervingen van materiële vaste activa via fusies en overnames;rj-i_PropertyPlantEquipmentAdditionsThroughAcquisitions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+BMva??????Dda;Buitengebruikstellingen en afstotingen van materiële vaste activa;rj-i_PropertyPlantEquipmentDivestitures;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+BMva??????Omv;Omrekeningsverschillen van materiële vaste activa;rj-i_PropertyPlantEquipmentExchangeDifferences;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+BMva??????Ovm;Overige mutaties van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentMovementsOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+BMva???Akp*;Actuele kostprijs van materiële vaste activa;rj-i_PropertyPlantEquipmentActualCostPrice;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+BMva???CaeTvw;Terugneming van waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentImpairmentReversal;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+BMva???CaeWvr;Waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentImpairment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+BMva???Cuh*;Som der herwaarderingen die betrekking hebben op de materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentAccumulatedRevaluations;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+BMva???Vvp*;Historische kostprijs van materiële vaste activa;rj-i_PropertyPlantEquipmentCostPrice;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentMember
+BMvaMei*;Machines en installaties;jenv-bw2-i_Machinery;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BMvaMei*;Materiële vaste activa;jenv-bw2-i_PropertyPlantEquipment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+BMvaMei???Ado;Verwervingen van materiële vaste activa via fusies en overnames;rj-i_PropertyPlantEquipmentAdditionsThroughAcquisitions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+BMvaMei???Dda;Buitengebruikstellingen en afstotingen van materiële vaste activa;rj-i_PropertyPlantEquipmentDivestitures;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+BMvaMei???Des;Som van de boekwaarden der materiële vaste activa waarover de rechtspersoon aan het einde van het boekjaar niet meer beschikt;jenv-bw2-i_PropertyPlantEquipmentDisposals;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+BMvaMei???Ina;Som van de waarden waartegen de in het boekjaar verkregen materiële vaste activa zijn te boek gesteld;jenv-bw2-i_PropertyPlantEquipmentAdditions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+BMvaMei???Omv;Omrekeningsverschillen van materiële vaste activa;rj-i_PropertyPlantEquipmentExchangeDifferences;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+BMvaMei???Ovm;Overige mutaties van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentMovementsOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+BMvaMeiAkp*;Actuele kostprijs van materiële vaste activa;rj-i_PropertyPlantEquipmentActualCostPrice;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+BMvaMeiCaeDca;Afschrijving op desinvesteringen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentDisposalsDepreciation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+BMvaMeiCaeTvw;Terugneming van waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentImpairmentReversal;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+BMvaMeiCaeWvr;Waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentImpairment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+BMvaMeiCuh*;Som der herwaarderingen die betrekking hebben op de materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentAccumulatedRevaluations;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+BMvaMeiVvp*;Historische kostprijs van materiële vaste activa;rj-i_PropertyPlantEquipmentCostPrice;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:MachineryMember
+BMvaNad*;Niet aan het productieproces dienstbare materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentNotUsedInOperations;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BMvaNad*;Materiële vaste activa;jenv-bw2-i_PropertyPlantEquipment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BMvaNad???Ado;Verwervingen van materiële vaste activa via fusies en overnames;rj-i_PropertyPlantEquipmentAdditionsThroughAcquisitions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BMvaNad???Dda;Buitengebruikstellingen en afstotingen van materiële vaste activa;rj-i_PropertyPlantEquipmentDivestitures;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BMvaNad???Des;Som van de boekwaarden der materiële vaste activa waarover de rechtspersoon aan het einde van het boekjaar niet meer beschikt;jenv-bw2-i_PropertyPlantEquipmentDisposals;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BMvaNad???Ina;Som van de waarden waartegen de in het boekjaar verkregen materiële vaste activa zijn te boek gesteld;jenv-bw2-i_PropertyPlantEquipmentAdditions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BMvaNad???Omv;Omrekeningsverschillen van materiële vaste activa;rj-i_PropertyPlantEquipmentExchangeDifferences;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BMvaNad???Ove;Overboekingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentTransfers;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BMvaNad???Ovm;Overige mutaties van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentMovementsOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BMvaNadAkp*;Actuele kostprijs van materiële vaste activa;rj-i_PropertyPlantEquipmentActualCostPrice;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BMvaNadCaeAfs;Afschrijvingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentDepreciation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BMvaNadCaeDca;Afschrijving op desinvesteringen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentDisposalsDepreciation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BMvaNadCaeTvw;Terugneming van waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentImpairmentReversal;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BMvaNadCaeWvr;Waardeverminderingen van materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentImpairment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BMvaNadCuh*;Som der herwaarderingen die betrekking hebben op de materiële vaste activa;jenv-bw2-i_PropertyPlantEquipmentAccumulatedRevaluations;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BMvaNadVvp*;Historische kostprijs van materiële vaste activa;rj-i_PropertyPlantEquipmentCostPrice;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember;jenv-bw2-dm:PropertyPlantEquipmentNotUsedInOperationsMember
+BPro*;Onderhanden projecten (activa);rj-i_ConstructionContractsAssets;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BSch*;Kortlopende schulden;jenv-bw2-i_LiabilitiesCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BSchAos*;Aflossingsverplichtingen van langlopende leningen;jenv-bw2-i_RepaymentObligationsOfNoncurrentBorrowings;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BSchCre*;Kortlopende schulden aan leveranciers en handelskredieten;jenv-bw2-i_TradePayablesCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BSchKolAok*;Kortlopende obligatieleningen, pandbrieven en andere leningen;jenv-bw2-i_DebenturesOtherPrivateLoansCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BSchOpp*;Onderhanden projecten (passiva);rj-i_ConstructionContractsLiabilities;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BSchSak*;Kortlopende schulden aan banken;jenv-bw2-i_PayablesBanksCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BSchSalTbv;Schulden uit hoofde van vakantiedagen;rj-i_PayablesVacationDays;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BSchSap*;Kortlopende schulden aan rechtspersonen en vennootschappen die een deelneming hebben in de rechtspersoon of waarin de rechtspersoon een deelneming heeft;jenv-bw2-i_PayablesShareholdersParticipatingInterestsCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BSchStz*;Kortlopende schulden ter zake van pensioenen;jenv-bw2-i_PensionPayablesCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BSchTbw*;Kortlopende te betalen wissels en cheques;jenv-bw2-i_BillsExchangeChequesPayableCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BSchVob*;Kortlopende ontvangen vooruitbetalingen op bestellingen voor zover niet reeds op actiefposten in mindering gebracht;jenv-bw2-i_AdvancesReceivedCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVas*;Vastgoedbeleggingen;rj-i_InvestmentProperties;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVasVio*;Vastgoedbeleggingen in ontwikkeling;rj-i_InvestmentPropertiesInDevelopment;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVor*;Vorderingen;jenv-bw2-i_Receivables;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVorDeb*;Vorderingen op handelsdebiteuren;jenv-bw2-i_TradeReceivables;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVorVbk*;Belastingvorderingen;rj-i_TaxReceivables;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVorVpk*;Pensioenvordering;rj-i_PensionReceivables;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrd*;Voorraden;jenv-bw2-i_Inventories;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrdOwe*;Onderhanden werk;jenv-bw2-i_WorkInProgress;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrdVrv*;Vooruitbetalingen op voorraden;jenv-bw2-i_PrepaymentsInventories;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrz*;Voorzieningen;jenv-bw2-i_Provisions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrzOvzArb*;Voorziening voor verzekering van arbeidsongeschiktheidsrisico's;rj-i_ProvisionInsuranceDisabilityRisks;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrzOvzGar*;Garantievoorziening;rj-i_ProvisionWarranty;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrzOvzJub*;Voorziening voor jubileumuitkeringen;rj-i_ProvisionJubileeBenefits;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrzOvzVhe*;Voorziening voor herstelkosten;rj-i_ProvisionRepairCosts;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrzOvzVid*;Voorziening in verband met deelnemingen;rj-i_ProvisionParticipatingInterests;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrzOvzVir*;Voorziening in verband met reorganisaties;rj-i_ProvisionRestructuring;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrzOvzVlc*;Voorziening voor verlieslatende contracten;rj-i_ProvisionOnerousContracts;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrzOvzVuc*;Voorziening uit hoofde van claims, geschillen en rechtsgedingen;rj-i_ProvisionLegalProceedings;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrzOvzVvg*;Voorziening voor groot onderhoud;rj-i_ProvisionMajorMaintenance;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrzOvzVvo*;Voorziening voor opruiming van aanwezige milieuvervuiling;rj-i_ProvisionEnvironmental;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrzOvzVwp*;Voorziening voor verwijderingsverplichtingen;rj-i_ProvisionDisposalObligation;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrzVvbVvb*;Voorziening voor belastingverplichtingen;jenv-bw2-i_ProvisionTaxLiabilities;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+BVrzVvp*;Voorzieningen voor pensioenverplichtingen;jenv-bw2-i_ProvisionPensionObligations;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+Beff*;Kortlopende effecten;jenv-bw2-i_SecuritiesCurrent;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+EUR;Rapporteringsvaluta van het document;nl-cd_DocumentPresentationCurrency
+WAfs*;Afschrijvingen op immateriële en materiële vaste activa;jenv-bw2-i_DepreciationPropertyPlantEquipmentAmortisationIntangibleAssets;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WAfs*;Afschrijvingen op immateriële en materiële vaste activa;jenv-bw2-i_DepreciationPropertyPlantEquipmentAmortisationIntangibleAssetsBreakdown;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WAfsAiv*;Afschrijvingen op immateriële vaste activa;jenv-bw2-i_AmortisationIntangibleAssets;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WAfsRvi*;Winsten of verliezen die ontstaan als gevolg van de buitengebruikstelling of afstoting van een immaterieel vast actief;rj-i_ResultSaleIntangibleAssets;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WAkf*;Algemene beheerskosten;jenv-bw2-i_GeneralAdministrativeExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WBed*;Overige bedrijfskosten;jenv-bw2-i_OperatingExpensesOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WBed*;Overige bedrijfskosten;jenv-bw2-i_OperatingExpensesOtherBreakdown;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WBedEem*;Exploitatiekosten;rj-i_OperationalExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WBedHui*;Huisvestingskosten;rj-i_AccommodationCosts;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WBedKan*;Kantoorkosten;rj-i_OfficeRelatedExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WBedVkk*;Verkoop gerelateerde kosten;rj-i_SalesRelatedExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WBwvGwb*;Gerealiseerde waardeveranderingen van beleggingen;jenv-bw2-i_RealisedChangesInValueOfInvestments;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WBwvNwb*;Niet-gerealiseerde waardeveranderingen van beleggingen;jenv-bw2-i_UnrealisedChangesInValueOfInvestments;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WBwvObw*;Waardeverminderingen van vlottende activa;jenv-bw2-i_ImpairmentCurrentAssets;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WFbeAlp*;Aflossingspremies;rj-i_RedemptionPremiums;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WFbeBkf*;Bijkomende kosten ter afsluiting van een financiering;rj-i_AdditionalCostsFinancing;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WFbeKva*;Kosten bij vervroegde aflossing (eenmalig);rj-i_EarlyRedemptionCosts;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WFbeNhp*;Negatieve herwaarderingen van puttable financiële instrumenten;rj-i_NegativeRevaluationsOfPuttableFinancialInstruments;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WFbeNol*;Negatieve verschil tussen het ontvangen bedrag en de bij het aangaan van de lening als schuld erkende hoofdsom;rj-i_UnfavourableDifferenceReceivedAmountPrincipalAmount;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WFbeOnn*;Uitkeringen uit niet op netto-vermogenswaarde e.d. gewaardeerde deelnemingen;jenv-bw2-i_IncomeFromInvestmentsInParticipatingInterestsNotValuedAtNetAssetValue;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WFbePhp*;Positieve herwaarderingen van puttable financiële instrumenten;rj-i_PositiveRevaluationsOfPuttableFinancialInstruments;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WFbePol*;Positieve verschil tussen het ontvangen bedrag en de bij het aangaan van de lening als schuld erkende hoofdsom;rj-i_FavourableDifferenceReceivedAmountPrincipalAmount;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WFbeRfl*;Rentekosten begrepen in de leasetermijn in geval van financiële leasing;rj-i_InterestExpensesIncludedLeaseTermFinancialLeasing;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WFbeRlm*;Overige rentebaten en soortgelijke opbrengsten;jenv-bw2-i_InterestIncomeRelatedIncome;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WFbeVlr*;Valutaverschillen op leningen voor zover zij als een correctie van de verschuldigde rentekosten kunnen worden aangemerkt;rj-i_CurrencyDifferencesLoansConsideredAsCorrectionInterestChargesDue;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WFbeWis*;Valutakoersverschillen;rj-i_ForeignCurrencyExchangeRateResults;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WFbeWnn*;Waardeveranderingen van niet op netto-vermogenswaarde e.d. gewaardeerde deelnemingen;jenv-bw2-i_ChangesValueParticipatingInterestsNotValuedAtNetAssetValue;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WKpr*;Kostprijs van de omzet;jenv-bw2-i_CostOfSales;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WKprKuw*;Kosten uitbesteed werk en andere externe kosten;jenv-bw2-i_CostsOutsourcedWorkOtherExternalExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WOmz*;Netto-omzet;jenv-bw2-i_NetRevenue;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WOmzNod*;Opbrengsten uit het verlenen van diensten;rj-i_RevenuesFromProvidingServices;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WOmzNooNdd;Opbrengsten uit dividenden;rj-i_RevenuesFromDividends;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WOmzNooNdl;Opbrengsten uit licenties;rj-i_RevenuesFromLicenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WOmzNooNdy;Opbrengsten uit royalty's;rj-i_RevenuesFromRoyalties;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WOmzNooOur;Opbrengsten uit rente;rj-i_RevenuesFromInterest;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WOvb*;Overige bedrijfsopbrengsten;jenv-bw2-i_OperatingIncomeOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WOvt*;Opbrengsten van andere effecten en vorderingen, die tot de vaste activa behoren;jenv-bw2-i_IncomeReceivablesNoncurrentSecurities;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WPer*;Lasten uit hoofde van personeelsbeloningen;jenv-bw2-i_EmployeeBenefitsExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WPer*;Lasten uit hoofde van personeelsbeloningen;jenv-bw2-i_EmployeeBenefitsExpensesBreakdown;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WPerLesBvc*;Bezoldiging van commissarissen en gewezen commissarissen;jenv-bw2-i_RemunerationSupervisoryDirectorsFormerSupervisoryDirectors;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WPerLesLiv;Op aandelen gebaseerde betalingen opgenomen onder lonen en salarissen;rj-i_ShareBasedPaymentsIncludedWagesSalaries;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WPerLesOnu;Ontslagvergoedingen;rj-i_SeverancePayments;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WPerLesSld*;Bezoldiging van bestuurders en gewezen bestuurders;jenv-bw2-i_RemunerationManagingDirectorsFormerManagingDirectors;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WPerOlu*;Overige lasten uit hoofde van personeelsbeloningen;rj-i_EmployeeBenefitsExpensesOther;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WPerPen*;Pensioenlasten;jenv-bw2-i_PensionCosts;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WPerPenAap;Aanvullende pensioenlasten;rj-i_PensionExpensesAdditional;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WPerSol*;Sociale lasten;jenv-bw2-i_SocialSecurityContributions;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WRed*;Aandeel in resultaat van ondernemingen waarin wordt deelgenomen;jenv-bw2-i_ShareInResultsParticipatingInterests;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WVkf*;Verkoopkosten;jenv-bw2-i_SellingExpenses;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WWfa*;Wijzigingen in de waarde van financiële vaste activa en van de effecten die tot de vlottende activa behoren;jenv-bw2-i_ChangesValueFinancialAssetsSecurities;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WWivGpvGpe;Geactiveerde productie ten behoeve van het eigen bedrijf;jenv-bw2-i_CapitalisedProductionCosts;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WWivGpvPge;Privé gebruik eigen bedrijf;frc-i_PrivateUseOwnBusiness;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WWivWva*;Waardeveranderingen van agrarische voorraden;rj-i_ChangeValueAgriculturalStocks;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
+WWviWvb*;Wijziging in de reële waarde van vastgoedbeleggingen;rj-i_ChangesValueInvestmentProperties;jenv-bw2-dm:CommercialMember;jenv-bw2-dm:SeparateMember
