@@ -92,6 +92,7 @@ extension TaxonomyProbe {
         public let maxFilesToScan: Int
         public let maxHits: Int
         public let demoRGSBalances: [String: Decimal]
+        public let chartFile: String?
 
         public init(
             entrypoint: String = "https://www.nltaxonomie.nl/nt20/bd/20251210/entrypoints/bd-rpt-ihz-aangifte-2025.xsd",
@@ -108,6 +109,7 @@ extension TaxonomyProbe {
             ],
             maxFilesToScan: Int = 400,
             maxHits: Int = 80,
+            chartFile: String? = nil,
             demoRGSBalances: [String: Decimal] = [
                 "WOmzHan": 125000,
                 "WVooMut": -3500,
@@ -129,6 +131,7 @@ extension TaxonomyProbe {
             self.probePatterns = probePatterns
             self.maxFilesToScan = maxFilesToScan
             self.maxHits = maxHits
+            self.chartFile = chartFile
             self.demoRGSBalances = demoRGSBalances
         }
     }
@@ -154,8 +157,9 @@ extension TaxonomyProbe {
         case commandUnavailable(String)
         case mappingCSVNotFound(String)
         case unableToWriteTempFile
+        case missingChartFile
 
-        var description: String {
+        public var description: String {
             switch self {
             case .invalidURL(let value):
                 return "Invalid URL: \(value)"
@@ -179,6 +183,9 @@ extension TaxonomyProbe {
                 return "Could not find mapping CSV for entrypoint basename: \(value)"
             case .unableToWriteTempFile:
                 return "Unable to write temporary file"
+            case .missingChartFile:
+                return
+                    "inspectGenericMapping requires a compiled chart JSON via chartFile / --chart"
             }
         }
     }
@@ -381,14 +388,52 @@ extension TaxonomyProbe {
             print("resolved mappings total: \(allMappings.count)")
             print("")
 
+            guard let chartFile = config.chartFile else {
+                throw Error.missingChartFile
+            }
+
+            let chartURL = try TaxonomyProbe.urlFromStringOrPath(chartFile)
+            let chart = try TaxonomyProbe.loadCompiledChart(from: chartURL)
+            let accounts = try AccountStore(chart: chart)
+
+            let canonicalization = TaxonomyProbe.canonicalizeMappings(
+                allMappings,
+                accounts: accounts
+            )
+
+            let canonicalMappings = canonicalization.canonical
+            let unresolvedMappings = canonicalization.unresolved
+
+            print("canonical mappings: \(canonicalMappings.count)")
+            print("unresolved mapping identifiers: \(unresolvedMappings.count)")
+
+            if !unresolvedMappings.isEmpty {
+                let unresolvedIds = Array(
+                    Set(
+                        unresolvedMappings.map {
+                            TaxonomyProbe.normalizedMappingSourceIdentifier($0.sourceConcept)
+                        }
+                    )
+                ).sorted()
+
+                for value in unresolvedIds.prefix(80) {
+                    print("  unresolved: \(value)")
+                }
+
+                if unresolvedIds.count > 80 {
+                    print("  ... \(unresolvedIds.count - 80) more")
+                }
+            }
+            print("")
+
             let factsByKey = TaxonomyProbe.compileMappedFacts(
-                mappings: allMappings,
+                mappings: canonicalMappings,
                 rgsBalances: config.demoRGSBalances
             )
 
             let factsByConcept = TaxonomyProbe.projectMappedFactsToConceptFacts(factsByKey)
             let unmatchedCodes = TaxonomyProbe.unmatchedRGSCodes(
-                mappings: allMappings,
+                mappings: canonicalMappings,
                 rgsBalances: config.demoRGSBalances
             )
 

@@ -68,6 +68,18 @@ public struct ResolvedMapping: Sendable {
     public let order: Double?
 }
 
+public struct CanonicalResolvedMapping: Sendable {
+    public let sourceLocatorLabel: String
+    public let sourceHref: String
+    public let sourceConcept: String
+    public let sourceIdentifier: String
+    public let sourceCode: String
+    public let targetDatapointLabel: String
+    public let targetPrimaryQName: String
+    public let dimensions: [RGSExplicitDimension]
+    public let order: Double?
+}
+
 // additions:
 public struct DimensionBinding: Hashable, Sendable {
     public let qname: String
@@ -83,5 +95,5 @@ public struct ComputedMappedFact: Sendable {
     public let key: MappedFactKey
     public let amount: Decimal
     public let matchedCodes: [String]
-    public let contributingMappings: [ResolvedMapping]
+    public let contributingMappings: [CanonicalResolvedMapping]
 }

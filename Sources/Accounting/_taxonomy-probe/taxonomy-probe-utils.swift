@@ -253,6 +253,76 @@ extension TaxonomyProbe {
 }
 
 extension TaxonomyProbe {
+    public static func normalizedMappingSourceIdentifier(_ raw: String) -> String {
+        if raw.hasPrefix("rgs-i_") {
+            return String(raw.dropFirst("rgs-i_".count))
+        }
+
+        if raw.hasPrefix("rgs-k_") {
+            return String(raw.dropFirst("rgs-k_".count))
+        }
+
+        return raw
+    }
+
+    public static func loadCompiledChart(from url: URL) throws -> CompiledChart {
+        let data = try Data(contentsOf: url)
+        let decoded = try JSONDecoder().decode(CompiledChart.self, from: data)
+        return try decoded.ensuringIndex(enrichNodes: true, strict: false)
+    }
+
+    public static func canonicalizeMappings(
+        _ mappings: [ResolvedMapping],
+        accounts: AccountStore
+    ) -> (canonical: [CanonicalResolvedMapping], unresolved: [ResolvedMapping]) {
+        var canonical: [CanonicalResolvedMapping] = []
+        var unresolved: [ResolvedMapping] = []
+
+        canonical.reserveCapacity(mappings.count)
+
+        for mapping in mappings {
+            let identifier = normalizedMappingSourceIdentifier(mapping.sourceConcept)
+
+            if let node = accounts.byIdentifier[identifier] {
+                canonical.append(
+                    .init(
+                        sourceLocatorLabel: mapping.sourceLocatorLabel,
+                        sourceHref: mapping.sourceHref,
+                        sourceConcept: mapping.sourceConcept,
+                        sourceIdentifier: identifier,
+                        sourceCode: node.codes.code,
+                        targetDatapointLabel: mapping.targetDatapointLabel,
+                        targetPrimaryQName: mapping.targetPrimaryQName,
+                        dimensions: mapping.dimensions,
+                        order: mapping.order
+                    )
+                )
+                continue
+            }
+
+            if let node = accounts.byCode[identifier] {
+                canonical.append(
+                    .init(
+                        sourceLocatorLabel: mapping.sourceLocatorLabel,
+                        sourceHref: mapping.sourceHref,
+                        sourceConcept: mapping.sourceConcept,
+                        sourceIdentifier: identifier,
+                        sourceCode: node.codes.code,
+                        targetDatapointLabel: mapping.targetDatapointLabel,
+                        targetPrimaryQName: mapping.targetPrimaryQName,
+                        dimensions: mapping.dimensions,
+                        order: mapping.order
+                    )
+                )
+                continue
+            }
+
+            unresolved.append(mapping)
+        }
+
+        return (canonical, unresolved)
+    }
+
     public static func sortDimensions(
         _ dimensions: [DimensionBinding]
     ) -> [DimensionBinding] {
@@ -265,7 +335,7 @@ extension TaxonomyProbe {
         }
     }
 
-    public static func factKey(from mapping: ResolvedMapping) -> MappedFactKey {
+    public static func factKey(from mapping: CanonicalResolvedMapping) -> MappedFactKey {
         let dims = sortDimensions(
             mapping.dimensions.map {
                 DimensionBinding(
@@ -282,13 +352,13 @@ extension TaxonomyProbe {
     }
 
     public static func compileMappedFacts(
-        mappings: [ResolvedMapping],
+        mappings: [CanonicalResolvedMapping],
         rgsBalances: [String: Decimal]
     ) -> [MappedFactKey: ComputedMappedFact] {
-        var groupedMappings: [String: [ResolvedMapping]] = [:]
+        var groupedMappings: [String: [CanonicalResolvedMapping]] = [:]
 
         for mapping in mappings {
-            groupedMappings[mapping.sourceConcept, default: []].append(mapping)
+            groupedMappings[mapping.sourceCode, default: []].append(mapping)
         }
 
         var out: [MappedFactKey: ComputedMappedFact] = [:]
@@ -326,6 +396,18 @@ extension TaxonomyProbe {
         return out
     }
 
+    public static func unmatchedRGSCodes(
+        mappings: [CanonicalResolvedMapping],
+        rgsBalances: [String: Decimal]
+    ) -> [String] {
+        let mappedCodes = Set(mappings.map(\.sourceCode))
+
+        return rgsBalances.keys
+            .filter { (rgsBalances[$0] ?? 0) != 0 }
+            .filter { !mappedCodes.contains($0) }
+            .sorted()
+    }
+
     public static func projectMappedFactsToConceptFacts(
         _ factsByKey: [MappedFactKey: ComputedMappedFact]
     ) -> [String: ComputedFact] {
@@ -353,17 +435,5 @@ extension TaxonomyProbe {
         }
 
         return out
-    }
-
-    public static func unmatchedRGSCodes(
-        mappings: [ResolvedMapping],
-        rgsBalances: [String: Decimal]
-    ) -> [String] {
-        let mappedCodes = Set(mappings.map(\.sourceConcept))
-
-        return rgsBalances.keys
-            .filter { (rgsBalances[$0] ?? 0) != 0 }
-            .filter { !mappedCodes.contains($0) }
-            .sorted()
     }
 }
