@@ -155,4 +155,72 @@ extension TaxonomyProbe {
             print("  ... \(sorted.count - limit) more")
         }
     }
+
+    public static func renderCanonicalMappings(
+        mappings: [CanonicalResolvedMapping],
+        prefix: String,
+        limit: Int = 200
+    ) {
+        let filtered = mappings
+            .filter { $0.sourceCode.hasPrefix(prefix) }
+            .sorted { lhs, rhs in
+                if lhs.sourceCode == rhs.sourceCode {
+                    if lhs.targetPrimaryQName == rhs.targetPrimaryQName {
+                        let lhsDims = lhs.dimensions
+                            .map { dim in
+                                if let member = dim.member, !member.isEmpty {
+                                    return "\(dim.qname)=\(member)"
+                                } else {
+                                    return dim.qname
+                                }
+                            }
+                            .sorted()
+                            .joined(separator: "|")
+
+                        let rhsDims = rhs.dimensions
+                            .map { dim in
+                                if let member = dim.member, !member.isEmpty {
+                                    return "\(dim.qname)=\(member)"
+                                } else {
+                                    return dim.qname
+                                }
+                            }
+                            .sorted()
+                            .joined(separator: "|")
+
+                        return lhsDims < rhsDims
+                    }
+
+                    return lhs.targetPrimaryQName < rhs.targetPrimaryQName
+                }
+
+                return lhs.sourceCode < rhs.sourceCode
+            }
+
+        print("canonical mappings with prefix \(prefix): \(filtered.count)")
+
+        for mapping in filtered.prefix(limit) {
+            let dims = mapping.dimensions
+                .map { dim in
+                    if let member = dim.member, !member.isEmpty {
+                        return "\(dim.qname)=\(member)"
+                    } else {
+                        return dim.qname
+                    }
+                }
+                .sorted()
+
+            if dims.isEmpty {
+                print("  \(mapping.sourceCode) -> \(mapping.targetPrimaryQName)")
+            } else {
+                print("  \(mapping.sourceCode) -> \(mapping.targetPrimaryQName) [\(dims.joined(separator: ", "))]")
+            }
+        }
+
+        if filtered.count > limit {
+            print("  ... \(filtered.count - limit) more")
+        }
+
+        print("")
+    }
 }

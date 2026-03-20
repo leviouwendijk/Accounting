@@ -84,32 +84,28 @@ extension TaxonomyProbe {
 
     public struct Config: Sendable {
         public let entrypoint: String
-        public let wantedPresentation: String
+        public let wantedPresentations: [String]
         public let mappingZIP: String
         public let mode: Mode
         public let probeKeywords: [String]
         public let probePatterns: [String]
         public let maxFilesToScan: Int
         public let maxHits: Int
-        public let demoRGSBalances: [String: Decimal]
-
         public let chartFile: String?
         public let balanceInput: BalanceInputMode
         public let projectRoot: String?
+        public let demoRGSBalances: [String: Decimal]
 
         public init(
             entrypoint: String = "https://www.nltaxonomie.nl/nt20/bd/20251210/entrypoints/bd-rpt-ihz-aangifte-2025.xsd",
-            wantedPresentation: String = "winst-resultatenrekening-pre.xml",
+            wantedPresentations: [String] = [
+                "winst-resultatenrekening-pre.xml",
+                "winst-activa-pre.xml",
+                "winst-passiva-pre.xml",
+                "winst-berekening-pre.xml"
+            ],
             mappingZIP: String = "https://www.referentiegrootboekschema.nl/sites/default/files/kennisbank/NT20_RGS_20251210.zip",
             mode: Mode = .probePackage,
-            // probeKeywords: [String] = ["bd", "ihz", "aangifte", "rgs", "mapping", "connect"],
-            // probePatterns: [String] = [
-            //     "bd-rpt-ihz-aangifte-2025",
-            //     "bd-ihz-aangifte",
-            //     "bd-i_turnovernetfiscal",
-            //     "bd-i_",
-            //     "rgs"
-            // ],
             probeKeywords: [String] = [
                 "bd",
                 "ihz",
@@ -139,24 +135,8 @@ extension TaxonomyProbe {
                 "table/",
                 "dictionary/",
                 "linkbaseRef",
-                "roleRef",
-                "arcroleRef",
-                "presentationLink",
-                "definitionLink",
-                "tableLink",
-                "labelLink",
-                "datapoint",
-                "explicitDimension",
-                "primary",
-                "xlink:role",
-                "xlink:arcrole",
                 "rgs-i_",
-                "rgs-k_",
-                "bd-i_",
-                "bd-t_",
-                "bd-abstr_",
-                "bd-dim-dim:",
-                "bd-dim-mem:"
+                "bd-i_"
             ],
             maxFilesToScan: Int = 400,
             maxHits: Int = 80,
@@ -177,7 +157,7 @@ extension TaxonomyProbe {
             ]
         ) {
             self.entrypoint = entrypoint
-            self.wantedPresentation = wantedPresentation
+            self.wantedPresentations = wantedPresentations
             self.mappingZIP = mappingZIP
             self.mode = mode
             self.probeKeywords = probeKeywords
@@ -196,7 +176,7 @@ extension TaxonomyProbe {
         public let entrypointBasename: String
         public let refs: EntrypointRefs
 
-        public let selectedPresentationURL: URL
+        public let selectedPresentationURLs: [URL]
         public let selectedLinks: [PresentationLink]
 
         public let allPresentationLinksByURL: [String: [PresentationLink]]
@@ -268,7 +248,10 @@ extension TaxonomyProbe {
             print("  table refs: \(bootstrap.refs.tables.count)")
             print("  other refs: \(bootstrap.refs.other.count)")
             print("")
-            print("selected presentation: \(bootstrap.selectedPresentationURL.absoluteString)")
+            print("selected presentations: \(bootstrap.selectedPresentationURLs.count)")
+            for url in bootstrap.selectedPresentationURLs {
+                print("  \(url.absoluteString)")
+            }
             print("")
             print("presentationLink count: \(bootstrap.selectedLinks.count)")
             print("")
@@ -321,27 +304,31 @@ extension TaxonomyProbe {
             let entrypointParser = EntrypointParser()
             let refs = try entrypointParser.parse(data: entrypointData)
 
-            guard let chosenPresentationRef = refs.presentation.first(where: { $0.href.contains(config.wantedPresentation) }) else {
-                throw Error.missingPresentation(config.wantedPresentation)
-            }
-
-            let selectedPresentationURL = try TaxonomyProbe.resolveURL(
-                chosenPresentationRef.href,
-                relativeTo: entrypointURL
-            )
-
             let presentationParser = PresentationParser()
 
-            let selectedPresentationData = try TaxonomyProbe.fetchData(from: selectedPresentationURL)
-            let selectedLinks = try presentationParser.parse(data: selectedPresentationData)
-
+            var selectedPresentationURLs: [URL] = []
+            var selectedLinks: [PresentationLink] = []
             var allPresentationLinksByURL: [String: [PresentationLink]] = [:]
 
             for ref in refs.presentation {
                 let url = try TaxonomyProbe.resolveURL(ref.href, relativeTo: entrypointURL)
                 let data = try TaxonomyProbe.fetchData(from: url)
                 let links = try presentationParser.parse(data: data)
+
                 allPresentationLinksByURL[url.absoluteString] = links
+
+                let isSelected = config.wantedPresentations.contains { wanted in
+                    ref.href.contains(wanted) || url.lastPathComponent == wanted
+                }
+
+                if isSelected {
+                    selectedPresentationURLs.append(url)
+                    selectedLinks.append(contentsOf: links)
+                }
+            }
+
+            guard !selectedPresentationURLs.isEmpty else {
+                throw Error.missingPresentation(config.wantedPresentations.joined(separator: ", "))
             }
 
             let dictionaryLabelURLs: [URL] = [
@@ -369,7 +356,7 @@ extension TaxonomyProbe {
                 entrypointURL: entrypointURL,
                 entrypointBasename: entrypointBasename,
                 refs: refs,
-                selectedPresentationURL: selectedPresentationURL,
+                selectedPresentationURLs: selectedPresentationURLs,
                 selectedLinks: selectedLinks,
                 allPresentationLinksByURL: allPresentationLinksByURL,
                 labelsByConcept: labelsByConcept
@@ -698,6 +685,18 @@ extension TaxonomyProbe {
                 TaxonomyProbe.renderMappingSuggestions(
                     unmatchedCodes: unmatchedCodes,
                     mappings: canonicalMappings
+                )
+            }
+
+            if !unmatchedCodes.isEmpty {
+                TaxonomyProbe.renderCanonicalMappings(
+                    mappings: canonicalMappings,
+                    prefix: "WBedKan"
+                )
+
+                TaxonomyProbe.renderCanonicalMappings(
+                    mappings: canonicalMappings,
+                    prefix: "WBedOvpW"
                 )
             }
 
