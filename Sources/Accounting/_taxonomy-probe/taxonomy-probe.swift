@@ -94,7 +94,7 @@ extension TaxonomyProbe {
         public let demoRGSBalances: [String: Decimal]
 
         public init(
-            source: TaxonomySourceData = TaxonomySourceProfile.bdIhz2025.data,
+            source: TaxonomySourceData = TaxonomySourceProfile.bd_ihz_2025.data,
             mode: Mode = .probePackage,
             maxFilesToScan: Int = 400,
             maxHits: Int = 80,

@@ -66,12 +66,12 @@ public struct TaxonomySourceData: Sendable {
 }
 
 public enum TaxonomySourceProfile: String, CaseIterable, Sendable {
-    case bdIhz2025
-    case bdVpb2025
+    case bd_ihz_2025
+    case bd_vpb_2025
 
     public var data: TaxonomySourceData {
         switch self {
-        case .bdIhz2025:
+        case .bd_ihz_2025:
             return .init(
                 name: "Belastingdienst IHZ 2025",
                 entrypoint: "https://www.nltaxonomie.nl/nt20/bd/20251210/entrypoints/bd-rpt-ihz-aangifte-2025.xsd",
@@ -136,7 +136,7 @@ public enum TaxonomySourceProfile: String, CaseIterable, Sendable {
                 ]
             )
 
-        case .bdVpb2025:
+        case .bd_vpb_2025:
             return .init(
                 name: "Belastingdienst VPB 2025",
                 entrypoint: "https://www.nltaxonomie.nl/nt20/bd/20251210/entrypoints/bd-rpt-vpb-aangifte-2025.xsd",
