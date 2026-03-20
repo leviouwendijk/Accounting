@@ -440,6 +440,33 @@ extension TaxonomyProbe {
 
         return out
     }
+
+    public static func groupMappedFactsByConceptKeepingDimensions(
+        _ factsByKey: [MappedFactKey: ComputedMappedFact]
+    ) -> [String: [ComputedMappedFact]] {
+        var out: [String: [ComputedMappedFact]] = [:]
+
+        for fact in factsByKey.values {
+            let concept = normalizedTaxonomyConceptKey(fact.key.concept)
+            out[concept, default: []].append(fact)
+        }
+
+        for concept in out.keys {
+            out[concept] = out[concept]?.sorted { lhs, rhs in
+                let lhsDims = sortDimensions(lhs.key.dimensions)
+                    .map { "\($0.qname)=\($0.member ?? "")" }
+                    .joined(separator: "|")
+
+                let rhsDims = sortDimensions(rhs.key.dimensions)
+                    .map { "\($0.qname)=\($0.member ?? "")" }
+                    .joined(separator: "|")
+
+                return lhsDims < rhsDims
+            }
+        }
+
+        return out
+    }
 }
 
 extension TaxonomyProbe {

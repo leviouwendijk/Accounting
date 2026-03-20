@@ -224,3 +224,145 @@ extension TaxonomyProbe {
         print("")
     }
 }
+
+extension TaxonomyProbe {
+    public static func summarizedPresentationDimensions(
+        _ dimensions: [DimensionBinding]
+    ) -> String {
+        let parts = sortDimensions(dimensions).compactMap { dimension -> String? in
+            switch dimension.qname {
+            case "bd-dim-dim:CompanySerialNumberDimension":
+                return nil
+
+            case "bd-dim-dim:PartyDimension":
+                switch dimension.member {
+                case "bd-dim-mem:Company":
+                    return nil
+                case "bd-dim-mem:Declarant":
+                    return "declarant"
+                case let member?:
+                    return "party=\(member)"
+                case nil:
+                    return "party"
+                }
+
+            case "bd-dim-dim:TimeDimension":
+                switch dimension.member {
+                case "bd-dim-mem:Begin":
+                    return "begin"
+                case "bd-dim-mem:End":
+                    return "end"
+                case let member?:
+                    return "time=\(member)"
+                case nil:
+                    return "time"
+                }
+
+            default:
+                if let member = dimension.member, !member.isEmpty {
+                    return "\(dimension.qname)=\(member)"
+                } else {
+                    return dimension.qname
+                }
+            }
+        }
+
+        return parts.joined(separator: ", ")
+    }
+
+    public static func renderPresentationLink(
+        _ link: PresentationLink,
+        labelsByConcept: [String: String],
+        factsByConcept: [String: [ComputedMappedFact]]
+    ) {
+        var childrenByFrom: [String: [(Double, String)]] = [:]
+        var allFrom: Set<String> = []
+        var allTo: Set<String> = []
+
+        for arc in link.arcs {
+            childrenByFrom[arc.from, default: []].append((arc.order, arc.to))
+            allFrom.insert(arc.from)
+            allTo.insert(arc.to)
+        }
+
+        let rootLabels = allFrom.subtracting(allTo).sorted()
+
+        func printFactVariants(
+            _ facts: [ComputedMappedFact],
+            prefix: String
+        ) {
+            for fact in facts {
+                let dims = summarizedPresentationDimensions(fact.key.dimensions)
+                let matched = Array(Set(fact.matchedCodes)).sorted()
+
+                if dims.isEmpty {
+                    print("\(prefix)  = \(decimalString(fact.amount))")
+                } else {
+                    print("\(prefix)  [\(dims)] = \(decimalString(fact.amount))")
+                }
+
+                if !matched.isEmpty {
+                    print("\(prefix)    matched: \(matched.joined(separator: ", "))")
+                }
+            }
+        }
+
+        func printNode(_ locatorLabel: String, indent: Int, seen: inout Set<String>) {
+            guard let href = link.locs[locatorLabel] else {
+                return
+            }
+
+            let concept = TaxonomyProbe.normalizedTaxonomyConceptKey(
+                conceptName(from: href)
+            )
+            let label = labelsByConcept[concept]
+            let prefix = String(repeating: " ", count: indent)
+
+            if let facts = factsByConcept[concept], !facts.isEmpty {
+                if let label {
+                    print("\(prefix)- \(concept) — \(label)")
+                } else {
+                    print("\(prefix)- \(concept)")
+                }
+
+                printFactVariants(facts, prefix: prefix)
+            } else {
+                if let label {
+                    print("\(prefix)- \(concept) — \(label)")
+                } else {
+                    print("\(prefix)- \(concept)")
+                }
+            }
+
+            if seen.contains(locatorLabel) {
+                print("\(prefix)  [cycle detected]")
+                return
+            }
+
+            seen.insert(locatorLabel)
+
+            let children = (childrenByFrom[locatorLabel] ?? [])
+                .sorted { lhs, rhs in
+                    if lhs.0 == rhs.0 {
+                        return lhs.1 < rhs.1
+                    }
+                    return lhs.0 < rhs.0
+                }
+                .map(\.1)
+
+            for child in children {
+                printNode(child, indent: indent + 4, seen: &seen)
+            }
+
+            seen.remove(locatorLabel)
+        }
+
+        print("role: \(link.role)")
+        print("roots: \(rootLabels.count)")
+
+        for root in rootLabels {
+            var seen: Set<String> = []
+            printNode(root, indent: 0, seen: &seen)
+        }
+    }
+}

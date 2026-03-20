@@ -591,7 +591,7 @@ extension TaxonomyProbe {
                 rgsBalances: inputBalances
             )
 
-            let factsByConcept = TaxonomyProbe.projectMappedFactsToConceptFacts(factsByKey)
+            let factsByConcept = TaxonomyProbe.groupMappedFactsByConceptKeepingDimensions(factsByKey)
             let unmatchedCodes = TaxonomyProbe.unmatchedRGSCodes(
                 mappings: canonicalMappings,
                 rgsBalances: inputBalances
