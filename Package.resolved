@@ -1,5 +1,5 @@
 {
-  "originHash" : "7bcb577d119269bc4c7fe8128cb3456e2cc42f2c9c01094439225be43e499e44",
+  "originHash" : "ca40e0e78ca5bf70b5abaecfab304a76cc77dd628603dd873589d189da645d95",
   "pins" : [
     {
       "identity" : "css",
@@ -16,7 +16,7 @@
       "location" : "https://github.com/leviouwendijk/HTML.git",
       "state" : {
         "branch" : "master",
-        "revision" : "ae845dd14fb416b8c7e13cfcd2d92b082fdf815f"
+        "revision" : "2119ab8974d78ebeb9c4d809b0f397e2fa40bedb"
       }
     },
     {
