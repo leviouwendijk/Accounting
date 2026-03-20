@@ -426,6 +426,17 @@ extension TaxonomyProbe {
             }
             print("")
 
+            TaxonomyProbe.renderDemoBalanceCoverage(
+                mappings: canonicalMappings,
+                rgsBalances: config.demoRGSBalances
+            )
+
+            TaxonomyProbe.renderCanonicalSourceCodes(
+                mappings: canonicalMappings,
+                prefix: "W",
+                limit: 300
+            )
+
             let factsByKey = TaxonomyProbe.compileMappedFacts(
                 mappings: canonicalMappings,
                 rgsBalances: config.demoRGSBalances

@@ -437,3 +437,83 @@ extension TaxonomyProbe {
         return out
     }
 }
+
+extension TaxonomyProbe {
+    public static func mappingHitCountsByCode(
+        mappings: [CanonicalResolvedMapping]
+    ) -> [String: Int] {
+        var out: [String: Int] = [:]
+
+        for mapping in mappings {
+            out[mapping.sourceCode, default: 0] += 1
+        }
+
+        return out
+    }
+
+    public static func renderDemoBalanceCoverage(
+        mappings: [CanonicalResolvedMapping],
+        rgsBalances: [String: Decimal],
+        limitPerCode: Int = 12
+    ) {
+        let grouped = Dictionary(grouping: mappings, by: \.sourceCode)
+
+        print("demo balance coverage:")
+
+        for code in rgsBalances.keys.sorted() {
+            let amount = rgsBalances[code] ?? 0
+            let hits = grouped[code] ?? []
+
+            print("  \(code) = \(decimalString(amount)) -> mappings: \(hits.count)")
+
+            for mapping in hits.prefix(limitPerCode) {
+                let dims = mapping.dimensions.map {
+                    if let member = $0.member, !member.isEmpty {
+                        return "\($0.qname)=\(member)"
+                    } else {
+                        return $0.qname
+                    }
+                }
+
+                if dims.isEmpty {
+                    print("    \(mapping.targetPrimaryQName)")
+                } else {
+                    print("    \(mapping.targetPrimaryQName) [\(dims.joined(separator: ", "))]")
+                }
+            }
+
+            if hits.count > limitPerCode {
+                print("    ... \(hits.count - limitPerCode) more")
+            }
+        }
+
+        print("")
+    }
+
+    public static func renderCanonicalSourceCodes(
+        mappings: [CanonicalResolvedMapping],
+        prefix: String? = nil,
+        limit: Int = 200
+    ) {
+        let codes = Array(Set(mappings.map(\.sourceCode))).sorted()
+
+        let filtered: [String]
+        if let prefix, !prefix.isEmpty {
+            filtered = codes.filter { $0.hasPrefix(prefix) }
+        } else {
+            filtered = codes
+        }
+
+        print("canonical source codes: \(filtered.count)")
+
+        for code in filtered.prefix(limit) {
+            print("  \(code)")
+        }
+
+        if filtered.count > limit {
+            print("  ... \(filtered.count - limit) more")
+        }
+
+        print("")
+    }
+}
