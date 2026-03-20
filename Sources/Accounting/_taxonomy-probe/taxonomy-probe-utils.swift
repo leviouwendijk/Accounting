@@ -251,3 +251,119 @@ extension TaxonomyProbe {
         throw Error.commandUnavailable("Could not find an executable unzip binary")
     }
 }
+
+extension TaxonomyProbe {
+    public static func sortDimensions(
+        _ dimensions: [DimensionBinding]
+    ) -> [DimensionBinding] {
+        dimensions.sorted { lhs, rhs in
+            if lhs.qname == rhs.qname {
+                return (lhs.member ?? "") < (rhs.member ?? "")
+            }
+
+            return lhs.qname < rhs.qname
+        }
+    }
+
+    public static func factKey(from mapping: ResolvedMapping) -> MappedFactKey {
+        let dims = sortDimensions(
+            mapping.dimensions.map {
+                DimensionBinding(
+                    qname: $0.qname,
+                    member: $0.member
+                )
+            }
+        )
+
+        return .init(
+            concept: mapping.targetPrimaryQName,
+            dimensions: dims
+        )
+    }
+
+    public static func compileMappedFacts(
+        mappings: [ResolvedMapping],
+        rgsBalances: [String: Decimal]
+    ) -> [MappedFactKey: ComputedMappedFact] {
+        var groupedMappings: [String: [ResolvedMapping]] = [:]
+
+        for mapping in mappings {
+            groupedMappings[mapping.sourceConcept, default: []].append(mapping)
+        }
+
+        var out: [MappedFactKey: ComputedMappedFact] = [:]
+
+        for (rgsCode, amount) in rgsBalances {
+            guard amount != 0 else {
+                continue
+            }
+
+            guard let matches = groupedMappings[rgsCode] else {
+                continue
+            }
+
+            for mapping in matches {
+                let key = factKey(from: mapping)
+
+                if let existing = out[key] {
+                    out[key] = .init(
+                        key: key,
+                        amount: existing.amount + amount,
+                        matchedCodes: existing.matchedCodes + [rgsCode],
+                        contributingMappings: existing.contributingMappings + [mapping]
+                    )
+                } else {
+                    out[key] = .init(
+                        key: key,
+                        amount: amount,
+                        matchedCodes: [rgsCode],
+                        contributingMappings: [mapping]
+                    )
+                }
+            }
+        }
+
+        return out
+    }
+
+    public static func projectMappedFactsToConceptFacts(
+        _ factsByKey: [MappedFactKey: ComputedMappedFact]
+    ) -> [String: ComputedFact] {
+        var out: [String: ComputedFact] = [:]
+
+        for fact in factsByKey.values {
+            let concept = fact.key.concept
+            let uniqueMatched = Array(Set(fact.matchedCodes)).sorted()
+
+            if let existing = out[concept] {
+                out[concept] = .init(
+                    concept: concept,
+                    amount: existing.amount + fact.amount,
+                    matchedCodes: Array(Set(existing.matchedCodes + uniqueMatched)).sorted(),
+                    mappingLabel: "projected-from-generic-mapping"
+                )
+            } else {
+                out[concept] = .init(
+                    concept: concept,
+                    amount: fact.amount,
+                    matchedCodes: uniqueMatched,
+                    mappingLabel: "projected-from-generic-mapping"
+                )
+            }
+        }
+
+        return out
+    }
+
+    public static func unmatchedRGSCodes(
+        mappings: [ResolvedMapping],
+        rgsBalances: [String: Decimal]
+    ) -> [String] {
+        let mappedCodes = Set(mappings.map(\.sourceConcept))
+
+        return rgsBalances.keys
+            .filter { (rgsBalances[$0] ?? 0) != 0 }
+            .filter { !mappedCodes.contains($0) }
+            .sorted()
+    }
+}

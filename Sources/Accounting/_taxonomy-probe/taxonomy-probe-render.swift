@@ -104,3 +104,53 @@ extension TaxonomyProbe {
         }
     }
 }
+
+extension TaxonomyProbe {
+    public static func renderComputedMappedFacts(
+        _ factsByKey: [MappedFactKey: ComputedMappedFact],
+        limit: Int = 120
+    ) {
+        let sorted = factsByKey.values.sorted { lhs, rhs in
+            if lhs.key.concept == rhs.key.concept {
+                let lhsDims = sortDimensions(lhs.key.dimensions)
+                    .map { "\($0.qname)=\($0.member ?? "")" }
+                    .joined(separator: "|")
+
+                let rhsDims = sortDimensions(rhs.key.dimensions)
+                    .map { "\($0.qname)=\($0.member ?? "")" }
+                    .joined(separator: "|")
+
+                return lhsDims < rhsDims
+            }
+
+            return lhs.key.concept < rhs.key.concept
+        }
+
+        print("computed mapped facts: \(sorted.count)")
+
+        for fact in sorted.prefix(limit) {
+            let dims = sortDimensions(fact.key.dimensions).map { dimension in
+                if let member = dimension.member, !member.isEmpty {
+                    return "\(dimension.qname)=\(member)"
+                } else {
+                    return dimension.qname
+                }
+            }
+
+            if dims.isEmpty {
+                print("  \(fact.key.concept) = \(decimalString(fact.amount))")
+            } else {
+                print("  \(fact.key.concept) [\(dims.joined(separator: ", "))] = \(decimalString(fact.amount))")
+            }
+
+            let matched = Array(Set(fact.matchedCodes)).sorted()
+            if !matched.isEmpty {
+                print("    matched: \(matched.joined(separator: ", "))")
+            }
+        }
+
+        if sorted.count > limit {
+            print("  ... \(sorted.count - limit) more")
+        }
+    }
+}

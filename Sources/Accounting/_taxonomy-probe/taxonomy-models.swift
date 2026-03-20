@@ -67,3 +67,21 @@ public struct ResolvedMapping: Sendable {
     public let dimensions: [RGSExplicitDimension]
     public let order: Double?
 }
+
+// additions:
+public struct DimensionBinding: Hashable, Sendable {
+    public let qname: String
+    public let member: String?
+}
+
+public struct MappedFactKey: Hashable, Sendable {
+    public let concept: String
+    public let dimensions: [DimensionBinding]
+}
+
+public struct ComputedMappedFact: Sendable {
+    public let key: MappedFactKey
+    public let amount: Decimal
+    public let matchedCodes: [String]
+    public let contributingMappings: [ResolvedMapping]
+}

@@ -377,7 +377,51 @@ extension TaxonomyProbe {
                 allMappings.append(contentsOf: mappings)
             }
 
-            TaxonomyProbe.renderResolvedMappings(allMappings, limit: 120)
+            // TaxonomyProbe.renderResolvedMappings(allMappings, limit: 120)
+            print("resolved mappings total: \(allMappings.count)")
+            print("")
+
+            let factsByKey = TaxonomyProbe.compileMappedFacts(
+                mappings: allMappings,
+                rgsBalances: config.demoRGSBalances
+            )
+
+            let factsByConcept = TaxonomyProbe.projectMappedFactsToConceptFacts(factsByKey)
+            let unmatchedCodes = TaxonomyProbe.unmatchedRGSCodes(
+                mappings: allMappings,
+                rgsBalances: config.demoRGSBalances
+            )
+
+            print("demo RGS balances:")
+            for key in config.demoRGSBalances.keys.sorted() {
+                print("  \(key) = \(TaxonomyProbe.decimalString(config.demoRGSBalances[key] ?? 0))")
+            }
+            print("")
+
+            if unmatchedCodes.isEmpty {
+                print("unmatched RGS codes: 0")
+            } else {
+                print("unmatched RGS codes: \(unmatchedCodes.count)")
+                for code in unmatchedCodes {
+                    print("  \(code)")
+                }
+            }
+            print("")
+
+            TaxonomyProbe.renderComputedMappedFacts(factsByKey, limit: 200)
+            print("")
+
+            print("projected presentation facts: \(factsByConcept.count)")
+            print("")
+
+            for link in bootstrap.links {
+                TaxonomyProbe.renderPresentationLink(
+                    link,
+                    labelsByConcept: bootstrap.labelsByConcept,
+                    factsByConcept: factsByConcept
+                )
+                print("")
+            }
         }
 
         public func runCSVMapping(
