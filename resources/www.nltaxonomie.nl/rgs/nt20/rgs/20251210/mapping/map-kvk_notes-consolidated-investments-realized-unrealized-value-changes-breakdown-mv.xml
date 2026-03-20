@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 17:19:18 2025
+-->
+<link:linkbase
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:gen="http://xbrl.org/2008/generic"
+	xmlns:rgs="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension"
+	xmlns:jenv-bw2-i="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data"
+	xmlns:jenv-bw2-dim="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes"
+	xmlns:jenv-bw2-dm="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd
+		http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension ../../../../2022/xbrl/rgs-syntax-extension.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains.xsd
+	">
+	<link:roleRef xlink:type="simple" roleURI="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_to_dts"/>
+	<link:roleRef xlink:type="simple" roleURI="urn:kvk:linkrole:notes-consolidated-investments-realized-unrealized-value-changes-breakdown" xlink:href="http://www.nltaxonomie.nl/nt20/kvk/20251210/dictionary/kvk-linkroles.xsd#kvk-lr_NotesConsolidatedInvestmentsRealizedUnrealizedValueChangesBreakdown"/>
+	<link:arcroleRef xlink:type="simple" arcroleURI="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_mapping"/>
+	<gen:link xlink:type="extended" xlink:role="urn:kvk:linkrole:notes-consolidated-investments-realized-unrealized-value-changes-breakdown">
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBwvGwb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBwvGwb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBwvGwbGwb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBwvGwbGwb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBwvGwbGwbGwg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBwvGwbGwbGwg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBwvGwbGwbGwd_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBwvGwbGwbGwd"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBwvGwbGwbGwt_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBwvGwbGwbGwt"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBwvGwbGwbGwa_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBwvGwbGwbGwa"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBwvGwbDfw_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBwvGwbDfw"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBwvNwb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBwvNwb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBwvNwbNwb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBwvNwbNwb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBwvNwbNwbGwg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBwvNwbNwbGwg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBwvNwbNwbGwd_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBwvNwbNwbGwd"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBwvNwbNwbGwt_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBwvNwbNwbGwt"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBwvNwbNwbGwa_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBwvNwbNwbGwa"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBwvNwbDfw_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBwvNwbDfw"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_RealisedChangesInValueOfInvestments_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_RealisedChangesInValueOfInvestments_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:RealisedChangesInValueOfInvestments">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>WBwvGwb*</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvGwb_loc" xlink:to="jenv-bw2-i_RealisedChangesInValueOfInvestments_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvGwbGwb_loc" xlink:to="jenv-bw2-i_RealisedChangesInValueOfInvestments_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvGwbGwbGwg_loc" xlink:to="jenv-bw2-i_RealisedChangesInValueOfInvestments_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvGwbGwbGwd_loc" xlink:to="jenv-bw2-i_RealisedChangesInValueOfInvestments_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvGwbGwbGwt_loc" xlink:to="jenv-bw2-i_RealisedChangesInValueOfInvestments_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvGwbGwbGwa_loc" xlink:to="jenv-bw2-i_RealisedChangesInValueOfInvestments_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvGwbDfw_loc" xlink:to="jenv-bw2-i_RealisedChangesInValueOfInvestments_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_RealisedChangesInValueOfInvestmentsInGroupCompanies_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_RealisedChangesInValueOfInvestmentsInGroupCompanies_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:RealisedChangesInValueOfInvestmentsInGroupCompanies">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>WBwvGwbGwbGwg</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvGwbGwbGwg_loc" xlink:to="jenv-bw2-i_RealisedChangesInValueOfInvestmentsInGroupCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_RealisedChangesInValueOfInvestmentsInInvestmentsOther_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_RealisedChangesInValueOfInvestmentsInInvestmentsOther_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:RealisedChangesInValueOfInvestmentsInInvestmentsOther">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>WBwvGwbGwbGwa</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvGwbGwbGwa_loc" xlink:to="jenv-bw2-i_RealisedChangesInValueOfInvestmentsInInvestmentsOther_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_RealisedChangesInValueOfInvestmentsInLandAndBuildings_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_RealisedChangesInValueOfInvestmentsInLandAndBuildings_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:RealisedChangesInValueOfInvestmentsInLandAndBuildings">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>WBwvGwbGwbGwt</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvGwbGwbGwt_loc" xlink:to="jenv-bw2-i_RealisedChangesInValueOfInvestmentsInLandAndBuildings_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_RealisedChangesInValueOfInvestmentsInParticipatingInterestsOther_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_RealisedChangesInValueOfInvestmentsInParticipatingInterestsOther_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:RealisedChangesInValueOfInvestmentsInParticipatingInterestsOther">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>WBwvGwbGwbGwd</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvGwbGwbGwd_loc" xlink:to="jenv-bw2-i_RealisedChangesInValueOfInvestmentsInParticipatingInterestsOther_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_UnrealisedChangesInValueOfInvestments_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_UnrealisedChangesInValueOfInvestments_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:UnrealisedChangesInValueOfInvestments">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>WBwvNwb*</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvNwb_loc" xlink:to="jenv-bw2-i_UnrealisedChangesInValueOfInvestments_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvNwbNwb_loc" xlink:to="jenv-bw2-i_UnrealisedChangesInValueOfInvestments_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvNwbNwbGwg_loc" xlink:to="jenv-bw2-i_UnrealisedChangesInValueOfInvestments_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvNwbNwbGwd_loc" xlink:to="jenv-bw2-i_UnrealisedChangesInValueOfInvestments_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvNwbNwbGwt_loc" xlink:to="jenv-bw2-i_UnrealisedChangesInValueOfInvestments_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvNwbNwbGwa_loc" xlink:to="jenv-bw2-i_UnrealisedChangesInValueOfInvestments_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvNwbDfw_loc" xlink:to="jenv-bw2-i_UnrealisedChangesInValueOfInvestments_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_UnrealisedChangesInValueOfInvestmentsInGroupCompanies_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_UnrealisedChangesInValueOfInvestmentsInGroupCompanies_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:UnrealisedChangesInValueOfInvestmentsInGroupCompanies">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>WBwvNwbNwbGwg</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvNwbNwbGwg_loc" xlink:to="jenv-bw2-i_UnrealisedChangesInValueOfInvestmentsInGroupCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_UnrealisedChangesInValueOfInvestmentsInLandAndBuildings_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_UnrealisedChangesInValueOfInvestmentsInLandAndBuildings_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:UnrealisedChangesInValueOfInvestmentsInLandAndBuildings">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>WBwvNwbNwbGwt</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvNwbNwbGwt_loc" xlink:to="jenv-bw2-i_UnrealisedChangesInValueOfInvestmentsInLandAndBuildings_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_UnrealisedChangesInValueOfInvestmentsInOther_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_UnrealisedChangesInValueOfInvestmentsInOther_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:UnrealisedChangesInValueOfInvestmentsInOther">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>WBwvNwbNwbGwa</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvNwbNwbGwa_loc" xlink:to="jenv-bw2-i_UnrealisedChangesInValueOfInvestmentsInOther_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_UnrealisedChangesInValueOfInvestmentsInParticipatingInterestsOther_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_UnrealisedChangesInValueOfInvestmentsInParticipatingInterestsOther_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:UnrealisedChangesInValueOfInvestmentsInParticipatingInterestsOther">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>WBwvNwbNwbGwd</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBwvNwbNwbGwd_loc" xlink:to="jenv-bw2-i_UnrealisedChangesInValueOfInvestmentsInParticipatingInterestsOther_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+	</gen:link>
+</link:linkbase>

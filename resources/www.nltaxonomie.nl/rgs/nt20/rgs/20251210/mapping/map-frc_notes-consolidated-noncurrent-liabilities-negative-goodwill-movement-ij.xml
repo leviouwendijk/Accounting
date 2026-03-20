@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Fri December 19 10:55:38 2025
+-->
+<link:linkbase
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:gen="http://xbrl.org/2008/generic"
+	xmlns:rgs="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension"
+	xmlns:jenv-bw2-dm="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains"
+	xmlns:rj-dm="http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-domains"
+	xmlns:jenv-bw2-dim="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes"
+	xmlns:rj-i="http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data"
+	xmlns:rj-dim="http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-axes"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd
+		http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension ../../../../2022/xbrl/rgs-syntax-extension.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains.xsd
+		http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-domains http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-domains.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes.xsd
+		http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data.xsd
+		http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-axes http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-axes.xsd
+	">
+	<link:roleRef xlink:type="simple" roleURI="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_to_dts"/>
+	<link:roleRef xlink:type="simple" roleURI="urn:kvk:linkrole:notes-consolidated-noncurrent-liabilities-negative-goodwill-movement" xlink:href="http://www.nltaxonomie.nl/nt20/kvk/20251210/dictionary/kvk-linkroles.xsd#kvk-lr_NotesConsolidatedNoncurrentLiabilitiesNegativeGoodwillMovement"/>
+	<link:arcroleRef xlink:type="simple" arcroleURI="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_mapping"/>
+	<gen:link xlink:type="extended" xlink:role="urn:kvk:linkrole:notes-consolidated-noncurrent-liabilities-negative-goodwill-movement">
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasNeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasNeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasNegBrw_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasNegBrw"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasNegBrwBeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasNegBrwBeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasNegBrwAao_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasNegBrwAao"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasNegBrwAag_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasNegBrwAag"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasNegBrwAga_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasNegBrwAga"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasNegBrwOvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasNegBrwOvm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasNegCbd_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasNegCbd"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasNegCbdBeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasNegCbdBeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasNegCbdTgv_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasNegCbdTgv"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasNegCbdVtg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasNegCbdVtg"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_NegativeGoodwill_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_NegativeGoodwill_dp">
+			<rgs:primary rgs:qname="rj-i:NegativeGoodwill">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:NegativeGoodwillAxis" member="rj-dm:NegativeGoodwillMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>BLasNeg*</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNeg_loc" xlink:to="rj-i_NegativeGoodwill_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrw_loc" xlink:to="rj-i_NegativeGoodwill_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwBeg_loc" xlink:to="rj-i_NegativeGoodwill_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwAao_loc" xlink:to="rj-i_NegativeGoodwill_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwAag_loc" xlink:to="rj-i_NegativeGoodwill_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwAga_loc" xlink:to="rj-i_NegativeGoodwill_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwOvm_loc" xlink:to="rj-i_NegativeGoodwill_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegCbd_loc" xlink:to="rj-i_NegativeGoodwill_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="8"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegCbdBeg_loc" xlink:to="rj-i_NegativeGoodwill_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="9"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegCbdTgv_loc" xlink:to="rj-i_NegativeGoodwill_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="10"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegCbdVtg_loc" xlink:to="rj-i_NegativeGoodwill_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="11"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_NegativeGoodwillAccumulatedAmortisation_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_NegativeGoodwillAccumulatedAmortisation_dp">
+			<rgs:primary rgs:qname="rj-i:NegativeGoodwillAccumulatedAmortisation">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:NegativeGoodwillAxis" member="rj-dm:NegativeGoodwillMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>BLasNegCbd*</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegCbd_loc" xlink:to="rj-i_NegativeGoodwillAccumulatedAmortisation_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegCbdBeg_loc" xlink:to="rj-i_NegativeGoodwillAccumulatedAmortisation_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegCbdTgv_loc" xlink:to="rj-i_NegativeGoodwillAccumulatedAmortisation_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegCbdVtg_loc" xlink:to="rj-i_NegativeGoodwillAccumulatedAmortisation_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_NegativeGoodwillAdditions_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_NegativeGoodwillAdditions_dp">
+			<rgs:primary rgs:qname="rj-i:NegativeGoodwillAdditions">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:NegativeGoodwillAxis" member="rj-dm:NegativeGoodwillMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>BLasNegBrwAao</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwAao_loc" xlink:to="rj-i_NegativeGoodwillAdditions_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_NegativeGoodwillAdjustmentsLaterIdentifiedAssetsLiabilities_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_NegativeGoodwillAdjustmentsLaterIdentifiedAssetsLiabilities_dp">
+			<rgs:primary rgs:qname="rj-i:NegativeGoodwillAdjustmentsLaterIdentifiedAssetsLiabilities">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:NegativeGoodwillAxis" member="rj-dm:NegativeGoodwillMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>BLasNegBrwAag</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwAag_loc" xlink:to="rj-i_NegativeGoodwillAdjustmentsLaterIdentifiedAssetsLiabilities_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_NegativeGoodwillGross_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_NegativeGoodwillGross_dp">
+			<rgs:primary rgs:qname="rj-i:NegativeGoodwillGross">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:NegativeGoodwillAxis" member="rj-dm:NegativeGoodwillMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>BLasNegBrw</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrw_loc" xlink:to="rj-i_NegativeGoodwillGross_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwBeg_loc" xlink:to="rj-i_NegativeGoodwillGross_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwAao_loc" xlink:to="rj-i_NegativeGoodwillGross_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwAag_loc" xlink:to="rj-i_NegativeGoodwillGross_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwAga_loc" xlink:to="rj-i_NegativeGoodwillGross_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwOvm_loc" xlink:to="rj-i_NegativeGoodwillGross_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_NegativeGoodwillMovement_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_NegativeGoodwillMovement_dp">
+			<rgs:primary rgs:qname="rj-i:NegativeGoodwillMovement">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:NegativeGoodwillAxis" member="rj-dm:NegativeGoodwillMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>=GROUP(BLasNeg*-BLasNeg???Beg)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNeg_loc" xlink:to="rj-i_NegativeGoodwillMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrw_loc" xlink:to="rj-i_NegativeGoodwillMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwAao_loc" xlink:to="rj-i_NegativeGoodwillMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwAag_loc" xlink:to="rj-i_NegativeGoodwillMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwAga_loc" xlink:to="rj-i_NegativeGoodwillMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwOvm_loc" xlink:to="rj-i_NegativeGoodwillMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegCbd_loc" xlink:to="rj-i_NegativeGoodwillMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegCbdTgv_loc" xlink:to="rj-i_NegativeGoodwillMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="8"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegCbdVtg_loc" xlink:to="rj-i_NegativeGoodwillMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="9"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_NegativeGoodwillMovementsOther_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_NegativeGoodwillMovementsOther_dp">
+			<rgs:primary rgs:qname="rj-i:NegativeGoodwillMovementsOther">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:NegativeGoodwillAxis" member="rj-dm:NegativeGoodwillMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>BLasNegBrwOvm</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwOvm_loc" xlink:to="rj-i_NegativeGoodwillMovementsOther_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_NegativeGoodwillReleaseIncomeStatement_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_NegativeGoodwillReleaseIncomeStatement_dp">
+			<rgs:primary rgs:qname="rj-i:NegativeGoodwillReleaseIncomeStatement">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:NegativeGoodwillAxis" member="rj-dm:NegativeGoodwillMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>BLasNegCbdTgv</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegCbdTgv_loc" xlink:to="rj-i_NegativeGoodwillReleaseIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_NegativeGoodwillReleaseIncomeStatementNotFutureRelated_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_NegativeGoodwillReleaseIncomeStatementNotFutureRelated_dp">
+			<rgs:primary rgs:qname="rj-i:NegativeGoodwillReleaseIncomeStatementNotFutureRelated">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:NegativeGoodwillAxis" member="rj-dm:NegativeGoodwillMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>BLasNegCbdVtg</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegCbdVtg_loc" xlink:to="rj-i_NegativeGoodwillReleaseIncomeStatementNotFutureRelated_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_NegativeGoodwillWriteOffDueToDisposals_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_NegativeGoodwillWriteOffDueToDisposals_dp">
+			<rgs:primary rgs:qname="rj-i:NegativeGoodwillWriteOffDueToDisposals">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:NegativeGoodwillAxis" member="rj-dm:NegativeGoodwillMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>BLasNegBrwAga</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasNegBrwAga_loc" xlink:to="rj-i_NegativeGoodwillWriteOffDueToDisposals_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+	</gen:link>
+</link:linkbase>

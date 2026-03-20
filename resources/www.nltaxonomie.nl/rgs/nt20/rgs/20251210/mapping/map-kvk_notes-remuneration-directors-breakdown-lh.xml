@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 17:22:46 2025
+-->
+<link:linkbase
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:gen="http://xbrl.org/2008/generic"
+	xmlns:rgs="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension"
+	xmlns:jenv-bw2-dim="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes"
+	xmlns:rj-i="http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data"
+	xmlns:jenv-bw2-dm="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains"
+	xmlns:jenv-bw2-i="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd
+		http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension ../../../../2022/xbrl/rgs-syntax-extension.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes.xsd
+		http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data.xsd
+	">
+	<link:roleRef xlink:type="simple" roleURI="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_to_dts"/>
+	<link:roleRef xlink:type="simple" roleURI="urn:kvk:linkrole:notes-remuneration-directors-breakdown" xlink:href="http://www.nltaxonomie.nl/nt20/kvk/20251210/dictionary/kvk-linkroles.xsd#kvk-lr_NotesRemunerationDirectorsBreakdown"/>
+	<link:arcroleRef xlink:type="simple" arcroleURI="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_mapping"/>
+	<gen:link xlink:type="extended" xlink:role="urn:kvk:linkrole:notes-remuneration-directors-breakdown">
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WPerLesSld_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WPerLesSld"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WPerLesSldPbb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WPerLesSldPbb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WPerLesSldBtb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WPerLesSldBtb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WPerLesSldUbb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WPerLesSldUbb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WPerLesSldWbb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WPerLesSldWbb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WPerLesBvc_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WPerLesBvc"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WPerLesBvcPbc_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WPerLesBvcPbc"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WPerLesBvcBtc_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WPerLesBvcBtc"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WPerLesBvcUbc_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WPerLesBvcUbc"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WPerLesBvcWbc_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WPerLesBvcWbc"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WPerLesBvcKit_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WPerLesBvcKit"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_RemunerationManagingDirectorsFormerManagingDirectors_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_RemunerationManagingDirectorsFormerManagingDirectors_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:RemunerationManagingDirectorsFormerManagingDirectors">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:source>WPerLesSld*</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesSld_loc" xlink:to="jenv-bw2-i_RemunerationManagingDirectorsFormerManagingDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesSldPbb_loc" xlink:to="jenv-bw2-i_RemunerationManagingDirectorsFormerManagingDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesSldBtb_loc" xlink:to="jenv-bw2-i_RemunerationManagingDirectorsFormerManagingDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesSldUbb_loc" xlink:to="jenv-bw2-i_RemunerationManagingDirectorsFormerManagingDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesSldWbb_loc" xlink:to="jenv-bw2-i_RemunerationManagingDirectorsFormerManagingDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_RemunerationSupervisoryDirectorsFormerSupervisoryDirectors_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_RemunerationSupervisoryDirectorsFormerSupervisoryDirectors_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:RemunerationSupervisoryDirectorsFormerSupervisoryDirectors">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:source>WPerLesBvc*</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesBvc_loc" xlink:to="jenv-bw2-i_RemunerationSupervisoryDirectorsFormerSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesBvcPbc_loc" xlink:to="jenv-bw2-i_RemunerationSupervisoryDirectorsFormerSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesBvcBtc_loc" xlink:to="jenv-bw2-i_RemunerationSupervisoryDirectorsFormerSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesBvcUbc_loc" xlink:to="jenv-bw2-i_RemunerationSupervisoryDirectorsFormerSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesBvcWbc_loc" xlink:to="jenv-bw2-i_RemunerationSupervisoryDirectorsFormerSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesBvcKit_loc" xlink:to="jenv-bw2-i_RemunerationSupervisoryDirectorsFormerSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_RemunerationManagingSupervisoryDirectors_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_RemunerationManagingSupervisoryDirectors_dp">
+			<rgs:primary rgs:qname="rj-i:RemunerationManagingSupervisoryDirectors">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:source>=GROUP(WPerLesSld*+WPerLesBvc*)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesSld_loc" xlink:to="rj-i_RemunerationManagingSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesSldPbb_loc" xlink:to="rj-i_RemunerationManagingSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesSldBtb_loc" xlink:to="rj-i_RemunerationManagingSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesSldUbb_loc" xlink:to="rj-i_RemunerationManagingSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesSldWbb_loc" xlink:to="rj-i_RemunerationManagingSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesBvc_loc" xlink:to="rj-i_RemunerationManagingSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesBvcPbc_loc" xlink:to="rj-i_RemunerationManagingSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesBvcBtc_loc" xlink:to="rj-i_RemunerationManagingSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="8"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesBvcUbc_loc" xlink:to="rj-i_RemunerationManagingSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="9"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesBvcWbc_loc" xlink:to="rj-i_RemunerationManagingSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="10"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WPerLesBvcKit_loc" xlink:to="rj-i_RemunerationManagingSupervisoryDirectors_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="11"/>
+	</gen:link>
+</link:linkbase>

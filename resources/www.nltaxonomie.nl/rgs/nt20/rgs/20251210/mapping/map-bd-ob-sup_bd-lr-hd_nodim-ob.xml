@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Thu December 18 14:37:28 2025
+-->
+<link:linkbase
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:gen="http://xbrl.org/2008/generic"
+	xmlns:rgs="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension"
+	xmlns:bd-i="http://www.nltaxonomie.nl/nt20/bd/20251210/dictionary/bd-data"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd
+		http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension ../../../../2022/xbrl/rgs-syntax-extension.xsd
+		http://www.nltaxonomie.nl/nt20/bd/20251210/dictionary/bd-data https://www.nltaxonomie.nl/nt20/bd/20251210/dictionary/bd-data.xsd
+	">
+	<link:roleRef xlink:type="simple" roleURI="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_to_dts"/>
+	<link:roleRef xlink:type="simple" roleURI="http://www.xbrl.org/2008/role/link" xlink:href="http://www.xbrl.org/2008/generic-link.xsd#standard-link-role"/>
+	<link:arcroleRef xlink:type="simple" arcroleURI="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_mapping"/>
+	<gen:link xlink:type="extended" xlink:role="http://www.xbrl.org/2008/role/link">
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBlb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBlb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBtwOlb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBtwOlb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNodOpd_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNodOpd"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNopOpg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNopOpg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNohOpg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNohOpg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNodOdo_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNodOdo"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNopOlo_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNopOlo"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNohOlo_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNohOlo"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBla_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBla"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBtwOla_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBtwOla"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBlv_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBlv"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBtwOlv_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBtwOlv"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBtwOlt_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBtwOlt"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBlo_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBlo"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBtwOlo_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBtwOlo"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBop_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBop"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBtwOop_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBtwOop"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBlw_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBlw"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBtwOlw_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBtwOlw"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBlu_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBlu"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBtwOlu_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBtwOlu"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNopOlg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNopOlg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNopNod_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNopNod"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNohOlg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNohOlg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNohNod_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNohNod"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNodOdg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNodOdg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNodNod_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNodNod"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNopOlh_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNopOlh"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNohOlh_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNohOlh"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNohOmr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNohOmr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WKprInhMai_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WKprInhMai"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNodOdh_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNodOdh"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNopOlv_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNopOlv"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNohOlv_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNohOlv"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNodOdl_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNodOdl"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNodOdu_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNodOdu"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNopOlu_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNopOlu"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNohOlu_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNohOlu"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNopOln_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNopOln"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNohOln_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNohOln"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNodOdb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNodOdb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBtwVoo_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBtwVoo"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BSchBepBtwVvd_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BSchBepBtwVvd"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNodOde_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNodOde"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNopOle_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNopOle"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNohOle_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNohOle"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNopOll_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNopOll"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNohOll_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNohOll"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNodOdv_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNodOdv"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNopOla_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNopOla"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNohOla_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNohOla"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNodOda_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNodOda"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNopOli_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNopOli"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNohOli_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNohOli"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOmzNodOdi_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOmzNodOdi"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_ValueAddedTaxOnSuppliesFromCountriesOutsideTheEC_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_ValueAddedTaxOnSuppliesFromCountriesOutsideTheEC_dp">
+			<rgs:primary rgs:qname="bd-i:ValueAddedTaxOnSuppliesFromCountriesOutsideTheEC"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlb_loc" xlink:to="bd-i_ValueAddedTaxOnSuppliesFromCountriesOutsideTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlb_loc" xlink:to="bd-i_ValueAddedTaxOnSuppliesFromCountriesOutsideTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_TaxedTurnoverPrivateUse_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_TaxedTurnoverPrivateUse_dp">
+			<rgs:primary rgs:qname="bd-i:TaxedTurnoverPrivateUse"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNodOpd_loc" xlink:to="bd-i_TaxedTurnoverPrivateUse_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNopOpg_loc" xlink:to="bd-i_TaxedTurnoverPrivateUse_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNohOpg_loc" xlink:to="bd-i_TaxedTurnoverPrivateUse_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_TaxedTurnoverSuppliesServicesOtherRates_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_TaxedTurnoverSuppliesServicesOtherRates_dp">
+			<rgs:primary rgs:qname="bd-i:TaxedTurnoverSuppliesServicesOtherRates"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNodOdo_loc" xlink:to="bd-i_TaxedTurnoverSuppliesServicesOtherRates_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNopOlo_loc" xlink:to="bd-i_TaxedTurnoverSuppliesServicesOtherRates_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNohOlo_loc" xlink:to="bd-i_TaxedTurnoverSuppliesServicesOtherRates_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_ValueAddedTaxOwed_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_ValueAddedTaxOwed_dp">
+			<rgs:primary rgs:qname="bd-i:ValueAddedTaxOwed"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBla_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOla_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlv_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlv_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlt_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlo_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlo_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBop_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="8"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOop_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="9"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlw_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="10"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlw_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="11"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlb_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="12"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlb_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="13"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlu_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="14"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlu_loc" xlink:to="bd-i_ValueAddedTaxOwed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="15"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_SuppliesServicesNotTaxed_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_SuppliesServicesNotTaxed_dp">
+			<rgs:primary rgs:qname="bd-i:SuppliesServicesNotTaxed"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNopOlg_loc" xlink:to="bd-i_SuppliesServicesNotTaxed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNopNod_loc" xlink:to="bd-i_SuppliesServicesNotTaxed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNohOlg_loc" xlink:to="bd-i_SuppliesServicesNotTaxed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNohNod_loc" xlink:to="bd-i_SuppliesServicesNotTaxed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNodOdg_loc" xlink:to="bd-i_SuppliesServicesNotTaxed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNodNod_loc" xlink:to="bd-i_SuppliesServicesNotTaxed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_TaxedTurnoverSuppliesServicesGeneralTariff_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_TaxedTurnoverSuppliesServicesGeneralTariff_dp">
+			<rgs:primary rgs:qname="bd-i:TaxedTurnoverSuppliesServicesGeneralTariff"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNopOlh_loc" xlink:to="bd-i_TaxedTurnoverSuppliesServicesGeneralTariff_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNohOlh_loc" xlink:to="bd-i_TaxedTurnoverSuppliesServicesGeneralTariff_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNohOmr_loc" xlink:to="bd-i_TaxedTurnoverSuppliesServicesGeneralTariff_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WKprInhMai_loc" xlink:to="bd-i_TaxedTurnoverSuppliesServicesGeneralTariff_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNodOdh_loc" xlink:to="bd-i_TaxedTurnoverSuppliesServicesGeneralTariff_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_TaxedTurnoverSuppliesServicesReducedTariff_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_TaxedTurnoverSuppliesServicesReducedTariff_dp">
+			<rgs:primary rgs:qname="bd-i:TaxedTurnoverSuppliesServicesReducedTariff"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNopOlv_loc" xlink:to="bd-i_TaxedTurnoverSuppliesServicesReducedTariff_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNohOlv_loc" xlink:to="bd-i_TaxedTurnoverSuppliesServicesReducedTariff_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNodOdl_loc" xlink:to="bd-i_TaxedTurnoverSuppliesServicesReducedTariff_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_ValueAddedTaxPrivateUse_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_ValueAddedTaxPrivateUse_dp">
+			<rgs:primary rgs:qname="bd-i:ValueAddedTaxPrivateUse"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBop_loc" xlink:to="bd-i_ValueAddedTaxPrivateUse_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOop_loc" xlink:to="bd-i_ValueAddedTaxPrivateUse_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_ValueAddedTaxSuppliesServicesOtherRates_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_ValueAddedTaxSuppliesServicesOtherRates_dp">
+			<rgs:primary rgs:qname="bd-i:ValueAddedTaxSuppliesServicesOtherRates"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlo_loc" xlink:to="bd-i_ValueAddedTaxSuppliesServicesOtherRates_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlo_loc" xlink:to="bd-i_ValueAddedTaxSuppliesServicesOtherRates_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_TurnoverFromTaxedSuppliesFromCountriesOutsideTheEC_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_TurnoverFromTaxedSuppliesFromCountriesOutsideTheEC_dp">
+			<rgs:primary rgs:qname="bd-i:TurnoverFromTaxedSuppliesFromCountriesOutsideTheEC"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNodOdu_loc" xlink:to="bd-i_TurnoverFromTaxedSuppliesFromCountriesOutsideTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNopOlu_loc" xlink:to="bd-i_TurnoverFromTaxedSuppliesFromCountriesOutsideTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNohOlu_loc" xlink:to="bd-i_TurnoverFromTaxedSuppliesFromCountriesOutsideTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_SuppliesToCountriesOutsideTheEC_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_SuppliesToCountriesOutsideTheEC_dp">
+			<rgs:primary rgs:qname="bd-i:SuppliesToCountriesOutsideTheEC"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNopOln_loc" xlink:to="bd-i_SuppliesToCountriesOutsideTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNohOln_loc" xlink:to="bd-i_SuppliesToCountriesOutsideTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNodOdb_loc" xlink:to="bd-i_SuppliesToCountriesOutsideTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_ValueAddedTaxSuppliesServicesGeneralTariff_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_ValueAddedTaxSuppliesServicesGeneralTariff_dp">
+			<rgs:primary rgs:qname="bd-i:ValueAddedTaxSuppliesServicesGeneralTariff"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBla_loc" xlink:to="bd-i_ValueAddedTaxSuppliesServicesGeneralTariff_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOla_loc" xlink:to="bd-i_ValueAddedTaxSuppliesServicesGeneralTariff_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_ValueAddedTaxAmountTotalNew_dp">
+			<rgs:primary rgs:qname="bd-i:ValueAddedTaxAmountTotalNew"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBla_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOla_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlv_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlv_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlt_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlo_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlo_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBop_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="8"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOop_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="9"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlw_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="10"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlw_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="11"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlb_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="12"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlb_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="13"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlu_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="14"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlu_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="15"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwVoo_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="16"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwVvd_loc" xlink:to="bd-i_ValueAddedTaxAmountTotalNew_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="17"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_ValueAddedTaxOnInput_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_ValueAddedTaxOnInput_dp">
+			<rgs:primary rgs:qname="bd-i:ValueAddedTaxOnInput"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwVoo_loc" xlink:to="bd-i_ValueAddedTaxOnInput_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_TurnoverFromTaxedSuppliesFromCountriesWithinTheEC_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_TurnoverFromTaxedSuppliesFromCountriesWithinTheEC_dp">
+			<rgs:primary rgs:qname="bd-i:TurnoverFromTaxedSuppliesFromCountriesWithinTheEC"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNodOde_loc" xlink:to="bd-i_TurnoverFromTaxedSuppliesFromCountriesWithinTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNopOle_loc" xlink:to="bd-i_TurnoverFromTaxedSuppliesFromCountriesWithinTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNohOle_loc" xlink:to="bd-i_TurnoverFromTaxedSuppliesFromCountriesWithinTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_ValueAddedTaxOnSuppliesFromCountriesWithinTheEC_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_ValueAddedTaxOnSuppliesFromCountriesWithinTheEC_dp">
+			<rgs:primary rgs:qname="bd-i:ValueAddedTaxOnSuppliesFromCountriesWithinTheEC"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlu_loc" xlink:to="bd-i_ValueAddedTaxOnSuppliesFromCountriesWithinTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlu_loc" xlink:to="bd-i_ValueAddedTaxOnSuppliesFromCountriesWithinTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_ValueAddedTaxSuppliesServicesReducedTariff_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_ValueAddedTaxSuppliesServicesReducedTariff_dp">
+			<rgs:primary rgs:qname="bd-i:ValueAddedTaxSuppliesServicesReducedTariff"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlv_loc" xlink:to="bd-i_ValueAddedTaxSuppliesServicesReducedTariff_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlv_loc" xlink:to="bd-i_ValueAddedTaxSuppliesServicesReducedTariff_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlt_loc" xlink:to="bd-i_ValueAddedTaxSuppliesServicesReducedTariff_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_TurnoverSuppliesServicesByWhichVATTaxationIsTransferred_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_TurnoverSuppliesServicesByWhichVATTaxationIsTransferred_dp">
+			<rgs:primary rgs:qname="bd-i:TurnoverSuppliesServicesByWhichVATTaxationIsTransferred"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNopOll_loc" xlink:to="bd-i_TurnoverSuppliesServicesByWhichVATTaxationIsTransferred_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNohOll_loc" xlink:to="bd-i_TurnoverSuppliesServicesByWhichVATTaxationIsTransferred_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNodOdv_loc" xlink:to="bd-i_TurnoverSuppliesServicesByWhichVATTaxationIsTransferred_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_InstallationDistanceSalesWithinTheEC_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_InstallationDistanceSalesWithinTheEC_dp">
+			<rgs:primary rgs:qname="bd-i:InstallationDistanceSalesWithinTheEC"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNopOla_loc" xlink:to="bd-i_InstallationDistanceSalesWithinTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNohOla_loc" xlink:to="bd-i_InstallationDistanceSalesWithinTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNodOda_loc" xlink:to="bd-i_InstallationDistanceSalesWithinTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_ValueAddedTaxSuppliesServicesByWhichVATTaxationIsTransferred_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_ValueAddedTaxSuppliesServicesByWhichVATTaxationIsTransferred_dp">
+			<rgs:primary rgs:qname="bd-i:ValueAddedTaxSuppliesServicesByWhichVATTaxationIsTransferred"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBlw_loc" xlink:to="bd-i_ValueAddedTaxSuppliesServicesByWhichVATTaxationIsTransferred_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BSchBepBtwOlw_loc" xlink:to="bd-i_ValueAddedTaxSuppliesServicesByWhichVATTaxationIsTransferred_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_SuppliesToCountriesWithinTheEC_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_SuppliesToCountriesWithinTheEC_dp">
+			<rgs:primary rgs:qname="bd-i:SuppliesToCountriesWithinTheEC"/>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNopOli_loc" xlink:to="bd-i_SuppliesToCountriesWithinTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNohOli_loc" xlink:to="bd-i_SuppliesToCountriesWithinTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOmzNodOdi_loc" xlink:to="bd-i_SuppliesToCountriesWithinTheEC_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+	</gen:link>
+</link:linkbase>

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 17:15:15 2025
+-->
+<link:linkbase
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:gen="http://xbrl.org/2008/generic"
+	xmlns:rgs="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension"
+	xmlns:jenv-bw2-i="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data"
+	xmlns:jenv-bw2-dim="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes"
+	xmlns:rj-i="http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data"
+	xmlns:rj-dim="http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-axes"
+	xmlns:jenv-bw2-dm="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd
+		http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension ../../../../2022/xbrl/rgs-syntax-extension.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes.xsd
+		http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data.xsd
+		http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-axes http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-axes.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains.xsd
+	">
+	<link:roleRef xlink:type="simple" roleURI="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_to_dts"/>
+	<link:roleRef xlink:type="simple" roleURI="urn:kvk:linkrole:notes-revaluation-reserve-statement-of-changes" xlink:href="http://www.nltaxonomie.nl/nt20/kvk/20251210/dictionary/kvk-linkroles.xsd#kvk-lr_NotesRevaluationReserveStatementOfChanges"/>
+	<link:arcroleRef xlink:type="simple" arcroleURI="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_mapping"/>
+	<gen:link xlink:type="extended" xlink:role="urn:kvk:linkrole:notes-revaluation-reserve-statement-of-changes">
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHer_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHer"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHew_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHew"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewBeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewBeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewOhe_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewOhe"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewSte_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewSte"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewBvs_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewBvs"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewGhw_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewGhw"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewGhr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewGhr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewGha_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewGha"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewBrh_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewBrh"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewGvw_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewGvw"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewGvr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewGvr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewGva_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewGva"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewBvh_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewBvh"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewOve_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewOve"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewHer_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewHer"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewVrh_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewVrh"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivHerHewOvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivHerHewOvm"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_RevaluationReserve_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_RevaluationReserve_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:RevaluationReserve">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfRevaluationReserveAxis" member="jenv-bw2-dm:RevaluationReserveMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>BEivHer*</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHer_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHew_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewBeg_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewOhe_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewSte_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewBvs_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGhw_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGhr_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="8"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGha_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="9"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewBrh_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="10"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGvw_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="11"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGvr_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="12"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGva_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="13"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewBvh_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="14"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewOve_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="15"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewHer_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="16"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewVrh_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="17"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewOvm_loc" xlink:to="jenv-bw2-i_RevaluationReserve_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="18"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_RevaluationReserveMovement_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:RevaluationReserveMovement">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfRevaluationReserveAxis" member="jenv-bw2-dm:RevaluationReserveMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>=GROUP(BEivHer*)-GROUP(BEivHerHewBeg+BEivHerHewOhe+BEivHerHewSte+BEivHerHewBvs)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHer_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHew_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewBeg_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGhw_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGhr_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGha_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewBrh_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGvw_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="8"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGvr_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="9"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGva_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="10"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewBvh_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="11"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewOve_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="12"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewHer_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="13"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewVrh_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="14"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewOvm_loc" xlink:to="jenv-bw2-i_RevaluationReserveMovement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="15"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_RevaluationReserveRevaluationsTaxImpact_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_RevaluationReserveRevaluationsTaxImpact_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:RevaluationReserveRevaluationsTaxImpact">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfRevaluationReserveAxis" member="jenv-bw2-dm:RevaluationReserveMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>BEivHerHewBvh</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewBvh_loc" xlink:to="jenv-bw2-i_RevaluationReserveRevaluationsTaxImpact_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_AdjustedRevaluationReserveAfterRecalculationChangeAccountingPolicies_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_AdjustedRevaluationReserveAfterRecalculationChangeAccountingPolicies_dp">
+			<rgs:primary rgs:qname="rj-i:AdjustedRevaluationReserveAfterRecalculationChangeAccountingPolicies">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfRevaluationReserveAxis" member="jenv-bw2-dm:RevaluationReserveMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>=GROUP(BEivHerHewBeg+BEivHerHewOhe+BEivHerHewSte+BEivHerHewBvs)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewBeg_loc" xlink:to="rj-i_AdjustedRevaluationReserveAfterRecalculationChangeAccountingPolicies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewOhe_loc" xlink:to="rj-i_AdjustedRevaluationReserveAfterRecalculationChangeAccountingPolicies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewSte_loc" xlink:to="rj-i_AdjustedRevaluationReserveAfterRecalculationChangeAccountingPolicies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewBvs_loc" xlink:to="rj-i_AdjustedRevaluationReserveAfterRecalculationChangeAccountingPolicies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_RevaluationReserveChangeAccountingPolicies_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_RevaluationReserveChangeAccountingPolicies_dp">
+			<rgs:primary rgs:qname="rj-i:RevaluationReserveChangeAccountingPolicies">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfRevaluationReserveAxis" member="jenv-bw2-dm:RevaluationReserveMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>=GROUP(BEivHerHewOhe+BEivHerHewSte)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewOhe_loc" xlink:to="rj-i_RevaluationReserveChangeAccountingPolicies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewSte_loc" xlink:to="rj-i_RevaluationReserveChangeAccountingPolicies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_RevaluationReserveChangeAccountingPoliciesTaxImpact_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_RevaluationReserveChangeAccountingPoliciesTaxImpact_dp">
+			<rgs:primary rgs:qname="rj-i:RevaluationReserveChangeAccountingPoliciesTaxImpact">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfRevaluationReserveAxis" member="jenv-bw2-dm:RevaluationReserveMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>BEivHerHewBvs</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewBvs_loc" xlink:to="rj-i_RevaluationReserveChangeAccountingPoliciesTaxImpact_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_RevaluationReserveRealisedRevaluationsTaxImpact_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_RevaluationReserveRealisedRevaluationsTaxImpact_dp">
+			<rgs:primary rgs:qname="rj-i:RevaluationReserveRealisedRevaluationsTaxImpact">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfRevaluationReserveAxis" member="jenv-bw2-dm:RevaluationReserveMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>BEivHerHewBrh</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewBrh_loc" xlink:to="rj-i_RevaluationReserveRealisedRevaluationsTaxImpact_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_RevaluationReserveRealisedRevaluationsThroughHedgedAssetsLiabilities_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_RevaluationReserveRealisedRevaluationsThroughHedgedAssetsLiabilities_dp">
+			<rgs:primary rgs:qname="rj-i:RevaluationReserveRealisedRevaluationsThroughHedgedAssetsLiabilities">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfRevaluationReserveAxis" member="jenv-bw2-dm:RevaluationReserveMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>BEivHerHewGha</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGha_loc" xlink:to="rj-i_RevaluationReserveRealisedRevaluationsThroughHedgedAssetsLiabilities_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_RevaluationReserveRealisedRevaluationsThroughIncomeStatement_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_RevaluationReserveRealisedRevaluationsThroughIncomeStatement_dp">
+			<rgs:primary rgs:qname="rj-i:RevaluationReserveRealisedRevaluationsThroughIncomeStatement">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfRevaluationReserveAxis" member="jenv-bw2-dm:RevaluationReserveMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>=GROUP(BEivHerHewGhw+BEivHerHewOve+BEivHerHewHer+BEivHerHewVrh+BEivHerHewOvm)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGhw_loc" xlink:to="rj-i_RevaluationReserveRealisedRevaluationsThroughIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewOve_loc" xlink:to="rj-i_RevaluationReserveRealisedRevaluationsThroughIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewHer_loc" xlink:to="rj-i_RevaluationReserveRealisedRevaluationsThroughIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewVrh_loc" xlink:to="rj-i_RevaluationReserveRealisedRevaluationsThroughIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewOvm_loc" xlink:to="rj-i_RevaluationReserveRealisedRevaluationsThroughIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_RevaluationReserveRealisedRevaluationsThroughOtherReserves_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_RevaluationReserveRealisedRevaluationsThroughOtherReserves_dp">
+			<rgs:primary rgs:qname="rj-i:RevaluationReserveRealisedRevaluationsThroughOtherReserves">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfRevaluationReserveAxis" member="jenv-bw2-dm:RevaluationReserveMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>BEivHerHewGhr</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGhr_loc" xlink:to="rj-i_RevaluationReserveRealisedRevaluationsThroughOtherReserves_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_RevaluationReserveRevaluationsThroughHedgedAssetsLiabilities_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_RevaluationReserveRevaluationsThroughHedgedAssetsLiabilities_dp">
+			<rgs:primary rgs:qname="rj-i:RevaluationReserveRevaluationsThroughHedgedAssetsLiabilities">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfRevaluationReserveAxis" member="jenv-bw2-dm:RevaluationReserveMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>BEivHerHewGva</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGva_loc" xlink:to="rj-i_RevaluationReserveRevaluationsThroughHedgedAssetsLiabilities_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_RevaluationReserveRevaluationsThroughIncomeStatement_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_RevaluationReserveRevaluationsThroughIncomeStatement_dp">
+			<rgs:primary rgs:qname="rj-i:RevaluationReserveRevaluationsThroughIncomeStatement">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfRevaluationReserveAxis" member="jenv-bw2-dm:RevaluationReserveMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>BEivHerHewGvw</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGvw_loc" xlink:to="rj-i_RevaluationReserveRevaluationsThroughIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_RevaluationReserveRevaluationsThroughOtherReserves_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_RevaluationReserveRevaluationsThroughOtherReserves_dp">
+			<rgs:primary rgs:qname="rj-i:RevaluationReserveRevaluationsThroughOtherReserves">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfRevaluationReserveAxis" member="jenv-bw2-dm:RevaluationReserveMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>BEivHerHewGvr</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivHerHewGvr_loc" xlink:to="rj-i_RevaluationReserveRevaluationsThroughOtherReserves_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+	</gen:link>
+</link:linkbase>

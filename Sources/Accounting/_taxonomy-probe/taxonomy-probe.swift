@@ -22,6 +22,7 @@ extension TaxonomyProbe {
         var labels: [LinkbaseRef] = []
         var definitions: [LinkbaseRef] = []
         var tables: [LinkbaseRef] = []
+        var mappings: [LinkbaseRef] = []
         var other: [LinkbaseRef] = []
     }
 
@@ -246,6 +247,7 @@ extension TaxonomyProbe {
             print("  label refs: \(bootstrap.refs.labels.count)")
             print("  definition refs: \(bootstrap.refs.definitions.count)")
             print("  table refs: \(bootstrap.refs.tables.count)")
+            print("  mapping refs: \(bootstrap.refs.mappings.count)")
             print("  other refs: \(bootstrap.refs.other.count)")
             print("")
             print("selected presentations: \(bootstrap.selectedPresentationURLs.count)")
@@ -429,6 +431,7 @@ extension TaxonomyProbe {
             print("  label refs: \(rgsRefs.labels.count)")
             print("  definition refs: \(rgsRefs.definitions.count)")
             print("  table refs: \(rgsRefs.tables.count)")
+            print("  mapping refs: \(rgsRefs.mappings.count)")
             print("  other refs: \(rgsRefs.other.count)")
             print("")
 
@@ -449,11 +452,10 @@ extension TaxonomyProbe {
             printRefs("RGS label refs:", rgsRefs.labels)
             printRefs("RGS definition refs:", rgsRefs.definitions)
             printRefs("RGS table refs:", rgsRefs.tables)
+            printRefs("RGS mapping refs:", rgsRefs.mappings)
             printRefs("RGS other refs:", rgsRefs.other)
 
-            let mappingRefs = rgsRefs.other.filter { ref in
-                ref.href.contains("mapping/")
-            }
+            let mappingRefs = rgsRefs.mappings
 
             print("mapping refs in RGS entrypoint: \(mappingRefs.count)")
             for ref in mappingRefs {
@@ -482,12 +484,17 @@ extension TaxonomyProbe {
                 }
 
                 let linkbase = try parser.parse(data: xmlData)
-                let mappings = TaxonomyProbe.resolveMappings(from: linkbase)
+                let resolution = TaxonomyProbe.resolveMappingsDetailed(from: linkbase)
+                let mappings = resolution.mappings
 
                 print("  roleRefs: \(linkbase.roleRefs.count)")
                 print("  arcroleRefs: \(linkbase.arcroleRefs.count)")
                 print("  links: \(linkbase.links.count)")
                 print("  resolved mappings: \(mappings.count)")
+                TaxonomyProbe.renderMappingResolutionDiagnostics(
+                    resolution.diagnostics,
+                    indent: "  "
+                )
                 print("")
 
                 allMappings.append(contentsOf: mappings)

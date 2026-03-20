@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 17:22:46 2025
+-->
+<link:linkbase
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:gen="http://xbrl.org/2008/generic"
+	xmlns:rgs="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension"
+	xmlns:jenv-bw2-dm="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains"
+	xmlns:rj-dim="http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-axes"
+	xmlns:jenv-bw2-i="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data"
+	xmlns:jenv-bw2-dim="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes"
+	xmlns:rj-dm="http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-domains"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd
+		http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension ../../../../2022/xbrl/rgs-syntax-extension.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains.xsd
+		http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-axes http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-axes.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes.xsd
+		http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-domains http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-domains.xsd
+	">
+	<link:roleRef xlink:type="simple" roleURI="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_to_dts"/>
+	<link:roleRef xlink:type="simple" roleURI="urn:kvk:linkrole:notes-auditors-fees-breakdown" xlink:href="http://www.nltaxonomie.nl/nt20/kvk/20251210/dictionary/kvk-linkroles.xsd#kvk-lr_NotesAuditorsFeesBreakdown"/>
+	<link:arcroleRef xlink:type="simple" arcroleURI="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_mapping"/>
+	<gen:link xlink:type="extended" xlink:role="urn:kvk:linkrole:notes-auditors-fees-breakdown">
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBedAea_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBedAea"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBedAeaAea_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBedAeaAea"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBedAeaAeaAov_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBedAeaAeaAov"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBedAeaAeaAac_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBedAeaAeaAac"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBedAeaAeaAao_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBedAeaAeaAao"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBedAeaAeaAnc_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBedAeaAeaAnc"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBedAeaPda_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBedAeaPda"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBedAeaNot_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBedAeaNot"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBedAeaAej_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBedAeaAej"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBedAeaAdv_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBedAeaAdv"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBedAeaDae_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBedAeaDae"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBedAeaDfw_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBedAeaDfw"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_AuditorsFees_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_AuditorsFees_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:AuditorsFees">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:AuditorsFeesAxis" member="rj-dm:AuditorsFeesMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:source>WBedAea*</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAea_loc" xlink:to="jenv-bw2-i_AuditorsFees_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaAea_loc" xlink:to="jenv-bw2-i_AuditorsFees_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaAeaAov_loc" xlink:to="jenv-bw2-i_AuditorsFees_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaAeaAac_loc" xlink:to="jenv-bw2-i_AuditorsFees_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaAeaAao_loc" xlink:to="jenv-bw2-i_AuditorsFees_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaAeaAnc_loc" xlink:to="jenv-bw2-i_AuditorsFees_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaPda_loc" xlink:to="jenv-bw2-i_AuditorsFees_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaNot_loc" xlink:to="jenv-bw2-i_AuditorsFees_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="8"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaAej_loc" xlink:to="jenv-bw2-i_AuditorsFees_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="9"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaAdv_loc" xlink:to="jenv-bw2-i_AuditorsFees_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="10"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaDae_loc" xlink:to="jenv-bw2-i_AuditorsFees_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="11"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaDfw_loc" xlink:to="jenv-bw2-i_AuditorsFees_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="12"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_AuditorsFeesAuditFinancialStatements_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_AuditorsFeesAuditFinancialStatements_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:AuditorsFeesAuditFinancialStatements">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:AuditorsFeesAxis" member="rj-dm:AuditorsFeesMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:source>WBedAeaAeaAov</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaAeaAov_loc" xlink:to="jenv-bw2-i_AuditorsFeesAuditFinancialStatements_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_AuditorsFeesOtherAuditProcedures_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_AuditorsFeesOtherAuditProcedures_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:AuditorsFeesOtherAuditProcedures">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:AuditorsFeesAxis" member="rj-dm:AuditorsFeesMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:source>WBedAeaAeaAac</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaAeaAac_loc" xlink:to="jenv-bw2-i_AuditorsFeesOtherAuditProcedures_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_AuditorsFeesOtherNonAuditServices_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_AuditorsFeesOtherNonAuditServices_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:AuditorsFeesOtherNonAuditServices">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:AuditorsFeesAxis" member="rj-dm:AuditorsFeesMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:source>WBedAeaAeaAnc</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaAeaAnc_loc" xlink:to="jenv-bw2-i_AuditorsFeesOtherNonAuditServices_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_AuditorsFeesTaxServices_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_AuditorsFeesTaxServices_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:AuditorsFeesTaxServices">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:explicitDimension rgs:qname="rj-dim:AuditorsFeesAxis" member="rj-dm:AuditorsFeesMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:SeparateMember"/>
+				<rgs:source>WBedAeaAeaAao</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBedAeaAeaAao_loc" xlink:to="jenv-bw2-i_AuditorsFeesTaxServices_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+	</gen:link>
+</link:linkbase>

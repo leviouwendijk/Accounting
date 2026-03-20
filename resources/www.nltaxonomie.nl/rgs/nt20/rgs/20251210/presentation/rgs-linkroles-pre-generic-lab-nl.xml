@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 16:44:10 2025
+-->
+<link:linkbase
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:gen="http://xbrl.org/2008/generic"
+	xmlns:label="http://xbrl.org/2008/label"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd
+		http://xbrl.org/2008/label http://www.xbrl.org/2008/generic-label.xsd
+	">
+	<link:arcroleRef xlink:type="simple" arcroleURI="http://xbrl.org/arcrole/2008/element-label" xlink:href="http://www.xbrl.org/2008/generic-label.xsd#element-label"/>
+	<link:roleRef xlink:type="simple" roleURI="http://www.xbrl.org/2008/role/label" xlink:href="http://www.xbrl.org/2008/generic-label.xsd#standard-label"/>
+	<gen:link xlink:type="extended" xlink:role="http://www.xbrl.org/2003/role/link">
+		<link:loc xlink:type="locator" xlink:label="rgs-lr_hierarchy_loc" xlink:href="rgs-linkroles-pre.xsd#rgs-lr_hierarchy"/>
+		<label:label xlink:type="resource" xlink:label="rgs-lr_hierarchy_label-nl" xlink:role="http://www.xbrl.org/2008/role/label" xml:lang="nl" id="rgs-lr_hierarchy_label-nl">RGS hierarchie</label:label>
+		<gen:arc xlink:type="arc" xlink:from="rgs-lr_hierarchy_loc" xlink:to="rgs-lr_hierarchy_label-nl" xlink:arcrole="http://xbrl.org/arcrole/2008/element-label" order="1"/>
+	</gen:link>
+</link:linkbase>

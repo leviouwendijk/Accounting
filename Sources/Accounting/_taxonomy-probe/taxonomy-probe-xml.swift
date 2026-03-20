@@ -46,15 +46,23 @@ extension TaxonomyProbe {
             let role = TaxonomyProbe.attributeValue(attributeDict, ["xlink:role", "role"]) ?? ""
             let ref = LinkbaseRef(href: href, role: role)
 
-            if role.contains("presentationLinkbaseRef") || href.hasSuffix("-pre.xml") {
+            switch TaxonomyProbe.classifyLinkbaseRef(ref) {
+            case "presentation":
                 refs.presentation.append(ref)
-            } else if role.contains("labelLinkbaseRef") || href.hasSuffix("-lab.xml") {
+
+            case "label":
                 refs.labels.append(ref)
-            } else if role.contains("definitionLinkbaseRef") || href.hasSuffix("-def.xml") {
+
+            case "definition":
                 refs.definitions.append(ref)
-            } else if href.hasSuffix("-tab.xml") {
+
+            case "table":
                 refs.tables.append(ref)
-            } else {
+
+            case "mapping":
+                refs.mappings.append(ref)
+
+            default:
                 refs.other.append(ref)
             }
         }
@@ -588,19 +596,118 @@ extension TaxonomyProbe {
         return out
     }
 
-    public static func resolveMappings(from linkbase: GenericLinkbase) -> [ResolvedMapping] {
+    // public static func resolveMappings(from linkbase: GenericLinkbase) -> [ResolvedMapping] {
+    //     let datapointsByLabel = datapoints(from: linkbase)
+    //     var out: [ResolvedMapping] = []
+
+    //     for link in linkbase.links {
+    //         for arc in link.arcs {
+    //             guard let locator = link.locators[arc.from],
+    //                   let datapoint = datapointsByLabel[arc.to],
+    //                   let targetPrimaryQName = datapoint.primaryQName else {
+    //                 continue
+    //             }
+
+    //             let sourceConcept = conceptName(from: locator.href)
+
+    //             out.append(
+    //                 .init(
+    //                     sourceLocatorLabel: locator.label,
+    //                     sourceHref: locator.href,
+    //                     sourceConcept: sourceConcept,
+    //                     targetDatapointLabel: datapoint.label,
+    //                     targetPrimaryQName: targetPrimaryQName,
+    //                     dimensions: datapoint.dimensions,
+    //                     order: arc.order
+    //                 )
+    //             )
+    //         }
+    //     }
+
+    //     return out.sorted { lhs, rhs in
+    //         if lhs.sourceConcept == rhs.sourceConcept {
+    //             return lhs.targetPrimaryQName < rhs.targetPrimaryQName
+    //         }
+    //         return lhs.sourceConcept < rhs.sourceConcept
+    //     }
+    // }
+
+    public static func appendSample(
+        _ value: String,
+        to array: inout [String],
+        limit: Int = 8
+    ) {
+        guard !value.isEmpty else {
+            return
+        }
+
+        guard !array.contains(value) else {
+            return
+        }
+
+        guard array.count < limit else {
+            return
+        }
+
+        array.append(value)
+    }
+
+    public static func resolveMappingsDetailed(from linkbase: GenericLinkbase) -> MappingResolutionResult {
         let datapointsByLabel = datapoints(from: linkbase)
         var out: [ResolvedMapping] = []
+        var diagnostics = MappingResolutionDiagnostics()
 
         for link in linkbase.links {
             for arc in link.arcs {
-                guard let locator = link.locators[arc.from],
-                      let datapoint = datapointsByLabel[arc.to],
-                      let targetPrimaryQName = datapoint.primaryQName else {
+                diagnostics.totalArcs += 1
+
+                if let arcrole = arc.arcrole, !arcrole.isEmpty {
+                    diagnostics.arcroles[arcrole, default: 0] += 1
+                } else {
+                    diagnostics.arcroles["(missing)", default: 0] += 1
+                }
+
+                guard let locator = link.locators[arc.from] else {
+                    diagnostics.droppedMissingLocator += 1
+                    appendSample(arc.from, to: &diagnostics.sampleMissingLocatorLabels)
                     continue
                 }
 
-                let sourceConcept = conceptName(from: locator.href)
+                guard let datapoint = datapointsByLabel[arc.to] else {
+                    diagnostics.droppedMissingDatapoint += 1
+                    appendSample(arc.to, to: &diagnostics.sampleMissingDatapointLabels)
+                    continue
+                }
+
+                guard let targetPrimaryQName = datapoint.primaryQName,
+                      !TaxonomyProbe.trim(targetPrimaryQName).isEmpty else {
+                    diagnostics.droppedMissingPrimaryQName += 1
+                    appendSample(datapoint.label, to: &diagnostics.sampleMissingPrimaryQNameDatapoints)
+                    continue
+                }
+
+                let sourceExtraction = conceptNameExtraction(from: locator.href)
+
+                switch sourceExtraction.method {
+                case .urlFragment:
+                    diagnostics.sourceConceptFromURLFragment += 1
+
+                case .rawHashFragment:
+                    diagnostics.sourceConceptFromRawHashFragment += 1
+
+                case .fallbackWholeHref:
+                    diagnostics.sourceConceptFromFallbackWholeHref += 1
+                    appendSample(locator.href, to: &diagnostics.sampleFallbackSourceHrefs)
+
+                case .emptyHref:
+                    diagnostics.sourceConceptFromEmptyHref += 1
+                }
+
+                guard let sourceConcept = sourceExtraction.concept,
+                      !TaxonomyProbe.trim(sourceConcept).isEmpty else {
+                    diagnostics.droppedMissingSourceConcept += 1
+                    continue
+                }
 
                 out.append(
                     .init(
@@ -613,14 +720,54 @@ extension TaxonomyProbe {
                         order: arc.order
                     )
                 )
+
+                diagnostics.resolvedMappings += 1
             }
         }
 
-        return out.sorted { lhs, rhs in
+        let sorted = out.sorted { lhs, rhs in
             if lhs.sourceConcept == rhs.sourceConcept {
                 return lhs.targetPrimaryQName < rhs.targetPrimaryQName
             }
             return lhs.sourceConcept < rhs.sourceConcept
         }
+
+        return .init(
+            mappings: sorted,
+            diagnostics: diagnostics
+        )
+    }
+
+    public static func resolveMappings(from linkbase: GenericLinkbase) -> [ResolvedMapping] {
+        resolveMappingsDetailed(from: linkbase).mappings
+    }
+}
+
+extension TaxonomyProbe {
+    public static func classifyLinkbaseRef(_ ref: LinkbaseRef) -> String {
+        let href = ref.href.lowercased()
+        let role = ref.role.lowercased()
+
+        if role.contains("presentationlinkbaseref") || href.hasSuffix("-pre.xml") {
+            return "presentation"
+        }
+
+        if role.contains("labellinkbaseref") || href.hasSuffix("-lab.xml") {
+            return "label"
+        }
+
+        if role.contains("definitionlinkbaseref") || href.hasSuffix("-def.xml") {
+            return "definition"
+        }
+
+        if role.contains("tablelinkbaseref") || href.hasSuffix("-tab.xml") {
+            return "table"
+        }
+
+        if role.contains("mapping") || href.contains("/mapping/") || href.contains("/map/") || href.contains("map-") {
+            return "mapping"
+        }
+
+        return "other"
     }
 }

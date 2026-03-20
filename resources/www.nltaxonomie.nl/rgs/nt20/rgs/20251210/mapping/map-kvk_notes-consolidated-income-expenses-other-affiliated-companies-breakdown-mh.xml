@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 17:15:15 2025
+-->
+<link:linkbase
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:gen="http://xbrl.org/2008/generic"
+	xmlns:rgs="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension"
+	xmlns:jenv-bw2-i="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data"
+	xmlns:jenv-bw2-dim="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes"
+	xmlns:jenv-bw2-dm="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd
+		http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension ../../../../2022/xbrl/rgs-syntax-extension.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains.xsd
+	">
+	<link:roleRef xlink:type="simple" roleURI="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_to_dts"/>
+	<link:roleRef xlink:type="simple" roleURI="urn:kvk:linkrole:notes-consolidated-income-expenses-other-affiliated-companies-breakdown" xlink:href="http://www.nltaxonomie.nl/nt20/kvk/20251210/dictionary/kvk-linkroles.xsd#kvk-lr_NotesConsolidatedIncomeExpensesOtherAffiliatedCompaniesBreakdown"/>
+	<link:arcroleRef xlink:type="simple" arcroleURI="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_mapping"/>
+	<gen:link xlink:type="extended" xlink:role="urn:kvk:linkrole:notes-consolidated-income-expenses-other-affiliated-companies-breakdown">
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWfaBwvFvaDee_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWfaBwvFvaDee"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOvtRofRvp_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOvtRofRvp"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOvtRofRvi_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOvtRofRvi"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOvtRofRvu_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOvtRofRvu"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOvtRofRid_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOvtRofRid"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WOvtRofRud_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WOvtRofRud"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WFbeRlsRmi_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WFbeRlsRmi"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WFbeRlsRmu_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WFbeRlsRmu"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WFbeRlsRdi_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WFbeRlsRdi"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WFbeRlsRdu_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WFbeRlsRdu"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WFbeRlmRmi_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WFbeRlmRmi"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WFbeRlmRmu_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WFbeRlmRmu"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WFbeRlmRdi_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WFbeRlmRdi"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WFbeRlmRdu_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WFbeRlmRdu"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WRedAirOvd_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WRedAirOvd"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_ChangesValueFinancialAssetsSecuritiesOtherAffiliatedCompanies_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_ChangesValueFinancialAssetsSecuritiesOtherAffiliatedCompanies_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:ChangesValueFinancialAssetsSecuritiesOtherAffiliatedCompanies">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>WWfaBwvFvaDee</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWfaBwvFvaDee_loc" xlink:to="jenv-bw2-i_ChangesValueFinancialAssetsSecuritiesOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_IncomeReceivablesNoncurrentSecuritiesOtherAffiliatedCompanies_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_IncomeReceivablesNoncurrentSecuritiesOtherAffiliatedCompanies_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:IncomeReceivablesNoncurrentSecuritiesOtherAffiliatedCompanies">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>=GROUP(WOvtRofRvp+WOvtRofRvi+WOvtRofRvu+WOvtRofRid+WOvtRofRud)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOvtRofRvp_loc" xlink:to="jenv-bw2-i_IncomeReceivablesNoncurrentSecuritiesOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOvtRofRvi_loc" xlink:to="jenv-bw2-i_IncomeReceivablesNoncurrentSecuritiesOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOvtRofRvu_loc" xlink:to="jenv-bw2-i_IncomeReceivablesNoncurrentSecuritiesOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOvtRofRid_loc" xlink:to="jenv-bw2-i_IncomeReceivablesNoncurrentSecuritiesOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WOvtRofRud_loc" xlink:to="jenv-bw2-i_IncomeReceivablesNoncurrentSecuritiesOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_InterestExpensesRelatedExpensesOtherAffiliatedCompanies_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_InterestExpensesRelatedExpensesOtherAffiliatedCompanies_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:InterestExpensesRelatedExpensesOtherAffiliatedCompanies">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>=GROUP(WFbeRlsRmi+WFbeRlsRmu+WFbeRlsRdi+WFbeRlsRdu)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WFbeRlsRmi_loc" xlink:to="jenv-bw2-i_InterestExpensesRelatedExpensesOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WFbeRlsRmu_loc" xlink:to="jenv-bw2-i_InterestExpensesRelatedExpensesOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WFbeRlsRdi_loc" xlink:to="jenv-bw2-i_InterestExpensesRelatedExpensesOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WFbeRlsRdu_loc" xlink:to="jenv-bw2-i_InterestExpensesRelatedExpensesOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_InterestIncomeRelatedIncomeOtherAffiliatedCompanies_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_InterestIncomeRelatedIncomeOtherAffiliatedCompanies_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:InterestIncomeRelatedIncomeOtherAffiliatedCompanies">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>=GROUP(WFbeRlmRmi+WFbeRlmRmu+WFbeRlmRdi+WFbeRlmRdu)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WFbeRlmRmi_loc" xlink:to="jenv-bw2-i_InterestIncomeRelatedIncomeOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WFbeRlmRmu_loc" xlink:to="jenv-bw2-i_InterestIncomeRelatedIncomeOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WFbeRlmRdi_loc" xlink:to="jenv-bw2-i_InterestIncomeRelatedIncomeOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WFbeRlmRdu_loc" xlink:to="jenv-bw2-i_InterestIncomeRelatedIncomeOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_ShareInResultsParticipatingInterestsInOtherAffiliatedCompanies_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_ShareInResultsParticipatingInterestsInOtherAffiliatedCompanies_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:ShareInResultsParticipatingInterestsInOtherAffiliatedCompanies">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>WRedAirOvd</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WRedAirOvd_loc" xlink:to="jenv-bw2-i_ShareInResultsParticipatingInterestsInOtherAffiliatedCompanies_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+	</gen:link>
+</link:linkbase>

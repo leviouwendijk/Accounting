@@ -99,10 +99,48 @@ public struct ComputedMappedFact: Sendable {
 }
 
 // fuzzy
-
 public struct MappingSuggestion: Sendable {
     public let queryCode: String
     public let candidateCode: String
     public let score: Int
     public let reasons: [String]
+}
+
+// new mapping diag
+public struct ConceptNameExtraction: Sendable {
+    public enum Method: String, Sendable {
+        case urlFragment
+        case rawHashFragment
+        case fallbackWholeHref
+        case emptyHref
+    }
+
+    public let href: String
+    public let concept: String?
+    public let method: Method
+}
+
+public struct MappingResolutionDiagnostics: Sendable {
+    public var totalArcs: Int = 0
+    public var resolvedMappings: Int = 0
+    public var droppedMissingLocator: Int = 0
+    public var droppedMissingDatapoint: Int = 0
+    public var droppedMissingPrimaryQName: Int = 0
+    public var droppedMissingSourceConcept: Int = 0
+    public var sourceConceptFromURLFragment: Int = 0
+    public var sourceConceptFromRawHashFragment: Int = 0
+    public var sourceConceptFromFallbackWholeHref: Int = 0
+    public var sourceConceptFromEmptyHref: Int = 0
+    public var arcroles: [String: Int] = [:]
+    public var sampleMissingLocatorLabels: [String] = []
+    public var sampleMissingDatapointLabels: [String] = []
+    public var sampleMissingPrimaryQNameDatapoints: [String] = []
+    public var sampleFallbackSourceHrefs: [String] = []
+
+    public init() {}
+}
+
+public struct MappingResolutionResult: Sendable {
+    public let mappings: [ResolvedMapping]
+    public let diagnostics: MappingResolutionDiagnostics
 }

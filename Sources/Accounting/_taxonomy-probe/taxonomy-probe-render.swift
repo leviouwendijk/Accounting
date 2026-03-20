@@ -366,3 +366,48 @@ extension TaxonomyProbe {
         }
     }
 }
+
+extension TaxonomyProbe {
+    public static func renderMappingResolutionDiagnostics(
+        _ diagnostics: MappingResolutionDiagnostics,
+        indent: String = ""
+    ) {
+        print("\(indent)mapping diagnostics:")
+        print("\(indent)  arcs seen: \(diagnostics.totalArcs)")
+        print("\(indent)  resolved mappings: \(diagnostics.resolvedMappings)")
+        print("\(indent)  dropped missing locator: \(diagnostics.droppedMissingLocator)")
+        print("\(indent)  dropped missing datapoint: \(diagnostics.droppedMissingDatapoint)")
+        print("\(indent)  dropped missing primary qname: \(diagnostics.droppedMissingPrimaryQName)")
+        print("\(indent)  dropped missing source concept: \(diagnostics.droppedMissingSourceConcept)")
+        print("\(indent)  source concept via url fragment: \(diagnostics.sourceConceptFromURLFragment)")
+        print("\(indent)  source concept via raw hash fragment: \(diagnostics.sourceConceptFromRawHashFragment)")
+        print("\(indent)  source concept via whole-href fallback: \(diagnostics.sourceConceptFromFallbackWholeHref)")
+        print("\(indent)  source concept via empty href: \(diagnostics.sourceConceptFromEmptyHref)")
+
+        if !diagnostics.arcroles.isEmpty {
+            print("\(indent)  arcroles:")
+            for key in diagnostics.arcroles.keys.sorted() {
+                print("\(indent)    \(key): \(diagnostics.arcroles[key] ?? 0)")
+            }
+        }
+
+        if !diagnostics.sampleMissingLocatorLabels.isEmpty {
+            print("\(indent)  sample missing locator labels: \(diagnostics.sampleMissingLocatorLabels.joined(separator: ", "))")
+        }
+
+        if !diagnostics.sampleMissingDatapointLabels.isEmpty {
+            print("\(indent)  sample missing datapoint labels: \(diagnostics.sampleMissingDatapointLabels.joined(separator: ", "))")
+        }
+
+        if !diagnostics.sampleMissingPrimaryQNameDatapoints.isEmpty {
+            print("\(indent)  sample datapoints missing primary qname: \(diagnostics.sampleMissingPrimaryQNameDatapoints.joined(separator: ", "))")
+        }
+
+        if !diagnostics.sampleFallbackSourceHrefs.isEmpty {
+            print("\(indent)  sample fallback source hrefs:")
+            for href in diagnostics.sampleFallbackSourceHrefs {
+                print("\(indent)    \(href)")
+            }
+        }
+    }
+}

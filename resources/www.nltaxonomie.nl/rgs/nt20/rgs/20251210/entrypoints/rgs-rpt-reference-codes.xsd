@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 16:44:10 2025
+-->
+<xs:schema targetNamespace="http://www.nltaxonomie.nl/rgs/nt20/rgs/20251210/entrypoints/rgs-rpt-reference-codes" elementFormDefault="qualified" attributeFormDefault="unqualified"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+	<xs:annotation>
+		<xs:appinfo>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2003/role/presentationLinkbaseRef" xlink:href="../presentation/rgs-hierarchy-pre.xml"/>
+		</xs:appinfo>
+	</xs:annotation>
+</xs:schema>

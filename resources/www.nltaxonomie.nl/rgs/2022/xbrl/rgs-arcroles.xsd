@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ xmlns:rgs="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension"
+ xmlns:rgs-a="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-arcroles"
+ xmlns:link="http://www.xbrl.org/2003/linkbase"
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+ xmlns:gen="http://xbrl.org/2008/generic"
+ targetNamespace="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-arcroles"
+ elementFormDefault="qualified"
+ attributeFormDefault="unqualified"
+ version="20220610">
+	<xs:annotation>
+		<xs:appinfo>
+            <link:linkbaseRef xlink:href="./rgs-arcroles-generic-lab-en.xml" xlink:role="documentation" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:type="simple" />
+			<link:roleType roleURI="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rgs_to_dts">
+				<link:definition>Resource role for the 'to' side of a mapping.</link:definition>
+				<link:usedOn>rgs:datapoint</link:usedOn>
+			</link:roleType>
+			<!-- External validation required: if a 'many' arc is used only the from OR to MUST have more than one resource connected -->
+			<link:arcroleType id="rgs_mapping" cyclesAllowed="undirected" arcroleURI="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping">
+				<link:definition>Arcrole for combining a 'from' resource with a 'to' resource containing mapping information.</link:definition>
+				<link:usedOn>gen:arc</link:usedOn>
+			</link:arcroleType>
+		</xs:appinfo>
+	</xs:annotation>
+	<xs:import namespace="http://www.xbrl.org/2003/XLink" schemaLocation="http://www.xbrl.org/2003/xl-2003-12-31.xsd"/>
+	<xs:import namespace="http://www.xbrl.org/2003/linkbase" schemaLocation="http://www.xbrl.org/2003/xbrl-linkbase-2003-12-31.xsd"/>
+	<xs:import namespace="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension" schemaLocation="rgs-syntax-extension.xsd"/>
+</xs:schema>

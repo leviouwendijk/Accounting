@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 17:01:18 2025
+-->
+<xs:schema targetNamespace="http://www.nltaxonomie.nl/rgs/nt20/rgs/20251210/entrypoints/rgs-to-kvk-rpt-jaarverantwoording-2025-nlgaap-klein" elementFormDefault="qualified" attributeFormDefault="unqualified"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+	<xs:annotation>
+		<xs:appinfo>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_balance-sheet-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_consolidated-balance-sheet-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_consolidated-income-statement-small-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_income-statement-small-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-changes-in-value-assets-noncurrent-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-changes-investment-properties-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-changes-noncurrent-receivables-securities-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-changes-in-value-assets-noncurrent-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-changes-investment-properties-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-changes-noncurrent-receivables-securities-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-employee-benefits-expenses-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-financial-assets-accumulated-revaluations-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-financial-income-expense-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-income-expenses-group-companies-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-income-expenses-other-affiliated-companies-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-intangible-assets-accumulated-revaluations-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-intangible-assets-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-inventories-current-value-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-investment-properties-movement-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-loans-advances-guarantees-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-noncurrent-liabilities-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-noncurrent-liabilities-other-amounts-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-other-changes-intangible-assets-property-plant-equipment-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-property-plant-equipment-accumulated-revaluations-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-receivables-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-consolidated-securities-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-employee-benefits-expenses-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-equity-statement-of-changes-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-financial-assets-accumulated-revaluations-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-financial-income-expense-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-income-expenses-group-companies-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-income-expenses-other-affiliated-companies-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-intangible-assets-accumulated-revaluations-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-intangible-assets-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-inventories-current-value-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-investment-properties-movement-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-legal-reserves-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-loans-advances-guarantees-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-noncurrent-liabilities-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-noncurrent-liabilities-other-amounts-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-other-changes-intangible-assets-property-plant-equipment-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-property-plant-equipment-accumulated-revaluations-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-receivables-breakdown-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-revaluation-reserve-statement-of-changes-sh.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-securities-breakdown-sh.xml"/>
+		</xs:appinfo>
+	</xs:annotation>
+	<xs:import namespace="http://www.nltaxonomie.nl/nt20/kvk/20251210/entrypoints/kvk-rpt-jaarverantwoording-2025-nlgaap-klein" schemaLocation="http://www.nltaxonomie.nl/nt20/kvk/20251210/entrypoints/kvk-rpt-jaarverantwoording-2025-nlgaap-klein.xsd"/>
+</xs:schema>

@@ -977,7 +977,8 @@ func renderPresentationLink(
 
 // MARK: - Configuration
 
-let entrypoint = "https://www.nltaxonomie.nl/nt20/bd/20251210.a/entrypoints/bd-rpt-ihz-aangifte-2025.xsd"
+// let entrypoint = "https://www.nltaxonomie.nl/nt20/bd/20251210.a/entrypoints/bd-rpt-ihz-aangifte-2025.xsd"
+let entrypoint = "https://www.nltaxonomie.nl/nt20/bd/20251210/entrypoints/bd-rpt-ihz-aangifte-2025.xsd"
 let wantedPresentation = "winst-resultatenrekening-pre.xml"
 
 // Official separate RGS mapping package.

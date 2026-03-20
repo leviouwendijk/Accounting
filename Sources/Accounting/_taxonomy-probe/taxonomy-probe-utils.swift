@@ -64,18 +64,63 @@ extension TaxonomyProbe {
         return resolved
     }
 
-    public static func conceptName(from locatorHref: String) -> String {
-        if let url = URL(string: locatorHref), let fragment = url.fragment, !fragment.isEmpty {
-            return fragment
+    public static func conceptNameExtraction(from locatorHref: String) -> ConceptNameExtraction {
+        let raw = trim(locatorHref)
+
+        guard !raw.isEmpty else {
+            return .init(
+                href: locatorHref,
+                concept: nil,
+                method: .emptyHref
+            )
         }
 
-        if let hashIndex = locatorHref.lastIndex(of: "#") {
-            let next = locatorHref.index(after: hashIndex)
-            return String(locatorHref[next...])
+        if let url = URL(string: raw),
+           let fragment = url.fragment,
+           !fragment.isEmpty {
+            return .init(
+                href: locatorHref,
+                concept: fragment,
+                method: .urlFragment
+            )
         }
 
-        return locatorHref
+        if let hashIndex = raw.lastIndex(of: "#") {
+            let next = raw.index(after: hashIndex)
+            let fragment = String(raw[next...])
+
+            if !fragment.isEmpty {
+                return .init(
+                    href: locatorHref,
+                    concept: fragment,
+                    method: .rawHashFragment
+                )
+            }
+        }
+
+        return .init(
+            href: locatorHref,
+            concept: raw,
+            method: .fallbackWholeHref
+        )
     }
+
+    public static func conceptName(from locatorHref: String) -> String {
+        conceptNameExtraction(from: locatorHref).concept ?? trim(locatorHref)
+    }
+
+    // public static func conceptName(from locatorHref: String) -> String {
+    //     if let url = URL(string: locatorHref), let fragment = url.fragment, !fragment.isEmpty {
+    //         return fragment
+    //     }
+
+    //     if let hashIndex = locatorHref.lastIndex(of: "#") {
+    //         let next = locatorHref.index(after: hashIndex)
+    //         return String(locatorHref[next...])
+    //     }
+
+    //     return locatorHref
+    // }
 
     public static func fetchData(from url: URL) throws -> Data {
         if url.isFileURL {

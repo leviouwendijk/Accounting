@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 18:02:57 2025
+-->
+<xs:schema targetNamespace="http://www.nltaxonomie.nl/rgs/nt20/rgs/20251210/entrypoints/rgs-to-bzk-rpt-de-verantwoordingsinformatie-2025-toegelaten-instellingen-volkshuisvesting-administratieve-scheiding-geconsolideerd" elementFormDefault="qualified" attributeFormDefault="unqualified"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+	<xs:annotation>
+		<xs:appinfo>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_balance-sheet-consolidated-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_balance-sheet-daeb-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_balance-sheet-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_balance-sheet-non-daeb-compound-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_balance-sheet-non-daeb-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_cash-flow-statement-daeb-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_cash-flow-statement-non-daeb-compound-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_cash-flow-statement-non-daeb-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_income-statement-consolidated-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_income-statement-daeb-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_income-statement-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_income-statement-non-daeb-compound-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_income-statement-non-daeb-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_specification-of-the-rental-income-daeb-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_specification-of-the-rental-income-non-daeb-compound-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_specification-of-the-rental-income-non-daeb-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_specification-sector-specific-levy-independent-of-result-daeb-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_specification-sector-specific-levy-independent-of-result-non-daeb-compound-housing-dvi-dvi-asc.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bzk_specification-sector-specific-levy-independent-of-result-non-daeb-housing-dvi-dvi-asc.xml"/>
+		</xs:appinfo>
+	</xs:annotation>
+	<xs:import namespace="http://www.nltaxonomie.nl/nt20/bzk/20260121/entrypoints/bzk-rpt-de-verantwoordingsinformatie-2025-toegelaten-instellingen-volkshuisvesting-administratieve-scheiding-geconsolideerd" schemaLocation="http://www.nltaxonomie.nl/nt20/bzk/20260121/entrypoints/bzk-rpt-de-verantwoordingsinformatie-2025-toegelaten-instellingen-volkshuisvesting-administratieve-scheiding-geconsolideerd.xsd"/>
+</xs:schema>

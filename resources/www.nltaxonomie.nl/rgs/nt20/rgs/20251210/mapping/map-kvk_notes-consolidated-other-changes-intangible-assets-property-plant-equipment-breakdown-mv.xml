@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 17:19:18 2025
+-->
+<link:linkbase
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:gen="http://xbrl.org/2008/generic"
+	xmlns:rgs="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension"
+	xmlns:jenv-bw2-dm="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains"
+	xmlns:jenv-bw2-i="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data"
+	xmlns:rj-i="http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data"
+	xmlns:jenv-bw2-dim="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd
+		http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension ../../../../2022/xbrl/rgs-syntax-extension.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data.xsd
+		http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes.xsd
+	">
+	<link:roleRef xlink:type="simple" roleURI="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_to_dts"/>
+	<link:roleRef xlink:type="simple" roleURI="urn:kvk:linkrole:notes-consolidated-other-changes-intangible-assets-property-plant-equipment-breakdown" xlink:href="http://www.nltaxonomie.nl/nt20/kvk/20251210/dictionary/kvk-linkroles.xsd#kvk-lr_NotesConsolidatedOtherChangesIntangibleAssetsPropertyPlantEquipmentBreakdown"/>
+	<link:arcroleRef xlink:type="simple" arcroleURI="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_mapping"/>
+	<gen:link xlink:type="extended" xlink:role="urn:kvk:linkrole:notes-consolidated-other-changes-intangible-assets-property-plant-equipment-breakdown">
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvi_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvi"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWviBwi_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWviBwi"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWviTbi_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWviTbi"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWviDfw_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWviDfw"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvmBwm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvmBwm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvmTbm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvmTbm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvmDfw_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvmDfw"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_ChangesInValueIntangibleAssets_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_ChangesInValueIntangibleAssets_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:ChangesInValueIntangibleAssets">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>WWviWvi*</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvi_loc" xlink:to="jenv-bw2-i_ChangesInValueIntangibleAssets_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWviBwi_loc" xlink:to="jenv-bw2-i_ChangesInValueIntangibleAssets_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWviTbi_loc" xlink:to="jenv-bw2-i_ChangesInValueIntangibleAssets_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWviDfw_loc" xlink:to="jenv-bw2-i_ChangesInValueIntangibleAssets_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_ChangesInValueIntangibleAssetsPropertyPlantEquipmentBreakdown_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_ChangesInValueIntangibleAssetsPropertyPlantEquipmentBreakdown_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:ChangesInValueIntangibleAssetsPropertyPlantEquipmentBreakdown">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>=GROUP(WWviWvi*+WWviWvm*)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvi_loc" xlink:to="jenv-bw2-i_ChangesInValueIntangibleAssetsPropertyPlantEquipmentBreakdown_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWviBwi_loc" xlink:to="jenv-bw2-i_ChangesInValueIntangibleAssetsPropertyPlantEquipmentBreakdown_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWviTbi_loc" xlink:to="jenv-bw2-i_ChangesInValueIntangibleAssetsPropertyPlantEquipmentBreakdown_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWviDfw_loc" xlink:to="jenv-bw2-i_ChangesInValueIntangibleAssetsPropertyPlantEquipmentBreakdown_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvm_loc" xlink:to="jenv-bw2-i_ChangesInValueIntangibleAssetsPropertyPlantEquipmentBreakdown_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvmBwm_loc" xlink:to="jenv-bw2-i_ChangesInValueIntangibleAssetsPropertyPlantEquipmentBreakdown_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvmTbm_loc" xlink:to="jenv-bw2-i_ChangesInValueIntangibleAssetsPropertyPlantEquipmentBreakdown_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvmDfw_loc" xlink:to="jenv-bw2-i_ChangesInValueIntangibleAssetsPropertyPlantEquipmentBreakdown_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="8"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_ChangesInValuePropertyPlantEquipment_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_ChangesInValuePropertyPlantEquipment_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:ChangesInValuePropertyPlantEquipment">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>WWviWvm*</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvm_loc" xlink:to="jenv-bw2-i_ChangesInValuePropertyPlantEquipment_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvmBwm_loc" xlink:to="jenv-bw2-i_ChangesInValuePropertyPlantEquipment_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvmTbm_loc" xlink:to="jenv-bw2-i_ChangesInValuePropertyPlantEquipment_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvmDfw_loc" xlink:to="jenv-bw2-i_ChangesInValuePropertyPlantEquipment_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_ImpairmentIntangibleAssetsRecordedInIncomeStatement_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_ImpairmentIntangibleAssetsRecordedInIncomeStatement_dp">
+			<rgs:primary rgs:qname="rj-i:ImpairmentIntangibleAssetsRecordedInIncomeStatement">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>=GROUP(WWviWviBwi+WWviWviDfw)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWviBwi_loc" xlink:to="rj-i_ImpairmentIntangibleAssetsRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWviDfw_loc" xlink:to="rj-i_ImpairmentIntangibleAssetsRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_ImpairmentIntangibleAssetsReversalRecordedInIncomeStatement_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_ImpairmentIntangibleAssetsReversalRecordedInIncomeStatement_dp">
+			<rgs:primary rgs:qname="rj-i:ImpairmentIntangibleAssetsReversalRecordedInIncomeStatement">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>WWviWviTbi</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWviTbi_loc" xlink:to="rj-i_ImpairmentIntangibleAssetsReversalRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_ImpairmentPropertyPlantEquipmentRecordedInIncomeStatement_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_ImpairmentPropertyPlantEquipmentRecordedInIncomeStatement_dp">
+			<rgs:primary rgs:qname="rj-i:ImpairmentPropertyPlantEquipmentRecordedInIncomeStatement">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>=GROUP(WWviWvmBwm+WWviWvmDfw)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvmBwm_loc" xlink:to="rj-i_ImpairmentPropertyPlantEquipmentRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvmDfw_loc" xlink:to="rj-i_ImpairmentPropertyPlantEquipmentRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_ImpairmentPropertyPlantEquipmentReversalRecordedInIncomeStatement_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_ImpairmentPropertyPlantEquipmentReversalRecordedInIncomeStatement_dp">
+			<rgs:primary rgs:qname="rj-i:ImpairmentPropertyPlantEquipmentReversalRecordedInIncomeStatement">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>WWviWvmTbm</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvmTbm_loc" xlink:to="rj-i_ImpairmentPropertyPlantEquipmentReversalRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+	</gen:link>
+</link:linkbase>

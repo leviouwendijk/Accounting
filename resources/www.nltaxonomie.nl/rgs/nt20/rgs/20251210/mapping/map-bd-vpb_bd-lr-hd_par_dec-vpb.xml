@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Thu January 29 13:34:04 2026
+-->
+<link:linkbase
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:gen="http://xbrl.org/2008/generic"
+	xmlns:rgs="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension"
+	xmlns:bd-i="http://www.nltaxonomie.nl/nt20/bd/20251210/dictionary/bd-data"
+	xmlns:bd-dim-mem="http://www.nltaxonomie.nl/nt20/bd/20251210/dictionary/bd-domain-members"
+	xmlns:bd-dim-dim="http://www.nltaxonomie.nl/nt20/bd/20251210/validation/bd-axes"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd
+		http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension ../../../../2022/xbrl/rgs-syntax-extension.xsd
+		http://www.nltaxonomie.nl/nt20/bd/20251210/dictionary/bd-data https://www.nltaxonomie.nl/nt20/bd/20251210/dictionary/bd-data.xsd
+		http://www.nltaxonomie.nl/nt20/bd/20251210/dictionary/bd-domain-members https://www.nltaxonomie.nl/nt20/bd/20251210/dictionary/bd-domain-members.xsd
+		http://www.nltaxonomie.nl/nt20/bd/20251210/validation/bd-axes https://www.nltaxonomie.nl/nt20/bd/20251210/validation/bd-axes.xsd
+	">
+	<link:roleRef xlink:type="simple" roleURI="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_to_dts"/>
+	<link:roleRef xlink:type="simple" roleURI="http://www.xbrl.org/2008/role/link" xlink:href="http://www.xbrl.org/2008/generic-link.xsd#standard-link-role"/>
+	<link:arcroleRef xlink:type="simple" arcroleURI="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_mapping"/>
+	<gen:link xlink:type="extended" xlink:role="http://www.xbrl.org/2008/role/link">
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WAfsAmvAft_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WAfsAmvAft"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivOkcKegDot_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivOkcKegDot"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WAfsAmvBeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WAfsAmvBeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WAfsAmvVeb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WAfsAmvVeb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WBelBgrBgr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WBelBgrBgr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEivOkcKegKtl_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEivOkcKegKtl"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_CompanySitesEtcDepreciationSpecificationAmountFiscal_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_CompanySitesEtcDepreciationSpecificationAmountFiscal_dp">
+			<rgs:primary rgs:qname="bd-i:CompanySitesEtcDepreciationSpecificationAmountFiscal">
+				<rgs:explicitDimension rgs:qname="bd-dim-dim:PartyDimension" member="bd-dim-mem:Declarant"/>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WAfsAmvAft_loc" xlink:to="bd-i_CompanySitesEtcDepreciationSpecificationAmountFiscal_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_EqualizationReserveCostAddition_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_EqualizationReserveCostAddition_dp">
+			<rgs:primary rgs:qname="bd-i:EqualizationReserveCostAddition">
+				<rgs:explicitDimension rgs:qname="bd-dim-dim:PartyDimension" member="bd-dim-mem:Declarant"/>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivOkcKegDot_loc" xlink:to="bd-i_EqualizationReserveCostAddition_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_CompanyBuildingsDepreciationFiscal_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_CompanyBuildingsDepreciationFiscal_dp">
+			<rgs:primary rgs:qname="bd-i:CompanyBuildingsDepreciationFiscal">
+				<rgs:explicitDimension rgs:qname="bd-dim-dim:PartyDimension" member="bd-dim-mem:Declarant"/>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WAfsAmvBeg_loc" xlink:to="bd-i_CompanyBuildingsDepreciationFiscal_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WAfsAmvVeb_loc" xlink:to="bd-i_CompanyBuildingsDepreciationFiscal_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_TaxAccordingToOrdinaryRate_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_TaxAccordingToOrdinaryRate_dp">
+			<rgs:primary rgs:qname="bd-i:TaxAccordingToOrdinaryRate">
+				<rgs:explicitDimension rgs:qname="bd-dim-dim:PartyDimension" member="bd-dim-mem:Declarant"/>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WBelBgrBgr_loc" xlink:to="bd-i_TaxAccordingToOrdinaryRate_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="bd-i_EqualizationReserveWithdrawalCost_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="bd-i_EqualizationReserveWithdrawalCost_dp">
+			<rgs:primary rgs:qname="bd-i:EqualizationReserveWithdrawalCost">
+				<rgs:explicitDimension rgs:qname="bd-dim-dim:PartyDimension" member="bd-dim-mem:Declarant"/>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEivOkcKegKtl_loc" xlink:to="bd-i_EqualizationReserveWithdrawalCost_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+	</gen:link>
+</link:linkbase>

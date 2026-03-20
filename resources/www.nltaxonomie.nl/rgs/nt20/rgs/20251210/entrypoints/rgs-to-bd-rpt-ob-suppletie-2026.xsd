@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Thu December 18 14:37:28 2025
+-->
+<xs:schema targetNamespace="http://www.nltaxonomie.nl/rgs/nt20/rgs/20251210/entrypoints/rgs-to-bd-rpt-ob-suppletie-2026" elementFormDefault="qualified" attributeFormDefault="unqualified"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+	<xs:annotation>
+		<xs:appinfo>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-bd-ob-sup_bd-lr-hd_nodim-ob.xml"/>
+		</xs:appinfo>
+	</xs:annotation>
+	<xs:import namespace="http://www.nltaxonomie.nl/nt20/bd/20251210/entrypoints/bd-rpt-ob-suppletie-2026" schemaLocation="https://www.nltaxonomie.nl/nt20/bd/20251210/entrypoints/bd-rpt-ob-suppletie-2026.xsd"/>
+</xs:schema>

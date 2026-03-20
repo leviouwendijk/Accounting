@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 17:01:18 2025
+-->
+<link:linkbase
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:gen="http://xbrl.org/2008/generic"
+	xmlns:rgs="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension"
+	xmlns:jenv-bw2-dm="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains"
+	xmlns:jenv-bw2-i="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data"
+	xmlns:jenv-bw2-dim="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes"
+	xmlns:rj-i="http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd
+		http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension ../../../../2022/xbrl/rgs-syntax-extension.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-data.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes.xsd
+		http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data.xsd
+	">
+	<link:roleRef xlink:type="simple" roleURI="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_to_dts"/>
+	<link:roleRef xlink:type="simple" roleURI="urn:kvk:linkrole:notes-consolidated-securities-breakdown" xlink:href="http://www.nltaxonomie.nl/nt20/kvk/20251210/dictionary/kvk-linkroles.xsd#kvk-lr_NotesConsolidatedSecuritiesBreakdown"/>
+	<link:arcroleRef xlink:type="simple" arcroleURI="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_mapping"/>
+	<gen:link xlink:type="extended" xlink:role="urn:kvk:linkrole:notes-consolidated-securities-breakdown">
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEff_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEff"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAan_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAan"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAanAbe_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAanAbe"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAanAbeBeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAanAbeBeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAanAbeAan_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAanAbeAan"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAanAbeVrk_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAanAbeVrk"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAanAbeWvr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAanAbeWvr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAanAbeAsm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAanAbeAsm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAanAbeOvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAanAbeOvm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAanAnb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAanAnb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAanAnbBeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAanAnbBeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAanAnbAan_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAanAnbAan"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAanAnbVrk_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAanAnbVrk"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAanAnbWvr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAanAnbWvr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAanAnbAsm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAanAnbAsm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffAanAnbOvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffAanAnbOvm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffObl_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffObl"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblObb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblObb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblObbBeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblObbBeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblObbAan_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblObbAan"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblObbVrk_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblObbVrk"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblObbWvr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblObbWvr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblObbUil_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblObbUil"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblObbAsm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblObbAsm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblObbOvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblObbOvm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblOnb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblOnb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblOnbBeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblOnbBeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblOnbAan_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblOnbAan"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblOnbVrk_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblOnbVrk"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblOnbWvr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblOnbWvr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblOnbUil_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblOnbUil"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOblOnbOvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOblOnbOvm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOve_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOve"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOveOeb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOveOeb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOveOebBeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOveOebBeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOveOebAan_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOveOebAan"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOveOebVrk_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOveOebVrk"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOveOebWvr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOveOebWvr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOveOebOvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOveOebOvm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOveOen_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOveOen"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOveOenBeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOveOenBeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOveOenAan_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOveOenAan"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOveOenVrk_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOveOenVrk"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOveOenWvr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOveOenWvr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOveOenOvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOveOenOvm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOpt_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOpt"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOptOpb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOptOpb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOptOpbAan_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOptOpbAan"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOptOpbVrk_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOptOpbVrk"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOptOpbWvr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOptOpbWvr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOptOpbOvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOptOpbOvm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOptOpn_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOptOpn"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOptOpnAan_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOptOpnAan"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOptOpnVrk_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOptOpnVrk"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOptOpnWvr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOptOpnWvr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOptOpnOvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOptOpnOvm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOpv_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOpv"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOpvOpb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOpvOpb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOpvOpbAan_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOpvOpbAan"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOpvOpbVrk_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOpvOpbVrk"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOpvOpbWvr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOpvOpbWvr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOpvOpbOvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOpvOpbOvm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOpvOpn_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOpvOpn"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOpvOpnAan_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOpvOpnAan"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOpvOpnVrk_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOpvOpnVrk"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOpvOpnWvr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOpvOpnWvr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffOpvOpnOvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffOpvOpnOvm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffDer_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffDer"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffDerDer_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffDerDer"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffDerDerPmd_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffDerDerPmd"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BEffDerDerPed_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BEffDerDerPed"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="jenv-bw2-i_SecuritiesCurrent_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="jenv-bw2-i_SecuritiesCurrent_dp">
+			<rgs:primary rgs:qname="jenv-bw2-i:SecuritiesCurrent">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>Beff*</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEff_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAan_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAbe_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAbeBeg_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAbeAan_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAbeVrk_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAbeWvr_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAbeAsm_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="8"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAbeOvm_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="9"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAnb_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="10"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAnbBeg_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="11"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAnbAan_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="12"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAnbVrk_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="13"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAnbWvr_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="14"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAnbAsm_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="15"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAnbOvm_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="16"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffObl_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="17"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObb_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="18"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObbBeg_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="19"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObbAan_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="20"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObbVrk_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="21"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObbWvr_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="22"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObbUil_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="23"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObbAsm_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="24"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObbOvm_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="25"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblOnb_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="26"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblOnbBeg_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="27"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblOnbAan_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="28"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblOnbVrk_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="29"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblOnbWvr_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="30"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblOnbUil_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="31"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblOnbOvm_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="32"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOve_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="33"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOeb_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="34"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOebBeg_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="35"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOebAan_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="36"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOebVrk_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="37"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOebWvr_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="38"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOebOvm_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="39"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOen_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="40"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOenBeg_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="41"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOenAan_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="42"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOenVrk_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="43"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOenWvr_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="44"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOenOvm_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="45"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpt_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="46"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpb_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="47"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpbAan_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="48"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpbVrk_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="49"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpbWvr_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="50"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpbOvm_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="51"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpn_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="52"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpnAan_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="53"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpnVrk_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="54"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpnWvr_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="55"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpnOvm_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="56"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpv_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="57"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpb_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="58"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpbAan_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="59"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpbVrk_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="60"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpbWvr_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="61"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpbOvm_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="62"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpn_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="63"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpnAan_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="64"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpnVrk_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="65"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpnWvr_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="66"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpnOvm_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="67"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffDer_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="68"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffDerDer_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="69"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffDerDerPmd_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="70"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffDerDerPed_loc" xlink:to="jenv-bw2-i_SecuritiesCurrent_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="71"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_SecuritiesListed_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_SecuritiesListed_dp">
+			<rgs:primary rgs:qname="rj-i:SecuritiesListed">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>=GROUP(BEffAanAbe*+BEffOblObb*+BEffOveOeb*+BEffOptOpb*+BEffOpvOpb*)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAbe_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAbeBeg_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAbeAan_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAbeVrk_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAbeWvr_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAbeAsm_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAbeOvm_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObb_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="8"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObbBeg_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="9"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObbAan_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="10"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObbVrk_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="11"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObbWvr_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="12"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObbUil_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="13"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObbAsm_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="14"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblObbOvm_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="15"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOeb_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="16"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOebBeg_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="17"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOebAan_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="18"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOebVrk_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="19"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOebWvr_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="20"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOebOvm_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="21"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpb_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="22"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpbAan_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="23"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpbVrk_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="24"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpbWvr_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="25"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpbOvm_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="26"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpb_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="27"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpbAan_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="28"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpbVrk_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="29"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpbWvr_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="30"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpbOvm_loc" xlink:to="rj-i_SecuritiesListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="31"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_SecuritiesNonListed_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_SecuritiesNonListed_dp">
+			<rgs:primary rgs:qname="rj-i:SecuritiesNonListed">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:source>=GROUP(BEffAanAnb*+BEffOblOnb*+BEffOveOen*+BEffOptOpn*+BEffOpvOpn*+BEffDerDer*)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAnb_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAnbBeg_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAnbAan_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAnbVrk_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAnbWvr_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAnbAsm_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffAanAnbOvm_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblOnb_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="8"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblOnbBeg_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="9"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblOnbAan_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="10"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblOnbVrk_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="11"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblOnbWvr_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="12"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblOnbUil_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="13"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOblOnbOvm_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="14"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOen_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="15"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOenBeg_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="16"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOenAan_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="17"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOenVrk_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="18"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOenWvr_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="19"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOveOenOvm_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="20"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpn_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="21"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpnAan_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="22"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpnVrk_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="23"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpnWvr_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="24"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOptOpnOvm_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="25"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpn_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="26"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpnAan_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="27"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpnVrk_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="28"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpnWvr_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="29"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffOpvOpnOvm_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="30"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffDerDer_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="31"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffDerDerPmd_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="32"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BEffDerDerPed_loc" xlink:to="rj-i_SecuritiesNonListed_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="33"/>
+	</gen:link>
+</link:linkbase>

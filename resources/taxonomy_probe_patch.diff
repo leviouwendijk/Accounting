@@ -1,0 +1,370 @@
+*** Begin Patch
+*** Update File: taxonomy-models.swift
+@@
+ public struct CanonicalResolvedMapping: Sendable {
+     public let sourceLocatorLabel: String
+     public let sourceHref: String
+@@
+     public let order: Double?
+ }
++
++public struct ConceptNameExtraction: Sendable {
++    public enum Method: String, Sendable {
++        case urlFragment
++        case rawHashFragment
++        case fallbackWholeHref
++        case emptyHref
++    }
++
++    public let href: String
++    public let concept: String?
++    public let method: Method
++}
++
++public struct MappingResolutionDiagnostics: Sendable {
++    public var totalArcs: Int = 0
++    public var resolvedMappings: Int = 0
++    public var droppedMissingLocator: Int = 0
++    public var droppedMissingDatapoint: Int = 0
++    public var droppedMissingPrimaryQName: Int = 0
++    public var droppedMissingSourceConcept: Int = 0
++    public var sourceConceptFromURLFragment: Int = 0
++    public var sourceConceptFromRawHashFragment: Int = 0
++    public var sourceConceptFromFallbackWholeHref: Int = 0
++    public var sourceConceptFromEmptyHref: Int = 0
++    public var arcroles: [String: Int] = [:]
++    public var sampleMissingLocatorLabels: [String] = []
++    public var sampleMissingDatapointLabels: [String] = []
++    public var sampleMissingPrimaryQNameDatapoints: [String] = []
++    public var sampleFallbackSourceHrefs: [String] = []
++
++    public init() {}
++}
++
++public struct MappingResolutionResult: Sendable {
++    public let mappings: [ResolvedMapping]
++    public let diagnostics: MappingResolutionDiagnostics
++}
+*** Update File: taxonomy-probe.swift
+@@
+     public struct EntrypointRefs {
+         var presentation: [LinkbaseRef] = []
+         var labels: [LinkbaseRef] = []
+         var definitions: [LinkbaseRef] = []
+         var tables: [LinkbaseRef] = []
++        var mappings: [LinkbaseRef] = []
+         var other: [LinkbaseRef] = []
+     }
+@@
+             print("  definition refs: \(bootstrap.refs.definitions.count)")
+             print("  table refs: \(bootstrap.refs.tables.count)")
++            print("  mapping refs: \(bootstrap.refs.mappings.count)")
+             print("  other refs: \(bootstrap.refs.other.count)")
+             print("")
+@@
+             print("  label refs: \(rgsRefs.labels.count)")
+             print("  definition refs: \(rgsRefs.definitions.count)")
+             print("  table refs: \(rgsRefs.tables.count)")
++            print("  mapping refs: \(rgsRefs.mappings.count)")
+             print("  other refs: \(rgsRefs.other.count)")
+             print("")
+@@
+             printRefs("RGS label refs:", rgsRefs.labels)
+             printRefs("RGS definition refs:", rgsRefs.definitions)
+             printRefs("RGS table refs:", rgsRefs.tables)
++            printRefs("RGS mapping refs:", rgsRefs.mappings)
+             printRefs("RGS other refs:", rgsRefs.other)
+
+-            let mappingRefs = rgsRefs.other.filter { ref in
+-                ref.href.contains("mapping/")
+-            }
++            let mappingRefs = rgsRefs.mappings
+
+             print("mapping refs in RGS entrypoint: \(mappingRefs.count)")
+             for ref in mappingRefs {
+@@
+-                let mappings = TaxonomyProbe.resolveMappings(from: linkbase)
++                let resolution = TaxonomyProbe.resolveMappingsDetailed(from: linkbase)
++                let mappings = resolution.mappings
+
+                 print("  roleRefs: \(linkbase.roleRefs.count)")
+                 print("  arcroleRefs: \(linkbase.arcroleRefs.count)")
+                 print("  links: \(linkbase.links.count)")
+                 print("  resolved mappings: \(mappings.count)")
++                TaxonomyProbe.renderMappingResolutionDiagnostics(
++                    resolution.diagnostics,
++                    indent: "  "
++                )
+                 print("")
+*** Update File: taxonomy-probe-utils.swift
+@@
+-    public static func conceptName(from locatorHref: String) -> String {
+-        if let url = URL(string: locatorHref), let fragment = url.fragment, !fragment.isEmpty {
+-            return fragment
+-        }
+-
+-        if let hashIndex = locatorHref.lastIndex(of: "#") {
+-            let next = locatorHref.index(after: hashIndex)
+-            return String(locatorHref[next...])
+-        }
+-
+-        return locatorHref
++    public static func conceptNameExtraction(from locatorHref: String) -> ConceptNameExtraction {
++        let raw = trim(locatorHref)
++
++        guard !raw.isEmpty else {
++            return .init(
++                href: locatorHref,
++                concept: nil,
++                method: .emptyHref
++            )
++        }
++
++        if let url = URL(string: raw),
++           let fragment = url.fragment,
++           !fragment.isEmpty {
++            return .init(
++                href: locatorHref,
++                concept: fragment,
++                method: .urlFragment
++            )
++        }
++
++        if let hashIndex = raw.lastIndex(of: "#") {
++            let next = raw.index(after: hashIndex)
++            let fragment = String(raw[next...])
++
++            if !fragment.isEmpty {
++                return .init(
++                    href: locatorHref,
++                    concept: fragment,
++                    method: .rawHashFragment
++                )
++            }
++        }
++
++        return .init(
++            href: locatorHref,
++            concept: raw,
++            method: .fallbackWholeHref
++        )
++    }
++
++    public static func conceptName(from locatorHref: String) -> String {
++        conceptNameExtraction(from: locatorHref).concept ?? locatorHref
+     }
+*** Update File: taxonomy-probe-render.swift
+@@
+ extension TaxonomyProbe {
++    public static func renderMappingResolutionDiagnostics(
++        _ diagnostics: MappingResolutionDiagnostics,
++        indent: String = ""
++    ) {
++        print("\(indent)mapping diagnostics:")
++        print("\(indent)  arcs seen: \(diagnostics.totalArcs)")
++        print("\(indent)  resolved mappings: \(diagnostics.resolvedMappings)")
++        print("\(indent)  dropped missing locator: \(diagnostics.droppedMissingLocator)")
++        print("\(indent)  dropped missing datapoint: \(diagnostics.droppedMissingDatapoint)")
++        print("\(indent)  dropped missing primary qname: \(diagnostics.droppedMissingPrimaryQName)")
++        print("\(indent)  dropped missing source concept: \(diagnostics.droppedMissingSourceConcept)")
++        print("\(indent)  source concept via url fragment: \(diagnostics.sourceConceptFromURLFragment)")
++        print("\(indent)  source concept via raw hash fragment: \(diagnostics.sourceConceptFromRawHashFragment)")
++        print("\(indent)  source concept via whole-href fallback: \(diagnostics.sourceConceptFromFallbackWholeHref)")
++        print("\(indent)  source concept via empty href: \(diagnostics.sourceConceptFromEmptyHref)")
++
++        if !diagnostics.arcroles.isEmpty {
++            print("\(indent)  arcroles:")
++            for key in diagnostics.arcroles.keys.sorted() {
++                print("\(indent)    \(key): \(diagnostics.arcroles[key] ?? 0)")
++            }
++        }
++
++        if !diagnostics.sampleMissingLocatorLabels.isEmpty {
++            print("\(indent)  sample missing locator labels: \(diagnostics.sampleMissingLocatorLabels.joined(separator: ", "))")
++        }
++
++        if !diagnostics.sampleMissingDatapointLabels.isEmpty {
++            print("\(indent)  sample missing datapoint labels: \(diagnostics.sampleMissingDatapointLabels.joined(separator: ", "))")
++        }
++
++        if !diagnostics.sampleMissingPrimaryQNameDatapoints.isEmpty {
++            print("\(indent)  sample datapoints missing primary qname: \(diagnostics.sampleMissingPrimaryQNameDatapoints.joined(separator: ", "))")
++        }
++
++        if !diagnostics.sampleFallbackSourceHrefs.isEmpty {
++            print("\(indent)  sample fallback source hrefs:")
++            for href in diagnostics.sampleFallbackSourceHrefs {
++                print("\(indent)    \(href)")
++            }
++        }
++    }
++
+     public static func renderPresentationLink(
+         _ link: PresentationLink,
+         labelsByConcept: [String: String],
+*** Update File: taxonomy-probe-xml.swift
+@@
+ extension TaxonomyProbe {
++    private static func classifyLinkbaseRef(_ ref: LinkbaseRef) -> String {
++        let href = ref.href.lowercased()
++        let role = ref.role.lowercased()
++
++        if role.contains("presentationlinkbaseref") || href.hasSuffix("-pre.xml") {
++            return "presentation"
++        }
++
++        if role.contains("labellinkbaseref") || href.hasSuffix("-lab.xml") {
++            return "label"
++        }
++
++        if role.contains("definitionlinkbaseref") || href.hasSuffix("-def.xml") {
++            return "definition"
++        }
++
++        if role.contains("tablelinkbaseref") || href.hasSuffix("-tab.xml") {
++            return "table"
++        }
++
++        if role.contains("mapping") || href.contains("/mapping/") || href.contains("/map/") || href.contains("map-") {
++            return "mapping"
++        }
++
++        return "other"
++    }
++
+     public final class EntrypointParser: NSObject, XMLParserDelegate {
+@@
+             let role = TaxonomyProbe.attributeValue(attributeDict, ["xlink:role", "role"]) ?? ""
+             let ref = LinkbaseRef(href: href, role: role)
+-
+-            if role.contains("presentationLinkbaseRef") || href.hasSuffix("-pre.xml") {
++
++            switch TaxonomyProbe.classifyLinkbaseRef(ref) {
++            case "presentation":
+                 refs.presentation.append(ref)
+-            } else if role.contains("labelLinkbaseRef") || href.hasSuffix("-lab.xml") {
++            case "label":
+                 refs.labels.append(ref)
+-            } else if role.contains("definitionLinkbaseRef") || href.hasSuffix("-def.xml") {
++            case "definition":
+                 refs.definitions.append(ref)
+-            } else if href.hasSuffix("-tab.xml") {
++            case "table":
+                 refs.tables.append(ref)
+-            } else {
++            case "mapping":
++                refs.mappings.append(ref)
++            default:
+                 refs.other.append(ref)
+             }
+         }
+@@
+-    public static func resolveMappings(from linkbase: GenericLinkbase) -> [ResolvedMapping] {
++    private static func appendSample(
++        _ value: String,
++        to array: inout [String],
++        limit: Int = 8
++    ) {
++        guard !value.isEmpty else {
++            return
++        }
++
++        guard !array.contains(value) else {
++            return
++        }
++
++        guard array.count < limit else {
++            return
++        }
++
++        array.append(value)
++    }
++
++    public static func resolveMappingsDetailed(from linkbase: GenericLinkbase) -> MappingResolutionResult {
+         let datapointsByLabel = datapoints(from: linkbase)
+         var out: [ResolvedMapping] = []
++        var diagnostics = MappingResolutionDiagnostics()
+
+         for link in linkbase.links {
+             for arc in link.arcs {
+-                guard let locator = link.locators[arc.from],
+-                      let datapoint = datapointsByLabel[arc.to],
+-                      let targetPrimaryQName = datapoint.primaryQName else {
++                diagnostics.totalArcs += 1
++
++                if let arcrole = arc.arcrole, !arcrole.isEmpty {
++                    diagnostics.arcroles[arcrole, default: 0] += 1
++                } else {
++                    diagnostics.arcroles["(missing)", default: 0] += 1
++                }
++
++                guard let locator = link.locators[arc.from] else {
++                    diagnostics.droppedMissingLocator += 1
++                    appendSample(arc.from, to: &diagnostics.sampleMissingLocatorLabels)
+                     continue
+                 }
+
+-                let sourceConcept = conceptName(from: locator.href)
++                guard let datapoint = datapointsByLabel[arc.to] else {
++                    diagnostics.droppedMissingDatapoint += 1
++                    appendSample(arc.to, to: &diagnostics.sampleMissingDatapointLabels)
++                    continue
++                }
++
++                guard let targetPrimaryQName = datapoint.primaryQName,
++                      !TaxonomyProbe.trim(targetPrimaryQName).isEmpty else {
++                    diagnostics.droppedMissingPrimaryQName += 1
++                    appendSample(datapoint.label, to: &diagnostics.sampleMissingPrimaryQNameDatapoints)
++                    continue
++                }
++
++                let sourceExtraction = conceptNameExtraction(from: locator.href)
++
++                switch sourceExtraction.method {
++                case .urlFragment:
++                    diagnostics.sourceConceptFromURLFragment += 1
++                case .rawHashFragment:
++                    diagnostics.sourceConceptFromRawHashFragment += 1
++                case .fallbackWholeHref:
++                    diagnostics.sourceConceptFromFallbackWholeHref += 1
++                    appendSample(locator.href, to: &diagnostics.sampleFallbackSourceHrefs)
++                case .emptyHref:
++                    diagnostics.sourceConceptFromEmptyHref += 1
++                }
++
++                guard let sourceConcept = sourceExtraction.concept,
++                      !TaxonomyProbe.trim(sourceConcept).isEmpty else {
++                    diagnostics.droppedMissingSourceConcept += 1
++                    continue
++                }
+
+                 out.append(
+                     .init(
+@@
+                         order: arc.order
+                     )
+                 )
++
++                diagnostics.resolvedMappings += 1
+             }
+         }
+
+-        return out.sorted { lhs, rhs in
++        let sorted = out.sorted { lhs, rhs in
+             if lhs.sourceConcept == rhs.sourceConcept {
+                 return lhs.targetPrimaryQName < rhs.targetPrimaryQName
+             }
+             return lhs.sourceConcept < rhs.sourceConcept
+         }
++
++        return .init(
++            mappings: sorted,
++            diagnostics: diagnostics
++        )
++    }
++
++    public static func resolveMappings(from linkbase: GenericLinkbase) -> [ResolvedMapping] {
++        resolveMappingsDetailed(from: linkbase).mappings
+     }
+ }
+*** End Patch

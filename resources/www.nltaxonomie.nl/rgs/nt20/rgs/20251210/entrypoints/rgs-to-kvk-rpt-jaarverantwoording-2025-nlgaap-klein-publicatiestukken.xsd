@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 16:56:30 2025
+-->
+<xs:schema targetNamespace="http://www.nltaxonomie.nl/rgs/nt20/rgs/20251210/entrypoints/rgs-to-kvk-rpt-jaarverantwoording-2025-nlgaap-klein-publicatiestukken" elementFormDefault="qualified" attributeFormDefault="unqualified"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+	<xs:annotation>
+		<xs:appinfo>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_balance-sheet-shp.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-financial-assets-accumulated-revaluations-shp.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-intangible-assets-accumulated-revaluations-shp.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-intangible-assets-breakdown-shp.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-legal-reserves-breakdown-shp.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-noncurrent-liabilities-breakdown-shp.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-property-plant-equipment-accumulated-revaluations-shp.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-receivables-breakdown-shp.xml"/>
+			<link:linkbaseRef xlink:type="simple" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:role="http://www.xbrl.org/2008/role/link" xlink:href="../mapping/map-kvk_notes-revaluation-reserve-statement-of-changes-shp.xml"/>
+		</xs:appinfo>
+	</xs:annotation>
+	<xs:import namespace="http://www.nltaxonomie.nl/nt20/kvk/20251210/entrypoints/kvk-rpt-jaarverantwoording-2025-nlgaap-klein-publicatiestukken" schemaLocation="http://www.nltaxonomie.nl/nt20/kvk/20251210/entrypoints/kvk-rpt-jaarverantwoording-2025-nlgaap-klein-publicatiestukken.xsd"/>
+</xs:schema>

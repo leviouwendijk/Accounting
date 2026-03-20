@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 17:22:46 2025
+-->
+<link:linkbase
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:gen="http://xbrl.org/2008/generic"
+	xmlns:rgs="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension"
+	xmlns:rj-i="http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data"
+	xmlns:jenv-bw2-dim="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes"
+	xmlns:jenv-bw2-dm="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd
+		http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension ../../../../2022/xbrl/rgs-syntax-extension.xsd
+		http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains.xsd
+	">
+	<link:roleRef xlink:type="simple" roleURI="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_to_dts"/>
+	<link:roleRef xlink:type="simple" roleURI="urn:kvk:linkrole:notes-consolidated-noncurrent-liabilities-other-amounts-breakdown" xlink:href="http://www.nltaxonomie.nl/nt20/kvk/20251210/dictionary/kvk-linkroles.xsd#kvk-lr_NotesConsolidatedNoncurrentLiabilitiesOtherAmountsBreakdown"/>
+	<link:arcroleRef xlink:type="simple" arcroleURI="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_mapping"/>
+	<gen:link xlink:type="extended" xlink:role="urn:kvk:linkrole:notes-consolidated-noncurrent-liabilities-other-amounts-breakdown">
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSag_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSag"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSagHoo_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSagHoo"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSagHooBeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSagHooBeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSagHooAao_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSagHooAao"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSagHooSto_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSagHooSto"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSagHooBet_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSagHooBet"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSagHooBir_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSagHooBir"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSagHooOmr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSagHooOmr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSagHooOvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSagHooOvm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSagAfl_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSagAfl"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSagAflBeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSagAflBeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSagAflAfl_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSagAflAfl"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSagAflAvp_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSagAflAvp"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSagAflTer_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSagAflTer"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSap_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSap"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSapHoo_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSapHoo"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSapHooBeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSapHooBeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSapHooAao_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSapHooAao"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSapHooSto_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSapHooSto"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSapHooBet_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSapHooBet"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSapHooBir_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSapHooBir"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSapHooOmr_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSapHooOmr"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSapHooOvm_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSapHooOvm"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSapAfl_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSapAfl"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSapAflBeg_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSapAflBeg"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSapAflAfl_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSapAflAfl"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSapAflAvp_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSapAflAvp"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_BLasSapAflTer_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_BLasSapAflTer"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp">
+			<rgs:primary rgs:qname="rj-i:LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence">
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>=GROUP(BLasSag*+BLasSap*)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSag_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSagHoo_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSagHooBeg_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSagHooAao_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSagHooSto_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSagHooBet_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSagHooBir_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSagHooOmr_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="8"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSagHooOvm_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="9"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSagAfl_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="10"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSagAflBeg_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="11"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSagAflAfl_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="12"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSagAflAvp_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="13"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSagAflTer_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="14"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSap_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="15"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSapHoo_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="16"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSapHooBeg_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="17"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSapHooAao_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="18"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSapHooSto_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="19"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSapHooBet_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="20"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSapHooBir_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="21"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSapHooOmr_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="22"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSapHooOvm_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="23"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSapAfl_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="24"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSapAflBeg_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="25"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSapAflAfl_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="26"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSapAflAvp_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="27"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_BLasSapAflTer_loc" xlink:to="rj-i_LiabilitiesNoncurrentToParticipatingInterestsExerciseSignificantInfluence_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="28"/>
+	</gen:link>
+</link:linkbase>

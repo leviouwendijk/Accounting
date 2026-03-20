@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 16:44:10 2025
+-->
+<link:linkbase
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
+	<link:labelLink xlink:type="extended" xlink:role="http://www.xbrl.org/2003/role/link">
+		<link:loc xlink:type="locator" xlink:label="rgs-a_B_loc" xlink:href="rgs-abstracts.xsd#rgs-a_B"/>
+		<link:label xlink:type="resource" xlink:label="rgs-a_B_label_nl" xlink:role="http://www.xbrl.org/2003/role/label" xml:lang="nl" id="rgs-a_B_label_nl">BALANS</link:label>
+		<link:labelArc xlink:type="arc" xlink:from="rgs-a_B_loc" xlink:to="rgs-a_B_label_nl" xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-label"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-a_W_loc" xlink:href="rgs-abstracts.xsd#rgs-a_W"/>
+		<link:label xlink:type="resource" xlink:label="rgs-a_W_label_nl" xlink:role="http://www.xbrl.org/2003/role/label" xml:lang="nl" id="rgs-a_W_label_nl">WINST- EN VERLIESREKENING</link:label>
+		<link:labelArc xlink:type="arc" xlink:from="rgs-a_W_loc" xlink:to="rgs-a_W_label_nl" xlink:arcrole="http://www.xbrl.org/2003/arcrole/concept-label"/>
+	</link:labelLink>
+</link:linkbase>

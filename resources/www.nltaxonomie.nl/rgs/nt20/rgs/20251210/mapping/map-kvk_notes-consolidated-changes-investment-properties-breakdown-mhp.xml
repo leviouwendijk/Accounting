@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!--
+  This file is part of the RGS taxonomy
+  Intellectual Property State of the Netherlands
+  Version 20251210
+  Released by the Dutch SBR Programme
+  Release date Tue December 16 17:06:52 2025
+-->
+<link:linkbase
+	xmlns:link="http://www.xbrl.org/2003/linkbase"
+	xmlns:xlink="http://www.w3.org/1999/xlink"
+	xmlns:gen="http://xbrl.org/2008/generic"
+	xmlns:rgs="http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension"
+	xmlns:rj-dim="http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-axes"
+	xmlns:jenv-bw2-dm="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains"
+	xmlns:rj-i="http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data"
+	xmlns:rj-dm="http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-domains"
+	xmlns:jenv-bw2-dim="http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd
+		http://www.nltaxonomie.nl/rgs/2022/xbrl/rgs-syntax-extension ../../../../2022/xbrl/rgs-syntax-extension.xsd
+		http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-axes http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-axes.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-domains.xsd
+		http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-data.xsd
+		http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-domains http://www.nltaxonomie.nl/nt20/rj/20251210/dictionary/rj-domains.xsd
+		http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes http://www.nltaxonomie.nl/nt20/jenv/20251210/dictionary/jenv-bw2-axes.xsd
+	">
+	<link:roleRef xlink:type="simple" roleURI="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_to_dts"/>
+	<link:roleRef xlink:type="simple" roleURI="urn:kvk:linkrole:notes-consolidated-changes-investment-properties-breakdown" xlink:href="http://www.nltaxonomie.nl/nt20/kvk/20251210/dictionary/kvk-linkroles.xsd#kvk-lr_NotesConsolidatedChangesInvestmentPropertiesBreakdown"/>
+	<link:arcroleRef xlink:type="simple" arcroleURI="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" xlink:href="../../../../2022/xbrl/rgs-arcroles.xsd#rgs_mapping"/>
+	<gen:link xlink:type="extended" xlink:role="urn:kvk:linkrole:notes-consolidated-changes-investment-properties-breakdown">
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvb_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvb"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvbBwv_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvbBwv"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvbBwvVie_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvbBwvVie"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvbBwvVio_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvbBwvVio"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvbTbw_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvbTbw"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvbTbwVie_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvbTbwVie"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvbTbwVio_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvbTbwVio"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvbDfw_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvbDfw"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvbDfwVie_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvbDfwVie"/>
+		<link:loc xlink:type="locator" xlink:label="rgs-i_WWviWvbDfwVio_loc" xlink:href="../dictionary/rgs-codes.xsd#rgs-i_WWviWvbDfwVio"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_ChangesValueInvestmentProperties_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_ChangesValueInvestmentProperties_dp">
+			<rgs:primary rgs:qname="rj-i:ChangesValueInvestmentProperties">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfInvestmentPropertiesAxis" member="rj-dm:InvestmentPropertiesMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>WWviWvb*</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvb_loc" xlink:to="rj-i_ChangesValueInvestmentProperties_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbBwv_loc" xlink:to="rj-i_ChangesValueInvestmentProperties_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbBwvVie_loc" xlink:to="rj-i_ChangesValueInvestmentProperties_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbBwvVio_loc" xlink:to="rj-i_ChangesValueInvestmentProperties_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbTbw_loc" xlink:to="rj-i_ChangesValueInvestmentProperties_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbTbwVie_loc" xlink:to="rj-i_ChangesValueInvestmentProperties_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbTbwVio_loc" xlink:to="rj-i_ChangesValueInvestmentProperties_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="7"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbDfw_loc" xlink:to="rj-i_ChangesValueInvestmentProperties_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="8"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbDfwVie_loc" xlink:to="rj-i_ChangesValueInvestmentProperties_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="9"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbDfwVio_loc" xlink:to="rj-i_ChangesValueInvestmentProperties_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="10"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_ImpairmentInvestmentPropertiesRecordedInIncomeStatement_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_ImpairmentInvestmentPropertiesRecordedInIncomeStatement_dp">
+			<rgs:primary rgs:qname="rj-i:ImpairmentInvestmentPropertiesRecordedInIncomeStatement">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfInvestmentPropertiesAxis" member="rj-dm:InvestmentPropertiesMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>=GROUP(WWviWvbBwv*+WWviWvbDfw*)</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbBwv_loc" xlink:to="rj-i_ImpairmentInvestmentPropertiesRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbBwvVie_loc" xlink:to="rj-i_ImpairmentInvestmentPropertiesRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbBwvVio_loc" xlink:to="rj-i_ImpairmentInvestmentPropertiesRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbDfw_loc" xlink:to="rj-i_ImpairmentInvestmentPropertiesRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="4"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbDfwVie_loc" xlink:to="rj-i_ImpairmentInvestmentPropertiesRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="5"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbDfwVio_loc" xlink:to="rj-i_ImpairmentInvestmentPropertiesRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="6"/>
+		<rgs:datapoint xlink:type="resource" xlink:label="rj-i_ImpairmentInvestmentPropertiesReversalRecordedInIncomeStatement_dp" xlink:role="http://www.nltaxonomie.nl/rgs/2022/role/to_dts" id="rj-i_ImpairmentInvestmentPropertiesReversalRecordedInIncomeStatement_dp">
+			<rgs:primary rgs:qname="rj-i:ImpairmentInvestmentPropertiesReversalRecordedInIncomeStatement">
+				<rgs:explicitDimension rgs:qname="rj-dim:ClassesOfInvestmentPropertiesAxis" member="rj-dm:InvestmentPropertiesMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:FinancialStatementsTypeAxis" member="jenv-bw2-dm:ConsolidatedMember"/>
+				<rgs:explicitDimension rgs:qname="jenv-bw2-dim:BasisOfPreparationAxis" member="jenv-bw2-dm:CommercialMember"/>
+				<rgs:source>WWviWvbTbw*</rgs:source>
+			</rgs:primary>
+		</rgs:datapoint>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbTbw_loc" xlink:to="rj-i_ImpairmentInvestmentPropertiesReversalRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="1"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbTbwVie_loc" xlink:to="rj-i_ImpairmentInvestmentPropertiesReversalRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="2"/>
+		<gen:arc xlink:type="arc" xlink:from="rgs-i_WWviWvbTbwVio_loc" xlink:to="rj-i_ImpairmentInvestmentPropertiesReversalRecordedInIncomeStatement_dp" xlink:arcrole="http://www.nltaxonomie.nl/rgs/2022/arcrole/mapping" order="3"/>
+	</gen:link>
+</link:linkbase>
