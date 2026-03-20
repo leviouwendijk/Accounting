@@ -84,12 +84,8 @@ extension TaxonomyProbe {
     }
 
     public struct Config: Sendable {
-        public let entrypoint: String
-        public let wantedPresentations: [String]
-        public let mappingZIP: String
+        public let source: TaxonomySourceData
         public let mode: Mode
-        public let probeKeywords: [String]
-        public let probePatterns: [String]
         public let maxFilesToScan: Int
         public let maxHits: Int
         public let chartFile: String?
@@ -98,47 +94,8 @@ extension TaxonomyProbe {
         public let demoRGSBalances: [String: Decimal]
 
         public init(
-            entrypoint: String = "https://www.nltaxonomie.nl/nt20/bd/20251210/entrypoints/bd-rpt-ihz-aangifte-2025.xsd",
-            wantedPresentations: [String] = [
-                "winst-resultatenrekening-pre.xml",
-                "winst-activa-pre.xml",
-                "winst-passiva-pre.xml",
-                "winst-berekening-pre.xml"
-            ],
-            mappingZIP: String = "https://www.referentiegrootboekschema.nl/sites/default/files/kennisbank/NT20_RGS_20251210.zip",
+            source: TaxonomySourceData = TaxonomySourceProfile.bdIhz2025.data,
             mode: Mode = .probePackage,
-            probeKeywords: [String] = [
-                "bd",
-                "ihz",
-                "aangifte",
-                "rgs",
-                "mapping",
-                "entrypoint",
-                "entrypoints",
-                "presentation",
-                "definition",
-                "table",
-                "label",
-                "dictionary",
-                "datapoint",
-                "dimension",
-                "linkbase"
-            ],
-            probePatterns: [String] = [
-                "rgs-to-bd-rpt-ihz-aangifte-2025",
-                "bd-rpt-ihz-aangifte-2025",
-                "bd-ihz-aangifte",
-                "map-bd-ihz",
-                "mapping/",
-                "entrypoints/",
-                "presentation/",
-                "definition/",
-                "table/",
-                "dictionary/",
-                "linkbaseRef",
-                "rgs-i_",
-                "bd-i_"
-            ],
             maxFilesToScan: Int = 400,
             maxHits: Int = 80,
             chartFile: String? = nil,
@@ -157,18 +114,38 @@ extension TaxonomyProbe {
                 "WFbeRlmObr": 760
             ]
         ) {
-            self.entrypoint = entrypoint
-            self.wantedPresentations = wantedPresentations
-            self.mappingZIP = mappingZIP
+            self.source = source
             self.mode = mode
-            self.probeKeywords = probeKeywords
-            self.probePatterns = probePatterns
             self.maxFilesToScan = maxFilesToScan
             self.maxHits = maxHits
             self.chartFile = chartFile
             self.balanceInput = balanceInput
             self.projectRoot = projectRoot
             self.demoRGSBalances = demoRGSBalances
+        }
+
+        public var entrypoint: String {
+            source.entrypoint
+        }
+
+        public var wantedPresentations: [String] {
+            source.wantedPresentations
+        }
+
+        public var mappingZIP: String {
+            source.mappingZIP
+        }
+
+        public var probeKeywords: [String] {
+            source.probeKeywords
+        }
+
+        public var probePatterns: [String] {
+            source.probePatterns
+        }
+
+        public var labelHrefs: [String] {
+            source.labelHrefs
         }
     }
 
@@ -312,6 +289,10 @@ extension TaxonomyProbe {
             var selectedLinks: [PresentationLink] = []
             var allPresentationLinksByURL: [String: [PresentationLink]] = [:]
 
+            let wantsAllPresentations =
+                config.wantedPresentations.isEmpty ||
+                config.wantedPresentations.contains("all")
+
             for ref in refs.presentation {
                 let url = try TaxonomyProbe.resolveURL(ref.href, relativeTo: entrypointURL)
                 let data = try TaxonomyProbe.fetchData(from: url)
@@ -319,8 +300,13 @@ extension TaxonomyProbe {
 
                 allPresentationLinksByURL[url.absoluteString] = links
 
-                let isSelected = config.wantedPresentations.contains { wanted in
-                    ref.href.contains(wanted) || url.lastPathComponent == wanted
+                let isSelected: Bool
+                if wantsAllPresentations {
+                    isSelected = true
+                } else {
+                    isSelected = config.wantedPresentations.contains { wanted in
+                        ref.href.contains(wanted) || url.lastPathComponent == wanted
+                    }
                 }
 
                 if isSelected {
@@ -333,23 +319,48 @@ extension TaxonomyProbe {
                 throw Error.missingPresentation(config.wantedPresentations.joined(separator: ", "))
             }
 
-            let dictionaryLabelURLs: [URL] = [
-                try TaxonomyProbe.resolveURL("../dictionary/bd-data-lab-nl.xml", relativeTo: entrypointURL),
-                try TaxonomyProbe.resolveURL("../dictionary/bd-tuples-lab-nl.xml", relativeTo: entrypointURL)
-            ]
+            var labelURLs: [URL] = []
+
+            if !config.labelHrefs.isEmpty {
+                for href in config.labelHrefs {
+                    labelURLs.append(
+                        try TaxonomyProbe.resolveURL(href, relativeTo: entrypointURL)
+                    )
+                }
+            } else if !refs.labels.isEmpty {
+                for ref in refs.labels {
+                    labelURLs.append(
+                        try TaxonomyProbe.resolveURL(ref.href, relativeTo: entrypointURL)
+                    )
+                }
+            }
+
+            var dedupedLabelURLs: [URL] = []
+            var seenLabelURLs: Set<String> = []
+
+            for url in labelURLs {
+                if seenLabelURLs.insert(url.absoluteString).inserted {
+                    dedupedLabelURLs.append(url)
+                }
+            }
 
             var labelsByConcept: [String: String] = [:]
             let labelParser = LabelParser()
 
-            print("loading dictionary labels:")
-            for labelURL in dictionaryLabelURLs {
-                print("  - \(labelURL.absoluteString)")
-                let data = try TaxonomyProbe.fetchData(from: labelURL)
-                let part = try labelParser.parse(data: data)
+            if dedupedLabelURLs.isEmpty {
+                print("loading dictionary labels:")
+                print("  - none discovered")
+            } else {
+                print("loading dictionary labels:")
+                for labelURL in dedupedLabelURLs {
+                    print("  - \(labelURL.absoluteString)")
+                    let data = try TaxonomyProbe.fetchData(from: labelURL)
+                    let part = try labelParser.parse(data: data)
 
-                for (concept, label) in part {
-                    if labelsByConcept[concept] == nil {
-                        labelsByConcept[concept] = label
+                    for (concept, label) in part {
+                        if labelsByConcept[concept] == nil {
+                            labelsByConcept[concept] = label
+                        }
                     }
                 }
             }
