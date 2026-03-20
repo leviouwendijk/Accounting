@@ -308,4 +308,319 @@ extension TaxonomyProbe {
             self.parseError = parseError
         }
     }
+
+    public final class GenericLinkbaseParser: NSObject, XMLParserDelegate {
+        private struct DatapointBuilder {
+            var label: String?
+            var id: String?
+            var role: String?
+            var primaryQName: String?
+            var dimensions: [RGSExplicitDimension] = []
+        }
+
+        private var parseError: Swift.Error?
+
+        private var roleRefs: [RoleRef] = []
+        private var arcroleRefs: [ArcroleRef] = []
+        private var links: [GenericExtendedLink] = []
+
+        private var currentLinkRole: String?
+        private var currentLocators: [String: Locator] = [:]
+        private var currentResources: [String: GenericResource] = [:]
+        private var currentArcs: [GenericArc] = []
+
+        private var currentDatapoint: DatapointBuilder?
+
+        public func parse(data: Data) throws -> GenericLinkbase {
+            parseError = nil
+            roleRefs = []
+            arcroleRefs = []
+            links = []
+
+            currentLinkRole = nil
+            currentLocators = [:]
+            currentResources = [:]
+            currentArcs = []
+            currentDatapoint = nil
+
+            let parser = XMLParser(data: data)
+            parser.delegate = self
+            parser.shouldProcessNamespaces = false
+            parser.shouldReportNamespacePrefixes = true
+            parser.shouldResolveExternalEntities = false
+
+            guard parser.parse() else {
+                throw parseError ?? parser.parserError ?? Error.parseFailed("unknown error")
+            }
+
+            return .init(
+                roleRefs: roleRefs,
+                arcroleRefs: arcroleRefs,
+                links: links
+            )
+        }
+
+        public func parser(
+            _ parser: XMLParser,
+            didStartElement elementName: String,
+            namespaceURI: String?,
+            qualifiedName qName: String?,
+            attributes attributeDict: [String: String]
+        ) {
+            let name = TaxonomyProbe.localName(qName ?? elementName)
+
+            switch name {
+            case "roleRef":
+                guard let roleURI = TaxonomyProbe.attributeValue(attributeDict, ["roleURI"]),
+                      let href = TaxonomyProbe.attributeValue(attributeDict, ["xlink:href", "href"]) else {
+                    return
+                }
+
+                roleRefs.append(.init(roleURI: roleURI, href: href))
+
+            case "arcroleRef":
+                guard let arcroleURI = TaxonomyProbe.attributeValue(attributeDict, ["arcroleURI"]),
+                      let href = TaxonomyProbe.attributeValue(attributeDict, ["xlink:href", "href"]) else {
+                    return
+                }
+
+                arcroleRefs.append(.init(arcroleURI: arcroleURI, href: href))
+
+            case "link":
+                currentLinkRole = TaxonomyProbe.attributeValue(attributeDict, ["xlink:role", "role"]) ?? "(no role)"
+                currentLocators = [:]
+                currentResources = [:]
+                currentArcs = []
+
+            case "loc":
+                guard currentLinkRole != nil else {
+                    return
+                }
+
+                guard let label = TaxonomyProbe.attributeValue(attributeDict, ["xlink:label", "label"]),
+                      let href = TaxonomyProbe.attributeValue(attributeDict, ["xlink:href", "href"]) else {
+                    return
+                }
+
+                currentLocators[label] = .init(
+                    label: label,
+                    href: href
+                )
+
+            case "datapoint":
+                guard currentLinkRole != nil else {
+                    return
+                }
+
+                currentDatapoint = .init(
+                    label: TaxonomyProbe.attributeValue(attributeDict, ["xlink:label", "label"]),
+                    id: TaxonomyProbe.attributeValue(attributeDict, ["id"]),
+                    role: TaxonomyProbe.attributeValue(attributeDict, ["xlink:role", "role"]),
+                    primaryQName: nil,
+                    dimensions: []
+                )
+
+            case "primary":
+                guard currentDatapoint != nil else {
+                    return
+                }
+
+                let qname = TaxonomyProbe.attributeValue(attributeDict, ["rgs:qname", "qname"])
+                currentDatapoint?.primaryQName = qname
+
+            case "explicitDimension":
+                guard currentDatapoint != nil else {
+                    return
+                }
+
+                let qname = TaxonomyProbe.attributeValue(attributeDict, ["rgs:qname", "qname"]) ?? ""
+                let member = TaxonomyProbe.attributeValue(attributeDict, ["member"])
+
+                currentDatapoint?.dimensions.append(
+                    .init(
+                        qname: qname,
+                        member: member
+                    )
+                )
+
+            case "arc":
+                guard currentLinkRole != nil else {
+                    return
+                }
+
+                guard let from = TaxonomyProbe.attributeValue(attributeDict, ["xlink:from", "from"]),
+                      let to = TaxonomyProbe.attributeValue(attributeDict, ["xlink:to", "to"]) else {
+                    return
+                }
+
+                let arcrole = TaxonomyProbe.attributeValue(attributeDict, ["xlink:arcrole", "arcrole"])
+                let order = Double(TaxonomyProbe.attributeValue(attributeDict, ["order"]) ?? "")
+
+                currentArcs.append(
+                    .init(
+                        elementName: name,
+                        arcrole: arcrole,
+                        from: from,
+                        to: to,
+                        order: order,
+                        attributes: attributeDict
+                    )
+                )
+
+            default:
+                break
+            }
+        }
+
+        public func parser(
+            _ parser: XMLParser,
+            didEndElement elementName: String,
+            namespaceURI: String?,
+            qualifiedName qName: String?
+        ) {
+            let name = TaxonomyProbe.localName(qName ?? elementName)
+
+            switch name {
+            case "datapoint":
+                guard let datapoint = currentDatapoint,
+                      let label = datapoint.label else {
+                    currentDatapoint = nil
+                    return
+                }
+
+                var attributes: [String: String] = [:]
+
+                if let id = datapoint.id {
+                    attributes["id"] = id
+                }
+
+                if let role = datapoint.role {
+                    attributes["role"] = role
+                }
+
+                if let primaryQName = datapoint.primaryQName {
+                    attributes["primaryQName"] = primaryQName
+                }
+
+                attributes["dimensionCount"] = String(datapoint.dimensions.count)
+
+                for (index, dimension) in datapoint.dimensions.enumerated() {
+                    attributes["dimension.\(index).qname"] = dimension.qname
+                    if let member = dimension.member {
+                        attributes["dimension.\(index).member"] = member
+                    }
+                }
+
+                currentResources[label] = .init(
+                    elementName: "datapoint",
+                    label: label,
+                    role: datapoint.role,
+                    attributes: attributes,
+                    text: ""
+                )
+
+                currentDatapoint = nil
+
+            case "link":
+                if let role = currentLinkRole {
+                    links.append(
+                        .init(
+                            role: role,
+                            locators: currentLocators,
+                            resources: currentResources,
+                            arcs: currentArcs
+                        )
+                    )
+                }
+
+                currentLinkRole = nil
+                currentLocators = [:]
+                currentResources = [:]
+                currentArcs = []
+                currentDatapoint = nil
+
+            default:
+                break
+            }
+        }
+
+        public func parser(_ parser: XMLParser, parseErrorOccurred parseError: Swift.Error) {
+            self.parseError = parseError
+        }
+    }
+
+    public static func datapoints(from linkbase: GenericLinkbase) -> [String: RGSDatapoint] {
+        var out: [String: RGSDatapoint] = [:]
+
+        for link in linkbase.links {
+            for (label, resource) in link.resources {
+                guard resource.elementName == "datapoint" else {
+                    continue
+                }
+
+                let count = Int(resource.attributes["dimensionCount"] ?? "0") ?? 0
+
+                var dimensions: [RGSExplicitDimension] = []
+                dimensions.reserveCapacity(count)
+
+                for index in 0..<count {
+                    let qname = resource.attributes["dimension.\(index).qname"] ?? ""
+                    let member = resource.attributes["dimension.\(index).member"]
+
+                    dimensions.append(
+                        .init(
+                            qname: qname,
+                            member: member
+                        )
+                    )
+                }
+
+                out[label] = .init(
+                    label: label,
+                    id: resource.attributes["id"],
+                    role: resource.role,
+                    primaryQName: resource.attributes["primaryQName"],
+                    dimensions: dimensions
+                )
+            }
+        }
+
+        return out
+    }
+
+    public static func resolveMappings(from linkbase: GenericLinkbase) -> [ResolvedMapping] {
+        let datapointsByLabel = datapoints(from: linkbase)
+        var out: [ResolvedMapping] = []
+
+        for link in linkbase.links {
+            for arc in link.arcs {
+                guard let locator = link.locators[arc.from],
+                      let datapoint = datapointsByLabel[arc.to],
+                      let targetPrimaryQName = datapoint.primaryQName else {
+                    continue
+                }
+
+                let sourceConcept = conceptName(from: locator.href)
+
+                out.append(
+                    .init(
+                        sourceLocatorLabel: locator.label,
+                        sourceHref: locator.href,
+                        sourceConcept: sourceConcept,
+                        targetDatapointLabel: datapoint.label,
+                        targetPrimaryQName: targetPrimaryQName,
+                        dimensions: datapoint.dimensions,
+                        order: arc.order
+                    )
+                )
+            }
+        }
+
+        return out.sorted { lhs, rhs in
+            if lhs.sourceConcept == rhs.sourceConcept {
+                return lhs.targetPrimaryQName < rhs.targetPrimaryQName
+            }
+            return lhs.sourceConcept < rhs.sourceConcept
+        }
+    }
 }

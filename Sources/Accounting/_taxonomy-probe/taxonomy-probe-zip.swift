@@ -1,6 +1,31 @@
 import Foundation
 
 extension TaxonomyProbe {
+    public static func resolveZIPEntryPath(
+        _ href: String,
+        relativeTo entryPath: String
+    ) throws -> String {
+        if href.contains("://") {
+            throw Error.invalidURL("Absolute ZIP href not supported: \(href)")
+        }
+
+        let baseURL = URL(fileURLWithPath: "/" + entryPath)
+            .deletingLastPathComponent()
+
+        let resolvedURL = URL(fileURLWithPath: href, relativeTo: baseURL)
+            .standardizedFileURL
+
+        let path = resolvedURL.path
+
+        guard path.hasPrefix("/") else {
+            throw Error.parseFailed("Could not resolve ZIP entry path: \(href) relative to \(entryPath)")
+        }
+
+        return String(path.dropFirst())
+    }
+}
+
+extension TaxonomyProbe {
     public static func listZIPEntries(zipFileURL: URL) throws -> [String] {
         let unzip = try unzipPath()
         let output = try runCommand(unzip, ["-Z1", zipFileURL.path])

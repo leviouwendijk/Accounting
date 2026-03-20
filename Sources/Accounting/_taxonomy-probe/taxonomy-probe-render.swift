@@ -1,7 +1,7 @@
 import Foundation
 
 extension TaxonomyProbe {
-    static func renderPresentationLink(
+    public static func renderPresentationLink(
         _ link: PresentationLink,
         labelsByConcept: [String: String],
         factsByConcept: [String: ComputedFact]
@@ -74,6 +74,33 @@ extension TaxonomyProbe {
         for root in rootLabels {
             var seen: Set<String> = []
             printNode(root, indent: 0, seen: &seen)
+        }
+    }
+
+    public static func renderResolvedMappings(
+        _ mappings: [ResolvedMapping],
+        limit: Int = 80
+    ) {
+        print("resolved mappings: \(mappings.count)")
+
+        for mapping in mappings.prefix(limit) {
+            let dims = mapping.dimensions.map { dimension in
+                if let member = dimension.member, !member.isEmpty {
+                    return "\(dimension.qname)=\(member)"
+                } else {
+                    return dimension.qname
+                }
+            }
+
+            if dims.isEmpty {
+                print("  \(mapping.sourceConcept) -> \(mapping.targetPrimaryQName)")
+            } else {
+                print("  \(mapping.sourceConcept) -> \(mapping.targetPrimaryQName) [\(dims.joined(separator: ", "))]")
+            }
+        }
+
+        if mappings.count > limit {
+            print("  ... \(mappings.count - limit) more")
         }
     }
 }

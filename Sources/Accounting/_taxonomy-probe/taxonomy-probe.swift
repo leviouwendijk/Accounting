@@ -78,6 +78,7 @@ extension TaxonomyProbe {
 
     public enum Mode: String, Sendable {
         case probePackage
+        case inspectGenericMapping
         case csvMapping
     }
 
@@ -225,8 +226,17 @@ extension TaxonomyProbe {
             case .probePackage:
                 try runPackageProbe(zipFileURL: mappingZIPFileURL)
 
+            case .inspectGenericMapping:
+                try runGenericMappingInspection(
+                    zipFileURL: mappingZIPFileURL,
+                    bootstrap: bootstrap
+                )
+
             case .csvMapping:
-                try runCSVMapping(zipFileURL: mappingZIPFileURL, bootstrap: bootstrap)
+                try runCSVMapping(
+                    zipFileURL: mappingZIPFileURL,
+                    bootstrap: bootstrap
+                )
             }
         }
 
@@ -297,6 +307,77 @@ extension TaxonomyProbe {
                 maxFilesToScan: config.maxFilesToScan,
                 maxHits: config.maxHits
             )
+        }
+
+        public func runGenericMappingInspection(
+            zipFileURL: URL,
+            bootstrap: Bootstrap
+        ) throws {
+            let entries = try TaxonomyProbe.listZIPEntries(zipFileURL: zipFileURL)
+
+            let rgsEntrypointSuffix = "/entrypoints/rgs-to-\(bootstrap.entrypointBasename)"
+            guard let rgsEntrypointPath = entries.first(where: { $0.hasSuffix(rgsEntrypointSuffix) }) else {
+                throw Error.parseFailed("Could not find RGS mapping entrypoint for \(bootstrap.entrypointBasename)")
+            }
+
+            print("rgs mapping entrypoint inside zip: \(rgsEntrypointPath)")
+            print("")
+
+            let rgsEntrypointText = try TaxonomyProbe.readZIPEntryText(
+                zipFileURL: zipFileURL,
+                entryPath: rgsEntrypointPath
+            )
+
+            guard let rgsEntrypointData = rgsEntrypointText.data(using: .utf8) else {
+                throw Error.parseFailed("Could not UTF-8 decode RGS mapping entrypoint")
+            }
+
+            let entrypointParser = EntrypointParser()
+            let rgsRefs = try entrypointParser.parse(data: rgsEntrypointData)
+
+            let mappingRefs = rgsRefs.other.filter { ref in
+                ref.href.contains("mapping/")
+            }
+
+            print("mapping refs in RGS entrypoint: \(mappingRefs.count)")
+            for ref in mappingRefs {
+                print("  \(ref.href)")
+            }
+            print("")
+
+            let parser = GenericLinkbaseParser()
+            var allMappings: [ResolvedMapping] = []
+
+            for ref in mappingRefs {
+                let entryPath = try TaxonomyProbe.resolveZIPEntryPath(
+                    ref.href,
+                    relativeTo: rgsEntrypointPath
+                )
+
+                print("reading mapping XML: \(entryPath)")
+
+                let xmlText = try TaxonomyProbe.readZIPEntryText(
+                    zipFileURL: zipFileURL,
+                    entryPath: entryPath
+                )
+
+                guard let xmlData = xmlText.data(using: .utf8) else {
+                    throw Error.parseFailed("Could not UTF-8 decode mapping XML: \(entryPath)")
+                }
+
+                let linkbase = try parser.parse(data: xmlData)
+                let mappings = TaxonomyProbe.resolveMappings(from: linkbase)
+
+                print("  roleRefs: \(linkbase.roleRefs.count)")
+                print("  arcroleRefs: \(linkbase.arcroleRefs.count)")
+                print("  links: \(linkbase.links.count)")
+                print("  resolved mappings: \(mappings.count)")
+                print("")
+
+                allMappings.append(contentsOf: mappings)
+            }
+
+            TaxonomyProbe.renderResolvedMappings(allMappings, limit: 120)
         }
 
         public func runCSVMapping(
