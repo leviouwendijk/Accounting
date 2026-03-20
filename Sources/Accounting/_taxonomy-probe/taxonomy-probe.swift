@@ -102,13 +102,61 @@ extension TaxonomyProbe {
             wantedPresentation: String = "winst-resultatenrekening-pre.xml",
             mappingZIP: String = "https://www.referentiegrootboekschema.nl/sites/default/files/kennisbank/NT20_RGS_20251210.zip",
             mode: Mode = .probePackage,
-            probeKeywords: [String] = ["bd", "ihz", "aangifte", "rgs", "mapping", "connect"],
+            // probeKeywords: [String] = ["bd", "ihz", "aangifte", "rgs", "mapping", "connect"],
+            // probePatterns: [String] = [
+            //     "bd-rpt-ihz-aangifte-2025",
+            //     "bd-ihz-aangifte",
+            //     "bd-i_turnovernetfiscal",
+            //     "bd-i_",
+            //     "rgs"
+            // ],
+            probeKeywords: [String] = [
+                "bd",
+                "ihz",
+                "aangifte",
+                "rgs",
+                "mapping",
+                "entrypoint",
+                "entrypoints",
+                "presentation",
+                "definition",
+                "table",
+                "label",
+                "dictionary",
+                "datapoint",
+                "dimension",
+                "linkbase"
+            ],
             probePatterns: [String] = [
+                "rgs-to-bd-rpt-ihz-aangifte-2025",
                 "bd-rpt-ihz-aangifte-2025",
                 "bd-ihz-aangifte",
-                "bd-i_turnovernetfiscal",
+                "map-bd-ihz",
+                "mapping/",
+                "entrypoints/",
+                "presentation/",
+                "definition/",
+                "table/",
+                "dictionary/",
+                "linkbaseRef",
+                "roleRef",
+                "arcroleRef",
+                "presentationLink",
+                "definitionLink",
+                "tableLink",
+                "labelLink",
+                "datapoint",
+                "explicitDimension",
+                "primary",
+                "xlink:role",
+                "xlink:arcrole",
+                "rgs-i_",
+                "rgs-k_",
                 "bd-i_",
-                "rgs"
+                "bd-t_",
+                "bd-abstr_",
+                "bd-dim-dim:",
+                "bd-dim-mem:"
             ],
             maxFilesToScan: Int = 400,
             maxHits: Int = 80,
@@ -317,6 +365,7 @@ extension TaxonomyProbe {
             try TaxonomyProbe.findTextHitsInZIP(
                 zipFileURL: zipFileURL,
                 entries: entries,
+                keywords: config.probeKeywords,
                 patterns: config.probePatterns,
                 maxFilesToScan: config.maxFilesToScan,
                 maxHits: config.maxHits
@@ -346,8 +395,48 @@ extension TaxonomyProbe {
                 throw Error.parseFailed("Could not UTF-8 decode RGS mapping entrypoint")
             }
 
+            // let entrypointParser = EntrypointParser()
+            // let rgsRefs = try entrypointParser.parse(data: rgsEntrypointData)
+
+            // let mappingRefs = rgsRefs.other.filter { ref in
+            //     ref.href.contains("mapping/")
+            // }
+
+            // print("mapping refs in RGS entrypoint: \(mappingRefs.count)")
+            // for ref in mappingRefs {
+            //     print("  \(ref.href)")
+            // }
+            // print("")
+
             let entrypointParser = EntrypointParser()
             let rgsRefs = try entrypointParser.parse(data: rgsEntrypointData)
+
+            print("RGS entrypoint discovery:")
+            print("  presentation refs: \(rgsRefs.presentation.count)")
+            print("  label refs: \(rgsRefs.labels.count)")
+            print("  definition refs: \(rgsRefs.definitions.count)")
+            print("  table refs: \(rgsRefs.tables.count)")
+            print("  other refs: \(rgsRefs.other.count)")
+            print("")
+
+            func printRefs(_ title: String, _ refs: [LinkbaseRef]) {
+                guard !refs.isEmpty else {
+                    return
+                }
+
+                print(title)
+                for ref in refs {
+                    print("  role: \(ref.role)")
+                    print("  href: \(ref.href)")
+                }
+                print("")
+            }
+
+            printRefs("RGS presentation refs:", rgsRefs.presentation)
+            printRefs("RGS label refs:", rgsRefs.labels)
+            printRefs("RGS definition refs:", rgsRefs.definitions)
+            printRefs("RGS table refs:", rgsRefs.tables)
+            printRefs("RGS other refs:", rgsRefs.other)
 
             let mappingRefs = rgsRefs.other.filter { ref in
                 ref.href.contains("mapping/")
@@ -531,6 +620,13 @@ extension TaxonomyProbe {
                     accounts: accounts,
                     mappings: canonicalMappings,
                     resolvedEntries: compileResult.resolved
+                )
+            }
+
+            if !unmatchedCodes.isEmpty {
+                TaxonomyProbe.renderMappingSuggestions(
+                    unmatchedCodes: unmatchedCodes,
+                    mappings: canonicalMappings
                 )
             }
 

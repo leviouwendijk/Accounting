@@ -634,3 +634,136 @@ extension TaxonomyProbe {
         print("")
     }
 }
+
+extension TaxonomyProbe {
+    public static func commonPrefixLength(
+        _ lhs: String,
+        _ rhs: String
+    ) -> Int {
+        let left = Array(lhs)
+        let right = Array(rhs)
+        let limit = min(left.count, right.count)
+
+        var count = 0
+
+        for index in 0..<limit {
+            if left[index] != right[index] {
+                break
+            }
+
+            count += 1
+        }
+
+        return count
+    }
+
+    public static func codeFamilyPrefixes(_ code: String) -> [String] {
+        let cutoffs = [4, 8, 12]
+
+        return cutoffs.compactMap { cutoff in
+            guard code.count >= cutoff else {
+                return nil
+            }
+
+            return String(code.prefix(cutoff))
+        }
+    }
+
+    public static func suggestionScore(
+        query: String,
+        candidate: String
+    ) -> (score: Int, reasons: [String]) {
+        var score = 0
+        var reasons: [String] = []
+
+        let prefix = commonPrefixLength(query, candidate)
+        if prefix > 0 {
+            score += prefix * 10
+            reasons.append("common-prefix=\(prefix)")
+        }
+
+        let families = codeFamilyPrefixes(query)
+        for family in families {
+            if candidate.hasPrefix(family) {
+                score += 25
+                reasons.append("same-family=\(family)")
+            }
+        }
+
+        if query.first == candidate.first {
+            score += 5
+            reasons.append("same-leading-branch")
+        }
+
+        score -= abs(query.count - candidate.count)
+
+        return (score, reasons)
+    }
+
+    public static func suggestNearbyMappedCodes(
+        unmatchedCodes: [String],
+        mappings: [CanonicalResolvedMapping],
+        limitPerCode: Int = 8
+    ) -> [String: [MappingSuggestion]] {
+        let candidates = Array(Set(mappings.map(\.sourceCode))).sorted()
+        var out: [String: [MappingSuggestion]] = [:]
+
+        for code in unmatchedCodes {
+            let ranked = candidates
+                .map { candidate -> MappingSuggestion in
+                    let result = suggestionScore(query: code, candidate: candidate)
+
+                    return .init(
+                        queryCode: code,
+                        candidateCode: candidate,
+                        score: result.score,
+                        reasons: result.reasons
+                    )
+                }
+                .filter { $0.score > 0 }
+                .sorted { lhs, rhs in
+                    if lhs.score == rhs.score {
+                        return lhs.candidateCode < rhs.candidateCode
+                    }
+
+                    return lhs.score > rhs.score
+                }
+
+            out[code] = Array(ranked.prefix(limitPerCode))
+        }
+
+        return out
+    }
+
+    public static func renderMappingSuggestions(
+        unmatchedCodes: [String],
+        mappings: [CanonicalResolvedMapping],
+        limitPerCode: Int = 8
+    ) {
+        let suggestions = suggestNearbyMappedCodes(
+            unmatchedCodes: unmatchedCodes,
+            mappings: mappings,
+            limitPerCode: limitPerCode
+        )
+
+        print("fuzzy suggestions for unmatched codes:")
+
+        for code in unmatchedCodes {
+            print("  \(code)")
+
+            let matches = suggestions[code] ?? []
+            if matches.isEmpty {
+                print("    no suggestions")
+                continue
+            }
+
+            for suggestion in matches {
+                print(
+                    "    \(suggestion.candidateCode) score=\(suggestion.score) reasons: \(suggestion.reasons.joined(separator: ", "))"
+                )
+            }
+        }
+
+        print("")
+    }
+}

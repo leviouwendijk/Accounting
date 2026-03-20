@@ -94,23 +94,96 @@ extension TaxonomyProbe {
         print("")
     }
 
+    public static func zipPathMatchScore(
+        _ entry: String,
+        keywords: [String]
+    ) -> Int {
+        let value = entry.lowercased()
+        let basename = URL(fileURLWithPath: entry).lastPathComponent.lowercased()
+
+        var score = 0
+
+        // for keyword in keywords.map(\.lowercased) {
+        for keyword in keywords.map({ $0.lowercased() }) {
+            if basename.contains(keyword) {
+                score += 20
+            }
+
+            if value.contains(keyword) {
+                score += 10
+            }
+        }
+
+        if value.contains("/mapping/") {
+            score += 25
+        }
+        if value.contains("/entrypoints/") {
+            score += 20
+        }
+        if value.contains("/presentation/") {
+            score += 15
+        }
+        if value.contains("/definition/") {
+            score += 15
+        }
+        if value.contains("/table/") {
+            score += 15
+        }
+        if value.contains("/dictionary/") {
+            score += 15
+        }
+
+        if value.hasSuffix(".xml") || value.hasSuffix(".xsd") {
+            score += 10
+        }
+
+        if value.contains("rgs-to-bd-rpt-ihz-aangifte-2025") {
+            score += 50
+        }
+
+        if value.contains("map-bd-ihz") {
+            score += 40
+        }
+
+        return score
+    }
+
+    public static func rankedZIPPaths(
+        _ entries: [String],
+        keywords: [String]
+    ) -> [(entry: String, score: Int)] {
+        entries
+            .map { ($0, zipPathMatchScore($0, keywords: keywords)) }
+            .filter { $0.1 > 0 }
+            .sorted { lhs, rhs in
+                if lhs.1 == rhs.1 {
+                    return lhs.0 < rhs.0
+                }
+
+                return lhs.1 > rhs.1
+            }
+    }
+
     public static func printMatchingZIPPaths(
         _ entries: [String],
         keywords: [String],
         limit: Int = 100
     ) {
-        let loweredKeywords = keywords.map { $0.lowercased() }
-
-        let matches = entries.filter { entry in
-            let value = entry.lowercased()
-            return loweredKeywords.contains { value.contains($0) }
-        }
+        let matches = rankedZIPPaths(entries, keywords: keywords)
 
         print("path matches for keywords \(keywords): \(matches.count)")
-        for entry in matches.prefix(limit) {
-            print("  \(entry)")
+        for match in matches.prefix(limit) {
+            print("  [\(match.score)] \(match.entry)")
         }
         print("")
+    }
+
+    public static func rankedTextEntries(
+        _ entries: [String],
+        keywords: [String]
+    ) -> [String] {
+        rankedZIPPaths(candidateTextEntries(entries), keywords: keywords)
+            .map(\.entry)
     }
 
     public static func candidateTextEntries(_ entries: [String]) -> [String] {
@@ -131,20 +204,21 @@ extension TaxonomyProbe {
     public static func findTextHitsInZIP(
         zipFileURL: URL,
         entries: [String],
+        keywords: [String],
         patterns: [String],
         maxFilesToScan: Int = 300,
         maxHits: Int = 50
     ) throws {
         let textEntries = candidateTextEntries(entries)
+        let rankedEntries = rankedTextEntries(entries, keywords: keywords)
         let loweredPatterns = patterns.map { $0.lowercased() }
 
         print("text-like entries: \(textEntries.count)")
-        print("scanning first \(min(maxFilesToScan, textEntries.count)) text-like files for patterns...")
-        print("")
+        print("scanning first \(min(maxFilesToScan, rankedEntries.count)) ranked text-like files for patterns...")
 
         var hits = 0
 
-        for entry in textEntries.prefix(maxFilesToScan) {
+        for entry in rankedEntries.prefix(maxFilesToScan) {
             let text = try readZIPEntryText(zipFileURL: zipFileURL, entryPath: entry)
             let lowered = text.lowercased()
 

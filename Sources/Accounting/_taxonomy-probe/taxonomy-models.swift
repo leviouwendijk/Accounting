@@ -97,3 +97,12 @@ public struct ComputedMappedFact: Sendable {
     public let matchedCodes: [String]
     public let contributingMappings: [CanonicalResolvedMapping]
 }
+
+// fuzzy
+
+public struct MappingSuggestion: Sendable {
+    public let queryCode: String
+    public let candidateCode: String
+    public let score: Int
+    public let reasons: [String]
+}
