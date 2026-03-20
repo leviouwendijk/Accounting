@@ -78,10 +78,36 @@ extension TaxonomyProbe {
             return try Data(contentsOf: url)
         }
 
+        final class FetchBox: @unchecked Sendable {
+            private let lock = NSLock()
+
+            private var storedData: Data?
+            private var storedResponse: URLResponse?
+            private var storedError: Swift.Error?
+
+            func store(
+                data: Data?,
+                response: URLResponse?,
+                error: Swift.Error?
+            ) {
+                lock.lock()
+                defer { lock.unlock() }
+
+                storedData = data
+                storedResponse = response
+                storedError = error
+            }
+
+            func snapshot() -> (Data?, URLResponse?, Swift.Error?) {
+                lock.lock()
+                defer { lock.unlock() }
+
+                return (storedData, storedResponse, storedError)
+            }
+        }
+
         let semaphore = DispatchSemaphore(value: 0)
-        var capturedData: Data?
-        var capturedResponse: URLResponse?
-        var capturedError: Swift.Error?
+        let box = FetchBox()
 
         let request = URLRequest(
             url: url,
@@ -90,14 +116,18 @@ extension TaxonomyProbe {
         )
 
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            capturedData = data
-            capturedResponse = response
-            capturedError = error
+            box.store(
+                data: data,
+                response: response,
+                error: error
+            )
             semaphore.signal()
         }
 
         task.resume()
         semaphore.wait()
+
+        let (capturedData, capturedResponse, capturedError) = box.snapshot()
 
         if let capturedError {
             throw Error.network(capturedError.localizedDescription)
