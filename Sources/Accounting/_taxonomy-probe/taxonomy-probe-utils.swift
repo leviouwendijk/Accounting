@@ -6,6 +6,10 @@ import FoundationNetworking
 #endif
 
 extension TaxonomyProbe {
+    public static func normalizedTaxonomyConceptKey(_ raw: String) -> String {
+        trim(raw).replacingOccurrences(of: ":", with: "_")
+    }
+
     public static func stderrPrint(_ message: String) {
         let data = Data((message + "\n").utf8)
         FileHandle.standardError.write(data)
@@ -414,7 +418,7 @@ extension TaxonomyProbe {
         var out: [String: ComputedFact] = [:]
 
         for fact in factsByKey.values {
-            let concept = fact.key.concept
+            let concept = normalizedTaxonomyConceptKey(fact.key.concept)
             let uniqueMatched = Array(Set(fact.matchedCodes)).sorted()
 
             if let existing = out[concept] {
@@ -774,7 +778,11 @@ extension TaxonomyProbe {
 
         for link in links {
             for href in link.locs.values {
-                out.insert(conceptName(from: href))
+                out.insert(
+                    normalizedTaxonomyConceptKey(
+                        conceptName(from: href)
+                    )
+                )
             }
         }
 

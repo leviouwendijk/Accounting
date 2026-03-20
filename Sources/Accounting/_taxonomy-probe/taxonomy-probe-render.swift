@@ -23,7 +23,9 @@ extension TaxonomyProbe {
                 return
             }
 
-            let concept = conceptName(from: href)
+            let concept = TaxonomyProbe.normalizedTaxonomyConceptKey(
+                conceptName(from: href)
+            )
             let label = labelsByConcept[concept]
             let prefix = String(repeating: " ", count: indent)
 
