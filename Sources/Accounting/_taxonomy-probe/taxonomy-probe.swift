@@ -92,7 +92,10 @@ extension TaxonomyProbe {
         public let maxFilesToScan: Int
         public let maxHits: Int
         public let demoRGSBalances: [String: Decimal]
+
         public let chartFile: String?
+        public let balanceInput: BalanceInputMode
+        public let projectRoot: String?
 
         public init(
             entrypoint: String = "https://www.nltaxonomie.nl/nt20/bd/20251210/entrypoints/bd-rpt-ihz-aangifte-2025.xsd",
@@ -110,6 +113,8 @@ extension TaxonomyProbe {
             maxFilesToScan: Int = 400,
             maxHits: Int = 80,
             chartFile: String? = nil,
+            balanceInput: BalanceInputMode = .demo,
+            projectRoot: String? = nil,
             demoRGSBalances: [String: Decimal] = [
                 "WOmzHan": 125000,
                 "WVooMut": -3500,
@@ -132,6 +137,8 @@ extension TaxonomyProbe {
             self.maxFilesToScan = maxFilesToScan
             self.maxHits = maxHits
             self.chartFile = chartFile
+            self.balanceInput = balanceInput
+            self.projectRoot = projectRoot
             self.demoRGSBalances = demoRGSBalances
         }
     }
@@ -384,17 +391,46 @@ extension TaxonomyProbe {
                 allMappings.append(contentsOf: mappings)
             }
 
-            // TaxonomyProbe.renderResolvedMappings(allMappings, limit: 120)
             print("resolved mappings total: \(allMappings.count)")
             print("")
 
-            guard let chartFile = config.chartFile else {
-                throw Error.missingChartFile
-            }
+            let accounts: AccountStore
+            let inputBalances: [String: Decimal]
 
-            let chartURL = try TaxonomyProbe.urlFromStringOrPath(chartFile)
-            let chart = try TaxonomyProbe.loadCompiledChart(from: chartURL)
-            let accounts = try AccountStore(chart: chart)
+            switch config.balanceInput {
+            case .demo:
+                guard let chartFile = config.chartFile else {
+                    throw Error.missingChartFile
+                }
+
+                let chartURL = try TaxonomyProbe.urlFromStringOrPath(chartFile)
+                let chart = try TaxonomyProbe.loadCompiledChart(from: chartURL)
+
+                accounts = try AccountStore(chart: chart)
+                inputBalances = config.demoRGSBalances
+
+                print("balance input: demo")
+                print("demo balance count: \(inputBalances.count)")
+                print("")
+
+            case .project:
+                guard let rawProjectRoot = config.projectRoot else {
+                    throw Error.parseFailed("balanceInput=project requires projectRoot")
+                }
+
+                let projectRootURL = URL(fileURLWithPath: rawProjectRoot, isDirectory: true)
+                let projectData = try TaxonomyProbe.projectBalances(projectRoot: projectRootURL)
+
+                accounts = projectData.result.accounts
+                inputBalances = projectData.balances
+
+                print("balance input: project")
+                print("project root: \(projectRootURL.path)")
+                print("compiled resolved entries: \(projectData.result.resolved.count)")
+                print("compiled project accounts: \(projectData.result.accounts.byCode.count)")
+                print("project-derived balances loaded: \(inputBalances.count)")
+                print("")
+            }
 
             let canonicalization = TaxonomyProbe.canonicalizeMappings(
                 allMappings,
@@ -426,40 +462,60 @@ extension TaxonomyProbe {
             }
             print("")
 
-            TaxonomyProbe.renderDemoBalanceCoverage(
-                mappings: canonicalMappings,
-                rgsBalances: config.demoRGSBalances
-            )
+            switch config.balanceInput {
+            case .demo:
+                TaxonomyProbe.renderDemoBalanceCoverage(
+                    mappings: canonicalMappings,
+                    rgsBalances: inputBalances
+                )
 
-            TaxonomyProbe.renderCanonicalSourceCodes(
-                mappings: canonicalMappings,
-                prefix: "W",
-                limit: 300
-            )
+                TaxonomyProbe.renderCanonicalSourceCodes(
+                    mappings: canonicalMappings,
+                    prefix: "W",
+                    limit: 300
+                )
+
+            case .project:
+                TaxonomyProbe.renderUsedProjectCoverage(
+                    mappings: canonicalMappings,
+                    balances: inputBalances
+                )
+            }
 
             let factsByKey = TaxonomyProbe.compileMappedFacts(
                 mappings: canonicalMappings,
-                rgsBalances: config.demoRGSBalances
+                rgsBalances: inputBalances
             )
 
             let factsByConcept = TaxonomyProbe.projectMappedFactsToConceptFacts(factsByKey)
             let unmatchedCodes = TaxonomyProbe.unmatchedRGSCodes(
                 mappings: canonicalMappings,
-                rgsBalances: config.demoRGSBalances
+                rgsBalances: inputBalances
             )
 
-            print("demo RGS balances:")
-            for key in config.demoRGSBalances.keys.sorted() {
-                print("  \(key) = \(TaxonomyProbe.decimalString(config.demoRGSBalances[key] ?? 0))")
+            switch config.balanceInput {
+            case .demo:
+                print("input balances:")
+                for key in inputBalances.keys.sorted() {
+                    print("  \(key) = \(TaxonomyProbe.decimalString(inputBalances[key] ?? 0))")
+                }
+                print("")
+
+            case .project:
+                print("input balances used for mapping: \(inputBalances.count)")
+                print("")
             }
-            print("")
 
             if unmatchedCodes.isEmpty {
                 print("unmatched RGS codes: 0")
             } else {
                 print("unmatched RGS codes: \(unmatchedCodes.count)")
-                for code in unmatchedCodes {
+                for code in unmatchedCodes.prefix(200) {
                     print("  \(code)")
+                }
+
+                if unmatchedCodes.count > 200 {
+                    print("  ... \(unmatchedCodes.count - 200) more")
                 }
             }
             print("")
@@ -530,5 +586,12 @@ extension TaxonomyProbe {
                 print("")
             }
         }
+    }
+}
+
+extension TaxonomyProbe {
+    public enum BalanceInputMode: String, Sendable {
+        case demo
+        case project
     }
 }

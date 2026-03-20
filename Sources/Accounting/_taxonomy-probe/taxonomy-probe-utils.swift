@@ -517,3 +517,66 @@ extension TaxonomyProbe {
         print("")
     }
 }
+
+extension TaxonomyProbe {
+    public static func renderUsedProjectCoverage(
+        mappings: [CanonicalResolvedMapping],
+        balances: [String: Decimal],
+        limitUnmatched: Int = 120
+    ) {
+        let mappedCodes = Set(mappings.map(\.sourceCode))
+        let usedCodes = balances.keys.sorted()
+
+        let matched = usedCodes.filter { mappedCodes.contains($0) }
+        let unmatched = usedCodes.filter { !mappedCodes.contains($0) }
+
+        print("project balance coverage:")
+        print("  used codes: \(usedCodes.count)")
+        print("  matched used codes: \(matched.count)")
+        print("  unmatched used codes: \(unmatched.count)")
+        print("")
+
+        if !unmatched.isEmpty {
+            print("unmatched used project codes:")
+            for code in unmatched.prefix(limitUnmatched) {
+                print("  \(code) = \(decimalString(balances[code] ?? 0))")
+            }
+            if unmatched.count > limitUnmatched {
+                print("  ... \(unmatched.count - limitUnmatched) more")
+            }
+            print("")
+        }
+    }
+
+    public static func projectBalances(
+        projectRoot: URL
+    ) throws -> (result: EntryCompileDriver.Result, balances: [String: Decimal]) {
+        let compileResult = try EntryCompileDriver.compile(
+            projectRoot: projectRoot,
+            setting: .init(
+                entities: true,
+                accounts: true,
+                transactions: true,
+                entries: true,
+                assertion: true,
+                loc_trace: false
+            ),
+            verbose: false
+        )
+
+        let rows = trialBalance(compileResult.resolved)
+
+        var balances: [String: Decimal] = [:]
+        balances.reserveCapacity(rows.count)
+
+        for row in rows {
+            let net = row.net
+            guard net != 0 else {
+                continue
+            }
+            balances[row.accountCode] = net
+        }
+
+        return (compileResult, balances)
+    }
+}
