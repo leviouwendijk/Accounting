@@ -579,4 +579,58 @@ extension TaxonomyProbe {
 
         return (compileResult, balances)
     }
+
+    public static func inspectUnmatchedProjectCodes(
+        unmatchedCodes: [String],
+        balances: [String: Decimal],
+        accounts: AccountStore,
+        mappings: [CanonicalResolvedMapping],
+        resolvedEntries: [ResolvedEntry],
+        limitEntriesPerCode: Int = 20
+    ) {
+        let mappedCodes = Set(mappings.map(\.sourceCode))
+
+        var entryIDsByCode: [String: Set<String>] = [:]
+
+        for (index, entry) in resolvedEntries.enumerated() {
+            let entryLabel: String
+
+            if let id = entry.id {
+                entryLabel = String(id)
+            } else {
+                entryLabel = "index:\(index)"
+            }
+
+            for line in entry.lines {
+                entryIDsByCode[line.account.code, default: []].insert(entryLabel)
+            }
+        }
+
+        print("unmatched used project code inspection:")
+
+        for code in unmatchedCodes {
+            let amount = balances[code] ?? 0
+            let existsInChart = accounts.byCode[code] != nil
+            let existsInMappings = mappedCodes.contains(code)
+            let entryIDs = Array(entryIDsByCode[code] ?? []).sorted()
+
+            print("  \(code) = \(decimalString(amount))")
+            print("    in chart: \(existsInChart)")
+            print("    in taxonomy mappings: \(existsInMappings)")
+            print("    used in entries: \(entryIDs.count)")
+
+            if !entryIDs.isEmpty {
+                // let shown = entryIDs.prefix(limitEntriesPerCode).map(String.init).joined(separator: ", ")
+                let shown = entryIDs.prefix(limitEntriesPerCode).joined(separator: ", ")
+
+                print("    entry ids: \(shown)")
+
+                if entryIDs.count > limitEntriesPerCode {
+                    print("    ... \(entryIDs.count - limitEntriesPerCode) more")
+                }
+            }
+        }
+
+        print("")
+    }
 }

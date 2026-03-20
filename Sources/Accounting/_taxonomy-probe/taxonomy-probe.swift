@@ -396,6 +396,7 @@ extension TaxonomyProbe {
 
             let accounts: AccountStore
             let inputBalances: [String: Decimal]
+            var projectCompileResult: EntryCompileDriver.Result?
 
             switch config.balanceInput {
             case .demo:
@@ -421,6 +422,7 @@ extension TaxonomyProbe {
                 let projectRootURL = URL(fileURLWithPath: rawProjectRoot, isDirectory: true)
                 let projectData = try TaxonomyProbe.projectBalances(projectRoot: projectRootURL)
 
+                projectCompileResult = projectData.result
                 accounts = projectData.result.accounts
                 inputBalances = projectData.balances
 
@@ -519,6 +521,18 @@ extension TaxonomyProbe {
                 }
             }
             print("")
+
+            if config.balanceInput == .project,
+               let compileResult = projectCompileResult,
+               !unmatchedCodes.isEmpty {
+                TaxonomyProbe.inspectUnmatchedProjectCodes(
+                    unmatchedCodes: unmatchedCodes,
+                    balances: inputBalances,
+                    accounts: accounts,
+                    mappings: canonicalMappings,
+                    resolvedEntries: compileResult.resolved
+                )
+            }
 
             TaxonomyProbe.renderComputedMappedFacts(factsByKey, limit: 200)
             print("")
