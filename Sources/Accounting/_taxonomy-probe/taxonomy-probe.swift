@@ -9,15 +9,15 @@ import FoundationNetworking
 import FoundationXML
 #endif
 
-enum TaxonomyProbe {}
+public enum TaxonomyProbe {}
 
 extension TaxonomyProbe {
-    struct LinkbaseRef {
+    public struct LinkbaseRef {
         let href: String
         let role: String
     }
 
-    struct EntrypointRefs {
+    public struct EntrypointRefs {
         var presentation: [LinkbaseRef] = []
         var labels: [LinkbaseRef] = []
         var definitions: [LinkbaseRef] = []
@@ -25,41 +25,41 @@ extension TaxonomyProbe {
         var other: [LinkbaseRef] = []
     }
 
-    struct PresentationArc {
+    public struct PresentationArc {
         let from: String
         let to: String
         let order: Double
     }
 
-    struct PresentationLink {
+    public struct PresentationLink {
         let role: String
         let locs: [String: String]
         let arcs: [PresentationArc]
     }
 
-    struct LabelArc {
+    public struct LabelArc {
         let from: String
         let to: String
     }
 
-    struct MappingFile {
+    public struct MappingFile {
         let entrypoint: String?
         let rows: [MappingRow]
     }
 
-    struct MappingRow {
+    public struct MappingRow {
         let source: MappingSource
         let label: String
         let concept: String
         let dimensions: [String: String]
     }
 
-    enum MappingSource {
+    public enum MappingSource {
         case literal(String)
         case group([GroupTerm])
     }
 
-    struct GroupTerm {
+    public struct GroupTerm {
         enum Op {
             case include
             case exclude
@@ -69,30 +69,30 @@ extension TaxonomyProbe {
         let pattern: String
     }
 
-    struct ComputedFact {
+    public struct ComputedFact {
         let concept: String
         let amount: Decimal
         let matchedCodes: [String]
         let mappingLabel: String
     }
 
-    enum Mode: String, Sendable {
+    public enum Mode: String, Sendable {
         case probePackage
         case csvMapping
     }
 
-    struct Config: Sendable {
-        let entrypoint: String
-        let wantedPresentation: String
-        let mappingZIP: String
-        let mode: Mode
-        let probeKeywords: [String]
-        let probePatterns: [String]
-        let maxFilesToScan: Int
-        let maxHits: Int
-        let demoRGSBalances: [String: Decimal]
+    public struct Config: Sendable {
+        public let entrypoint: String
+        public let wantedPresentation: String
+        public let mappingZIP: String
+        public let mode: Mode
+        public let probeKeywords: [String]
+        public let probePatterns: [String]
+        public let maxFilesToScan: Int
+        public let maxHits: Int
+        public let demoRGSBalances: [String: Decimal]
 
-        init(
+        public init(
             entrypoint: String = "https://www.nltaxonomie.nl/nt20/bd/20251210/entrypoints/bd-rpt-ihz-aangifte-2025.xsd",
             wantedPresentation: String = "winst-resultatenrekening-pre.xml",
             mappingZIP: String = "https://www.referentiegrootboekschema.nl/sites/default/files/kennisbank/NT20_RGS_20251210.zip",
@@ -132,13 +132,13 @@ extension TaxonomyProbe {
         }
     }
 
-    struct Bootstrap {
-        let entrypointURL: URL
-        let entrypointBasename: String
-        let refs: EntrypointRefs
-        let presentationURL: URL
-        let links: [PresentationLink]
-        let labelsByConcept: [String: String]
+    public struct Bootstrap {
+        public let entrypointURL: URL
+        public let entrypointBasename: String
+        public let refs: EntrypointRefs
+        public let presentationURL: URL
+        public let links: [PresentationLink]
+        public let labelsByConcept: [String: String]
     }
 
     enum Error: Swift.Error, CustomStringConvertible {
@@ -182,14 +182,14 @@ extension TaxonomyProbe {
         }
     }
 
-    struct Runner: Sendable {
-        let config: Config
+    public struct Runner: Sendable {
+        public let config: Config
 
-        init(config: Config = .init()) {
+        public init(config: Config = .init()) {
             self.config = config
         }
 
-        func run() throws {
+        public func run() throws {
             let bootstrap = try loadBootstrap()
 
             print("entrypoint: \(bootstrap.entrypointURL.absoluteString)")
@@ -230,7 +230,7 @@ extension TaxonomyProbe {
             }
         }
 
-        func loadBootstrap() throws -> Bootstrap {
+        public func loadBootstrap() throws -> Bootstrap {
             let entrypointURL = try TaxonomyProbe.urlFromStringOrPath(config.entrypoint)
             let entrypointBasename = entrypointURL.lastPathComponent
 
@@ -278,7 +278,7 @@ extension TaxonomyProbe {
             )
         }
 
-        func runPackageProbe(zipFileURL: URL) throws {
+        public func runPackageProbe(zipFileURL: URL) throws {
             print("listing zip entries...")
             let entries = try TaxonomyProbe.listZIPEntries(zipFileURL: zipFileURL)
             print("zip entries: \(entries.count)")
@@ -299,7 +299,7 @@ extension TaxonomyProbe {
             )
         }
 
-        func runCSVMapping(
+        public func runCSVMapping(
             zipFileURL: URL,
             bootstrap: Bootstrap
         ) throws {

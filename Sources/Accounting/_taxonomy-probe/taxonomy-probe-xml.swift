@@ -5,11 +5,11 @@ import FoundationXML
 #endif
 
 extension TaxonomyProbe {
-    final class EntrypointParser: NSObject, XMLParserDelegate {
+    public final class EntrypointParser: NSObject, XMLParserDelegate {
         private(set) var refs = EntrypointRefs()
         private var parseError: Swift.Error?
 
-        func parse(data: Data) throws -> EntrypointRefs {
+        public func parse(data: Data) throws -> EntrypointRefs {
             refs = EntrypointRefs()
             parseError = nil
 
@@ -26,7 +26,7 @@ extension TaxonomyProbe {
             return refs
         }
 
-        func parser(
+        public func parser(
             _ parser: XMLParser,
             didStartElement elementName: String,
             namespaceURI: String?,
@@ -59,12 +59,12 @@ extension TaxonomyProbe {
             }
         }
 
-        func parser(_ parser: XMLParser, parseErrorOccurred parseError: Swift.Error) {
+        public func parser(_ parser: XMLParser, parseErrorOccurred parseError: Swift.Error) {
             self.parseError = parseError
         }
     }
 
-    final class PresentationParser: NSObject, XMLParserDelegate {
+    public final class PresentationParser: NSObject, XMLParserDelegate {
         private(set) var links: [PresentationLink] = []
 
         private var currentRole: String?
@@ -72,7 +72,7 @@ extension TaxonomyProbe {
         private var currentArcs: [PresentationArc] = []
         private var parseError: Swift.Error?
 
-        func parse(data: Data) throws -> [PresentationLink] {
+        public func parse(data: Data) throws -> [PresentationLink] {
             links = []
             currentRole = nil
             currentLocs = [:]
@@ -92,7 +92,7 @@ extension TaxonomyProbe {
             return links
         }
 
-        func parser(
+        public func parser(
             _ parser: XMLParser,
             didStartElement elementName: String,
             namespaceURI: String?,
@@ -137,7 +137,7 @@ extension TaxonomyProbe {
             }
         }
 
-        func parser(
+        public func parser(
             _ parser: XMLParser,
             didEndElement elementName: String,
             namespaceURI: String?,
@@ -164,12 +164,12 @@ extension TaxonomyProbe {
             currentArcs = []
         }
 
-        func parser(_ parser: XMLParser, parseErrorOccurred parseError: Swift.Error) {
+        public func parser(_ parser: XMLParser, parseErrorOccurred parseError: Swift.Error) {
             self.parseError = parseError
         }
     }
 
-    final class LabelParser: NSObject, XMLParserDelegate {
+    public final class LabelParser: NSObject, XMLParserDelegate {
         private var parseError: Swift.Error?
 
         private var currentLocs: [String: String] = [:]
@@ -182,7 +182,7 @@ extension TaxonomyProbe {
 
         private(set) var labelsByConcept: [String: String] = [:]
 
-        func parse(data: Data) throws -> [String: String] {
+        public func parse(data: Data) throws -> [String: String] {
             parseError = nil
             labelsByConcept = [:]
             currentLocs = [:]
@@ -205,7 +205,7 @@ extension TaxonomyProbe {
             return labelsByConcept
         }
 
-        func parser(
+        public func parser(
             _ parser: XMLParser,
             didStartElement elementName: String,
             namespaceURI: String?,
@@ -246,13 +246,13 @@ extension TaxonomyProbe {
             }
         }
 
-        func parser(_ parser: XMLParser, foundCharacters string: String) {
+        public func parser(_ parser: XMLParser, foundCharacters string: String) {
             if currentResourceLabel != nil {
                 currentText.append(string)
             }
         }
 
-        func parser(
+        public func parser(
             _ parser: XMLParser,
             didEndElement elementName: String,
             namespaceURI: String?,
@@ -304,7 +304,7 @@ extension TaxonomyProbe {
             }
         }
 
-        func parser(_ parser: XMLParser, parseErrorOccurred parseError: Swift.Error) {
+        public func parser(_ parser: XMLParser, parseErrorOccurred parseError: Swift.Error) {
             self.parseError = parseError
         }
     }

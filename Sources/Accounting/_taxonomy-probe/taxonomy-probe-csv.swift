@@ -1,11 +1,11 @@
 import Foundation
 
 extension TaxonomyProbe {
-    static func splitSemicolonLine(_ line: String) -> [String] {
+    public static func splitSemicolonLine(_ line: String) -> [String] {
         line.split(separator: ";", omittingEmptySubsequences: false).map(String.init)
     }
 
-    static func parseMappingSource(_ raw: String) -> MappingSource {
+    public static func parseMappingSource(_ raw: String) -> MappingSource {
         let value = trim(raw)
 
         if value.hasPrefix("=GROUP("), value.hasSuffix(")") {
@@ -41,7 +41,7 @@ extension TaxonomyProbe {
         return .literal(value)
     }
 
-    static func parseMappingCSV(_ text: String) throws -> MappingFile {
+    public static func parseMappingCSV(_ text: String) throws -> MappingFile {
         let normalized = text.replacingOccurrences(of: "\r\n", with: "\n")
         let lines = normalized.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
 
@@ -114,7 +114,7 @@ extension TaxonomyProbe {
         return .init(entrypoint: entrypoint, rows: rows)
     }
 
-    static func globMatch(pattern: String, text: String) -> Bool {
+    public static func globMatch(pattern: String, text: String) -> Bool {
         let p = Array(pattern)
         let t = Array(text)
 
@@ -153,7 +153,7 @@ extension TaxonomyProbe {
         return rec(0, 0)
     }
 
-    static func compileFacts(
+    public static func compileFacts(
         mappingRows: [MappingRow],
         rgsBalances: [String: Decimal]
     ) -> [String: ComputedFact] {

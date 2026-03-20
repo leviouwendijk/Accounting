@@ -1,7 +1,7 @@
 import Foundation
 
 extension TaxonomyProbe {
-    static func listZIPEntries(zipFileURL: URL) throws -> [String] {
+    public static func listZIPEntries(zipFileURL: URL) throws -> [String] {
         let unzip = try unzipPath()
         let output = try runCommand(unzip, ["-Z1", zipFileURL.path])
         return output
@@ -9,12 +9,12 @@ extension TaxonomyProbe {
             .map(String.init)
     }
 
-    static func readZIPEntryText(zipFileURL: URL, entryPath: String) throws -> String {
+    public static func readZIPEntryText(zipFileURL: URL, entryPath: String) throws -> String {
         let unzip = try unzipPath()
         return try runCommand(unzip, ["-p", zipFileURL.path, entryPath])
     }
 
-    static func extractMatchingMappingCSV(
+    public static func extractMatchingMappingCSV(
         zipFileURL: URL,
         entrypointBasename: String
     ) throws -> (entryPath: String, text: String) {
@@ -49,12 +49,12 @@ extension TaxonomyProbe {
         throw Error.mappingCSVNotFound(entrypointBasename)
     }
 
-    static func fileExtensionLowercased(for path: String) -> String {
+    public static func fileExtensionLowercased(for path: String) -> String {
         let ext = URL(fileURLWithPath: path).pathExtension.lowercased()
         return ext.isEmpty ? "(none)" : ext
     }
 
-    static func summarizeZIPEntries(_ entries: [String]) {
+    public static func summarizeZIPEntries(_ entries: [String]) {
         var counts: [String: Int] = [:]
 
         for entry in entries {
@@ -69,7 +69,7 @@ extension TaxonomyProbe {
         print("")
     }
 
-    static func printMatchingZIPPaths(
+    public static func printMatchingZIPPaths(
         _ entries: [String],
         keywords: [String],
         limit: Int = 100
@@ -88,7 +88,7 @@ extension TaxonomyProbe {
         print("")
     }
 
-    static func candidateTextEntries(_ entries: [String]) -> [String] {
+    public static func candidateTextEntries(_ entries: [String]) -> [String] {
         let allowed: Set<String> = [
             "xml",
             "xsd",
@@ -103,7 +103,7 @@ extension TaxonomyProbe {
         return entries.filter { allowed.contains(fileExtensionLowercased(for: $0)) }
     }
 
-    static func findTextHitsInZIP(
+    public static func findTextHitsInZIP(
         zipFileURL: URL,
         entries: [String],
         patterns: [String],

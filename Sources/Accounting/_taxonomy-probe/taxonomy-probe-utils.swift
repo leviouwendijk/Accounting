@@ -6,12 +6,12 @@ import FoundationNetworking
 #endif
 
 extension TaxonomyProbe {
-    static func stderrPrint(_ message: String) {
+    public static func stderrPrint(_ message: String) {
         let data = Data((message + "\n").utf8)
         FileHandle.standardError.write(data)
     }
 
-    static func localName(_ name: String?) -> String {
+    public static func localName(_ name: String?) -> String {
         guard let name else {
             return ""
         }
@@ -23,7 +23,7 @@ extension TaxonomyProbe {
         return name
     }
 
-    static func attributeValue(_ attributes: [String: String], _ names: [String]) -> String? {
+    public static func attributeValue(_ attributes: [String: String], _ names: [String]) -> String? {
         for name in names {
             if let value = attributes[name] {
                 return value
@@ -40,15 +40,15 @@ extension TaxonomyProbe {
         return nil
     }
 
-    static func trim(_ value: String) -> String {
+    public static func trim(_ value: String) -> String {
         value.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    static func decimalString(_ value: Decimal) -> String {
+    public static func decimalString(_ value: Decimal) -> String {
         NSDecimalNumber(decimal: value).stringValue
     }
 
-    static func resolveURL(_ href: String, relativeTo base: URL) throws -> URL {
+    public static func resolveURL(_ href: String, relativeTo base: URL) throws -> URL {
         if let absolute = URL(string: href), absolute.scheme != nil {
             return absolute
         }
@@ -60,7 +60,7 @@ extension TaxonomyProbe {
         return resolved
     }
 
-    static func conceptName(from locatorHref: String) -> String {
+    public static func conceptName(from locatorHref: String) -> String {
         if let url = URL(string: locatorHref), let fragment = url.fragment, !fragment.isEmpty {
             return fragment
         }
@@ -73,7 +73,7 @@ extension TaxonomyProbe {
         return locatorHref
     }
 
-    static func fetchData(from url: URL) throws -> Data {
+    public static func fetchData(from url: URL) throws -> Data {
         if url.isFileURL {
             return try Data(contentsOf: url)
         }
@@ -145,7 +145,7 @@ extension TaxonomyProbe {
         return capturedData
     }
 
-    static func fetchText(from url: URL) throws -> String {
+    public static func fetchText(from url: URL) throws -> String {
         let data = try fetchData(from: url)
 
         if let string = String(data: data, encoding: .utf8) {
@@ -159,7 +159,7 @@ extension TaxonomyProbe {
         throw Error.parseFailed("could not decode text from \(url.absoluteString)")
     }
 
-    static func urlFromStringOrPath(_ value: String) throws -> URL {
+    public static func urlFromStringOrPath(_ value: String) throws -> URL {
         if let url = URL(string: value), url.scheme != nil {
             return url
         }
@@ -171,7 +171,7 @@ extension TaxonomyProbe {
         throw Error.invalidURL(value)
     }
 
-    static func writeTempFile(data: Data, suffix: String) throws -> URL {
+    public static func writeTempFile(data: Data, suffix: String) throws -> URL {
         let tempURL = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
             .appendingPathExtension(suffix)
@@ -185,7 +185,7 @@ extension TaxonomyProbe {
         return tempURL
     }
 
-    static func runCommand(_ launchPath: String, _ arguments: [String]) throws -> String {
+    public static func runCommand(_ launchPath: String, _ arguments: [String]) throws -> String {
         let fileManager = FileManager.default
 
         let stdoutURL = fileManager.temporaryDirectory
@@ -236,7 +236,7 @@ extension TaxonomyProbe {
         return stdout
     }
 
-    static func unzipPath() throws -> String {
+    public static func unzipPath() throws -> String {
         let candidates = [
             "/usr/bin/unzip",
             "/bin/unzip"
