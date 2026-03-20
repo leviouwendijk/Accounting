@@ -631,6 +631,30 @@ extension TaxonomyProbe {
 
             print("")
 
+            var allBDPresentationConcepts: Set<String> = []
+
+            for links in bootstrap.allPresentationLinksByURL.values {
+                allBDPresentationConcepts.formUnion(
+                    TaxonomyProbe.presentationConcepts(from: links)
+                )
+            }
+
+            let conceptFactsOutsideAllBDPresentations =
+                Set(factsByConcept.keys).subtracting(allBDPresentationConcepts).sorted()
+
+            print("all BD presentation concepts: \(allBDPresentationConcepts.count)")
+            print("projected concept facts outside all BD presentations: \(conceptFactsOutsideAllBDPresentations.count)")
+
+            for concept in conceptFactsOutsideAllBDPresentations.prefix(200) {
+                print("  \(concept)")
+            }
+
+            if conceptFactsOutsideAllBDPresentations.count > 200 {
+                print("  ... \(conceptFactsOutsideAllBDPresentations.count - 200) more")
+            }
+
+            print("")
+
             switch config.balanceInput {
             case .demo:
                 print("input balances:")
