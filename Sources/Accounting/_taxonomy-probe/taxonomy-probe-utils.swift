@@ -766,4 +766,18 @@ extension TaxonomyProbe {
 
         print("")
     }
+
+    public static func presentationConcepts(
+        from links: [PresentationLink]
+    ) -> Set<String> {
+        var out: Set<String> = []
+
+        for link in links {
+            for href in link.locs.values {
+                out.insert(conceptName(from: href))
+            }
+        }
+
+        return out
+    }
 }

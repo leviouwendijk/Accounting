@@ -195,8 +195,12 @@ extension TaxonomyProbe {
         public let entrypointURL: URL
         public let entrypointBasename: String
         public let refs: EntrypointRefs
-        public let presentationURL: URL
-        public let links: [PresentationLink]
+
+        public let selectedPresentationURL: URL
+        public let selectedLinks: [PresentationLink]
+
+        public let allPresentationLinksByURL: [String: [PresentationLink]]
+
         public let labelsByConcept: [String: String]
     }
 
@@ -264,9 +268,16 @@ extension TaxonomyProbe {
             print("  table refs: \(bootstrap.refs.tables.count)")
             print("  other refs: \(bootstrap.refs.other.count)")
             print("")
-            print("selected presentation: \(bootstrap.presentationURL.absoluteString)")
+            print("selected presentation: \(bootstrap.selectedPresentationURL.absoluteString)")
             print("")
-            print("presentationLink count: \(bootstrap.links.count)")
+            print("presentationLink count: \(bootstrap.selectedLinks.count)")
+            print("")
+            print("all presentation refs:")
+            for ref in bootstrap.refs.presentation {
+                print("  \(ref.href)")
+            }
+            print("")
+            print("all loaded presentation files: \(bootstrap.allPresentationLinksByURL.count)")
             print("")
             print("labels loaded: \(bootstrap.labelsByConcept.count)")
             print("")
@@ -314,10 +325,24 @@ extension TaxonomyProbe {
                 throw Error.missingPresentation(config.wantedPresentation)
             }
 
-            let presentationURL = try TaxonomyProbe.resolveURL(chosenPresentationRef.href, relativeTo: entrypointURL)
-            let presentationData = try TaxonomyProbe.fetchData(from: presentationURL)
+            let selectedPresentationURL = try TaxonomyProbe.resolveURL(
+                chosenPresentationRef.href,
+                relativeTo: entrypointURL
+            )
+
             let presentationParser = PresentationParser()
-            let links = try presentationParser.parse(data: presentationData)
+
+            let selectedPresentationData = try TaxonomyProbe.fetchData(from: selectedPresentationURL)
+            let selectedLinks = try presentationParser.parse(data: selectedPresentationData)
+
+            var allPresentationLinksByURL: [String: [PresentationLink]] = [:]
+
+            for ref in refs.presentation {
+                let url = try TaxonomyProbe.resolveURL(ref.href, relativeTo: entrypointURL)
+                let data = try TaxonomyProbe.fetchData(from: url)
+                let links = try presentationParser.parse(data: data)
+                allPresentationLinksByURL[url.absoluteString] = links
+            }
 
             let dictionaryLabelURLs: [URL] = [
                 try TaxonomyProbe.resolveURL("../dictionary/bd-data-lab-nl.xml", relativeTo: entrypointURL),
@@ -344,8 +369,9 @@ extension TaxonomyProbe {
                 entrypointURL: entrypointURL,
                 entrypointBasename: entrypointBasename,
                 refs: refs,
-                presentationURL: presentationURL,
-                links: links,
+                selectedPresentationURL: selectedPresentationURL,
+                selectedLinks: selectedLinks,
+                allPresentationLinksByURL: allPresentationLinksByURL,
                 labelsByConcept: labelsByConcept
             )
         }
@@ -584,6 +610,27 @@ extension TaxonomyProbe {
                 rgsBalances: inputBalances
             )
 
+            let selectedPresentationConcepts = TaxonomyProbe.presentationConcepts(
+                from: bootstrap.selectedLinks
+            )
+
+            let conceptFactsNotInSelectedPresentation =
+                Set(factsByConcept.keys).subtracting(selectedPresentationConcepts).sorted()
+
+            print("selected presentation concepts: \(selectedPresentationConcepts.count)")
+            print("projected concept facts: \(factsByConcept.count)")
+            print("projected concept facts not in selected presentation: \(conceptFactsNotInSelectedPresentation.count)")
+
+            for concept in conceptFactsNotInSelectedPresentation.prefix(200) {
+                print("  \(concept)")
+            }
+
+            if conceptFactsNotInSelectedPresentation.count > 200 {
+                print("  ... \(conceptFactsNotInSelectedPresentation.count - 200) more")
+            }
+
+            print("")
+
             switch config.balanceInput {
             case .demo:
                 print("input balances:")
@@ -636,7 +683,7 @@ extension TaxonomyProbe {
             print("projected presentation facts: \(factsByConcept.count)")
             print("")
 
-            for link in bootstrap.links {
+            for link in bootstrap.selectedLinks {
                 TaxonomyProbe.renderPresentationLink(
                     link,
                     labelsByConcept: bootstrap.labelsByConcept,
@@ -687,7 +734,7 @@ extension TaxonomyProbe {
             }
             print("")
 
-            for link in bootstrap.links {
+            for link in bootstrap.selectedLinks {
                 TaxonomyProbe.renderPresentationLink(
                     link,
                     labelsByConcept: bootstrap.labelsByConcept,
