@@ -34,22 +34,23 @@ extension TaxonomyProjection {
                 ?? lookup.byIdentifier[normalizedSource]
                 ?? lookup.byCode[normalizedSource]
 
-            for mapping in mappings.prefix(50) {
-                let normalizedSource = normalizedMappingSourceIdentifier(
-                    mapping.sourceIdentifier
-                )
+            // for mapping in mappings.prefix(50) {
+                // let normalizedSource = normalizedMappingSourceIdentifier(
+                //     mapping.sourceIdentifier
+                // )
 
-                let identifierHit = lookup.byIdentifier[normalizedSource]
-                let codeHit = lookup.byCode[normalizedSource]
+                // let identifierHit = lookup.byIdentifier[normalizedSource]
+                // let codeHit = lookup.byCode[normalizedSource]
 
-                print("canonicalization sample:")
-                print("  sourceHref: \(mapping.sourceHref)")
-                print("  sourceIdentifier: \(mapping.sourceIdentifier)")
-                print("  normalized: \(normalizedSource)")
-                print("  identifierHit: \(identifierHit ?? "nil")")
-                print("  codeHit: \(codeHit ?? "nil")")
-                print("  targetConcept: \(mapping.targetConcept)")
-            }
+                // DEBUG:
+                // print("canonicalization sample:")
+                // print("  sourceHref: \(mapping.sourceHref)")
+                // print("  sourceIdentifier: \(mapping.sourceIdentifier)")
+                // print("  normalized: \(normalizedSource)")
+                // print("  identifierHit: \(identifierHit ?? "nil")")
+                // print("  codeHit: \(codeHit ?? "nil")")
+                // print("  targetConcept: \(mapping.targetConcept)")
+            // }
 
             guard let matchedCode else {
                 continue
