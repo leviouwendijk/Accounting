@@ -129,8 +129,6 @@ public struct TaxonomySourceData: Sendable {
     public let csvPriorityKeywords: [String]
     public let presentationDimensionRules: [TaxonomyDimensionPresentationRule]
 
-    public let maxPresentationDimensionSummaryCount: Int
-
     public init(
         name: String,
         entrypoint: String,
@@ -144,8 +142,7 @@ public struct TaxonomySourceData: Sendable {
         mappingEntrypointDirectories: [String]? = nil,
         zipPathBonusRules: [TaxonomyZIPPathBonusRule] = [],
         csvPriorityKeywords: [String] = [],
-        presentationDimensionRules: [TaxonomyDimensionPresentationRule]? = nil,
-        maxPresentationDimensionSummaryCount: Int = 6
+        presentationDimensionRules: [TaxonomyDimensionPresentationRule]? = nil
     ) {
         self.name = name
         self.entrypoint = entrypoint
@@ -162,8 +159,6 @@ public struct TaxonomySourceData: Sendable {
         self.csvPriorityKeywords = csvPriorityKeywords
         self.presentationDimensionRules =
             presentationDimensionRules ?? Self.defaultPresentationDimensionRules
-        
-        self.maxPresentationDimensionSummaryCount = maxPresentationDimensionSummaryCount
     }
 
     public func applying(overrides: TaxonomySourceOverrides) -> TaxonomySourceData {
@@ -250,7 +245,7 @@ public struct TaxonomySourceData: Sendable {
     }
 
     public func summarizePresentationDimension(
-        _ dimension: TaxonomyDimensionBinding
+        _ dimension: DimensionBinding
     ) -> String? {
         Self.summarizePresentationDimension(
             dimension,
@@ -259,7 +254,7 @@ public struct TaxonomySourceData: Sendable {
     }
 
     public static func summarizePresentationDimensionDefault(
-        _ dimension: TaxonomyDimensionBinding
+        _ dimension: DimensionBinding
     ) -> String? {
         summarizePresentationDimension(
             dimension,
@@ -268,17 +263,15 @@ public struct TaxonomySourceData: Sendable {
     }
 
     private static func summarizePresentationDimension(
-        _ dimension: TaxonomyDimensionBinding,
+        _ dimension: DimensionBinding,
         using rules: [TaxonomyDimensionPresentationRule]
     ) -> String? {
-        if let rule = rules.first(where: { $0.qname == dimension.axis }) {
+        if let rule = rules.first(where: { $0.qname == dimension.qname }) {
             if rule.hideDimension {
                 return nil
             }
 
-            let member = dimension.member
-
-            if !member.isEmpty {
+            if let member = dimension.member, !member.isEmpty {
                 if rule.hiddenMembers.contains(member) {
                     return nil
                 }
@@ -291,7 +284,7 @@ public struct TaxonomySourceData: Sendable {
                     return "\(prefix)=\(member)"
                 }
 
-                return "\(dimension.axis)=\(member)"
+                return "\(dimension.qname)=\(member)"
             }
 
             if rule.hideWhenMemberNil {
@@ -302,14 +295,14 @@ public struct TaxonomySourceData: Sendable {
                 return alias
             }
 
-            return dimension.axis
+            return dimension.qname
         }
 
-        if !dimension.member.isEmpty {
-            return "\(dimension.axis)=\(dimension.member)"
+        if let member = dimension.member, !member.isEmpty {
+            return "\(dimension.qname)=\(member)"
         }
 
-        return dimension.axis
+        return dimension.qname
     }
 
     public static let defaultLinkbaseRules: [TaxonomyLinkbaseRule] = [
