@@ -87,7 +87,7 @@ extension TaxonomyParser {
                     let qname = resource.attributes["dimension.\(index).qname"] ?? ""
                     let member = resource.attributes["dimension.\(index).member"] ?? ""
 
-                    guard !qname.isEmpty, !member.isEmpty else {
+                    guard !qname.isEmpty else {
                         continue
                     }
 

@@ -101,8 +101,16 @@ private extension TaxonomyGenericLinkbaseParser {
                 continue
             }
 
-            if childLocalName.hasSuffix("Arc") {
+            if childLocalName == "arc" || childLocalName.hasSuffix("Arc") {
                 arcs.append(parseArc(child))
+                continue
+            }
+
+            if childLocalName == "datapoint" {
+                let resource = parseDatapointResource(child)
+                if !resource.label.isEmpty {
+                    resources[resource.label] = resource
+                }
                 continue
             }
 
@@ -204,6 +212,88 @@ private extension TaxonomyGenericLinkbaseParser {
             to: to,
             order: order,
             targetRole: targetRole,
+            attributes: attributes
+        )
+    }
+
+    static func parseDatapointResource(
+        _ element: XMLElement
+    ) -> TaxonomyGenericResource {
+        let label = TaxonomyShared.attributeValue(element, "xlink:label")
+            ?? TaxonomyShared.attributeValue(element, "label")
+            ?? ""
+
+        let role = TaxonomyShared.attributeValue(element, "xlink:role")
+            ?? TaxonomyShared.attributeValue(element, "role")
+
+        var attributes: [String: String] = [:]
+
+        for attribute in element.attributes ?? [] {
+            guard let name = attribute.name else {
+                continue
+            }
+
+            attributes[name] = attribute.stringValue ?? ""
+        }
+
+        var primaryQName: String?
+        var dimensions: [TaxonomyExplicitDimension] = []
+
+        for node in element.children ?? [] {
+            guard let child = node as? XMLElement else {
+                continue
+            }
+
+            let localName = TaxonomyShared.localName(child.name ?? "")
+
+            switch localName {
+            case "primary":
+                let qname = TaxonomyShared.attributeValue(child, "rgs:qname")
+                    ?? TaxonomyShared.attributeValue(child, "qname")
+
+                if let qname, !TaxonomyShared.trim(qname).isEmpty {
+                    primaryQName = qname
+                }
+
+            case "explicitDimension":
+                let qname = TaxonomyShared.attributeValue(child, "rgs:qname")
+                    ?? TaxonomyShared.attributeValue(child, "qname")
+                    ?? ""
+
+                let member = TaxonomyShared.attributeValue(child, "member")
+
+                if !TaxonomyShared.trim(qname).isEmpty {
+                    dimensions.append(
+                        TaxonomyExplicitDimension(
+                            axis: qname,
+                            member: member ?? ""
+                        )
+                    )
+                }
+
+            default:
+                continue
+            }
+        }
+
+        if let primaryQName {
+            attributes["primaryQName"] = primaryQName
+        }
+
+        attributes["dimensionCount"] = String(dimensions.count)
+
+        for (index, dimension) in dimensions.enumerated() {
+            attributes["dimension.\(index).qname"] = dimension.axis
+            if !TaxonomyShared.trim(dimension.member).isEmpty {
+                attributes["dimension.\(index).member"] = dimension.member
+            }
+        }
+
+        return TaxonomyGenericResource(
+            elementName: "datapoint",
+            label: label,
+            role: role,
+            text: "",
             attributes: attributes
         )
     }
