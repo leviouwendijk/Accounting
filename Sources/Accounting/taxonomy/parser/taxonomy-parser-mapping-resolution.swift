@@ -74,7 +74,7 @@ extension TaxonomyParser {
 
         for link in linkbase.links {
             for (label, resource) in link.resources {
-                guard resource.elementName == "datapoint" else {
+                guard TaxonomyShared.localName(resource.elementName) == "datapoint" else {
                     continue
                 }
 
@@ -84,16 +84,25 @@ extension TaxonomyParser {
                 dimensions.reserveCapacity(count)
 
                 for index in 0..<count {
-                    let qname = resource.attributes["dimension.\(index).qname"] ?? ""
-                    let member = resource.attributes["dimension.\(index).member"] ?? ""
+                    let axis =
+                        resource.attributes["dimension.\(index).qname"]
+                        ?? ""
 
-                    guard !qname.isEmpty else {
+                    let member =
+                        resource.attributes["dimension.\(index).member"]
+                        ?? ""
+
+                    guard !TaxonomyShared.trim(axis).isEmpty else {
+                        continue
+                    }
+
+                    guard !TaxonomyShared.trim(member).isEmpty else {
                         continue
                     }
 
                     dimensions.append(
                         TaxonomyExplicitDimension(
-                            axis: qname,
+                            axis: axis,
                             member: member
                         )
                     )
