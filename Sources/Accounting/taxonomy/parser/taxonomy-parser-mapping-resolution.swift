@@ -78,39 +78,30 @@ extension TaxonomyParser {
                     continue
                 }
 
-                let primaryQName =
-                    resource.attributes["rgs:qname"]
-                    ?? resource.attributes["qname"]
-                    ?? resource.attributes["primaryQName"]
+                let count = Int(resource.attributes["dimensionCount"] ?? "0") ?? 0
 
                 var dimensions: [TaxonomyExplicitDimension] = []
+                dimensions.reserveCapacity(count)
 
-                for (name, value) in resource.attributes {
-                    let localName = TaxonomyShared.localName(name)
+                for index in 0..<count {
+                    let qname = resource.attributes["dimension.\(index).qname"] ?? ""
+                    let member = resource.attributes["dimension.\(index).member"] ?? ""
 
-                    guard localName == "member" else {
-                        continue
-                    }
-
-                    let axis =
-                        resource.attributes["rgs:qname"]
-                        ?? resource.attributes["qname"]
-
-                    guard let axis, !axis.isEmpty, !value.isEmpty else {
+                    guard !qname.isEmpty, !member.isEmpty else {
                         continue
                     }
 
                     dimensions.append(
                         TaxonomyExplicitDimension(
-                            axis: axis,
-                            member: value
+                            axis: qname,
+                            member: member
                         )
                     )
                 }
 
                 out[label] = TaxonomyDatapoint(
                     label: label,
-                    primaryQName: primaryQName,
+                    primaryQName: resource.attributes["primaryQName"],
                     dimensions: dimensions
                 )
             }
