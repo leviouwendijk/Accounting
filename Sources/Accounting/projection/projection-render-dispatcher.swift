@@ -19,12 +19,17 @@ public enum ProjectionRenderDispatcher {
             )
 
         case .taxonomyCompile(let output):
-            TaxonomyRenderer.render(output)
+            TaxonomyRenderer.render(
+                output,
+                options: .init()
+            )
 
         case .taxonomyPeriod(let output):
             TaxonomyRenderer.render(
                 output,
-                comparePrevious: options.comparePrevious
+                options: .init(
+                    comparePrevious: options.comparePrevious
+                )
             )
         }
     }
