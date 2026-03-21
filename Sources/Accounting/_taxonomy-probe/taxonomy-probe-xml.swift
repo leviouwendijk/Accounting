@@ -602,42 +602,6 @@ extension TaxonomyProbe {
         return out
     }
 
-    // public static func resolveMappings(from linkbase: GenericLinkbase) -> [ResolvedMapping] {
-    //     let datapointsByLabel = datapoints(from: linkbase)
-    //     var out: [ResolvedMapping] = []
-
-    //     for link in linkbase.links {
-    //         for arc in link.arcs {
-    //             guard let locator = link.locators[arc.from],
-    //                   let datapoint = datapointsByLabel[arc.to],
-    //                   let targetPrimaryQName = datapoint.primaryQName else {
-    //                 continue
-    //             }
-
-    //             let sourceConcept = conceptName(from: locator.href)
-
-    //             out.append(
-    //                 .init(
-    //                     sourceLocatorLabel: locator.label,
-    //                     sourceHref: locator.href,
-    //                     sourceConcept: sourceConcept,
-    //                     targetDatapointLabel: datapoint.label,
-    //                     targetPrimaryQName: targetPrimaryQName,
-    //                     dimensions: datapoint.dimensions,
-    //                     order: arc.order
-    //                 )
-    //             )
-    //         }
-    //     }
-
-    //     return out.sorted { lhs, rhs in
-    //         if lhs.sourceConcept == rhs.sourceConcept {
-    //             return lhs.targetPrimaryQName < rhs.targetPrimaryQName
-    //         }
-    //         return lhs.sourceConcept < rhs.sourceConcept
-    //     }
-    // }
-
     public static func appendSample(
         _ value: String,
         to array: inout [String],

@@ -109,19 +109,6 @@ extension TaxonomyProbe {
         conceptNameExtraction(from: locatorHref).concept ?? trim(locatorHref)
     }
 
-    // public static func conceptName(from locatorHref: String) -> String {
-    //     if let url = URL(string: locatorHref), let fragment = url.fragment, !fragment.isEmpty {
-    //         return fragment
-    //     }
-
-    //     if let hashIndex = locatorHref.lastIndex(of: "#") {
-    //         let next = locatorHref.index(after: hashIndex)
-    //         return String(locatorHref[next...])
-    //     }
-
-    //     return locatorHref
-    // }
-
     public static func fetchData(from url: URL) throws -> Data {
         if url.isFileURL {
             return try Data(contentsOf: url)

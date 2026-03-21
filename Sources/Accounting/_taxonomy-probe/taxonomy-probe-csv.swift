@@ -153,52 +153,6 @@ extension TaxonomyProbe {
         return rec(0, 0)
     }
 
-    // public static func compileFacts(
-    //     mappingRows: [MappingRow],
-    //     rgsBalances: [String: Decimal]
-    // ) -> [String: ComputedFact] {
-    //     var out: [String: ComputedFact] = [:]
-
-    //     for row in mappingRows {
-    //         switch row.source {
-    //         case .literal:
-    //             continue
-
-    //         case .group(let terms):
-    //             var amount: Decimal = 0
-    //             var matched: [String] = []
-
-    //             let sortedCodes = rgsBalances.keys.sorted()
-
-    //             for term in terms {
-    //                 let termMatches = sortedCodes.filter { globMatch(pattern: term.pattern, text: $0) }
-
-    //                 for code in termMatches {
-    //                     let value = rgsBalances[code] ?? 0
-
-    //                     switch term.op {
-    //                     case .include:
-    //                         amount += value
-    //                     case .exclude:
-    //                         amount -= value
-    //                     }
-
-    //                     matched.append("\(term.op == .include ? "+" : "-")\(code)")
-    //                 }
-    //             }
-
-    //             out[row.concept] = .init(
-    //                 concept: row.concept,
-    //                 amount: amount,
-    //                 matchedCodes: matched,
-    //                 mappingLabel: row.label
-    //             )
-    //         }
-    //     }
-
-    //     return out
-    // }
-
     public static func csvAxisQName(from raw: String) -> String {
         let value = trim(raw)
 
