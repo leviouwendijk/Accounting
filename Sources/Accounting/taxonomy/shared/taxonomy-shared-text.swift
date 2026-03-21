@@ -43,12 +43,26 @@ extension TaxonomyShared {
     public static func conceptNameExtraction(
         from raw: String
     ) -> TaxonomyConceptNameExtraction {
-        let local = localName(raw)
-        let normalized = normalizedTaxonomyConceptKey(local)
+        let trimmed = trim(raw)
+
+        let concept: String
+        if trimmed.isEmpty {
+            concept = ""
+        } else if let url = URL(string: trimmed),
+                  let fragment = url.fragment,
+                  !fragment.isEmpty {
+            concept = fragment
+        } else if let hashIndex = trimmed.lastIndex(of: "#") {
+            let next = trimmed.index(after: hashIndex)
+            let fragment = String(trimmed[next...])
+            concept = fragment.isEmpty ? trimmed : fragment
+        } else {
+            concept = localName(trimmed)
+        }
 
         return TaxonomyConceptNameExtraction(
-            localName: local,
-            normalizedName: normalized
+            localName: concept,
+            normalizedName: normalizedTaxonomyConceptKey(concept)
         )
     }
 

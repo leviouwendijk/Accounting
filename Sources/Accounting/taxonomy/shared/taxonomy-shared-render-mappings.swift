@@ -3,7 +3,7 @@ import Foundation
 extension TaxonomyShared {
     public static func renderResolvedMappings(
         _ mappings: [TaxonomyResolvedMapping],
-        limit: Int = 200
+        limit: Int = 500
     ) {
         print("resolved mappings:")
 
@@ -15,15 +15,11 @@ extension TaxonomyShared {
         for mapping in mappings.prefix(limit) {
             let dimensionSuffix = renderExplicitDimensions(mapping.dimensions)
 
-            if let matchedCode = mapping.matchedCode, !matchedCode.isEmpty {
-                print(
-                    "  \(mapping.sourceIdentifier) -> \(matchedCode) -> \(mapping.targetConcept)\(dimensionSuffix)"
-                )
-            } else {
-                print(
-                    "  \(mapping.sourceIdentifier) -> \(mapping.targetConcept)\(dimensionSuffix)"
-                )
-            }
+            print("  href: \(mapping.sourceHref)")
+            print("    locator: \(mapping.sourceLocatorLabel)")
+            print("    sourceIdentifier: \(mapping.sourceIdentifier)")
+            print("    datapoint: \(mapping.targetDatapointLabel)")
+            print("    target: \(mapping.targetConcept)\(dimensionSuffix)")
         }
 
         if mappings.count > limit {
@@ -33,7 +29,7 @@ extension TaxonomyShared {
 
     public static func renderComputedMappedFacts(
         _ factsByKey: [TaxonomyMappedFactKey: TaxonomyComputedMappedFact],
-        limit: Int = 200
+        limit: Int = 500
     ) {
         print("computed mapped facts:")
 

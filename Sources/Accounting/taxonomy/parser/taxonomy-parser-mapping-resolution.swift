@@ -193,10 +193,15 @@ extension TaxonomyParser {
 
                 resolvedMappings.append(
                     TaxonomyResolvedMapping(
+                        sourceHref: locator.href,
+                        sourceLocatorLabel: locator.label,
                         sourceIdentifier: sourceIdentifier,
                         matchedCode: nil,
+                        targetDatapointLabel: datapoint.label,
+                        targetPrimaryQName: targetConcept,
                         targetConcept: targetConcept,
-                        dimensions: datapoint.dimensions
+                        dimensions: datapoint.dimensions,
+                        arcOrder: arc.order
                     )
                 )
             }

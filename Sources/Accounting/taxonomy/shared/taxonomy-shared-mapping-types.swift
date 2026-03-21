@@ -1,5 +1,18 @@
 import Foundation
 
+public struct TaxonomyAccountLookup: Sendable, Hashable {
+    public let byIdentifier: [String: String]
+    public let byCode: [String: String]
+
+    public init(
+        byIdentifier: [String: String],
+        byCode: [String: String]
+    ) {
+        self.byIdentifier = byIdentifier
+        self.byCode = byCode
+    }
+}
+
 public struct TaxonomyCanonicalResolvedMapping: Sendable, Hashable {
     public let sourceIdentifier: String
     public let matchedCode: String

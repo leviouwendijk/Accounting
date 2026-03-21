@@ -1,21 +1,38 @@
 import Foundation
 
 public struct TaxonomyResolvedMapping: Sendable, Hashable {
+    public let sourceHref: String
+    public let sourceLocatorLabel: String
     public let sourceIdentifier: String
     public let matchedCode: String?
+
+    public let targetDatapointLabel: String
+    public let targetPrimaryQName: String
     public let targetConcept: String
+
     public let dimensions: [TaxonomyExplicitDimension]
+    public let arcOrder: Decimal?
 
     public init(
+        sourceHref: String,
+        sourceLocatorLabel: String,
         sourceIdentifier: String,
         matchedCode: String?,
+        targetDatapointLabel: String,
+        targetPrimaryQName: String,
         targetConcept: String,
-        dimensions: [TaxonomyExplicitDimension] = []
+        dimensions: [TaxonomyExplicitDimension] = [],
+        arcOrder: Decimal? = nil
     ) {
+        self.sourceHref = sourceHref
+        self.sourceLocatorLabel = sourceLocatorLabel
         self.sourceIdentifier = sourceIdentifier
         self.matchedCode = matchedCode
+        self.targetDatapointLabel = targetDatapointLabel
+        self.targetPrimaryQName = targetPrimaryQName
         self.targetConcept = targetConcept
         self.dimensions = dimensions
+        self.arcOrder = arcOrder
     }
 }
 

@@ -15,6 +15,11 @@ extension TaxonomyProberRunner {
 
         let accountCodes = chart.nodes.map(\.codes.code).filter { !$0.isEmpty }
 
+        let accountLookup = TaxonomyProjection.makeAccountLookup(
+            identifiers: accountCodes,
+            codes: accountCodes
+        )
+
         let loadedMapping = try TaxonomyLoader.loadGenericMapping(
             zipFileURL: zipFileURL,
             taxonomy: bootstrap
@@ -62,7 +67,7 @@ extension TaxonomyProberRunner {
 
         let canonicalMappings = TaxonomyProjection.canonicalizeMappings(
             loadedMapping.resolvedMappings,
-            accounts: accountCodes
+            lookup: accountLookup
         )
 
         let balances: [String: Decimal]
