@@ -299,7 +299,7 @@ public enum RGSPrinter {
         }
     }
 
-    static func printLines(
+    public static func printLines(
         _ title: String,
         lines: [StatementLine],
         chart: CompiledChart,
