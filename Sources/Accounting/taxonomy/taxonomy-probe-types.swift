@@ -6,6 +6,7 @@ public enum TaxonomyParser {}
 public enum TaxonomyShared {}
 public enum TaxonomyLoader {}
 public enum TaxonomyProjection {}
+public enum TaxonomyPresentation {}
 public enum TaxonomyTester {}
 
 public enum TaxonomyProbeMode: String, Sendable, CaseIterable {

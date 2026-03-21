@@ -21,10 +21,10 @@ extension TaxonomyLoader {
             throw TaxonomyProbeError.commandUnavailable(launchPath)
         }
 
-        process.waitUntilExit()
-
         let stdoutData = stdout.fileHandleForReading.readDataToEndOfFile()
         let stderrData = stderr.fileHandleForReading.readDataToEndOfFile()
+
+        process.waitUntilExit()
 
         let stdoutText = String(data: stdoutData, encoding: .utf8) ?? ""
         let stderrText = String(data: stderrData, encoding: .utf8) ?? ""
