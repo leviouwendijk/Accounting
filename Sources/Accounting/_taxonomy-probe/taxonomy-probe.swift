@@ -280,7 +280,7 @@ extension TaxonomyProbe {
             let entrypointBasename = entrypointURL.lastPathComponent
 
             let entrypointData = try TaxonomyProbe.fetchData(from: entrypointURL)
-            let entrypointParser = EntrypointParser()
+            let entrypointParser = EntrypointParser(source: config.source)
             let refs = try entrypointParser.parse(data: entrypointData)
 
             let presentationParser = PresentationParser()
@@ -385,7 +385,8 @@ extension TaxonomyProbe {
             TaxonomyProbe.summarizeZIPEntries(entries)
             TaxonomyProbe.printMatchingZIPPaths(
                 entries,
-                keywords: config.probeKeywords
+                keywords: config.probeKeywords,
+                source: config.source
             )
 
             try TaxonomyProbe.findTextHitsInZIP(
@@ -393,6 +394,7 @@ extension TaxonomyProbe {
                 entries: entries,
                 keywords: config.probeKeywords,
                 patterns: config.probePatterns,
+                source: config.source,
                 maxFilesToScan: config.maxFilesToScan,
                 maxHits: config.maxHits
             )
@@ -404,10 +406,11 @@ extension TaxonomyProbe {
         ) throws {
             let entries = try TaxonomyProbe.listZIPEntries(zipFileURL: zipFileURL)
 
-            let rgsEntrypointSuffix = "/entrypoints/rgs-to-\(bootstrap.entrypointBasename)"
-            guard let rgsEntrypointPath = entries.first(where: { $0.hasSuffix(rgsEntrypointSuffix) }) else {
-                throw Error.parseFailed("Could not find RGS mapping entrypoint for \(bootstrap.entrypointBasename)")
-            }
+            let rgsEntrypointPath = try TaxonomyProbe.resolveRGSMappingEntrypointPath(
+                entries: entries,
+                targetEntrypointBasename: bootstrap.entrypointBasename,
+                source: config.source
+            )
 
             print("rgs mapping entrypoint inside zip: \(rgsEntrypointPath)")
             print("")
@@ -421,20 +424,7 @@ extension TaxonomyProbe {
                 throw Error.parseFailed("Could not UTF-8 decode RGS mapping entrypoint")
             }
 
-            // let entrypointParser = EntrypointParser()
-            // let rgsRefs = try entrypointParser.parse(data: rgsEntrypointData)
-
-            // let mappingRefs = rgsRefs.other.filter { ref in
-            //     ref.href.contains("mapping/")
-            // }
-
-            // print("mapping refs in RGS entrypoint: \(mappingRefs.count)")
-            // for ref in mappingRefs {
-            //     print("  \(ref.href)")
-            // }
-            // print("")
-
-            let entrypointParser = EntrypointParser()
+            let entrypointParser = EntrypointParser(source: config.source)
             let rgsRefs = try entrypointParser.parse(data: rgsEntrypointData)
 
             print("RGS entrypoint discovery:")
@@ -728,7 +718,8 @@ extension TaxonomyProbe {
                 TaxonomyProbe.renderPresentationLink(
                     link,
                     labelsByConcept: bootstrap.labelsByConcept,
-                    factsByConcept: factsByConcept
+                    factsByConcept: factsByConcept,
+                    source: config.source
                 )
                 print("")
             }
@@ -740,7 +731,8 @@ extension TaxonomyProbe {
         ) throws {
             let (mappingEntryPath, mappingText) = try TaxonomyProbe.extractMatchingMappingCSV(
                 zipFileURL: zipFileURL,
-                entrypointBasename: bootstrap.entrypointBasename
+                entrypointBasename: bootstrap.entrypointBasename,
+                source: config.source
             )
             print("selected mapping CSV inside zip: \(mappingEntryPath)")
             print("mapping csv bytes: \(mappingText.utf8.count)")
@@ -751,7 +743,7 @@ extension TaxonomyProbe {
             print("mapping rows: \(mappingFile.rows.count)")
             print("")
 
-            let factsByConcept = TaxonomyProbe.compileFacts(
+            let factsByConcept = TaxonomyProbe.compileFactsKeepingDimensions(
                 mappingRows: mappingFile.rows,
                 rgsBalances: config.demoRGSBalances
             )
@@ -763,14 +755,27 @@ extension TaxonomyProbe {
             print("")
 
             print("compiled facts:")
-            for key in factsByConcept.keys.sorted() {
-                guard let fact = factsByConcept[key] else {
+            for concept in factsByConcept.keys.sorted() {
+                guard let facts = factsByConcept[concept] else {
                     continue
                 }
-                print("  \(fact.concept) = \(TaxonomyProbe.decimalString(fact.amount))")
-                print("    label: \(fact.mappingLabel)")
-                if !fact.matchedCodes.isEmpty {
-                    print("    matched: \(fact.matchedCodes.joined(separator: ", "))")
+
+                for fact in facts {
+                    let dims = TaxonomyProbe.summarizedPresentationDimensions(
+                        fact.key.dimensions,
+                        source: config.source
+                    )
+                    let matched = Array(Set(fact.matchedCodes)).sorted()
+
+                    if dims.isEmpty {
+                        print("  \(concept) = \(TaxonomyProbe.decimalString(fact.amount))")
+                    } else {
+                        print("  \(concept) [\(dims)] = \(TaxonomyProbe.decimalString(fact.amount))")
+                    }
+
+                    if !matched.isEmpty {
+                        print("    matched: \(matched.joined(separator: ", "))")
+                    }
                 }
             }
             print("")
@@ -779,11 +784,65 @@ extension TaxonomyProbe {
                 TaxonomyProbe.renderPresentationLink(
                     link,
                     labelsByConcept: bootstrap.labelsByConcept,
-                    factsByConcept: factsByConcept
+                    factsByConcept: factsByConcept,
+                    source: config.source
                 )
                 print("")
             }
         }
+
+        // public func runCSVMapping(
+        //     zipFileURL: URL,
+        //     bootstrap: Bootstrap
+        // ) throws {
+        //     let (mappingEntryPath, mappingText) = try TaxonomyProbe.extractMatchingMappingCSV(
+        //         zipFileURL: zipFileURL,
+        //         entrypointBasename: bootstrap.entrypointBasename,
+        //         source: config.source
+        //     )
+        //     print("selected mapping CSV inside zip: \(mappingEntryPath)")
+        //     print("mapping csv bytes: \(mappingText.utf8.count)")
+        //     print("")
+
+        //     let mappingFile = try TaxonomyProbe.parseMappingCSV(mappingText)
+        //     print("mapping entrypoint: \(mappingFile.entrypoint ?? "(none)")")
+        //     print("mapping rows: \(mappingFile.rows.count)")
+        //     print("")
+
+        //     let factsByConcept = TaxonomyProbe.compileFacts(
+        //         mappingRows: mappingFile.rows,
+        //         rgsBalances: config.demoRGSBalances
+        //     )
+
+        //     print("demo RGS balances:")
+        //     for key in config.demoRGSBalances.keys.sorted() {
+        //         print("  \(key) = \(TaxonomyProbe.decimalString(config.demoRGSBalances[key] ?? 0))")
+        //     }
+        //     print("")
+
+        //     print("compiled facts:")
+        //     for key in factsByConcept.keys.sorted() {
+        //         guard let fact = factsByConcept[key] else {
+        //             continue
+        //         }
+        //         print("  \(fact.concept) = \(TaxonomyProbe.decimalString(fact.amount))")
+        //         print("    label: \(fact.mappingLabel)")
+        //         if !fact.matchedCodes.isEmpty {
+        //             print("    matched: \(fact.matchedCodes.joined(separator: ", "))")
+        //         }
+        //     }
+        //     print("")
+
+        //     for link in bootstrap.selectedLinks {
+        //         TaxonomyProbe.renderPresentationLink(
+        //             link,
+        //             labelsByConcept: bootstrap.labelsByConcept,
+        //             factsByConcept: factsByConcept,
+        //             source: config.source
+        //         )
+        //         print("")
+        //     }
+        // }
     }
 }
 

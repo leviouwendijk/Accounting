@@ -227,44 +227,15 @@ extension TaxonomyProbe {
 
 extension TaxonomyProbe {
     public static func summarizedPresentationDimensions(
-        _ dimensions: [DimensionBinding]
+        _ dimensions: [DimensionBinding],
+        source: TaxonomySourceData? = nil
     ) -> String {
         let parts = sortDimensions(dimensions).compactMap { dimension -> String? in
-            switch dimension.qname {
-            case "bd-dim-dim:CompanySerialNumberDimension":
-                return nil
-
-            case "bd-dim-dim:PartyDimension":
-                switch dimension.member {
-                case "bd-dim-mem:Company":
-                    return nil
-                case "bd-dim-mem:Declarant":
-                    return "declarant"
-                case let member?:
-                    return "party=\(member)"
-                case nil:
-                    return "party"
-                }
-
-            case "bd-dim-dim:TimeDimension":
-                switch dimension.member {
-                case "bd-dim-mem:Begin":
-                    return "begin"
-                case "bd-dim-mem:End":
-                    return "end"
-                case let member?:
-                    return "time=\(member)"
-                case nil:
-                    return "time"
-                }
-
-            default:
-                if let member = dimension.member, !member.isEmpty {
-                    return "\(dimension.qname)=\(member)"
-                } else {
-                    return dimension.qname
-                }
+            if let source {
+                return source.summarizePresentationDimension(dimension)
             }
+
+            return TaxonomySourceData.summarizePresentationDimensionDefault(dimension)
         }
 
         return parts.joined(separator: ", ")
@@ -273,7 +244,8 @@ extension TaxonomyProbe {
     public static func renderPresentationLink(
         _ link: PresentationLink,
         labelsByConcept: [String: String],
-        factsByConcept: [String: [ComputedMappedFact]]
+        factsByConcept: [String: [ComputedMappedFact]],
+        source: TaxonomySourceData? = nil
     ) {
         var childrenByFrom: [String: [(Double, String)]] = [:]
         var allFrom: Set<String> = []
@@ -292,7 +264,10 @@ extension TaxonomyProbe {
             prefix: String
         ) {
             for fact in facts {
-                let dims = summarizedPresentationDimensions(fact.key.dimensions)
+                let dims = summarizedPresentationDimensions(
+                    fact.key.dimensions,
+                    source: source
+                )
                 let matched = Array(Set(fact.matchedCodes)).sorted()
 
                 if dims.isEmpty {

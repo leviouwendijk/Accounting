@@ -6,8 +6,14 @@ import FoundationXML
 
 extension TaxonomyProbe {
     public final class EntrypointParser: NSObject, XMLParserDelegate {
+        private let source: TaxonomySourceData?
+
         private(set) var refs = EntrypointRefs()
         private var parseError: Swift.Error?
+
+        public init(source: TaxonomySourceData? = nil) {
+            self.source = source
+        }
 
         public func parse(data: Data) throws -> EntrypointRefs {
             refs = EntrypointRefs()
@@ -46,23 +52,23 @@ extension TaxonomyProbe {
             let role = TaxonomyProbe.attributeValue(attributeDict, ["xlink:role", "role"]) ?? ""
             let ref = LinkbaseRef(href: href, role: role)
 
-            switch TaxonomyProbe.classifyLinkbaseRef(ref) {
-            case "presentation":
+            switch TaxonomyProbe.classifyLinkbaseRef(ref, source: source) {
+            case .presentation:
                 refs.presentation.append(ref)
 
-            case "label":
+            case .label:
                 refs.labels.append(ref)
 
-            case "definition":
+            case .definition:
                 refs.definitions.append(ref)
 
-            case "table":
+            case .table:
                 refs.tables.append(ref)
 
-            case "mapping":
+            case .mapping:
                 refs.mappings.append(ref)
 
-            default:
+            case .other:
                 refs.other.append(ref)
             }
         }
@@ -744,30 +750,20 @@ extension TaxonomyProbe {
 }
 
 extension TaxonomyProbe {
-    public static func classifyLinkbaseRef(_ ref: LinkbaseRef) -> String {
-        let href = ref.href.lowercased()
-        let role = ref.role.lowercased()
-
-        if role.contains("presentationlinkbaseref") || href.hasSuffix("-pre.xml") {
-            return "presentation"
+    public static func classifyLinkbaseRef(
+        _ ref: LinkbaseRef,
+        source: TaxonomySourceData? = nil
+    ) -> TaxonomyLinkbaseKind {
+        if let source {
+            return source.classifyLinkbase(
+                href: ref.href,
+                role: ref.role
+            )
         }
 
-        if role.contains("labellinkbaseref") || href.hasSuffix("-lab.xml") {
-            return "label"
-        }
-
-        if role.contains("definitionlinkbaseref") || href.hasSuffix("-def.xml") {
-            return "definition"
-        }
-
-        if role.contains("tablelinkbaseref") || href.hasSuffix("-tab.xml") {
-            return "table"
-        }
-
-        if role.contains("mapping") || href.contains("/mapping/") || href.contains("/map/") || href.contains("map-") {
-            return "mapping"
-        }
-
-        return "other"
+        return TaxonomySourceData.classifyLinkbaseDefault(
+            href: ref.href,
+            role: ref.role
+        )
     }
 }

@@ -153,11 +153,90 @@ extension TaxonomyProbe {
         return rec(0, 0)
     }
 
-    public static func compileFacts(
+    // public static func compileFacts(
+    //     mappingRows: [MappingRow],
+    //     rgsBalances: [String: Decimal]
+    // ) -> [String: ComputedFact] {
+    //     var out: [String: ComputedFact] = [:]
+
+    //     for row in mappingRows {
+    //         switch row.source {
+    //         case .literal:
+    //             continue
+
+    //         case .group(let terms):
+    //             var amount: Decimal = 0
+    //             var matched: [String] = []
+
+    //             let sortedCodes = rgsBalances.keys.sorted()
+
+    //             for term in terms {
+    //                 let termMatches = sortedCodes.filter { globMatch(pattern: term.pattern, text: $0) }
+
+    //                 for code in termMatches {
+    //                     let value = rgsBalances[code] ?? 0
+
+    //                     switch term.op {
+    //                     case .include:
+    //                         amount += value
+    //                     case .exclude:
+    //                         amount -= value
+    //                     }
+
+    //                     matched.append("\(term.op == .include ? "+" : "-")\(code)")
+    //                 }
+    //             }
+
+    //             out[row.concept] = .init(
+    //                 concept: row.concept,
+    //                 amount: amount,
+    //                 matchedCodes: matched,
+    //                 mappingLabel: row.label
+    //             )
+    //         }
+    //     }
+
+    //     return out
+    // }
+
+    public static func csvAxisQName(from raw: String) -> String {
+        let value = trim(raw)
+
+        guard value.hasPrefix("SBR_AXIS["),
+              let open = value.firstIndex(of: "["),
+              let close = value.lastIndex(of: "]"),
+              open < close else {
+            return value
+        }
+
+        return trim(String(value[value.index(after: open)..<close]))
+    }
+
+    public static func csvDimensionBindings(
+        from row: MappingRow
+    ) -> [DimensionBinding] {
+        let out = row.dimensions.compactMap { rawKey, rawValue -> DimensionBinding? in
+            let qname = csvAxisQName(from: rawKey)
+            let member = trim(rawValue)
+
+            guard !qname.isEmpty else {
+                return nil
+            }
+
+            return .init(
+                qname: qname,
+                member: member.isEmpty ? nil : member
+            )
+        }
+
+        return sortDimensions(out)
+    }
+
+    public static func compileFactsKeepingDimensions(
         mappingRows: [MappingRow],
         rgsBalances: [String: Decimal]
-    ) -> [String: ComputedFact] {
-        var out: [String: ComputedFact] = [:]
+    ) -> [String: [ComputedMappedFact]] {
+        var factsByKey: [MappedFactKey: ComputedMappedFact] = [:]
 
         for row in mappingRows {
             switch row.source {
@@ -171,7 +250,9 @@ extension TaxonomyProbe {
                 let sortedCodes = rgsBalances.keys.sorted()
 
                 for term in terms {
-                    let termMatches = sortedCodes.filter { globMatch(pattern: term.pattern, text: $0) }
+                    let termMatches = sortedCodes.filter {
+                        globMatch(pattern: term.pattern, text: $0)
+                    }
 
                     for code in termMatches {
                         let value = rgsBalances[code] ?? 0
@@ -187,15 +268,29 @@ extension TaxonomyProbe {
                     }
                 }
 
-                out[row.concept] = .init(
+                let key = MappedFactKey(
                     concept: row.concept,
-                    amount: amount,
-                    matchedCodes: matched,
-                    mappingLabel: row.label
+                    dimensions: csvDimensionBindings(from: row)
                 )
+
+                if let existing = factsByKey[key] {
+                    factsByKey[key] = .init(
+                        key: key,
+                        amount: existing.amount + amount,
+                        matchedCodes: existing.matchedCodes + matched,
+                        contributingMappings: existing.contributingMappings
+                    )
+                } else {
+                    factsByKey[key] = .init(
+                        key: key,
+                        amount: amount,
+                        matchedCodes: matched,
+                        contributingMappings: []
+                    )
+                }
             }
         }
 
-        return out
+        return groupMappedFactsByConceptKeepingDimensions(factsByKey)
     }
 }
