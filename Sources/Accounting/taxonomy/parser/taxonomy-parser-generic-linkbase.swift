@@ -59,7 +59,7 @@ public enum TaxonomyGenericLinkbaseParser {
                 continue
             }
 
-            guard local.hasSuffix("Link") else {
+            guard local == "link" || local.hasSuffix("Link") else {
                 continue
             }
 

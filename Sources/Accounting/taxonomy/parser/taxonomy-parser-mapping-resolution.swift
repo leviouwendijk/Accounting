@@ -83,26 +83,42 @@ extension TaxonomyParser {
                 var dimensions: [TaxonomyExplicitDimension] = []
                 dimensions.reserveCapacity(count)
 
+                // for index in 0..<count {
+                //     let axis =
+                //         resource.attributes["dimension.\(index).qname"]
+                //         ?? ""
+
+                //     let member =
+                //         resource.attributes["dimension.\(index).member"]
+                //         ?? ""
+
+                //     guard !TaxonomyShared.trim(axis).isEmpty else {
+                //         continue
+                //     }
+
+                //     guard !TaxonomyShared.trim(member).isEmpty else {
+                //         continue
+                //     }
+
+                //     dimensions.append(
+                //         TaxonomyExplicitDimension(
+                //             axis: axis,
+                //             member: member
+                //         )
+                //     )
+                // }
+
                 for index in 0..<count {
-                    let axis =
-                        resource.attributes["dimension.\(index).qname"]
-                        ?? ""
+                    let qname = resource.attributes["dimension.\(index).qname"] ?? ""
+                    let member = resource.attributes["dimension.\(index).member"] ?? ""
 
-                    let member =
-                        resource.attributes["dimension.\(index).member"]
-                        ?? ""
-
-                    guard !TaxonomyShared.trim(axis).isEmpty else {
-                        continue
-                    }
-
-                    guard !TaxonomyShared.trim(member).isEmpty else {
+                    guard !TaxonomyShared.trim(qname).isEmpty else {
                         continue
                     }
 
                     dimensions.append(
                         TaxonomyExplicitDimension(
-                            axis: axis,
+                            axis: qname,
                             member: member
                         )
                     )
