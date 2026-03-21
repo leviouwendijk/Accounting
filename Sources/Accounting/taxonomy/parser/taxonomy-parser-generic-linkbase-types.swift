@@ -40,17 +40,20 @@ public struct TaxonomyLocator: Sendable, Hashable {
 }
 
 public struct TaxonomyGenericResource: Sendable, Hashable {
+    public let elementName: String
     public let label: String
     public let role: String?
     public let text: String
     public let attributes: [String: String]
 
     public init(
+        elementName: String,
         label: String,
         role: String?,
         text: String,
         attributes: [String: String] = [:]
     ) {
+        self.elementName = elementName
         self.label = label
         self.role = role
         self.text = text
@@ -135,14 +138,18 @@ public struct TaxonomyExplicitDimension: Sendable, Hashable {
 }
 
 public struct TaxonomyDatapoint: Sendable, Hashable {
-    public let concept: String
+    public let label: String
+    public let primaryQName: String?
     public let dimensions: [TaxonomyExplicitDimension]
 
     public init(
-        concept: String,
+        label: String,
+        primaryQName: String?,
         dimensions: [TaxonomyExplicitDimension] = []
     ) {
-        self.concept = concept
+        self.label = label
+        self.primaryQName = primaryQName
         self.dimensions = dimensions
     }
 }
+

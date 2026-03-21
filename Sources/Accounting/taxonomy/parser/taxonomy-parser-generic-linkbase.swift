@@ -157,6 +157,7 @@ private extension TaxonomyGenericLinkbaseParser {
         }
 
         return TaxonomyGenericResource(
+            elementName: TaxonomyShared.localName(element.name ?? ""),
             label: label,
             role: role,
             text: text,

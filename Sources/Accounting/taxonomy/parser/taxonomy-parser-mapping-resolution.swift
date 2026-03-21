@@ -31,35 +31,87 @@ extension TaxonomyParser {
         return .other
     }
 
+    // public static func datapoints(
+    //     from linkbase: TaxonomyGenericLinkbase
+    // ) -> [TaxonomyDatapoint] {
+    //     var out: [TaxonomyDatapoint] = []
+
+    //     for link in linkbase.links {
+    //         let axisByLocatorLabel = axisConceptsByLocatorLabel(link)
+    //         let memberByLocatorLabel = memberConceptsByLocatorLabel(link)
+    //         let dimensionBindings = explicitDimensionBindings(
+    //             link,
+    //             axisByLocatorLabel: axisByLocatorLabel,
+    //             memberByLocatorLabel: memberByLocatorLabel
+    //         )
+
+    //         for locator in link.locators.values {
+    //             let concept = TaxonomyShared.conceptName(from: locator.href)
+    //             guard !concept.isEmpty else {
+    //                 continue
+    //             }
+
+    //             let dimensions = sortDimensions(
+    //                 dimensionBindings[locator.label] ?? []
+    //             )
+
+    //             out.append(
+    //                 TaxonomyDatapoint(
+    //                     concept: concept,
+    //                     dimensions: dimensions
+    //                 )
+    //             )
+    //         }
+    //     }
+
+    //     return out
+    // }
+
     public static func datapoints(
         from linkbase: TaxonomyGenericLinkbase
-    ) -> [TaxonomyDatapoint] {
-        var out: [TaxonomyDatapoint] = []
+    ) -> [String: TaxonomyDatapoint] {
+        var out: [String: TaxonomyDatapoint] = [:]
 
         for link in linkbase.links {
-            let axisByLocatorLabel = axisConceptsByLocatorLabel(link)
-            let memberByLocatorLabel = memberConceptsByLocatorLabel(link)
-            let dimensionBindings = explicitDimensionBindings(
-                link,
-                axisByLocatorLabel: axisByLocatorLabel,
-                memberByLocatorLabel: memberByLocatorLabel
-            )
-
-            for locator in link.locators.values {
-                let concept = TaxonomyShared.conceptName(from: locator.href)
-                guard !concept.isEmpty else {
+            for (label, resource) in link.resources {
+                guard resource.elementName == "datapoint" else {
                     continue
                 }
 
-                let dimensions = sortDimensions(
-                    dimensionBindings[locator.label] ?? []
-                )
+                let primaryQName =
+                    resource.attributes["rgs:qname"]
+                    ?? resource.attributes["qname"]
+                    ?? resource.attributes["primaryQName"]
 
-                out.append(
-                    TaxonomyDatapoint(
-                        concept: concept,
-                        dimensions: dimensions
+                var dimensions: [TaxonomyExplicitDimension] = []
+
+                for (name, value) in resource.attributes {
+                    let localName = TaxonomyShared.localName(name)
+
+                    guard localName == "member" else {
+                        continue
+                    }
+
+                    let axis =
+                        resource.attributes["rgs:qname"]
+                        ?? resource.attributes["qname"]
+
+                    guard let axis, !axis.isEmpty, !value.isEmpty else {
+                        continue
+                    }
+
+                    dimensions.append(
+                        TaxonomyExplicitDimension(
+                            axis: axis,
+                            member: value
+                        )
                     )
+                }
+
+                out[label] = TaxonomyDatapoint(
+                    label: label,
+                    primaryQName: primaryQName,
+                    dimensions: dimensions
                 )
             }
         }
@@ -85,6 +137,7 @@ extension TaxonomyParser {
         }
 
         samples.append(value)
+
     }
 
     public static func resolveMappingsDetailed(
@@ -94,47 +147,111 @@ extension TaxonomyParser {
 
         var resolvedMappings: [TaxonomyResolvedMapping] = []
         var unresolvedSamples: [String] = []
+        var totalArcs = 0
 
-        for datapoint in datapoints {
-            let extraction = TaxonomyShared.conceptNameExtraction(from: datapoint.concept)
-            let sourceIdentifier = extraction.localName
+        for link in linkbase.links {
+            for arc in link.arcs {
+                totalArcs += 1
 
-            let resolved = TaxonomyResolvedMapping(
-                sourceIdentifier: sourceIdentifier,
-                matchedCode: nil,
-                targetConcept: extraction.localName,
-                dimensions: datapoint.dimensions
-            )
+                guard let locator = link.locators[arc.from] else {
+                    appendSample(arc.from, to: &unresolvedSamples, limit: 20)
+                    continue
+                }
 
-            resolvedMappings.append(resolved)
+                guard let datapoint = datapoints[arc.to] else {
+                    appendSample(arc.to, to: &unresolvedSamples, limit: 20)
+                    continue
+                }
 
-            if extraction.localName.isEmpty {
-                appendSample(
-                    datapoint.concept,
-                    to: &unresolvedSamples,
-                    limit: 20
+                guard let targetConcept = datapoint.primaryQName,
+                      !TaxonomyShared.trim(targetConcept).isEmpty else {
+                    appendSample(datapoint.label, to: &unresolvedSamples, limit: 20)
+                    continue
+                }
+
+                let sourceIdentifier = TaxonomyShared.conceptName(from: locator.href)
+                guard !sourceIdentifier.isEmpty else {
+                    appendSample(locator.href, to: &unresolvedSamples, limit: 20)
+                    continue
+                }
+
+                resolvedMappings.append(
+                    TaxonomyResolvedMapping(
+                        sourceIdentifier: sourceIdentifier,
+                        matchedCode: nil,
+                        targetConcept: targetConcept,
+                        dimensions: datapoint.dimensions
+                    )
                 )
             }
         }
 
-        let unresolvedCount = resolvedMappings.reduce(into: 0) { partial, mapping in
-            if mapping.targetConcept.isEmpty {
-                partial += 1
-            }
-        }
-
         let diagnostics = TaxonomyMappingResolutionDiagnostics(
-            totalDatapoints: datapoints.count,
-            resolvedCount: resolvedMappings.count - unresolvedCount,
-            unresolvedCount: unresolvedCount,
+            totalDatapoints: totalArcs,
+            resolvedCount: resolvedMappings.count,
+            unresolvedCount: totalArcs - resolvedMappings.count,
             unresolvedConceptSamples: unresolvedSamples
         )
 
         return TaxonomyMappingResolutionResult(
-            resolvedMappings: resolvedMappings,
+            resolvedMappings: resolvedMappings.sorted {
+                if $0.sourceIdentifier == $1.sourceIdentifier {
+                    return $0.targetConcept < $1.targetConcept
+                }
+                return $0.sourceIdentifier < $1.sourceIdentifier
+            },
             diagnostics: diagnostics
         )
     }
+
+    // public static func resolveMappingsDetailed(
+    //     from linkbase: TaxonomyGenericLinkbase
+    // ) -> TaxonomyMappingResolutionResult {
+    //     let datapoints = datapoints(from: linkbase)
+
+    //     var resolvedMappings: [TaxonomyResolvedMapping] = []
+    //     var unresolvedSamples: [String] = []
+
+    //     for datapoint in datapoints {
+    //         let extraction = TaxonomyShared.conceptNameExtraction(from: datapoint.concept)
+    //         let sourceIdentifier = extraction.localName
+
+    //         let resolved = TaxonomyResolvedMapping(
+    //             sourceIdentifier: sourceIdentifier,
+    //             matchedCode: nil,
+    //             targetConcept: extraction.localName,
+    //             dimensions: datapoint.dimensions
+    //         )
+
+    //         resolvedMappings.append(resolved)
+
+    //         if extraction.localName.isEmpty {
+    //             appendSample(
+    //                 datapoint.concept,
+    //                 to: &unresolvedSamples,
+    //                 limit: 20
+    //             )
+    //         }
+    //     }
+
+    //     let unresolvedCount = resolvedMappings.reduce(into: 0) { partial, mapping in
+    //         if mapping.targetConcept.isEmpty {
+    //             partial += 1
+    //         }
+    //     }
+
+    //     let diagnostics = TaxonomyMappingResolutionDiagnostics(
+    //         totalDatapoints: datapoints.count,
+    //         resolvedCount: resolvedMappings.count - unresolvedCount,
+    //         unresolvedCount: unresolvedCount,
+    //         unresolvedConceptSamples: unresolvedSamples
+    //     )
+
+    //     return TaxonomyMappingResolutionResult(
+    //         resolvedMappings: resolvedMappings,
+    //         diagnostics: diagnostics
+    //     )
+    // }
 
     public static func resolveMappings(
         from linkbase: TaxonomyGenericLinkbase
