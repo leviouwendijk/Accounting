@@ -10,7 +10,13 @@ public struct TaxonomyProberRunner: Sendable {
     }
 
     public func run() throws {
-        let bootstrap = try loadBootstrap()
+        let bootstrap = try TaxonomyLoader.load(
+            config: .init(
+                source: config.source,
+                wantedPresentations: config.wantedPresentations,
+                labelHrefs: config.labelHrefs
+            )
+        )
 
         print("entrypoint: \(bootstrap.entrypointURL.absoluteString)")
         print("")
@@ -27,7 +33,7 @@ public struct TaxonomyProberRunner: Sendable {
             print("  \(url.absoluteString)")
         }
         print("")
-        print("presentationLink count: \(bootstrap.selectedLinks.count)")
+        print("presentationLink count: \(bootstrap.selectedPresentationLinks.count)")
         print("")
         print("all presentation refs:")
         for ref in bootstrap.refs.presentation {

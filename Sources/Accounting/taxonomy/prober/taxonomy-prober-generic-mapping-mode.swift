@@ -3,7 +3,7 @@ import Foundation
 extension TaxonomyProberRunner {
     public func runGenericMappingInspection(
         zipFileURL: URL,
-        bootstrap: TaxonomyProbeBootstrap
+        bootstrap: LoadedTaxonomy
     ) throws {
         guard let chartFile = config.chartFile else {
             throw TaxonomyProbeError.missingChartFile
@@ -150,7 +150,7 @@ extension TaxonomyProberRunner {
         )
         print("")
 
-        for link in bootstrap.selectedLinks {
+        for link in bootstrap.selectedPresentationLinks {
             renderPresentationLink(
                 link,
                 labelsByConcept: bootstrap.labelsByConcept,
@@ -160,7 +160,7 @@ extension TaxonomyProberRunner {
         }
 
         print("dimensional presentation view:")
-        for link in bootstrap.selectedLinks {
+        for link in bootstrap.selectedPresentationLinks {
             renderPresentationLink(
                 link,
                 labelsByConcept: bootstrap.labelsByConcept,

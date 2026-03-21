@@ -180,7 +180,8 @@ public struct TaxonomySourceData: Sendable {
             mappingEntrypointDirectories: mappingEntrypointDirectories,
             zipPathBonusRules: zipPathBonusRules,
             csvPriorityKeywords: csvPriorityKeywords,
-            presentationDimensionRules: presentationDimensionRules
+            presentationDimensionRules: presentationDimensionRules,
+            maxPresentationDimensionSummaryCount: maxPresentationDimensionSummaryCount
         )
     }
 

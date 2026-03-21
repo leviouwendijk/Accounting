@@ -3,7 +3,7 @@ import Foundation
 extension TaxonomyProberRunner {
     public func runCSVMapping(
         zipFileURL: URL,
-        bootstrap: TaxonomyProbeBootstrap
+        bootstrap: LoadedTaxonomy
     ) throws {
         let extracted = try extractMatchingMappingCSV(
             zipFileURL: zipFileURL,
@@ -43,7 +43,7 @@ extension TaxonomyProberRunner {
         )
         print("")
 
-        for link in bootstrap.selectedLinks {
+        for link in bootstrap.selectedPresentationLinks {
             renderPresentationLink(
                 link,
                 labelsByConcept: bootstrap.labelsByConcept,
@@ -53,7 +53,7 @@ extension TaxonomyProberRunner {
         }
 
         print("dimensional presentation view:")
-        for link in bootstrap.selectedLinks {
+        for link in bootstrap.selectedPresentationLinks {
             renderPresentationLink(
                 link,
                 labelsByConcept: bootstrap.labelsByConcept,

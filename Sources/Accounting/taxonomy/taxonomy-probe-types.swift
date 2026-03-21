@@ -1,12 +1,10 @@
 import Foundation
 
 public enum TaxonomyProbe {}
-
 public enum TaxonomyProber {}
-
 public enum TaxonomyParser {}
-
 public enum TaxonomyShared {}
+public enum TaxonomyLoader {}
 
 public enum TaxonomyProbeMode: String, Sendable, CaseIterable {
     case probePackage
