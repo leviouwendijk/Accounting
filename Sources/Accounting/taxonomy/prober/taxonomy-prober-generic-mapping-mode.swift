@@ -17,8 +17,7 @@ extension TaxonomyProberRunner {
 
         let loadedMapping = try TaxonomyLoader.loadGenericMapping(
             zipFileURL: zipFileURL,
-            source: config.source,
-            probeKeywords: config.probeKeywords
+            taxonomy: bootstrap
         )
 
         print("generic mapping candidates:")
@@ -37,16 +36,32 @@ extension TaxonomyProberRunner {
         }
         print("")
 
-        print("selected generic mapping entry:")
-        print("  \(loadedMapping.selectedEntryPath)")
+        print("selected generic mapping entrypoint:")
+        print("  \(loadedMapping.selectedEntrypointPath)")
         print("")
 
-        let resolution = TaxonomyParser.resolveMappingsDetailed(
-            from: loadedMapping.linkbase
-        )
+        print("resolved mapping XML entries:")
+        if loadedMapping.mappingEntryPaths.isEmpty {
+            print("  none")
+        } else {
+            for path in loadedMapping.mappingEntryPaths {
+                print("  \(path)")
+            }
+        }
+        print("")
+
+        for path in loadedMapping.mappingEntryPaths {
+            if let diagnostics = loadedMapping.diagnostics[path] {
+                print("mapping diagnostics for: \(path)")
+                TaxonomyShared.renderMappingResolutionDiagnostics(
+                    diagnostics
+                )
+                print("")
+            }
+        }
 
         let canonicalMappings = TaxonomyProjection.canonicalizeMappings(
-            resolution.resolvedMappings,
+            loadedMapping.resolvedMappings,
             accounts: accountCodes
         )
 
@@ -61,7 +76,7 @@ extension TaxonomyProberRunner {
                 break
             }
 
-            balances = TaxonomyTester.projectBalances(
+            balances = try TaxonomyTester.projectBalances(
                 projectRoot: projectRoot
             )
         }
@@ -79,13 +94,8 @@ extension TaxonomyProberRunner {
             factsByKey
         )
 
-        TaxonomyShared.renderMappingResolutionDiagnostics(
-            resolution.diagnostics
-        )
-        print("")
-
         TaxonomyShared.renderResolvedMappings(
-            resolution.resolvedMappings,
+            loadedMapping.resolvedMappings,
             limit: 200
         )
         print("")

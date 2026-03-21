@@ -54,29 +54,30 @@ extension TaxonomyLoader {
         entrypointURL: URL,
         labelHrefs: [String]
     ) throws -> [String: String] {
-        let selectedLabelRefs: [TaxonomyLinkbaseRef]
+        let labelURLs: [URL]
 
-        if labelHrefs.isEmpty {
-            selectedLabelRefs = refs.labels
+        if !labelHrefs.isEmpty {
+            labelURLs = labelHrefs.compactMap {
+                TaxonomyShared.resolveURL($0, relativeTo: entrypointURL)
+            }
         } else {
-            selectedLabelRefs = refs.labels.filter { ref in
-                let href = ref.href.lowercased()
-                return labelHrefs.contains { wanted in
-                    href.contains(wanted.lowercased())
-                }
+            labelURLs = refs.labels.compactMap { ref in
+                TaxonomyShared.resolveURL(ref.href, relativeTo: entrypointURL)
+            }
+        }
+
+        var dedupedLabelURLs: [URL] = []
+        var seen: Set<String> = []
+
+        for url in labelURLs {
+            if seen.insert(url.absoluteString).inserted {
+                dedupedLabelURLs.append(url)
             }
         }
 
         var labelsByConcept: [String: String] = [:]
 
-        for labelRef in selectedLabelRefs {
-            guard let labelURL = TaxonomyShared.resolveURL(
-                labelRef.href,
-                relativeTo: entrypointURL
-            ) else {
-                continue
-            }
-
+        for labelURL in dedupedLabelURLs {
             let xml = try fetchText(from: labelURL)
             let parsed = try TaxonomyLabelParser.parse(xml)
 

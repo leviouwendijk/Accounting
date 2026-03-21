@@ -3,43 +3,37 @@ import Foundation
 extension TaxonomyTester {
     public static func projectBalances(
         projectRoot: String
-    ) -> [String: Decimal] {
-        stderrPrint(
-            "warning: projectBalances(projectRoot:) is a temporary shared diagnostics shim and should not become part of final reporting"
+    ) throws -> [String: Decimal] {
+        let rootURL = URL(
+            fileURLWithPath: projectRoot,
+            isDirectory: true
         )
 
-        let rootURL = URL(fileURLWithPath: projectRoot)
-        let fm = FileManager.default
+        let compileResult = try EntryCompileDriver.compile(
+            projectRoot: rootURL,
+            setting: .init(
+                entities: true,
+                accounts: true,
+                transactions: true,
+                entries: true,
+                assertion: true,
+                loc_trace: false
+            ),
+            verbose: false
+        )
 
-        guard let enumerator = fm.enumerator(
-            at: rootURL,
-            includingPropertiesForKeys: nil
-        ) else {
-            return [:]
-        }
+        let rows = trialBalance(compileResult.resolved)
 
         var balances: [String: Decimal] = [:]
+        balances.reserveCapacity(rows.count)
 
-        while let value = enumerator.nextObject() as? URL {
-            guard value.pathExtension.lowercased() == "ec" else {
+        for row in rows {
+            let net = row.net
+            guard net != 0 else {
                 continue
             }
 
-            guard let text = try? String(contentsOf: value, encoding: .utf8) else {
-                continue
-            }
-
-            for line in text.components(separatedBy: .newlines) {
-                let trimmed = TaxonomyShared.trim(line)
-
-                guard trimmed.contains("=") else {
-                    continue
-                }
-
-                if let pair = parseSimpleBalanceLine(trimmed) {
-                    balances[pair.code, default: 0] += pair.amount
-                }
-            }
+            balances[row.accountCode] = net
         }
 
         return balances

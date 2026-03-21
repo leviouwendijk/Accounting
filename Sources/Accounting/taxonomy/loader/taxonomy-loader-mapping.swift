@@ -25,8 +25,7 @@ extension TaxonomyLoader {
 extension TaxonomyLoader {
     public static func loadGenericMapping(
         zipFileURL: URL,
-        source: TaxonomySourceData,
-        probeKeywords: [String]
+        taxonomy: LoadedTaxonomy
     ) throws -> LoadedTaxonomyGenericMapping {
         let entries = try listZIPEntries(
             zipFileURL: zipFileURL
@@ -34,33 +33,64 @@ extension TaxonomyLoader {
 
         let rankedCandidates = rankedZIPPaths(
             entries,
-            keywords: probeKeywords,
-            source: source
+            keywords: taxonomy.source.probeKeywords,
+            source: taxonomy.source
         )
 
-        guard let selectedEntryPath = rankedCandidates.first(where: {
-            let lowercased = $0.lowercased()
-            return lowercased.hasSuffix(".xml")
-                || lowercased.hasSuffix(".xsd")
-        }) else {
+        guard let selectedEntrypointPath = resolveRGSMappingEntrypointPath(
+            entries: entries,
+            targetEntrypointBasename: taxonomy.entrypointBasename,
+            source: taxonomy.source
+        ) else {
             throw TaxonomyProbeError.parseFailed(
-                "no generic mapping candidate XML found in zip"
+                "could not resolve RGS mapping entrypoint for \(taxonomy.entrypointBasename)"
             )
         }
 
-        let xml = try readZIPEntryText(
+        let entrypointXML = try readZIPEntryText(
             zipFileURL: zipFileURL,
-            entryPath: selectedEntryPath
+            entryPath: selectedEntrypointPath
         )
 
-        let linkbase = try TaxonomyGenericLinkbaseParser.parse(
-            xml
+        let refs = try TaxonomyEntrypointParser.parse(
+            entrypointXML,
+            source: taxonomy.source
         )
+
+        let mappingEntryPaths = refs.mappings.map { ref in
+            resolveZIPEntryPath(
+                ref.href,
+                relativeTo: selectedEntrypointPath
+            )
+        }
+
+        var allResolvedMappings: [TaxonomyResolvedMapping] = []
+        var diagnosticsByEntryPath: [String: TaxonomyMappingResolutionDiagnostics] = [:]
+
+        for mappingEntryPath in mappingEntryPaths {
+            let mappingXML = try readZIPEntryText(
+                zipFileURL: zipFileURL,
+                entryPath: mappingEntryPath
+            )
+
+            let linkbase = try TaxonomyGenericLinkbaseParser.parse(
+                mappingXML
+            )
+
+            let resolution = TaxonomyParser.resolveMappingsDetailed(
+                from: linkbase
+            )
+
+            allResolvedMappings.append(contentsOf: resolution.resolvedMappings)
+            diagnosticsByEntryPath[mappingEntryPath] = resolution.diagnostics
+        }
 
         return LoadedTaxonomyGenericMapping(
             rankedCandidates: rankedCandidates,
-            selectedEntryPath: selectedEntryPath,
-            linkbase: linkbase
+            selectedEntrypointPath: selectedEntrypointPath,
+            mappingEntryPaths: mappingEntryPaths,
+            resolvedMappings: allResolvedMappings,
+            diagnostics: diagnosticsByEntryPath
         )
     }
 }

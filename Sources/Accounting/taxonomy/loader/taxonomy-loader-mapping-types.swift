@@ -15,16 +15,22 @@ public struct LoadedTaxonomyCSVMapping: Sendable {
 
 public struct LoadedTaxonomyGenericMapping: Sendable {
     public let rankedCandidates: [String]
-    public let selectedEntryPath: String
-    public let linkbase: TaxonomyGenericLinkbase
+    public let selectedEntrypointPath: String
+    public let mappingEntryPaths: [String]
+    public let resolvedMappings: [TaxonomyResolvedMapping]
+    public let diagnostics: [String: TaxonomyMappingResolutionDiagnostics]
 
     public init(
         rankedCandidates: [String],
-        selectedEntryPath: String,
-        linkbase: TaxonomyGenericLinkbase
+        selectedEntrypointPath: String,
+        mappingEntryPaths: [String],
+        resolvedMappings: [TaxonomyResolvedMapping],
+        diagnostics: [String: TaxonomyMappingResolutionDiagnostics]
     ) {
         self.rankedCandidates = rankedCandidates
-        self.selectedEntryPath = selectedEntryPath
-        self.linkbase = linkbase
+        self.selectedEntrypointPath = selectedEntrypointPath
+        self.mappingEntryPaths = mappingEntryPaths
+        self.resolvedMappings = resolvedMappings
+        self.diagnostics = diagnostics
     }
 }
