@@ -1,66 +1,6 @@
 import Foundation
 
-extension TaxonomyShared {
-    public static func globMatch(
-        pattern: String,
-        text: String
-    ) -> Bool {
-        let patternScalars = Array(pattern.unicodeScalars)
-        let textScalars = Array(text.unicodeScalars)
-
-        var patternIndex = 0
-        var textIndex = 0
-        var starIndex: Int?
-        var matchIndex = 0
-
-        while textIndex < textScalars.count {
-            if patternIndex < patternScalars.count,
-               (
-                   patternScalars[patternIndex] == textScalars[textIndex]
-                   || patternScalars[patternIndex] == "?"
-               ) {
-                patternIndex += 1
-                textIndex += 1
-                continue
-            }
-
-            if patternIndex < patternScalars.count,
-               patternScalars[patternIndex] == "*" {
-                starIndex = patternIndex
-                matchIndex = textIndex
-                patternIndex += 1
-                continue
-            }
-
-            if let starIndex {
-                patternIndex = starIndex + 1
-                matchIndex += 1
-                textIndex = matchIndex
-                continue
-            }
-
-            return false
-        }
-
-        while patternIndex < patternScalars.count,
-              patternScalars[patternIndex] == "*" {
-            patternIndex += 1
-        }
-
-        return patternIndex == patternScalars.count
-    }
-
-    public static func csvDimensionBindings(
-        from dimensions: [TaxonomyExplicitDimension]
-    ) -> [TaxonomyDimensionBinding] {
-        dimensions.map {
-            TaxonomyDimensionBinding(
-                axis: $0.axis,
-                member: $0.member
-            )
-        }
-    }
-
+extension TaxonomyProjection {
     public static func compileFactsKeepingDimensions(
         mappingRows: [TaxonomyCSVMappingRow],
         rgsBalances: [String: Decimal]
@@ -68,8 +8,8 @@ extension TaxonomyShared {
         var computedByKey: [TaxonomyMappedFactKey: TaxonomyComputedMappedFact] = [:]
 
         for row in mappingRows {
-            let dimensions = sortDimensions(
-                csvDimensionBindings(from: row.dimensions)
+            let dimensions = TaxonomyShared.sortDimensions(
+                TaxonomyShared.csvDimensionBindings(from: row.dimensions)
             )
 
             let result = amountAndSourceCodes(
@@ -107,7 +47,7 @@ extension TaxonomyShared {
                 continue
             }
 
-            let dimensions = sortDimensions(
+            let dimensions = TaxonomyShared.sortDimensions(
                 mapping.dimensions.map {
                     TaxonomyDimensionBinding(
                         axis: $0.axis,
@@ -207,7 +147,7 @@ extension TaxonomyShared {
         var concepts = Set<String>()
 
         for href in link.locators.values {
-            let concept = conceptName(from: href)
+            let concept = TaxonomyShared.conceptName(from: href)
             guard !concept.isEmpty else {
                 continue
             }
@@ -217,9 +157,7 @@ extension TaxonomyShared {
 
         return concepts.sorted()
     }
-}
 
-private extension TaxonomyShared {
     static func amountAndSourceCodes(
         for source: TaxonomyCSVMappingSource,
         balances: [String: Decimal]
@@ -246,7 +184,7 @@ private extension TaxonomyShared {
 
         case .glob(let pattern):
             let matches = balances
-                .filter { globMatch(pattern: pattern, text: $0.key) && $0.value != 0 }
+                .filter { TaxonomyShared.globMatch(pattern: pattern, text: $0.key) && $0.value != 0 }
 
             let amount = matches.reduce(Decimal.zero) { partial, pair in
                 partial + pair.value
@@ -261,7 +199,7 @@ private extension TaxonomyShared {
 
             for term in terms {
                 let matches = balances
-                    .filter { globMatch(pattern: term.pattern, text: $0.key) && $0.value != 0 }
+                    .filter { TaxonomyShared.globMatch(pattern: term.pattern, text: $0.key) && $0.value != 0 }
 
                 for (code, value) in matches {
                     amount += term.sign * value

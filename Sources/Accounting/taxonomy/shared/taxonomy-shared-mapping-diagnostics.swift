@@ -73,7 +73,7 @@ extension TaxonomyShared {
         balances: [String: Decimal],
         limitUnmatched: Int = 60
     ) {
-        let unmatched = unmatchedRGSCodes(
+        let unmatched = TaxonomyProjection.unmatchedRGSCodes(
             mappings: mappings,
             rgsBalances: balances
         )
@@ -107,7 +107,7 @@ extension TaxonomyShared {
         balances: [String: Decimal],
         limitPerCode: Int = 5
     ) {
-        let unmatched = unmatchedRGSCodes(
+        let unmatched = TaxonomyProjection.unmatchedRGSCodes(
             mappings: mappings,
             rgsBalances: balances
         )

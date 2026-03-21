@@ -1,10 +1,10 @@
 import Foundation
 
-extension TaxonomyShared {
+extension TaxonomyProjection {
     public static func normalizedMappingSourceIdentifier(
         _ value: String
     ) -> String {
-        trim(value)
+        TaxonomyShared.trim(value)
             .replacingOccurrences(of: " ", with: "")
             .replacingOccurrences(of: "_", with: "")
             .lowercased()
@@ -48,24 +48,12 @@ extension TaxonomyShared {
         return out
     }
 
-    public static func sortDimensions(
-        _ dimensions: [TaxonomyDimensionBinding]
-    ) -> [TaxonomyDimensionBinding] {
-        dimensions.sorted {
-            if $0.axis == $1.axis {
-                return $0.member < $1.member
-            }
-
-            return $0.axis < $1.axis
-        }
-    }
-
     public static func factKey(
         from fact: TaxonomyComputedMappedFact
     ) -> TaxonomyMappedFactKey {
         TaxonomyMappedFactKey(
             concept: fact.concept,
-            dimensions: sortDimensions(fact.dimensions)
+            dimensions: TaxonomyShared.sortDimensions(fact.dimensions)
         )
     }
 }

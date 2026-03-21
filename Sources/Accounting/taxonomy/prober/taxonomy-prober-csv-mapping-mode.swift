@@ -18,16 +18,16 @@ extension TaxonomyProberRunner {
         print("  rows: \(loadedMapping.mappingFile.rows.count)")
         print("")
 
-        let factsByKey = TaxonomyShared.compileFactsKeepingDimensions(
+        let factsByKey = TaxonomyProjection.compileFactsKeepingDimensions(
             mappingRows: loadedMapping.mappingFile.rows,
             rgsBalances: config.demoRGSBalances
         )
 
-        let factsByConcept = TaxonomyShared.groupMappedFactsByConceptKeepingDimensions(
+        let factsByConcept = TaxonomyProjection.groupMappedFactsByConceptKeepingDimensions(
             factsByKey
         )
 
-        let flattenedFacts = TaxonomyShared.projectMappedFactsToConceptFacts(
+        let flattenedFacts = TaxonomyProjection.projectMappedFactsToConceptFacts(
             factsByKey
         )
 

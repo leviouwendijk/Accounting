@@ -45,7 +45,7 @@ extension TaxonomyProberRunner {
             from: loadedMapping.linkbase
         )
 
-        let canonicalMappings = TaxonomyShared.canonicalizeMappings(
+        let canonicalMappings = TaxonomyProjection.canonicalizeMappings(
             resolution.resolvedMappings,
             accounts: accountCodes
         )
@@ -66,16 +66,16 @@ extension TaxonomyProberRunner {
             )
         }
 
-        let factsByKey = TaxonomyShared.compileMappedFacts(
+        let factsByKey = TaxonomyProjection.compileMappedFacts(
             mappings: canonicalMappings,
             rgsBalances: balances
         )
 
-        let factsByConcept = TaxonomyShared.groupMappedFactsByConceptKeepingDimensions(
+        let factsByConcept = TaxonomyProjection.groupMappedFactsByConceptKeepingDimensions(
             factsByKey
         )
 
-        let flattenedFacts = TaxonomyShared.projectMappedFactsToConceptFacts(
+        let flattenedFacts = TaxonomyProjection.projectMappedFactsToConceptFacts(
             factsByKey
         )
 
@@ -114,7 +114,7 @@ extension TaxonomyProberRunner {
         )
         print("")
 
-        let unmatched = TaxonomyShared.unmatchedRGSCodes(
+        let unmatched = TaxonomyProjection.unmatchedRGSCodes(
             mappings: canonicalMappings,
             rgsBalances: balances
         )
