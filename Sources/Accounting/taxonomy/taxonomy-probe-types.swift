@@ -83,34 +83,6 @@ public struct TaxonomyProbeConfig: Sendable {
     }
 }
 
-public struct TaxonomyProbeBootstrap: Sendable {
-    public let entrypointURL: URL
-    public let entrypointBasename: String
-    public let refs: TaxonomyEntrypointRefs
-    public let selectedPresentationURLs: [URL]
-    public let selectedLinks: [TaxonomyPresentationLink]
-    public let allPresentationLinksByURL: [String: [TaxonomyPresentationLink]]
-    public let labelsByConcept: [String: String]
-
-    public init(
-        entrypointURL: URL,
-        entrypointBasename: String,
-        refs: TaxonomyEntrypointRefs,
-        selectedPresentationURLs: [URL],
-        selectedLinks: [TaxonomyPresentationLink],
-        allPresentationLinksByURL: [String: [TaxonomyPresentationLink]],
-        labelsByConcept: [String: String]
-    ) {
-        self.entrypointURL = entrypointURL
-        self.entrypointBasename = entrypointBasename
-        self.refs = refs
-        self.selectedPresentationURLs = selectedPresentationURLs
-        self.selectedLinks = selectedLinks
-        self.allPresentationLinksByURL = allPresentationLinksByURL
-        self.labelsByConcept = labelsByConcept
-    }
-}
-
 public enum TaxonomyProbeError: Swift.Error, CustomStringConvertible, Sendable {
     case invalidURL(String)
     case network(String)
