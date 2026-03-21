@@ -37,13 +37,15 @@ extension TaxonomyLoader {
             source: taxonomy.source
         )
 
-        guard let selectedEntrypointPath = resolveRGSMappingEntrypointPath(
+        // guard let selectedEntrypointPath = resolveRGSMappingEntrypointPath(
+        guard let selectedEntrypointPath = resolveMappingEntrypointPath(
             entries: entries,
             targetEntrypointBasename: taxonomy.entrypointBasename,
             source: taxonomy.source
         ) else {
             throw TaxonomyProbeError.parseFailed(
-                "could not resolve RGS mapping entrypoint for \(taxonomy.entrypointBasename)"
+                // "could not resolve RGS mapping entrypoint for \(taxonomy.entrypointBasename)"
+                "could not resolve generic mapping entrypoint for \(taxonomy.entrypointBasename)"
             )
         }
 
@@ -56,6 +58,12 @@ extension TaxonomyLoader {
             entrypointXML,
             source: taxonomy.source
         )
+
+        guard !refs.mappings.isEmpty else {
+            throw TaxonomyProbeError.parseFailed(
+                "resolved mapping entrypoint has no mapping refs: \(selectedEntrypointPath)"
+            )
+        }
 
         let mappingEntryPaths = refs.mappings.map { ref in
             resolveZIPEntryPath(

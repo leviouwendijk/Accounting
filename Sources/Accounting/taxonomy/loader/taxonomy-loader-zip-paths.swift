@@ -1,6 +1,118 @@
 import Foundation
 
 extension TaxonomyLoader {
+    public static func resolveMappingEntrypointPath(
+        entries: [String],
+        targetEntrypointBasename: String,
+        source: TaxonomySourceData
+    ) -> String? {
+        let normalizedTarget = targetEntrypointBasename.lowercased()
+
+        let basenameTokens = Set(
+            normalizedTarget
+                .split(whereSeparator: { !$0.isLetter && !$0.isNumber })
+                .map(String.init)
+                .filter { !$0.isEmpty }
+        )
+
+        let candidates = entries.filter { entry in
+            let lowercased = entry.lowercased()
+
+            guard lowercased.hasSuffix(".xml") || lowercased.hasSuffix(".xsd") else {
+                return false
+            }
+
+            if lowercased.contains("/presentation/") {
+                return false
+            }
+
+            if lowercased.contains("/definition/") {
+                return false
+            }
+
+            if lowercased.contains("/table/") {
+                return false
+            }
+
+            if lowercased.contains("/dictionary/") {
+                return false
+            }
+
+            return true
+        }
+
+        let scored = candidates.map { entry in
+            let lowercased = entry.lowercased()
+            let basename = URL(fileURLWithPath: entry)
+                .deletingPathExtension()
+                .lastPathComponent
+                .lowercased()
+
+            var score = 0
+
+            if lowercased.contains("/entrypoints/") {
+                score += 80
+            }
+
+            if lowercased.contains("/mapping/") {
+                score += 60
+            }
+
+            if lowercased.contains("/map/") {
+                score += 40
+            }
+
+            if lowercased.contains("map-") {
+                score += 30
+            }
+
+            if lowercased.hasSuffix(".xsd") {
+                score += 10
+            }
+
+            if basename == normalizedTarget {
+                score += 200
+            } else if lowercased.contains(normalizedTarget) {
+                score += 120
+            }
+
+            for bonus in source.zipPathBonusRules {
+                if lowercased.contains(bonus.needle.lowercased()) {
+                    score += bonus.score
+                }
+            }
+
+            let tokenHits = basenameTokens.reduce(into: 0) { partial, token in
+                if lowercased.contains(token) {
+                    partial += 1
+                }
+            }
+
+            score += tokenHits * 10
+
+            return (
+                entry: entry,
+                score: score,
+                tokenHits: tokenHits
+            )
+        }
+        .sorted { lhs, rhs in
+            if lhs.score == rhs.score {
+                if lhs.tokenHits == rhs.tokenHits {
+                    return lhs.entry < rhs.entry
+                }
+
+                return lhs.tokenHits > rhs.tokenHits
+            }
+
+            return lhs.score > rhs.score
+        }
+
+        return scored.first?.entry
+    }
+}
+
+extension TaxonomyLoader {
     public static func csvPathPriorityScore(
         _ path: String,
         source: TaxonomySourceData
@@ -210,3 +322,4 @@ extension TaxonomyLoader {
             .lowercased()
     }
 }
+
