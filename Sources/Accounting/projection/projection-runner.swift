@@ -10,9 +10,12 @@ public enum ProjectionRunner {
             return .nativeCompile(output)
 
         case .taxonomy(let profile, let presentation):
-            _ = profile
-            _ = presentation
-            throw ProjectionRunnerError.taxonomyProjectionNotImplemented
+            let projected = try TaxonomyProjector.projectCompile(
+                output,
+                profile: profile,
+                presentation: presentation
+            )
+            return .taxonomyCompile(projected)
         }
     }
 
@@ -25,20 +28,12 @@ public enum ProjectionRunner {
             return .nativePeriod(output)
 
         case .taxonomy(let profile, let presentation):
-            _ = profile
-            _ = presentation
-            throw ProjectionRunnerError.taxonomyProjectionNotImplemented
-        }
-    }
-}
-
-public enum ProjectionRunnerError: LocalizedError, Sendable {
-    case taxonomyProjectionNotImplemented
-
-    public var errorDescription: String? {
-        switch self {
-        case .taxonomyProjectionNotImplemented:
-            return "Taxonomy projection is not implemented yet."
+            let projected = try TaxonomyProjector.projectPeriod(
+                output,
+                profile: profile,
+                presentation: presentation
+            )
+            return .taxonomyPeriod(projected)
         }
     }
 }
