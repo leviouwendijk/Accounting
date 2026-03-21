@@ -69,28 +69,3 @@ extension TaxonomyShared {
         )
     }
 }
-
-public func normalizedMappingSourceIdentifier(
-    _ value: String
-) -> String {
-    TaxonomyShared.normalizedMappingSourceIdentifier(value)
-}
-
-public func canonicalizeMappings(
-    _ mappings: [TaxonomyResolvedMapping],
-    accounts: [String]
-) -> [TaxonomyCanonicalResolvedMapping] {
-    TaxonomyShared.canonicalizeMappings(mappings, accounts: accounts)
-}
-
-public func sortDimensions(
-    _ dimensions: [TaxonomyDimensionBinding]
-) -> [TaxonomyDimensionBinding] {
-    TaxonomyShared.sortDimensions(dimensions)
-}
-
-public func factKey(
-    from fact: TaxonomyComputedMappedFact
-) -> TaxonomyMappedFactKey {
-    TaxonomyShared.factKey(from: fact)
-}

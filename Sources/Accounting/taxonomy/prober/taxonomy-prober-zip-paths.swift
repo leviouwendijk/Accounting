@@ -1,6 +1,6 @@
 import Foundation
 
-extension TaxonomyProber {
+extension TaxonomyLoader {
     public static func csvPathPriorityScore(
         _ path: String,
         source: TaxonomySourceData
@@ -209,74 +209,4 @@ extension TaxonomyProber {
             .pathExtension
             .lowercased()
     }
-}
-
-public func csvPathPriorityScore(
-    _ path: String,
-    source: TaxonomySourceData
-) -> Int {
-    TaxonomyProber.csvPathPriorityScore(
-        path,
-        source: source
-    )
-}
-
-public func resolveRGSMappingEntrypointPath(
-    entries: [String],
-    targetEntrypointBasename: String,
-    source: TaxonomySourceData
-) -> String? {
-    TaxonomyProber.resolveRGSMappingEntrypointPath(
-        entries: entries,
-        targetEntrypointBasename: targetEntrypointBasename,
-        source: source
-    )
-}
-
-public func zipPathMatchScore(
-    _ path: String,
-    keywords: [String],
-    source: TaxonomySourceData
-) -> Int {
-    TaxonomyProber.zipPathMatchScore(
-        path,
-        keywords: keywords,
-        source: source
-    )
-}
-
-public func rankedZIPPaths(
-    _ entries: [String],
-    keywords: [String],
-    source: TaxonomySourceData
-) -> [String] {
-    TaxonomyProber.rankedZIPPaths(
-        entries,
-        keywords: keywords,
-        source: source
-    )
-}
-
-public func candidateTextEntries(
-    _ entries: [String]
-) -> [String] {
-    TaxonomyProber.candidateTextEntries(entries)
-}
-
-public func rankedTextEntries(
-    _ entries: [String],
-    keywords: [String],
-    source: TaxonomySourceData
-) -> [String] {
-    TaxonomyProber.rankedTextEntries(
-        entries,
-        keywords: keywords,
-        source: source
-    )
-}
-
-public func fileExtensionLowercased(
-    for path: String
-) -> String {
-    TaxonomyProber.fileExtensionLowercased(for: path)
 }

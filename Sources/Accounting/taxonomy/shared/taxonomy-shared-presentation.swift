@@ -46,13 +46,3 @@ extension TaxonomyShared {
         return rendered.joined(separator: ", ")
     }
 }
-
-public func summarizedPresentationDimensions(
-    _ facts: [TaxonomyComputedMappedFact],
-    source: TaxonomySourceData
-) -> String? {
-    TaxonomyShared.summarizedPresentationDimensions(
-        facts,
-        source: source
-    )
-}

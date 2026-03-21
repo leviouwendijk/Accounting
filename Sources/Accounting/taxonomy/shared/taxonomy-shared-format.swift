@@ -15,23 +15,4 @@ extension TaxonomyShared {
 
         return formatter.string(from: number) ?? number.stringValue
     }
-
-    public static func stderrPrint(
-        _ value: String
-    ) {
-        FileHandle.standardError.write(Data(value.utf8))
-        FileHandle.standardError.write(Data("\n".utf8))
-    }
-}
-
-public func decimalString(
-    _ value: Decimal
-) -> String {
-    TaxonomyShared.decimalString(value)
-}
-
-public func stderrPrint(
-    _ value: String
-) {
-    TaxonomyShared.stderrPrint(value)
 }

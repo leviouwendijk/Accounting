@@ -15,7 +15,7 @@ public enum TaxonomyCSVParser {
             }
 
             if character == ";" && !isInsideQuotes {
-                cells.append(trim(current))
+                cells.append(TaxonomyShared.trim(current))
                 current = ""
                 continue
             }
@@ -23,14 +23,14 @@ public enum TaxonomyCSVParser {
             current.append(character)
         }
 
-        cells.append(trim(current))
+        cells.append(TaxonomyShared.trim(current))
         return cells
     }
 
     public static func parseMappingSource(
         _ raw: String
     ) -> TaxonomyCSVMappingSource {
-        let value = trim(raw)
+        let value = TaxonomyShared.trim(raw)
 
         if value.contains("+") || value.contains("-") {
             let terms = parseGroupTerms(value)
@@ -55,7 +55,7 @@ public enum TaxonomyCSVParser {
     ) throws -> TaxonomyCSVMappingFile {
         let lines = csv
             .components(separatedBy: .newlines)
-            .map(trim)
+            .map(TaxonomyShared.trim)
             .filter { !$0.isEmpty }
 
         guard let headerLine = lines.first else {
@@ -140,7 +140,7 @@ public enum TaxonomyCSVParser {
     public static func csvAxisQName(
         from raw: String
     ) -> TaxonomyExplicitDimension? {
-        let value = trim(raw)
+        let value = TaxonomyShared.trim(raw)
         guard !value.isEmpty else {
             return nil
         }
@@ -149,8 +149,8 @@ public enum TaxonomyCSVParser {
         for separator in separators {
             let parts = value.components(separatedBy: separator)
             if parts.count == 2 {
-                let axis = trim(parts[0])
-                let member = trim(parts[1])
+                let axis = TaxonomyShared.trim(parts[0])
+                let member = TaxonomyShared.trim(parts[1])
 
                 guard !axis.isEmpty, !member.isEmpty else {
                     continue
@@ -176,7 +176,7 @@ private extension TaxonomyCSVParser {
         var sign: Decimal = 1
 
         func flushBuffer() {
-            let pattern = trim(buffer)
+            let pattern = TaxonomyShared.trim(buffer)
             guard !pattern.isEmpty else {
                 buffer = ""
                 return

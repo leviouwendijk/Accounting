@@ -46,7 +46,7 @@ extension TaxonomyParser {
             )
 
             for locator in link.locators.values {
-                let concept = conceptName(from: locator.href)
+                let concept = TaxonomyShared.conceptName(from: locator.href)
                 guard !concept.isEmpty else {
                     continue
                 }
@@ -96,7 +96,7 @@ extension TaxonomyParser {
         var unresolvedSamples: [String] = []
 
         for datapoint in datapoints {
-            let extraction = conceptNameExtraction(from: datapoint.concept)
+            let extraction = TaxonomyShared.conceptNameExtraction(from: datapoint.concept)
             let sourceIdentifier = extraction.localName
 
             let resolved = TaxonomyResolvedMapping(
@@ -150,7 +150,7 @@ private extension TaxonomyParser {
         var out: [String: String] = [:]
 
         for locator in link.locators.values {
-            let concept = conceptName(from: locator.href)
+            let concept = TaxonomyShared.conceptName(from: locator.href)
             guard !concept.isEmpty else {
                 continue
             }
@@ -169,7 +169,7 @@ private extension TaxonomyParser {
         var out: [String: String] = [:]
 
         for locator in link.locators.values {
-            let concept = conceptName(from: locator.href)
+            let concept = TaxonomyShared.conceptName(from: locator.href)
             guard !concept.isEmpty else {
                 continue
             }
@@ -240,7 +240,7 @@ private extension TaxonomyParser {
             return nil
         }
 
-        let concept = conceptName(from: href)
+        let concept = TaxonomyShared.conceptName(from: href)
         guard concept.lowercased().contains("member") else {
             return nil
         }

@@ -9,30 +9,26 @@ extension TaxonomyProberRunner {
             throw TaxonomyProbeError.missingChartFile
         }
 
-        let chart = try loadCompiledChart(
+        let chart = try TaxonomyProber.loadCompiledChart(
             from: chartFile
         )
 
         let accountCodes = chart.nodes.map(\.codes.code).filter { !$0.isEmpty }
 
-        let entries = try listZIPEntries(
-            zipFileURL: zipFileURL
-        )
-
-        let rankedCandidates = rankedZIPPaths(
-            entries,
-            keywords: config.probeKeywords,
-            source: config.source
+        let loadedMapping = try TaxonomyLoader.loadGenericMapping(
+            zipFileURL: zipFileURL,
+            source: config.source,
+            probeKeywords: config.probeKeywords
         )
 
         print("generic mapping candidates:")
-        if rankedCandidates.isEmpty {
+        if loadedMapping.rankedCandidates.isEmpty {
             print("  none")
             return
         }
 
-        for entry in rankedCandidates.prefix(40) {
-            let score = zipPathMatchScore(
+        for entry in loadedMapping.rankedCandidates.prefix(40) {
+            let score = TaxonomyLoader.zipPathMatchScore(
                 entry,
                 keywords: config.probeKeywords,
                 source: config.source
@@ -41,36 +37,15 @@ extension TaxonomyProberRunner {
         }
         print("")
 
-        let selectedEntry = rankedCandidates.first(where: {
-            let lowercased = $0.lowercased()
-            return lowercased.hasSuffix(".xml")
-                || lowercased.hasSuffix(".xsd")
-        })
-
-        guard let selectedEntry else {
-            throw TaxonomyProbeError.parseFailed(
-                "no generic mapping candidate XML found in zip"
-            )
-        }
-
         print("selected generic mapping entry:")
-        print("  \(selectedEntry)")
+        print("  \(loadedMapping.selectedEntryPath)")
         print("")
 
-        let xml = try readZIPEntryText(
-            zipFileURL: zipFileURL,
-            entryPath: selectedEntry
-        )
-
-        let linkbase = try TaxonomyGenericLinkbaseParser.parse(
-            xml
-        )
-
         let resolution = TaxonomyParser.resolveMappingsDetailed(
-            from: linkbase
+            from: loadedMapping.linkbase
         )
 
-        let canonicalMappings = canonicalizeMappings(
+        let canonicalMappings = TaxonomyShared.canonicalizeMappings(
             resolution.resolvedMappings,
             accounts: accountCodes
         )
@@ -86,72 +61,72 @@ extension TaxonomyProberRunner {
                 break
             }
 
-            balances = projectBalances(
+            balances = TaxonomyTester.projectBalances(
                 projectRoot: projectRoot
             )
         }
 
-        let factsByKey = compileMappedFacts(
+        let factsByKey = TaxonomyShared.compileMappedFacts(
             mappings: canonicalMappings,
             rgsBalances: balances
         )
 
-        let factsByConcept = groupMappedFactsByConceptKeepingDimensions(
+        let factsByConcept = TaxonomyShared.groupMappedFactsByConceptKeepingDimensions(
             factsByKey
         )
 
-        let flattenedFacts = projectMappedFactsToConceptFacts(
+        let flattenedFacts = TaxonomyShared.projectMappedFactsToConceptFacts(
             factsByKey
         )
 
-        renderMappingResolutionDiagnostics(
+        TaxonomyShared.renderMappingResolutionDiagnostics(
             resolution.diagnostics
         )
         print("")
 
-        renderResolvedMappings(
+        TaxonomyShared.renderResolvedMappings(
             resolution.resolvedMappings,
             limit: 200
         )
         print("")
 
-        renderCanonicalMappings(
+        TaxonomyShared.renderCanonicalMappings(
             mappings: canonicalMappings,
             limit: 200
         )
         print("")
 
-        renderComputedMappedFacts(
+        TaxonomyShared.renderComputedMappedFacts(
             factsByKey,
             limit: 200
         )
         print("")
 
-        renderDemoBalanceCoverage(
+        TaxonomyShared.renderDemoBalanceCoverage(
             mappings: canonicalMappings,
             rgsBalances: balances
         )
         print("")
 
-        renderUsedProjectCoverage(
+        TaxonomyShared.renderUsedProjectCoverage(
             mappings: canonicalMappings,
             balances: balances
         )
         print("")
 
-        let unmatched = unmatchedRGSCodes(
+        let unmatched = TaxonomyShared.unmatchedRGSCodes(
             mappings: canonicalMappings,
             rgsBalances: balances
         )
 
-        renderMappingSuggestions(
+        TaxonomyShared.renderMappingSuggestions(
             unmatchedCodes: unmatched,
             mappings: canonicalMappings
         )
         print("")
 
         for link in bootstrap.selectedPresentationLinks {
-            renderPresentationLink(
+            TaxonomyShared.renderPresentationLink(
                 link,
                 labelsByConcept: bootstrap.labelsByConcept,
                 factsByConcept: flattenedFacts
@@ -161,7 +136,7 @@ extension TaxonomyProberRunner {
 
         print("dimensional presentation view:")
         for link in bootstrap.selectedPresentationLinks {
-            renderPresentationLink(
+            TaxonomyShared.renderPresentationLink(
                 link,
                 labelsByConcept: bootstrap.labelsByConcept,
                 factsByConcept: factsByConcept,

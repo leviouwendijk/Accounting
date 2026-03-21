@@ -15,14 +15,14 @@ public enum TaxonomyPresentationParser {
 
         var links: [TaxonomyPresentationLink] = []
 
-        for element in descendantElements(of: root) {
+        for element in TaxonomyShared.descendantElements(of: root) {
             let name = element.name ?? ""
             guard name.hasSuffix("presentationLink") else {
                 continue
             }
 
-            let role = attributeValue(element, "xlink:role")
-                ?? attributeValue(element, "role")
+            let role = TaxonomyShared.attributeValue(element, "xlink:role")
+                ?? TaxonomyShared.attributeValue(element, "role")
 
             var locators: [String: String] = [:]
             var arcs: [TaxonomyPresentationArc] = []
@@ -35,11 +35,11 @@ public enum TaxonomyPresentationParser {
                 let childName = childElement.name ?? ""
 
                 if childName.hasSuffix("loc") {
-                    let label = attributeValue(childElement, "xlink:label")
-                        ?? attributeValue(childElement, "label")
+                    let label = TaxonomyShared.attributeValue(childElement, "xlink:label")
+                        ?? TaxonomyShared.attributeValue(childElement, "label")
                         ?? ""
-                    let href = attributeValue(childElement, "xlink:href")
-                        ?? attributeValue(childElement, "href")
+                    let href = TaxonomyShared.attributeValue(childElement, "xlink:href")
+                        ?? TaxonomyShared.attributeValue(childElement, "href")
                         ?? ""
 
                     guard !label.isEmpty, !href.isEmpty else {
@@ -51,11 +51,11 @@ public enum TaxonomyPresentationParser {
                 }
 
                 if childName.hasSuffix("presentationArc") {
-                    let from = attributeValue(childElement, "xlink:from")
-                        ?? attributeValue(childElement, "from")
+                    let from = TaxonomyShared.attributeValue(childElement, "xlink:from")
+                        ?? TaxonomyShared.attributeValue(childElement, "from")
                         ?? ""
-                    let to = attributeValue(childElement, "xlink:to")
-                        ?? attributeValue(childElement, "to")
+                    let to = TaxonomyShared.attributeValue(childElement, "xlink:to")
+                        ?? TaxonomyShared.attributeValue(childElement, "to")
                         ?? ""
 
                     guard !from.isEmpty, !to.isEmpty else {
@@ -94,9 +94,9 @@ private func decimalAttributeValue(
     _ element: XMLElement,
     _ name: String
 ) -> Decimal? {
-    guard let raw = attributeValue(element, name) else {
+    guard let raw = TaxonomyShared.attributeValue(element, name) else {
         return nil
     }
 
-    return Decimal(string: trim(raw), locale: Locale(identifier: "en_US_POSIX"))
+    return Decimal(string: TaxonomyShared.trim(raw), locale: Locale(identifier: "en_US_POSIX"))
 }

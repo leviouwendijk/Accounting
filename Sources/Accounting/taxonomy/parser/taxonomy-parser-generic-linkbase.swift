@@ -17,14 +17,14 @@ public enum TaxonomyGenericLinkbaseParser {
         var arcroleRefs: [TaxonomyArcroleRef] = []
         var links: [TaxonomyGenericExtendedLink] = []
 
-        for element in descendantElements(of: root) {
+        for element in TaxonomyShared.descendantElements(of: root) {
             let name = element.name ?? ""
-            let local = localName(name)
+            let local = TaxonomyShared.localName(name)
 
             if local == "roleRef" {
-                let roleURI = attributeValue(element, "roleURI") ?? ""
-                let href = attributeValue(element, "xlink:href")
-                    ?? attributeValue(element, "href")
+                let roleURI = TaxonomyShared.attributeValue(element, "roleURI") ?? ""
+                let href = TaxonomyShared.attributeValue(element, "xlink:href")
+                    ?? TaxonomyShared.attributeValue(element, "href")
                     ?? ""
 
                 guard !roleURI.isEmpty, !href.isEmpty else {
@@ -41,9 +41,9 @@ public enum TaxonomyGenericLinkbaseParser {
             }
 
             if local == "arcroleRef" {
-                let arcroleURI = attributeValue(element, "arcroleURI") ?? ""
-                let href = attributeValue(element, "xlink:href")
-                    ?? attributeValue(element, "href")
+                let arcroleURI = TaxonomyShared.attributeValue(element, "arcroleURI") ?? ""
+                let href = TaxonomyShared.attributeValue(element, "xlink:href")
+                    ?? TaxonomyShared.attributeValue(element, "href")
                     ?? ""
 
                 guard !arcroleURI.isEmpty, !href.isEmpty else {
@@ -78,9 +78,9 @@ private extension TaxonomyGenericLinkbaseParser {
     static func parseExtendedLink(
         _ element: XMLElement
     ) -> TaxonomyGenericExtendedLink {
-        let role = attributeValue(element, "xlink:role")
-            ?? attributeValue(element, "role")
-        let type = localName(element.name ?? "")
+        let role = TaxonomyShared.attributeValue(element, "xlink:role")
+            ?? TaxonomyShared.attributeValue(element, "role")
+        let type = TaxonomyShared.localName(element.name ?? "")
 
         var locators: [String: TaxonomyLocator] = [:]
         var resources: [String: TaxonomyGenericResource] = [:]
@@ -91,7 +91,7 @@ private extension TaxonomyGenericLinkbaseParser {
                 continue
             }
 
-            let childLocalName = localName(child.name ?? "")
+            let childLocalName = TaxonomyShared.localName(child.name ?? "")
 
             if childLocalName == "loc" {
                 let locator = parseLocator(child)
@@ -124,11 +124,11 @@ private extension TaxonomyGenericLinkbaseParser {
     static func parseLocator(
         _ element: XMLElement
     ) -> TaxonomyLocator {
-        let label = attributeValue(element, "xlink:label")
-            ?? attributeValue(element, "label")
+        let label = TaxonomyShared.attributeValue(element, "xlink:label")
+            ?? TaxonomyShared.attributeValue(element, "label")
             ?? ""
-        let href = attributeValue(element, "xlink:href")
-            ?? attributeValue(element, "href")
+        let href = TaxonomyShared.attributeValue(element, "xlink:href")
+            ?? TaxonomyShared.attributeValue(element, "href")
             ?? ""
 
         return TaxonomyLocator(
@@ -140,12 +140,12 @@ private extension TaxonomyGenericLinkbaseParser {
     static func parseResource(
         _ element: XMLElement
     ) -> TaxonomyGenericResource {
-        let label = attributeValue(element, "xlink:label")
-            ?? attributeValue(element, "label")
+        let label = TaxonomyShared.attributeValue(element, "xlink:label")
+            ?? TaxonomyShared.attributeValue(element, "label")
             ?? ""
-        let role = attributeValue(element, "xlink:role")
-            ?? attributeValue(element, "role")
-        let text = trim(element.stringValue ?? "")
+        let role = TaxonomyShared.attributeValue(element, "xlink:role")
+            ?? TaxonomyShared.attributeValue(element, "role")
+        let text = TaxonomyShared.trim(element.stringValue ?? "")
 
         var attributes: [String: String] = [:]
         for attribute in element.attributes ?? [] {
@@ -167,21 +167,21 @@ private extension TaxonomyGenericLinkbaseParser {
     static func parseArc(
         _ element: XMLElement
     ) -> TaxonomyGenericArc {
-        let arcrole = attributeValue(element, "xlink:arcrole")
-            ?? attributeValue(element, "arcrole")
-        let from = attributeValue(element, "xlink:from")
-            ?? attributeValue(element, "from")
+        let arcrole = TaxonomyShared.attributeValue(element, "xlink:arcrole")
+            ?? TaxonomyShared.attributeValue(element, "arcrole")
+        let from = TaxonomyShared.attributeValue(element, "xlink:from")
+            ?? TaxonomyShared.attributeValue(element, "from")
             ?? ""
-        let to = attributeValue(element, "xlink:to")
-            ?? attributeValue(element, "to")
+        let to = TaxonomyShared.attributeValue(element, "xlink:to")
+            ?? TaxonomyShared.attributeValue(element, "to")
             ?? ""
-        let targetRole = attributeValue(element, "xlink:targetRole")
-            ?? attributeValue(element, "targetRole")
+        let targetRole = TaxonomyShared.attributeValue(element, "xlink:targetRole")
+            ?? TaxonomyShared.attributeValue(element, "targetRole")
 
         let order: Decimal?
-        if let rawOrder = attributeValue(element, "order") {
+        if let rawOrder = TaxonomyShared.attributeValue(element, "order") {
             order = Decimal(
-                string: trim(rawOrder),
+                string: TaxonomyShared.trim(rawOrder),
                 locale: Locale(identifier: "en_US_POSIX")
             )
         } else {

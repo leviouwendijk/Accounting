@@ -1,6 +1,6 @@
 import Foundation
 
-extension TaxonomyProber {
+extension TaxonomyLoader {
     public static func listZIPEntries(
         zipFileURL: URL
     ) throws -> [String] {
@@ -12,7 +12,7 @@ extension TaxonomyProber {
 
         return output
             .components(separatedBy: .newlines)
-            .map(trim)
+            .map(TaxonomyShared.trim)
             .filter { !$0.isEmpty }
     }
 
@@ -50,30 +50,4 @@ extension TaxonomyProber {
 
         return String(resolvedURL.path.dropFirst())
     }
-}
-
-public func listZIPEntries(
-    zipFileURL: URL
-) throws -> [String] {
-    try TaxonomyProber.listZIPEntries(zipFileURL: zipFileURL)
-}
-
-public func readZIPEntryText(
-    zipFileURL: URL,
-    entryPath: String
-) throws -> String {
-    try TaxonomyProber.readZIPEntryText(
-        zipFileURL: zipFileURL,
-        entryPath: entryPath
-    )
-}
-
-public func resolveZIPEntryPath(
-    _ href: String,
-    relativeTo baseEntryPath: String
-) -> String {
-    TaxonomyProber.resolveZIPEntryPath(
-        href,
-        relativeTo: baseEntryPath
-    )
 }

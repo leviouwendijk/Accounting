@@ -1,6 +1,6 @@
 import Foundation
 
-extension TaxonomyProber {
+extension TaxonomyLoader {
     public static func fetchData(
         from url: URL
     ) throws -> Data {
@@ -32,16 +32,4 @@ extension TaxonomyProber {
             "Unable to decode text response from \(url.absoluteString)"
         )
     }
-}
-
-public func fetchData(
-    from url: URL
-) throws -> Data {
-    try TaxonomyProber.fetchData(from: url)
-}
-
-public func fetchText(
-    from url: URL
-) throws -> String {
-    try TaxonomyProber.fetchText(from: url)
 }

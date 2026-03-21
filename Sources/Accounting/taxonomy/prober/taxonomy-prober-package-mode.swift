@@ -4,20 +4,20 @@ extension TaxonomyProberRunner {
     public func runPackageProbe(
         zipFileURL: URL
     ) throws {
-        let entries = try listZIPEntries(
+        let entries = try TaxonomyLoader.listZIPEntries(
             zipFileURL: zipFileURL
         )
 
-        summarizeZIPEntries(entries)
+        TaxonomyProber.summarizeZIPEntries(entries)
         print("")
-        printMatchingZIPPaths(
+        TaxonomyProber.printMatchingZIPPaths(
             entries,
             keywords: config.probeKeywords,
             source: config.source
         )
         print("")
 
-        let hits = findTextHitsInZIP(
+        let hits = TaxonomyProber.findTextHitsInZIP(
             zipFileURL: zipFileURL,
             entries: entries,
             keywords: config.probeKeywords,

@@ -4,7 +4,7 @@ extension TaxonomyLoader {
     public static func load(
         config: TaxonomyLoadConfig
     ) throws -> LoadedTaxonomy {
-        let entrypointURL = try urlFromStringOrPath(config.source.entrypoint)
+        let entrypointURL = try TaxonomyShared.urlFromStringOrPath(config.source.entrypoint)
         let entrypointXML = try fetchText(from: entrypointURL)
 
         let refs = try TaxonomyEntrypointParser.parse(

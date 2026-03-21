@@ -8,7 +8,7 @@ extension TaxonomyLoader {
     ) -> [URL] {
         refs.presentation
             .compactMap { ref in
-                resolveURL(ref.href, relativeTo: entrypointURL)
+                TaxonomyShared.resolveURL(ref.href, relativeTo: entrypointURL)
             }
             .filter { url in
                 guard !wantedPresentations.isEmpty else {
@@ -70,7 +70,7 @@ extension TaxonomyLoader {
         var labelsByConcept: [String: String] = [:]
 
         for labelRef in selectedLabelRefs {
-            guard let labelURL = resolveURL(
+            guard let labelURL = TaxonomyShared.resolveURL(
                 labelRef.href,
                 relativeTo: entrypointURL
             ) else {

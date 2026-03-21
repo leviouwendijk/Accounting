@@ -5,46 +5,40 @@ extension TaxonomyProberRunner {
         zipFileURL: URL,
         bootstrap: LoadedTaxonomy
     ) throws {
-        let extracted = try extractMatchingMappingCSV(
+        let loadedMapping = try TaxonomyLoader.loadCSVMapping(
             zipFileURL: zipFileURL,
-            entrypointBasename: bootstrap.entrypointBasename,
-            source: config.source
+            taxonomy: bootstrap
         )
 
         print("resolved mapping csv entry:")
-        print("  \(extracted.entryPath)")
+        print("  \(loadedMapping.entryPath)")
         print("")
-
-        let mappingFile = try TaxonomyCSVParser.parseMappingCSV(
-            extracted.csv
-        )
-
         print("mapping csv:")
-        print("  header columns: \(mappingFile.header.count)")
-        print("  rows: \(mappingFile.rows.count)")
+        print("  header columns: \(loadedMapping.mappingFile.header.count)")
+        print("  rows: \(loadedMapping.mappingFile.rows.count)")
         print("")
 
-        let factsByKey = compileFactsKeepingDimensions(
-            mappingRows: mappingFile.rows,
+        let factsByKey = TaxonomyShared.compileFactsKeepingDimensions(
+            mappingRows: loadedMapping.mappingFile.rows,
             rgsBalances: config.demoRGSBalances
         )
 
-        let factsByConcept = groupMappedFactsByConceptKeepingDimensions(
+        let factsByConcept = TaxonomyShared.groupMappedFactsByConceptKeepingDimensions(
             factsByKey
         )
 
-        let flattenedFacts = projectMappedFactsToConceptFacts(
+        let flattenedFacts = TaxonomyShared.projectMappedFactsToConceptFacts(
             factsByKey
         )
 
-        renderComputedMappedFacts(
+        TaxonomyShared.renderComputedMappedFacts(
             factsByKey,
             limit: 200
         )
         print("")
 
         for link in bootstrap.selectedPresentationLinks {
-            renderPresentationLink(
+            TaxonomyShared.renderPresentationLink(
                 link,
                 labelsByConcept: bootstrap.labelsByConcept,
                 factsByConcept: flattenedFacts
@@ -54,7 +48,7 @@ extension TaxonomyProberRunner {
 
         print("dimensional presentation view:")
         for link in bootstrap.selectedPresentationLinks {
-            renderPresentationLink(
+            TaxonomyShared.renderPresentationLink(
                 link,
                 labelsByConcept: bootstrap.labelsByConcept,
                 factsByConcept: factsByConcept,

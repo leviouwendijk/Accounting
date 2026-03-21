@@ -17,15 +17,15 @@ public enum TaxonomyLabelParser {
         var labelTextByLabel: [String: String] = [:]
         var arcs: [TaxonomyLabelArc] = []
 
-        for element in descendantElements(of: root) {
+        for element in TaxonomyShared.descendantElements(of: root) {
             let name = element.name ?? ""
 
             if name.hasSuffix("loc") {
-                let label = attributeValue(element, "xlink:label")
-                    ?? attributeValue(element, "label")
+                let label = TaxonomyShared.attributeValue(element, "xlink:label")
+                    ?? TaxonomyShared.attributeValue(element, "label")
                     ?? ""
-                let href = attributeValue(element, "xlink:href")
-                    ?? attributeValue(element, "href")
+                let href = TaxonomyShared.attributeValue(element, "xlink:href")
+                    ?? TaxonomyShared.attributeValue(element, "href")
                     ?? ""
 
                 guard !label.isEmpty, !href.isEmpty else {
@@ -37,11 +37,11 @@ public enum TaxonomyLabelParser {
             }
 
             if name.hasSuffix("labelArc") {
-                let from = attributeValue(element, "xlink:from")
-                    ?? attributeValue(element, "from")
+                let from = TaxonomyShared.attributeValue(element, "xlink:from")
+                    ?? TaxonomyShared.attributeValue(element, "from")
                     ?? ""
-                let to = attributeValue(element, "xlink:to")
-                    ?? attributeValue(element, "to")
+                let to = TaxonomyShared.attributeValue(element, "xlink:to")
+                    ?? TaxonomyShared.attributeValue(element, "to")
                     ?? ""
 
                 guard !from.isEmpty, !to.isEmpty else {
@@ -58,11 +58,11 @@ public enum TaxonomyLabelParser {
             }
 
             if name.hasSuffix("label") {
-                let label = attributeValue(element, "xlink:label")
-                    ?? attributeValue(element, "label")
+                let label = TaxonomyShared.attributeValue(element, "xlink:label")
+                    ?? TaxonomyShared.attributeValue(element, "label")
                     ?? ""
-                let role = attributeValue(element, "xlink:role")
-                    ?? attributeValue(element, "role")
+                let role = TaxonomyShared.attributeValue(element, "xlink:role")
+                    ?? TaxonomyShared.attributeValue(element, "role")
                     ?? ""
 
                 guard !label.isEmpty else {
@@ -78,7 +78,7 @@ public enum TaxonomyLabelParser {
                     continue
                 }
 
-                let text = trim(element.stringValue ?? "")
+                let text = TaxonomyShared.trim(element.stringValue ?? "")
                 guard !text.isEmpty else {
                     continue
                 }
@@ -100,7 +100,7 @@ public enum TaxonomyLabelParser {
                 continue
             }
 
-            let concept = conceptName(from: href)
+            let concept = TaxonomyShared.conceptName(from: href)
             guard !concept.isEmpty else {
                 continue
             }

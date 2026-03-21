@@ -192,29 +192,3 @@ private extension TaxonomyShared {
         }
     }
 }
-
-public func renderPresentationLink(
-    _ link: TaxonomyPresentationLink,
-    labelsByConcept: [String: String],
-    factsByConcept: [String: TaxonomyComputedFact]
-) {
-    TaxonomyShared.renderPresentationLink(
-        link,
-        labelsByConcept: labelsByConcept,
-        factsByConcept: factsByConcept
-    )
-}
-
-public func renderPresentationLink(
-    _ link: TaxonomyPresentationLink,
-    labelsByConcept: [String: String],
-    factsByConcept: [String: [TaxonomyComputedMappedFact]],
-    source: TaxonomySourceData
-) {
-    TaxonomyShared.renderPresentationLink(
-        link,
-        labelsByConcept: labelsByConcept,
-        factsByConcept: factsByConcept,
-        source: source
-    )
-}

@@ -22,9 +22,3 @@ extension TaxonomyShared {
         return out
     }
 }
-
-public func descendantElements(
-    of root: XMLElement
-) -> [XMLElement] {
-    TaxonomyShared.descendantElements(of: root)
-}

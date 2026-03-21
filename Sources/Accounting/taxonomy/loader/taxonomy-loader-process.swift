@@ -1,6 +1,6 @@
 import Foundation
 
-extension TaxonomyProber {
+extension TaxonomyLoader {
     public static func runCommand(
         _ launchPath: String,
         _ arguments: [String]
@@ -31,7 +31,7 @@ extension TaxonomyProber {
 
         guard process.terminationStatus == 0 else {
             let message = stderrText.isEmpty ? stdoutText : stderrText
-            throw TaxonomyProbeError.commandFailed(trim(message))
+            throw TaxonomyProbeError.commandFailed(TaxonomyShared.trim(message))
         }
 
         return stdoutText
@@ -70,28 +70,4 @@ extension TaxonomyProber {
 
         throw TaxonomyProbeError.commandUnavailable("unzip")
     }
-}
-
-public func runCommand(
-    _ launchPath: String,
-    _ arguments: [String]
-) throws -> String {
-    try TaxonomyProber.runCommand(
-        launchPath,
-        arguments
-    )
-}
-
-public func writeTempFile(
-    data: Data,
-    suffix: String
-) throws -> URL {
-    try TaxonomyProber.writeTempFile(
-        data: data,
-        suffix: suffix
-    )
-}
-
-public func unzipPath() throws -> String {
-    try TaxonomyProber.unzipPath()
 }

@@ -5,6 +5,7 @@ public enum TaxonomyProber {}
 public enum TaxonomyParser {}
 public enum TaxonomyShared {}
 public enum TaxonomyLoader {}
+public enum TaxonomyTester {}
 
 public enum TaxonomyProbeMode: String, Sendable, CaseIterable {
     case probePackage

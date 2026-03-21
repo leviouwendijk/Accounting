@@ -21,22 +21,22 @@ public enum TaxonomyEntrypointParser {
         var mappings: [TaxonomyLinkbaseRef] = []
         var other: [TaxonomyLinkbaseRef] = []
 
-        for element in descendantElements(of: root) {
+        for element in TaxonomyShared.descendantElements(of: root) {
             let name = element.name ?? ""
             guard name.hasSuffix("linkbaseRef") else {
                 continue
             }
 
-            let href = attributeValue(element, "xlink:href")
-                ?? attributeValue(element, "href")
+            let href = TaxonomyShared.attributeValue(element, "xlink:href")
+                ?? TaxonomyShared.attributeValue(element, "href")
                 ?? ""
 
             guard !href.isEmpty else {
                 continue
             }
 
-            let role = attributeValue(element, "xlink:role")
-                ?? attributeValue(element, "role")
+            let role = TaxonomyShared.attributeValue(element, "xlink:role")
+                ?? TaxonomyShared.attributeValue(element, "role")
 
             let ref = TaxonomyLinkbaseRef(
                 href: href,

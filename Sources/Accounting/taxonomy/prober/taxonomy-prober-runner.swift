@@ -45,12 +45,12 @@ public struct TaxonomyProberRunner: Sendable {
         print("labels loaded: \(bootstrap.labelsByConcept.count)")
         print("")
 
-        let mappingZIPURL = try urlFromStringOrPath(config.mappingZIP)
+        let mappingZIPURL = try TaxonomyShared.urlFromStringOrPath(config.mappingZIP)
         print("fetching mapping zip: \(mappingZIPURL.absoluteString)")
-        let mappingZIPData = try fetchData(from: mappingZIPURL)
+        let mappingZIPData = try TaxonomyLoader.fetchData(from: mappingZIPURL)
         print("mapping zip bytes: \(mappingZIPData.count)")
 
-        let mappingZIPFileURL = try writeTempFile(
+        let mappingZIPFileURL = try TaxonomyLoader.writeTempFile(
             data: mappingZIPData,
             suffix: "zip"
         )

@@ -1,42 +1,13 @@
 import Foundation
 
 extension TaxonomyProber {
-    public static func extractMatchingMappingCSV(
-        zipFileURL: URL,
-        entrypointBasename: String,
-        source: TaxonomySourceData
-    ) throws -> (
-        entryPath: String,
-        csv: String
-    ) {
-        let entries = try listZIPEntries(zipFileURL: zipFileURL)
-
-        guard let entryPath = resolveRGSMappingEntrypointPath(
-            entries: entries,
-            targetEntrypointBasename: entrypointBasename,
-            source: source
-        ) else {
-            throw TaxonomyProbeError.mappingCSVNotFound(entrypointBasename)
-        }
-
-        let csv = try readZIPEntryText(
-            zipFileURL: zipFileURL,
-            entryPath: entryPath
-        )
-
-        return (
-            entryPath: entryPath,
-            csv: csv
-        )
-    }
-
     public static func printMatchingZIPPaths(
         _ entries: [String],
         keywords: [String],
         source: TaxonomySourceData,
         limit: Int = 80
     ) {
-        let ranked = rankedZIPPaths(
+        let ranked = TaxonomyLoader.rankedZIPPaths(
             entries,
             keywords: keywords,
             source: source
@@ -49,7 +20,7 @@ extension TaxonomyProber {
         }
 
         for entry in ranked.prefix(limit) {
-            let score = zipPathMatchScore(
+            let score = TaxonomyLoader.zipPathMatchScore(
                 entry,
                 keywords: keywords,
                 source: source
@@ -71,7 +42,7 @@ extension TaxonomyProber {
         maxFilesToScan: Int,
         maxHits: Int
     ) -> [(entry: String, line: String)] {
-        let ranked = rankedTextEntries(
+        let ranked = TaxonomyLoader.rankedTextEntries(
             entries,
             keywords: keywords,
             source: source
@@ -84,7 +55,7 @@ extension TaxonomyProber {
                 break
             }
 
-            guard let text = try? readZIPEntryText(
+            guard let text = try? TaxonomyLoader.readZIPEntryText(
                 zipFileURL: zipFileURL,
                 entryPath: entry
             ) else {
@@ -99,7 +70,7 @@ extension TaxonomyProber {
                     break
                 }
 
-                let line = trim(rawLine)
+                let line = TaxonomyShared.trim(rawLine)
                 guard !line.isEmpty else {
                     continue
                 }
@@ -125,7 +96,7 @@ extension TaxonomyProber {
     ) {
         let countsByExtension = Dictionary(
             grouping: entries,
-            by: { fileExtensionLowercased(for: $0) }
+            by: { TaxonomyLoader.fileExtensionLowercased(for: $0) }
         ).mapValues(\.count)
 
         let ordered = countsByExtension.keys.sorted { lhs, rhs in
@@ -147,59 +118,4 @@ extension TaxonomyProber {
             print("  \(rendered): \(countsByExtension[ext] ?? 0)")
         }
     }
-}
-
-public func extractMatchingMappingCSV(
-    zipFileURL: URL,
-    entrypointBasename: String,
-    source: TaxonomySourceData
-) throws -> (
-    entryPath: String,
-    csv: String
-) {
-    try TaxonomyProber.extractMatchingMappingCSV(
-        zipFileURL: zipFileURL,
-        entrypointBasename: entrypointBasename,
-        source: source
-    )
-}
-
-public func printMatchingZIPPaths(
-    _ entries: [String],
-    keywords: [String],
-    source: TaxonomySourceData,
-    limit: Int = 80
-) {
-    TaxonomyProber.printMatchingZIPPaths(
-        entries,
-        keywords: keywords,
-        source: source,
-        limit: limit
-    )
-}
-
-public func findTextHitsInZIP(
-    zipFileURL: URL,
-    entries: [String],
-    keywords: [String],
-    patterns: [String],
-    source: TaxonomySourceData,
-    maxFilesToScan: Int,
-    maxHits: Int
-) -> [(entry: String, line: String)] {
-    TaxonomyProber.findTextHitsInZIP(
-        zipFileURL: zipFileURL,
-        entries: entries,
-        keywords: keywords,
-        patterns: patterns,
-        source: source,
-        maxFilesToScan: maxFilesToScan,
-        maxHits: maxHits
-    )
-}
-
-public func summarizeZIPEntries(
-    _ entries: [String]
-) {
-    TaxonomyProber.summarizeZIPEntries(entries)
 }

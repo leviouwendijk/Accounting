@@ -36,16 +36,3 @@ extension TaxonomyShared {
         return URL(string: href, relativeTo: baseURL)?.absoluteURL
     }
 }
-
-public func urlFromStringOrPath(
-    _ value: String
-) throws -> URL {
-    try TaxonomyShared.urlFromStringOrPath(value)
-}
-
-public func resolveURL(
-    _ href: String,
-    relativeTo baseURL: URL
-) -> URL? {
-    TaxonomyShared.resolveURL(href, relativeTo: baseURL)
-}
