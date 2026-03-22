@@ -19,7 +19,7 @@ public enum DepreciationResolutionPass {
         on entities: EntityStore,
         using accounts: AccountStore
     ) throws -> EntityStore {
-        var newMap: [EntityKey: EntityDef] = entities.byFull   // copy, because EntityStore is immutable. :contentReference[oaicite:3]{index=3}
+        var newMap = entities.byFull
 
         for (key, var def) in newMap {
             let hasFinal = (def.depreciation != nil)
@@ -30,22 +30,60 @@ public enum DepreciationResolutionPass {
             }
 
             if let draft = def.depreciationDraft {
-                // Resolve account ref → AccountKey via node-backed store
-                let cfg = try draft.resolve(using: entities, accounts: accounts, at: nil)
-                try cfg.validate() // your strong safety checks (life > 0, residual ≤ cost, etc.) :contentReference[oaicite:4]{index=4}
+                let cfg = try draft.resolve(
+                    for: key,
+                    entity: def,
+                    accounts: accounts,
+                    at: nil
+                )
+
+                try cfg.validate()
 
                 def.depreciation = cfg
                 def.depreciationDraft = nil
                 newMap[key] = def
             } else if let cfg = def.depreciation {
-                // Validate existing final config as well
-                try cfg.validate()                                // :contentReference[oaicite:5]{index=5}
+                try cfg.validate()
                 newMap[key] = def
-            } else {
-                // no depreciation on this entity → nothing to do
             }
         }
 
         return EntityStore(newMap)
     }
 }
+
+// public enum DepreciationResolutionPass {
+//     public static func run(
+//         on entities: EntityStore,
+//         using accounts: AccountStore
+//     ) throws -> EntityStore {
+//         var newMap: [EntityKey: EntityDef] = entities.byFull   // copy, because EntityStore is immutable. :contentReference[oaicite:3]{index=3}
+
+//         for (key, var def) in newMap {
+//             let hasFinal = (def.depreciation != nil)
+//             let hasDraft = (def.depreciationDraft != nil)
+
+//             if hasFinal && hasDraft {
+//                 throw DepreciationResolutionError.bothDraftAndFinal(key)
+//             }
+
+//             if let draft = def.depreciationDraft {
+//                 // Resolve account ref → AccountKey via node-backed store
+//                 let cfg = try draft.resolve(using: entities, accounts: accounts, at: nil)
+//                 try cfg.validate() // your strong safety checks (life > 0, residual ≤ cost, etc.) :contentReference[oaicite:4]{index=4}
+
+//                 def.depreciation = cfg
+//                 def.depreciationDraft = nil
+//                 newMap[key] = def
+//             } else if let cfg = def.depreciation {
+//                 // Validate existing final config as well
+//                 try cfg.validate()                                // :contentReference[oaicite:5]{index=5}
+//                 newMap[key] = def
+//             } else {
+//                 // no depreciation on this entity → nothing to do
+//             }
+//         }
+
+//         return EntityStore(newMap)
+//     }
+// }
