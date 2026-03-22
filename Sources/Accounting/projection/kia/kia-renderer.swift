@@ -43,9 +43,9 @@ public enum KIARenderer {
             }
         }
 
-        guard verbose || diagnostics else {
-            return lines.joined(separator: "\n")
-        }
+        // guard verbose || diagnostics else {
+        //     return lines.joined(separator: "\n")
+        // }
 
         if !result.qualifiedAssets.isEmpty {
             lines.append("")
@@ -72,7 +72,10 @@ public enum KIARenderer {
             }
         }
 
-        if !result.excludedAssets.isEmpty {
+        if 
+            verbose,
+            !result.excludedAssets.isEmpty 
+        {
             lines.append("")
             lines.append("Excluded assets")
             lines.append("───────────────")
