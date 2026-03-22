@@ -6,45 +6,152 @@ public enum KIAAssetAssessor {
         taxYear: Int,
         config: KIAConfig,
         calendar: Calendar = Calendar(identifier: .gregorian)
-    ) -> (qualified: [KIAQualifiedAsset], excluded: [KIAExcludedAsset]) {
+    ) -> KIAAssessmentResult {
         var qualified: [KIAQualifiedAsset] = []
         var excluded: [KIAExcludedAsset] = []
+        var diagnostics: [KIADiagnosticRecord] = []
 
         for (key, def) in entities.pairs() {
-            guard shouldInspectForKIA(key: key, entity: def) else {
-                continue
-            }
+            let displayName = normalizedDisplayName(
+                key: key,
+                entity: def
+            )
 
-            guard let depreciation = def.depreciation else {
-                excluded.append(
-                    .init(entityKey: key, reason: .missingDepreciation)
-                )
-                continue
-            }
+            let wasCandidate = isAssetCandidate(
+                key: key,
+                entity: def
+            )
 
-            let acquisitionDate = depreciation.schedule.effectiveDate
-            let year = calendar.component(.year, from: acquisitionDate)
-
-            guard year == taxYear else {
-                excluded.append(
-                    .init(entityKey: key, reason: .outsideTaxYear)
-                )
-                continue
-            }
-
-            let totalAmount = depreciation.acquistion.cost
-            guard totalAmount > 0 else {
-                excluded.append(
-                    .init(entityKey: key, reason: .missingAcquisitionCost)
-                )
-                continue
-            }
-
-            guard totalAmount >= config.minimumAssetAmount else {
-                excluded.append(
-                    .init(
+            guard wasCandidate else {
+                diagnostics.append(
+                    KIADiagnosticRecord(
                         entityKey: key,
-                        reason: .belowMinimumAssetAmount(totalAmount)
+                        displayName: displayName,
+                        wasCandidate: false,
+                        commissionDate: nil,
+                        acquisitionCost: nil,
+                        shareSummary: nil,
+                        outcome: .excluded(.notAssetCandidate)
+                    )
+                )
+                continue
+            }
+
+            let profile = def.profile
+            let depreciation = def.depreciation
+
+            let commissionDate = extractCommissionDate(
+                entity: def
+            )
+            let acquisitionCost = extractAcquisitionCost(
+                entity: def
+            )
+
+            guard profile != nil || depreciation != nil else {
+                let reason: KIAQualificationReason = .missingProfile
+
+                excluded.append(
+                    .init(entityKey: key, reason: reason)
+                )
+
+                diagnostics.append(
+                    KIADiagnosticRecord(
+                        entityKey: key,
+                        displayName: displayName,
+                        wasCandidate: true,
+                        commissionDate: commissionDate,
+                        acquisitionCost: acquisitionCost,
+                        shareSummary: nil,
+                        outcome: .excluded(reason)
+                    )
+                )
+                continue
+            }
+
+            guard let commissionDate else {
+                let reason: KIAQualificationReason = .missingCommissionDate
+
+                excluded.append(
+                    .init(entityKey: key, reason: reason)
+                )
+
+                diagnostics.append(
+                    KIADiagnosticRecord(
+                        entityKey: key,
+                        displayName: displayName,
+                        wasCandidate: true,
+                        commissionDate: nil,
+                        acquisitionCost: acquisitionCost,
+                        shareSummary: nil,
+                        outcome: .excluded(reason)
+                    )
+                )
+                continue
+            }
+
+            let actualYear = calendar.component(.year, from: commissionDate)
+            guard actualYear == taxYear else {
+                let reason: KIAQualificationReason = .outsideTaxYear(
+                    actualYear: actualYear
+                )
+
+                excluded.append(
+                    .init(entityKey: key, reason: reason)
+                )
+
+                diagnostics.append(
+                    KIADiagnosticRecord(
+                        entityKey: key,
+                        displayName: displayName,
+                        wasCandidate: true,
+                        commissionDate: commissionDate,
+                        acquisitionCost: acquisitionCost,
+                        shareSummary: nil,
+                        outcome: .excluded(reason)
+                    )
+                )
+                continue
+            }
+
+            guard let acquisitionCost, acquisitionCost > 0 else {
+                let reason: KIAQualificationReason = .missingAcquisitionCost
+
+                excluded.append(
+                    .init(entityKey: key, reason: reason)
+                )
+
+                diagnostics.append(
+                    KIADiagnosticRecord(
+                        entityKey: key,
+                        displayName: displayName,
+                        wasCandidate: true,
+                        commissionDate: commissionDate,
+                        acquisitionCost: acquisitionCost,
+                        shareSummary: nil,
+                        outcome: .excluded(reason)
+                    )
+                )
+                continue
+            }
+
+            guard acquisitionCost >= config.minimumAssetAmount else {
+                let reason: KIAQualificationReason = .belowMinimumAssetAmount(
+                    acquisitionCost
+                )
+
+                excluded.append(
+                    .init(entityKey: key, reason: reason)
+                )
+
+                diagnostics.append(
+                    KIADiagnosticRecord(
+                        entityKey: key,
+                        displayName: displayName,
+                        wasCandidate: true,
+                        commissionDate: commissionDate,
+                        acquisitionCost: acquisitionCost,
+                        shareSummary: nil,
+                        outcome: .excluded(reason)
                     )
                 )
                 continue
@@ -54,30 +161,50 @@ public enum KIAAssetAssessor {
             do {
                 shares = try resolveShares(
                     entity: def,
-                    totalAmount: totalAmount
+                    totalAmount: acquisitionCost
                 )
             } catch {
+                let reason: KIAQualificationReason = .invalidShareConfiguration(
+                    error.localizedDescription
+                )
+
                 excluded.append(
-                    .init(
+                    .init(entityKey: key, reason: reason)
+                )
+
+                diagnostics.append(
+                    KIADiagnosticRecord(
                         entityKey: key,
-                        reason: .invalidShareConfiguration(error.localizedDescription)
+                        displayName: displayName,
+                        wasCandidate: true,
+                        commissionDate: commissionDate,
+                        acquisitionCost: acquisitionCost,
+                        shareSummary: "error: \(error.localizedDescription)",
+                        outcome: .excluded(reason)
                     )
                 )
                 continue
             }
 
-            let displayName = normalizedDisplayName(
-                key: key,
-                entity: def
+            let asset = KIAQualifiedAsset(
+                entityKey: key,
+                displayName: displayName,
+                acquisitionDate: commissionDate,
+                totalAmount: acquisitionCost,
+                shares: shares
             )
 
-            qualified.append(
-                KIAQualifiedAsset(
+            qualified.append(asset)
+
+            diagnostics.append(
+                KIADiagnosticRecord(
                     entityKey: key,
                     displayName: displayName,
-                    acquisitionDate: acquisitionDate,
-                    totalAmount: totalAmount,
-                    shares: shares
+                    wasCandidate: true,
+                    commissionDate: commissionDate,
+                    acquisitionCost: acquisitionCost,
+                    shareSummary: shareSummary(from: shares),
+                    outcome: .qualified
                 )
             )
         }
@@ -89,23 +216,83 @@ public enum KIAAssetAssessor {
             return lhs.acquisitionDate < rhs.acquisitionDate
         }
 
-        return (qualified, excluded)
+        diagnostics.sort { lhs, rhs in
+            lhs.entityKey.identifier(displaying: .fullchain)
+                < rhs.entityKey.identifier(displaying: .fullchain)
+        }
+
+        return KIAAssessmentResult(
+            qualified: qualified,
+            excluded: excluded,
+            diagnostics: diagnostics
+        )
     }
 
     @inline(__always)
-    private static func shouldInspectForKIA(
+    private static func isAssetCandidate(
         key: EntityKey,
         entity: EntityDef
     ) -> Bool {
+        if key.class == "objects" {
+            return true
+        }
+
+        if entity.profile != nil {
+            return true
+        }
+
         if entity.depreciation != nil {
             return true
         }
 
-        if key.identifier(displaying: .fullchain).contains("objects") {
+        if entity.depreciationDraft != nil {
+            return true
+        }
+
+        if let type = entity.metadata["type"]?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
+           type == "tangible"
+        {
             return true
         }
 
         return false
+    }
+
+    @inline(__always)
+    private static func extractCommissionDate(
+        entity: EntityDef
+    ) -> Date? {
+        if let date = entity.profile?.commissionDate {
+            return date
+        }
+
+        if let date = entity.profile?.acquisitionDate {
+            return date
+        }
+
+        if let depreciation = entity.depreciation {
+            return depreciation.schedule.effectiveDate
+        }
+
+        return nil
+    }
+
+    @inline(__always)
+    private static func extractAcquisitionCost(
+        entity: EntityDef
+    ) -> Decimal? {
+        if let cost = entity.profile?.acquisitionCost?.cost, cost > 0 {
+            return cost
+        }
+
+        if let depreciation = entity.depreciation {
+            let cost = depreciation.acquistion.cost
+            if cost > 0 {
+                return cost
+            }
+        }
+
+        return nil
     }
 
     private static func resolveShares(
@@ -143,6 +330,19 @@ public enum KIAAssetAssessor {
                 amount: totalAmount
             )
         ]
+    }
+
+    private static func shareSummary(
+        from shares: [KIAAssetShare]
+    ) -> String {
+        if shares.isEmpty {
+            return "none"
+        }
+
+        return shares.map { share in
+            "\(share.ownerLabel): \(share.percentage)% → \(share.amount)"
+        }
+        .joined(separator: "; ")
     }
 
     private static func normalizedDisplayName(

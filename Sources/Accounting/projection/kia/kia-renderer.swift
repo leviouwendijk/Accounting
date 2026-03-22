@@ -3,7 +3,8 @@ import Foundation
 public enum KIARenderer {
     public static func renderText(
         _ result: KIAProjectionResult,
-        verbose: Bool = false
+        verbose: Bool = false,
+        diagnostics: Bool = false
     ) -> String {
         var lines: [String] = []
 
@@ -14,7 +15,35 @@ public enum KIARenderer {
         lines.append("Qualified assets: \(result.qualifiedAssets.count)")
         lines.append("Excluded assets: \(result.excludedAssets.count)")
 
-        guard verbose else {
+        if diagnostics {
+            let inspectedCount = result.diagnostics.count
+            let candidateCount = result.diagnostics.filter { $0.wasCandidate }.count
+            let summary = summarizeDiagnostics(result.diagnostics)
+
+            lines.append("")
+            lines.append("Diagnostics summary")
+            lines.append("──────────────────")
+            lines.append("Inspected entities: \(inspectedCount)")
+            lines.append("Candidate entities: \(candidateCount)")
+            lines.append("Qualified outcomes: \(summary.qualifiedCount)")
+            lines.append("Excluded outcomes: \(summary.excludedCount)")
+
+            if !summary.reasonCounts.isEmpty {
+                lines.append("")
+                lines.append("Exclusion reasons")
+                lines.append("────────────────")
+                for item in summary.reasonCounts.sorted(by: { lhs, rhs in
+                    if lhs.value == rhs.value {
+                        return lhs.key < rhs.key
+                    }
+                    return lhs.value > rhs.value
+                }) {
+                    lines.append("\(item.key): \(item.value)")
+                }
+            }
+        }
+
+        guard verbose || diagnostics else {
             return lines.joined(separator: "\n")
         }
 
@@ -25,6 +54,7 @@ public enum KIARenderer {
 
             for asset in result.qualifiedAssets {
                 lines.append("\(asset.displayName)")
+                lines.append("    Key: \(asset.entityKey.identifier(displaying: .fullchain))")
                 lines.append("    Date: \(dateString(asset.acquisitionDate))")
                 lines.append("    Total amount: \(fmt(asset.totalAmount))")
                 lines.append("    Qualifying amount: \(fmt(asset.qualifyingAmount))")
@@ -55,7 +85,60 @@ public enum KIARenderer {
             }
         }
 
+        if diagnostics {
+            lines.append("")
+            lines.append("Per-entity diagnostics")
+            lines.append("──────────────────────")
+
+            for record in result.diagnostics {
+                lines.append(record.entityKey.identifier(displaying: .fullchain))
+                lines.append("    Display name: \(record.displayName)")
+                lines.append("    Candidate: \(record.wasCandidate ? "yes" : "no")")
+                lines.append("    Commission date: \(record.commissionDate.map(dateString) ?? "—")")
+                lines.append("    Acquisition cost: \(record.acquisitionCost.map(fmt) ?? "—")")
+                lines.append("    Share summary: \(record.shareSummary ?? "—")")
+                lines.append("    Outcome: \(outcomeString(record.outcome))")
+            }
+        }
+
         return lines.joined(separator: "\n")
+    }
+
+    private static func summarizeDiagnostics(
+        _ diagnostics: [KIADiagnosticRecord]
+    ) -> (
+        qualifiedCount: Int,
+        excludedCount: Int,
+        reasonCounts: [String: Int]
+    ) {
+        var qualifiedCount = 0
+        var excludedCount = 0
+        var reasonCounts: [String: Int] = [:]
+
+        for record in diagnostics {
+            switch record.outcome {
+            case .qualified:
+                qualifiedCount += 1
+
+            case .excluded(let reason):
+                excludedCount += 1
+                let key = reasonString(reason)
+                reasonCounts[key, default: 0] += 1
+            }
+        }
+
+        return (qualifiedCount, excludedCount, reasonCounts)
+    }
+
+    private static func outcomeString(
+        _ outcome: KIADiagnosticOutcome
+    ) -> String {
+        switch outcome {
+        case .qualified:
+            return "qualified"
+        case .excluded(let reason):
+            return "excluded — \(reasonString(reason))"
+        }
     }
 
     private static func fmt(_ value: Decimal) -> String {
@@ -78,16 +161,30 @@ public enum KIARenderer {
         switch reason {
         case .missingDepreciation:
             return "Missing depreciation config"
-        case .missingEffectiveDate:
-            return "Missing effective/acquisition date"
+
+        case .missingProfile:
+            return "Missing profile"
+
+        case .missingCommissionDate:
+            return "Missing commission date"
+
         case .missingAcquisitionCost:
             return "Missing acquisition cost"
+
         case .belowMinimumAssetAmount(let amount):
             return "Below minimum qualifying asset amount (€450): \(fmt(amount))"
-        case .outsideTaxYear:
+
+        case .outsideTaxYear(let actualYear):
+            if let actualYear {
+                return "Outside requested tax year (actual year: \(actualYear))"
+            }
             return "Outside requested tax year"
+
         case .invalidShareConfiguration(let message):
             return "Invalid share configuration: \(message)"
+
+        case .notAssetCandidate:
+            return "Not an asset candidate"
         }
     }
 }

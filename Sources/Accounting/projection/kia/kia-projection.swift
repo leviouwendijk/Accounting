@@ -27,7 +27,8 @@ public enum KIAProjection {
             qualifyingInvestmentTotal: total,
             deduction: deduction,
             qualifiedAssets: assessed.qualified,
-            excludedAssets: assessed.excluded
+            excludedAssets: assessed.excluded,
+            diagnostics: assessed.diagnostics
         )
     }
 }
