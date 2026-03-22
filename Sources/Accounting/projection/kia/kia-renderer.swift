@@ -15,6 +15,20 @@ public enum KIARenderer {
         lines.append("Qualified assets: \(result.qualifiedAssets.count)")
         lines.append("Excluded assets: \(result.excludedAssets.count)")
 
+        let deductionByOwner = aggregateDeductionByOwner(result)
+
+        if !deductionByOwner.isEmpty {
+            lines.append("")
+            lines.append("Deduction by owner")
+            lines.append("──────────────────")
+
+            for owner in deductionByOwner {
+                lines.append(
+                    "\(owner.ownerLabel): \(fmt(owner.qualifyingAmount)) → \(fmt(owner.deductionAmount))"
+                )
+            }
+        }
+
         if diagnostics {
             let inspectedCount = result.diagnostics.count
             let candidateCount = result.diagnostics.filter { $0.wasCandidate }.count
@@ -108,6 +122,41 @@ public enum KIARenderer {
         }
 
         return lines.joined(separator: "\n")
+    }
+
+    private struct OwnerDeductionSummary: Sendable, Hashable {
+        let ownerLabel: String
+        let qualifyingAmount: Decimal
+        let deductionAmount: Decimal
+    }
+
+    private static func aggregateDeductionByOwner(
+        _ result: KIAProjectionResult
+    ) -> [OwnerDeductionSummary] {
+        guard result.qualifyingInvestmentTotal > 0 else {
+            return []
+        }
+
+        let ratio = result.deduction / result.qualifyingInvestmentTotal
+        var totalsByOwner: [String: Decimal] = [:]
+
+        for asset in result.qualifiedAssets {
+            for share in asset.shares {
+                totalsByOwner[share.ownerLabel, default: 0] += share.amount
+            }
+        }
+
+        return totalsByOwner
+            .map { ownerLabel, qualifyingAmount in
+                OwnerDeductionSummary(
+                    ownerLabel: ownerLabel,
+                    qualifyingAmount: qualifyingAmount,
+                    deductionAmount: qualifyingAmount * ratio
+                )
+            }
+            .sorted { lhs, rhs in
+                lhs.ownerLabel < rhs.ownerLabel
+            }
     }
 
     private static func summarizeDiagnostics(
