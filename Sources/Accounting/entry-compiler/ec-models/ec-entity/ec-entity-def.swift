@@ -9,6 +9,9 @@ public struct EntityDef: Sendable, Codable {
     public var depreciationDraft: DepreciationConfigDraft?
     public var ownerEquity: OwnerEquity?
 
+    public var kia: KIAConfigAssetAllocation?
+    public var kiaDraft: KIADraft?
+
     public init(
         key: EntityKey,
         displayName: String? = nil,
@@ -16,7 +19,9 @@ public struct EntityDef: Sendable, Codable {
         profile: EntityUnitProfile? = nil,
         depreciation: DepreciationConfig? = nil,
         depreciationDraft: DepreciationConfigDraft? = nil,
-        ownerEquity: OwnerEquity? = nil
+        ownerEquity: OwnerEquity? = nil,
+        kia: KIAConfigAssetAllocation? = nil,
+        kiaDraft: KIADraft? = nil,
     ) {
         self.key = key
         self.displayName = displayName
@@ -25,5 +30,7 @@ public struct EntityDef: Sendable, Codable {
         self.depreciation = depreciation
         self.depreciationDraft = depreciationDraft
         self.ownerEquity = ownerEquity
+        self.kia = kia
+        self.kiaDraft = kiaDraft
     }
 }

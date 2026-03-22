@@ -41,6 +41,7 @@ public extension EntryCompilerParsing {
             var profile: EntityUnitProfile?
             var details: String?
             var dep: DepreciationConfigDraft?
+            var kiaDraft: KIADraft?
 
             while current != .rBrace && current != .eof {
                 switch current {
@@ -76,6 +77,10 @@ public extension EntryCompilerParsing {
 
                 case .ident("depreciation"), .keyword("depreciation"):
                     dep = try parseDepreciationBlock(meta: &metadata, tz: defaultTZ)
+
+                case .ident("kia"), .keyword("kia"):
+                    advance()
+                    kiaDraft = try parseKIABlock()
 
                 default:
                     throw ParserError.unexpectedToken(
@@ -122,7 +127,9 @@ public extension EntryCompilerParsing {
                 metadata: mergedMeta,
                 profile: profile,
                 depreciation: nil,
-                depreciationDraft: dep
+                depreciationDraft: dep,
+                kia: nil,
+                kiaDraft: kiaDraft,
             ))
         }
 
