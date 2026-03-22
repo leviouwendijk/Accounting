@@ -67,6 +67,7 @@ public extension EntryCompilerParsing {
                     metadata = try parseStringMapBlock(named: "metadata")
 
                 case .ident("profile"), .keyword("profile"):
+                    advance()
                     profile = try parseEntityUnitProfileBlock(tz: defaultTZ)
                     core.trace("  profile { … }")
 
@@ -79,7 +80,7 @@ public extension EntryCompilerParsing {
                 default:
                     throw ParserError.unexpectedToken(
                         current, 
-                        expected: "use alias / of / metadata / details / depreciation", 
+                        expected: "use alias / of / metadata / profile / details / depreciation", 
                         at: loc()
                     )
                 }
