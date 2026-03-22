@@ -22,7 +22,8 @@ public enum TaxonomyRenderer {
                 TaxonomyShared.renderPresentationLink(
                     link,
                     labelsByConcept: output.bootstrap.labelsByConcept,
-                    factsByConcept: output.flattenedFacts,
+                    factsByConcept: output.factsByConcept,
+                    source: output.bootstrap.source,
                     pruneEmpty: options.pruneEmptyPresentationBranches
                 )
                 print("")
