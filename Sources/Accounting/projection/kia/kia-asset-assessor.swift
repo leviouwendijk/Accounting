@@ -189,6 +189,7 @@ public enum KIAAssetAssessor {
             let asset = KIAQualifiedAsset(
                 entityKey: key,
                 displayName: displayName,
+                details: normalizedDetails(from: def),
                 acquisitionDate: commissionDate,
                 totalAmount: acquisitionCost,
                 shares: shares
@@ -370,5 +371,22 @@ public enum KIAAssetAssessor {
         }
 
         return ref.alias.string
+    }
+
+    private static func normalizedDetails(
+        from entity: EntityDef
+    ) -> String? {
+        guard let raw = entity.metadata["details"]?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+              !raw.isEmpty
+        else {
+            return nil
+        }
+
+        return raw
+            .split(whereSeparator: \.isNewline)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
     }
 }

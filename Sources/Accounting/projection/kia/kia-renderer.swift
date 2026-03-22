@@ -55,6 +55,9 @@ public enum KIARenderer {
             for asset in result.qualifiedAssets {
                 lines.append("\(asset.displayName)")
                 lines.append("    Key: \(asset.entityKey.identifier(displaying: .fullchain))")
+                if let details = asset.details, !details.isEmpty {
+                    lines.append("    Details: \(details)")
+                }
                 lines.append("    Date: \(dateString(asset.acquisitionDate))")
                 lines.append("    Total amount: \(fmt(asset.totalAmount))")
                 lines.append("    Qualifying amount: \(fmt(asset.qualifyingAmount))")
