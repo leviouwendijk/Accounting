@@ -11,6 +11,15 @@ extension TaxonomyShared {
         let childConcepts = Set(link.arcs.map(\.child))
         let rootConcepts = link.locators.keys.filter { !childConcepts.contains($0) }.sorted()
 
+        let normalizedFactsByConcept = Dictionary(
+            uniqueKeysWithValues: factsByConcept.map { key, value in
+                (
+                    normalizedTaxonomyConceptKey(key),
+                    value
+                )
+            }
+        )
+
         print("presentation:")
 
         if rootConcepts.isEmpty {
@@ -26,7 +35,7 @@ extension TaxonomyShared {
                     locatorLabel: root,
                     link: link,
                     orderedChildrenByParent: orderedChildrenByParent,
-                    flattenedFactsByConcept: factsByConcept
+                    flattenedFactsByConcept: normalizedFactsByConcept
                ) {
                 continue
             }
@@ -39,7 +48,7 @@ extension TaxonomyShared {
                 locatorLabel: root,
                 link: link,
                 labelsByConcept: labelsByConcept,
-                factsByConcept: factsByConcept,
+                factsByConcept: normalizedFactsByConcept,
                 orderedChildrenByParent: orderedChildrenByParent,
                 pruneEmpty: pruneEmpty,
                 indent: 0,
@@ -63,6 +72,15 @@ extension TaxonomyShared {
         let childConcepts = Set(link.arcs.map(\.child))
         let rootConcepts = link.locators.keys.filter { !childConcepts.contains($0) }.sorted()
 
+        let normalizedFactsByConcept = Dictionary(
+            uniqueKeysWithValues: factsByConcept.map { key, value in
+                (
+                    normalizedTaxonomyConceptKey(key),
+                    value
+                )
+            }
+        )
+
         print("presentation:")
 
         if rootConcepts.isEmpty {
@@ -78,7 +96,7 @@ extension TaxonomyShared {
                     locatorLabel: root,
                     link: link,
                     orderedChildrenByParent: orderedChildrenByParent,
-                    dimensionalFactsByConcept: factsByConcept
+                    dimensionalFactsByConcept: normalizedFactsByConcept
                ) {
                 continue
             }
@@ -91,7 +109,7 @@ extension TaxonomyShared {
                 locatorLabel: root,
                 link: link,
                 labelsByConcept: labelsByConcept,
-                factsByConcept: factsByConcept,
+                factsByConcept: normalizedFactsByConcept,
                 orderedChildrenByParent: orderedChildrenByParent,
                 source: source,
                 pruneEmpty: pruneEmpty,
@@ -138,19 +156,39 @@ private extension TaxonomyShared {
         return out
     }
 
+    static func normalizedPresentationConcept(
+        locatorLabel: String,
+        link: TaxonomyPresentationLink
+    ) -> String? {
+        guard let href = link.locators[locatorLabel] else {
+            return nil
+        }
+
+        return conceptNameExtraction(from: href).normalizedName
+    }
+
+    static func displayPresentationConcept(
+        locatorLabel: String,
+        link: TaxonomyPresentationLink
+    ) -> String? {
+        guard let href = link.locators[locatorLabel] else {
+            return nil
+        }
+
+        return conceptNameExtraction(from: href).localName
+    }
+
     static func shouldRenderPresentationNode(
         locatorLabel: String,
         link: TaxonomyPresentationLink,
         orderedChildrenByParent: [String: [TaxonomyPresentationArc]],
         flattenedFactsByConcept: [String: TaxonomyComputedFact]
     ) -> Bool {
-        guard let href = link.locators[locatorLabel] else {
-            return false
-        }
-
-        let concept = conceptName(from: href)
-
-        if flattenedFactsByConcept[concept] != nil {
+        if let concept = normalizedPresentationConcept(
+            locatorLabel: locatorLabel,
+            link: link
+        ),
+        flattenedFactsByConcept[concept] != nil {
             return true
         }
 
@@ -174,13 +212,12 @@ private extension TaxonomyShared {
         orderedChildrenByParent: [String: [TaxonomyPresentationArc]],
         dimensionalFactsByConcept: [String: [TaxonomyComputedMappedFact]]
     ) -> Bool {
-        guard let href = link.locators[locatorLabel] else {
-            return false
-        }
-
-        let concept = conceptName(from: href)
-
-        if let facts = dimensionalFactsByConcept[concept], !facts.isEmpty {
+        if let concept = normalizedPresentationConcept(
+            locatorLabel: locatorLabel,
+            link: link
+        ),
+        let facts = dimensionalFactsByConcept[concept],
+        !facts.isEmpty {
             return true
         }
 
@@ -224,15 +261,22 @@ private extension TaxonomyShared {
 
         visited.insert(locatorLabel)
 
-        guard let href = link.locators[locatorLabel] else {
+        guard let normalizedConcept = normalizedPresentationConcept(
+            locatorLabel: locatorLabel,
+            link: link
+        ) else {
             return
         }
 
-        let concept = conceptName(from: href)
-        let label = labelsByConcept[concept] ?? concept
+        let displayConcept = displayPresentationConcept(
+            locatorLabel: locatorLabel,
+            link: link
+        ) ?? normalizedConcept
+
+        let label = labelsByConcept[displayConcept] ?? displayConcept
         let prefix = String(repeating: "    ", count: indent)
 
-        if let fact = factsByConcept[concept] {
+        if let fact = factsByConcept[normalizedConcept] {
             print("\(prefix)\(label) = \(decimalString(fact.amount))")
         } else {
             print("\(prefix)\(label)")
@@ -279,15 +323,22 @@ private extension TaxonomyShared {
 
         visited.insert(locatorLabel)
 
-        guard let href = link.locators[locatorLabel] else {
+        guard let normalizedConcept = normalizedPresentationConcept(
+            locatorLabel: locatorLabel,
+            link: link
+        ) else {
             return
         }
 
-        let concept = conceptName(from: href)
-        let label = labelsByConcept[concept] ?? concept
+        let displayConcept = displayPresentationConcept(
+            locatorLabel: locatorLabel,
+            link: link
+        ) ?? normalizedConcept
+
+        let label = labelsByConcept[displayConcept] ?? displayConcept
         let prefix = String(repeating: "    ", count: indent)
 
-        if let facts = factsByConcept[concept], !facts.isEmpty {
+        if let facts = factsByConcept[normalizedConcept], !facts.isEmpty {
             let total = facts.reduce(Decimal.zero) { partial, fact in
                 partial + fact.amount
             }
