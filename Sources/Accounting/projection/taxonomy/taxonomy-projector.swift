@@ -69,6 +69,13 @@ public enum TaxonomyProjector {
             factsByKey
         )
 
+        let diagnostics = TaxonomyProjectionDiagnosticsBuilder.build(
+            bootstrap: bootstrap,
+            genericMapping: loadedMapping,
+            presentation: presentation,
+            currentBalances: balances
+        )
+
         return .init(
             profile: profile,
             bootstrap: bootstrap,
@@ -77,7 +84,8 @@ public enum TaxonomyProjector {
             balances: balances,
             factsByKey: factsByKey,
             factsByConcept: factsByConcept,
-            flattenedFacts: flattenedFacts
+            flattenedFacts: flattenedFacts,
+            diagnostics: diagnostics
         )
     }
 
@@ -152,6 +160,14 @@ public enum TaxonomyProjector {
             currentFactsByKey
         )
 
+        // diagnostics based on current
+        let diagnostics = TaxonomyProjectionDiagnosticsBuilder.build(
+            bootstrap: bootstrap,
+            genericMapping: loadedMapping,
+            presentation: presentation,
+            currentBalances: currentBalances
+        )
+
         let previousBalances = output.assembled.previous.map {
             TaxonomyNativeBalanceExtractor.balances(
                 period: $0,
@@ -188,7 +204,8 @@ public enum TaxonomyProjector {
             previousFactsByConcept: previousFactsByConcept,
             previousFlattenedFacts: previousFlattenedFacts,
             currentRange: output.assembled.current.range,
-            previousRange: output.assembled.previous?.range
+            previousRange: output.assembled.previous?.range,
+            diagnostics: diagnostics
         )
     }
 

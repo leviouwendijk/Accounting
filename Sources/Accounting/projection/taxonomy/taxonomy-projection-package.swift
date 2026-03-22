@@ -12,6 +12,8 @@ public struct TaxonomyCompileProjectionOutput: Sendable {
     public let factsByConcept: [String: [TaxonomyComputedMappedFact]]
     public let flattenedFacts: [String: TaxonomyComputedFact]
 
+    public let diagnostics: TaxonomyProjectionDiagnostics?
+
     public init(
         profile: String,
         bootstrap: LoadedTaxonomy,
@@ -20,7 +22,8 @@ public struct TaxonomyCompileProjectionOutput: Sendable {
         balances: [String: Decimal],
         factsByKey: [TaxonomyMappedFactKey: TaxonomyComputedMappedFact],
         factsByConcept: [String: [TaxonomyComputedMappedFact]],
-        flattenedFacts: [String: TaxonomyComputedFact]
+        flattenedFacts: [String: TaxonomyComputedFact],
+        diagnostics: TaxonomyProjectionDiagnostics? = nil
     ) {
         self.profile = profile
         self.bootstrap = bootstrap
@@ -30,6 +33,7 @@ public struct TaxonomyCompileProjectionOutput: Sendable {
         self.factsByKey = factsByKey
         self.factsByConcept = factsByConcept
         self.flattenedFacts = flattenedFacts
+        self.diagnostics = diagnostics
     }
 }
 
@@ -52,6 +56,8 @@ public struct TaxonomyPeriodProjectionOutput: Sendable {
     public let currentRange: PeriodWindow
     public let previousRange: PeriodWindow?
 
+    public let diagnostics: TaxonomyProjectionDiagnostics?
+
     public init(
         profile: String,
         bootstrap: LoadedTaxonomy,
@@ -66,7 +72,8 @@ public struct TaxonomyPeriodProjectionOutput: Sendable {
         previousFactsByConcept: [String: [TaxonomyComputedMappedFact]]?,
         previousFlattenedFacts: [String: TaxonomyComputedFact]?,
         currentRange: PeriodWindow,
-        previousRange: PeriodWindow?
+        previousRange: PeriodWindow?,
+        diagnostics: TaxonomyProjectionDiagnostics? = nil
     ) {
         self.profile = profile
         self.bootstrap = bootstrap
@@ -82,5 +89,6 @@ public struct TaxonomyPeriodProjectionOutput: Sendable {
         self.previousFlattenedFacts = previousFlattenedFacts
         self.currentRange = currentRange
         self.previousRange = previousRange
+        self.diagnostics = diagnostics
     }
 }
