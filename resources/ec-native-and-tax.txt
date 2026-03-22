@@ -1,0 +1,303 @@
+> ~/myworkdir/accounting/accounting-hondenmeesters $ ec period year --anchor 2025-01-01 --projection taxonomy --taxonomy bd_ihz_2025
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1331): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1828): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1825): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1813): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1831): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1816): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1819): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1425): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1369): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1395): 1
+
+1 Jan 2025 → 31 Dec 2025
+
+presentation:
+bd-abstr_ProfitAndLossTitle
+    Saldo fiscale winstberekening = -265423.6
+    Resultaat gewone bedrijfsuitoefening fiscaal = -265423.6
+    bd-abstr_BusinessRevenuesTitle
+        Totaal bedrijfsopbrengsten fiscaal = -375802.92
+        Netto omzet fiscaal = -375802.92
+    bd-abstr_BusinessExpenditureTitle
+        Totaal bedrijfslasten fiscaal = 110400.89
+        bd-abstr_RawAndAncillaryMaterialsAndOutsourcedWorkTitle
+            Kosten grond- en hulpstoffen, inkoopprijs van de verkopen fiscaal = 843.39
+        bd-abstr_DepreciationsTitle
+            Andere vaste bedrijfsmiddelen afschrijving = 5704.38
+        bd-abstr_BusinessCostsOtherTitle
+            Auto- en transportkosten fiscaal = 12817.52
+            Verkoopkosten fiscaal = 34476.54
+            Andere kosten fiscaal = 20016.29
+    bd-abstr_BusinessFinancialResultTitle
+        Totaal financiële baten en lasten fiscaal = -21.57
+        Opbrengsten banktegoeden fiscaal = -7.19
+
+presentation:
+bd-abstr_BalanceSheetAssetsTitle
+    Totaal activa fiscaal = 242443.52
+    bd-abstr_AssetsNoncurrentTitle
+        bd-abstr_TangibleFixedAssetsTitle
+            Totaal materiële vaste activa fiscaal = 141402.56
+            Andere vaste bedrijfsmiddelen fiscaal = 106051.92
+            Andere vaste bedrijfsmiddelen aanschafwaarde fiscaal = 45416.4
+    bd-abstr_AssetsCurrentTitle
+        bd-abstr_StockCurrentAssetsTitle
+            Totaal voorraden fiscaal = 7891.56
+            Voorraden, exclusief onderhanden werk = 5261.04
+        Liquide middelen fiscaal = 93149.4
+
+presentation:
+bd-abstr_BalanceSheetLiabilitiesTile
+    Totaal passiva fiscaal = -276123.84
+    bd-abstr_BusinessCapitalTitle
+        Eigen vermogen/fiscaal ondernemingsvermogen = -243516.32
+        Ondernemingsvermogen exclusief fiscale reserves fiscaal = -182637.24
+    bd-abstr_ShortTermDebtsTitle
+        Totaal kortlopende schulden = -32607.52
+        Schulden omzetbelasting fiscaal = -16303.76
+
+presentation:
+bd-abstr_BusinessProfitTitle
+    bd-abstr_CapitalComparisonTitle
+        Stortingen van kapitaal = -4747.78
+        Mutaties/onttrekkingen kapitaal in het boekjaar = 176445.88
+
+> ~/myworkdir/accounting/accounting-hondenmeesters $
+
+
+> ~/myworkdir/accounting/accounting-hondenmeesters $ ec period year --anchor 2025-01-01
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1331): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1828): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1825): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1813): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1819): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1831): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1816): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1425): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1369): 1
+
+! WARNING: Placeholder detected
+    kind: "service"
+    lowered alias: "service_placeholder"
+placeholders in entry (id: 1395): 1
+
+1 Jan 2025 → 31 Dec 2025
+
+Balance Sheet (current)
+———————————————————————
+• Assets
+——————
+    • Immateriële vaste activa  0
+    • Materiële vaste activa  17675.32
+      • Inventaris  13633.98
+        • Verkrijgings- of vervaardigingsprijs  18115.7
+          • Beginbalans (overname eindsaldo vorig jaar)  16843.6
+          • Investeringen  1272.1
+        • Cumulatieve afschrijvingen en waardeverminderingen  4481.72
+          • Beginbalans (overname eindsaldo vorig jaar)  1966.35
+          • Afschrijvingen  2515.37
+      • Automobielen en overige transportmiddelen  4041.34
+        • Verkrijgings- of vervaardigingsprijs  4592.5
+          • Beginbalans (overname eindsaldo vorig jaar)  4592.5
+        • Cumulatieve afschrijvingen en waardeverminderingen  551.16
+          • Beginbalans (overname eindsaldo vorig jaar)  214.34
+          • Afschrijvingen  336.82
+    • Vastgoedbeleggingen  0
+    • Financiële vaste activa  0
+• Voorraden  1315.26
+  • Voorraad grond- en hulpstoffen  1044.12
+    • Voorraad grond- en hulpstoffen, bruto  1044.12
+  • Gereed product  13.28
+    • Gereed product, bruto  13.28
+  • Handelsgoederen  257.86
+    • Handelsgoederen, bruto  257.86
+    • Onderhanden projecten (activa)  0
+    • Vorderingen  0
+    • Effecten (kortlopend)  0
+    • Liquide middelen  15524.9
+      • Kasmiddelen  2558
+        • Kas  2558
+      • Tegoeden bij banken  12966.9
+        • Rekening-courant bank  10461.6
+        • (Bedrijfs)spaarrekening  2505.3
+  — Subtotal Assets: 34515.48
+
+• Equity
+——————
+• Groepsvermogen - Eigen vermogen - Kapitaal  30439.54
+  • Eigen vermogen onderneming natuurlijke personen  30439.54
+    • Ondernemingsvermogen exclusief fiscale reserves fiscaal  116288.59
+      • Beginbalans (overname eindsaldo vorig jaar)  27837.66
+      • Aandeel in de overwinst  88450.93
+    • Privé-stortingen  2373.89
+      • Privé-storting kapitaal  2373.89
+    • Privé-opnamen  88222.94
+      • Privé-opname kapitaal  86002.62
+      • Privé-gebruik materiële vaste activa  1809.48
+      • Privé-aandeel in zakelijke lasten  410.84
+  — Subtotal Equity: 30439.54
+
+• Liabilities
+———————————
+• Voorzieningen  0
+    • Langlopende schulden  0
+    • Kortlopende schulden  4075.94
+      • Belastingen en premies sociale verzekeringen  4075.94
+        • Te betalen Omzetbelasting  4075.94
+          • Beginbalans af te dragen omzetbelasting  4835.04
+          • 1a. Omzetbelasting leveringen/diensten belast met hoog tarief  26306.15
+          • 1d. Omzetbelasting over privégebruik  707.49
+          • 5b. Voorbelasting  2580.74
+          • Afgedragen omzetbelasting  25192
+  — Subtotal Liabilities: 4075.94
+
+== Summary ==
+Subtotal Equity + Liabilities: 34515.48
+
+Check: ( Assets ==  Equity + Liabilities )? → ( 34515.48 == 34515.48 )
+
+Income Statement (current)
+——————————————————————————
+• WINST- EN VERLIESREKENING  -176901.86
+  • Netto-omzet  125267.64
+    • Netto-omzet uit leveringen geproduceerde goederen  954.72
+      • 1a. Netto-omzet uit leveringen geproduceerde goederen belast met hoog tarief  954.72
+    • Netto-omzet uit verkoop van handelsgoederen  198.38
+      • 1a. Netto-omzet uit verkoop van handelsgoederen belast met hoog tarief  198.38
+    • Opbrengsten uit het verlenen van diensten  124114.54
+      • 1a. Netto-omzet uit verleende diensten belast met hoog tarief  124114.54
+  • Wijziging voorraden  0
+  • Kostprijs van de omzet  281.13
+    • Kosten van grond- en hulpstoffen / halffabrikaten  145.61
+      • Kosten van grond- en hulpstoffen, ingekocht in Nederland  145.61
+    • Inkoopwaarde handelsgoederen  135.52
+      • Inkoopwaarde handelsgoederen  135.52
+  • Overige bedrijfsopbrengsten  0
+  • Lasten uit hoofde van personeelsbeloningen  0
+  • Afschrijvingen op immateriële en materiële vaste activa  2852.19
+    • Afschrijvingen op materiële vaste activa  2852.19
+      • Afschrijvingen Automobielen en overige transportmiddelen  336.82
+      • Afschrijvingen Inventaris  2515.37
+  • Waardeveranderingen van immateriële en materiële vaste activa en vastgoedbeleggingen  0
+  • Overige waardeveranderingen  0
+  • Overige bedrijfskosten  33690.58
+    • Exploitatie- en machinekosten  355.7
+      • Kleine aanschaffingen inventaris  313.23
+      • Gereedschapskosten  42.47
+    • Verkoop gerelateerde kosten  17238.27
+      • Reclame- en advertentiekosten  16863.53
+      • Vrachtkosten  55.55
+      • Websitekosten  308.34
+      • Overige verkoopkosten  10.85
+    • Autokosten en andere vervoermiddelen  6375.33
+      • Brandstofkosten auto's en andere vervoermiddelen  2546.66
+      • Reparatie en onderhoud auto's en andere vervoermiddelen  2057.46
+      • Assurantiepremie auto's en andere vervoermiddelen  1119.87
+      • Motorrijtuigenbelasting auto's en andere vervoermiddelen  972
+      • Privé-gebruik auto's en andere vervoermiddelen  1225
+      • Parkeerkosten auto's en andere vervoermiddelen  392.95
+      • Overige autokosten en andere vervoermiddelen  511.39
+    • Transportkosten  33.43
+      • Afhandelingskosten import  23.8
+      • Overige transportkosten  9.63
+    • Kantoorkosten  2089.39
+      • Kantoorbenodigdheden  321.43
+      • Porti  438.7
+      • Telefoonkosten  89.02
+      • Drukwerk  28.35
+      • Kleine aanschaffingen kantoorinventaris  383.42
+      • Vakliteratuur  477.22
+      • Kosten software abonnementen  70.81
+      • Communicatie  280.44
+    • Assurantiekosten  1516.65
+      • Schadevergoedingen betaald  1516.65
+    • Administratieve lasten  835.42
+      • Bankkosten  718.42
+      • Boetes en verhogingen belastingen en premies sociale verzekeringen  117
+    • Andere kosten  5246.39
+      • Algemene kosten  5246.39
+  • Opbrengst van vorderingen die tot de vaste activa behoren en van effecten  0
+  • Vrijval herwaarderingsreserve  0
+  • Waardeveranderingen van financiële vaste activa en van effecten  0
+  • Financiële baten en lasten  7.19
+    • Rentebaten en soortgelijke opbrengsten  7.19
+      • Rentebaten bankrekeningen  7.19
+  • Nettoresultaat  88450.93
+    • Nettoresultaat (EZ-VOF)  88450.93
+      • Netto resultaat (EZ-VOF)  88450.93
+> ~/myworkdir/accounting/accounting-hondenmeesters $
