@@ -4,6 +4,7 @@ public enum KIAAssetAssessor {
     public static func assess(
         entities: EntityStore,
         taxYear: Int,
+        config: KIAConfig,
         calendar: Calendar = Calendar(identifier: .gregorian)
     ) -> (qualified: [KIAQualifiedAsset], excluded: [KIAExcludedAsset]) {
         var qualified: [KIAQualifiedAsset] = []
@@ -35,6 +36,16 @@ public enum KIAAssetAssessor {
             guard totalAmount > 0 else {
                 excluded.append(
                     .init(entityKey: key, reason: .missingAcquisitionCost)
+                )
+                continue
+            }
+
+            guard totalAmount >= config.minimumAssetAmount else {
+                excluded.append(
+                    .init(
+                        entityKey: key,
+                        reason: .belowMinimumAssetAmount(totalAmount)
+                    )
                 )
                 continue
             }

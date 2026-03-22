@@ -13,15 +13,27 @@ public enum KIACalculator {
             let lowerOK = qualifyingInvestmentTotal >= bracket.lowerInclusive
             let upperOK = bracket.upperInclusive.map { qualifyingInvestmentTotal <= $0 } ?? true
 
-            guard lowerOK && upperOK else { continue }
+            guard lowerOK && upperOK else {
+                continue
+            }
 
+            // Declining bracket:
+            // fixed deduction minus rate * excess above baseAmount
+            if let fixed = bracket.fixedDeduction,
+               let rate = bracket.rate,
+               let base = bracket.baseAmount {
+                let excess = qualifyingInvestmentTotal - base
+                return fixed + (rate * excess)
+            }
+
+            // Flat fixed bracket
             if let fixed = bracket.fixedDeduction {
                 return fixed
             }
 
+            // Straight percentage bracket
             if let rate = bracket.rate {
-                let base = bracket.baseAmount ?? qualifyingInvestmentTotal
-                return base * rate
+                return qualifyingInvestmentTotal * rate
             }
         }
 
