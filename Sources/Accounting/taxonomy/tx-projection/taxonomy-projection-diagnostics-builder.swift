@@ -114,28 +114,26 @@ public enum TaxonomyProjectionDiagnosticsBuilder {
             }
         )
 
-        return grouped
-            .compactMap { sourceIdentifier, mappings in
-                let targets = Array(
-                    Set(
-                        mappings.map { mapping in
-                            mapping.targetConcept
-                        }
-                    )
+        return grouped.compactMap { sourceIdentifier, mappings in
+            let targets = Array(
+                Set(
+                    mappings.map { mapping in
+                        mapping.targetConcept
+                    }
                 )
-                .sorted()
+            )
+            .sorted()
 
-                guard targets.count > 1 else {
-                    return nil
-                }
+            guard targets.count > 1 else {
+                return nil
+            }
 
-                return TaxonomySourceExpansion(
-                    sourceIdentifier: sourceIdentifier,
-                    targets: targets
-                )
-            }
-            .sorted { lhs, rhs in
-                lhs.sourceIdentifier < rhs.sourceIdentifier
-            }
+            return TaxonomySourceExpansion(
+                sourceIdentifier: sourceIdentifier,
+                targets: targets
+            )
+        }.sorted { lhs, rhs in
+            lhs.sourceIdentifier < rhs.sourceIdentifier
+        }
     }
 }
