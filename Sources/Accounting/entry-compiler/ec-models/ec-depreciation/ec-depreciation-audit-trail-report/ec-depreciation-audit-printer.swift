@@ -128,7 +128,11 @@ public extension DepreciationAuditReport {
             if opts.showPerMonthAmounts {
                 var byMonth: [String: [DepreciationAuditItem]] = [:]
                 for item in items {
-                    let key = monthKey(for: item.periodStart, calendar: cal)
+                    let postingMonth = DepreciationPostingWindow.postingMonthStart(
+                        for: item,
+                        calendar: cal
+                    )
+                    let key = monthKey(for: postingMonth, calendar: cal)
                     byMonth[key, default: []].append(item)
                 }
 

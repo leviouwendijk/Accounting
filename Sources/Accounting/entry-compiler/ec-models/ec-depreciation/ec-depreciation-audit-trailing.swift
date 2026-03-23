@@ -64,10 +64,21 @@ public extension Array where Element == ResolvedEntry {
 
         var items: [DepreciationAuditItem] = []
 
+        // func qkey(_ d: Date) -> QKey {
+        //     let c = calendar.dateComponents([.year, .month], from: d)
+        //     let m = (c.month ?? 1)
+        //     return QKey(y: c.year ?? 1970, q: ((m - 1) / 3) + 1)
+        // }
+
         func qkey(_ d: Date) -> QKey {
             let c = calendar.dateComponents([.year, .month], from: d)
             let m = (c.month ?? 1)
             return QKey(y: c.year ?? 1970, q: ((m - 1) / 3) + 1)
+        }
+
+        func qkey(for slice: DepreciationSlice) -> QKey {
+            let postingDate = calendar.date(byAdding: .day, value: -1, to: slice.periodEnd) ?? slice.periodEnd
+            return qkey(postingDate)
         }
 
         var quarterExpected: [QKey: Decimal] = [:]
@@ -79,14 +90,24 @@ public extension Array where Element == ResolvedEntry {
 
             // Precompute quarter sums
             if granularity == .monthly || granularity == .quarterly {
+                // for s in slices {
+                //     quarterExpected[qkey(s.periodStart), default: 0] += s.depreciation
+                //     let (act, _) = sumForPeriod(
+                //         entity: ekey, account: account,
+                //         from: s.periodStart, to: s.periodEnd,
+                //         dateOf: dateOf
+                //     )
+                //     quarterActual[qkey(s.periodStart), default: 0] += act
+                // }
                 for s in slices {
-                    quarterExpected[qkey(s.periodStart), default: 0] += s.depreciation
+                    let k = qkey(for: s)
+                    quarterExpected[k, default: 0] += s.depreciation
                     let (act, _) = sumForPeriod(
                         entity: ekey, account: account,
                         from: s.periodStart, to: s.periodEnd,
                         dateOf: dateOf
                     )
-                    quarterActual[qkey(s.periodStart), default: 0] += act
+                    quarterActual[k, default: 0] += act
                 }
             }
 
@@ -109,7 +130,8 @@ public extension Array where Element == ResolvedEntry {
                 } else if delta <= tolerance {
                     coverage = .withinTolerance
                 } else if granularity == .monthly && tolerateAggregateIntraQuarter {
-                    let k = qkey(s.periodStart)
+                    // let k = qkey(s.periodStart)
+                    let k = qkey(for: s)
                     if let qExp = quarterExpected[k], let qAct = quarterActual[k],
                        (qAct - qExp).magnitude <= tolerance {
                         coverage = .aggregateCovered
