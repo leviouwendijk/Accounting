@@ -41,57 +41,28 @@ extension TaxonomyProjection {
         var groupedAmountByKey: [TaxonomyMappedFactKey: Decimal] = [:]
         var groupedCodesByKey: [TaxonomyMappedFactKey: Set<String>] = [:]
 
-        let mappingsBySource = Dictionary(
-            grouping: mappings,
-            by: \.matchedCode
-        )
-
-        for (matchedCode, amount) in rgsBalances.sorted(by: { $0.key < $1.key }) {
+        for mapping in mappings {
+            let amount = rgsBalances[mapping.matchedCode] ?? 0
             guard amount != 0 else {
                 continue
             }
 
-            let matched = mappingsBySource[matchedCode, default: []]
-
-            if !matched.isEmpty {
-                print("! TAXONOMY SOURCE MATCH")
-                print("    source: \(matchedCode)")
-                print("    amount: \(amount)")
-                print("    matched mappings: \(matched.count)")
-
-                for mapping in matched {
-                    let dimensions = TaxonomyShared.sortDimensions(
-                        mapping.dimensions.map {
-                            TaxonomyDimensionBinding(
-                                axis: $0.axis,
-                                member: $0.member
-                            )
-                        }
+            let dimensions = TaxonomyShared.sortDimensions(
+                mapping.dimensions.map {
+                    TaxonomyDimensionBinding(
+                        axis: $0.axis,
+                        member: $0.member
                     )
-
-                    print("        -> concept: \(mapping.targetConcept)")
-                    print("           dimensions: \(dimensions)")
                 }
-            }
+            )
 
-            for mapping in matched {
-                let dimensions = TaxonomyShared.sortDimensions(
-                    mapping.dimensions.map {
-                        TaxonomyDimensionBinding(
-                            axis: $0.axis,
-                            member: $0.member
-                        )
-                    }
-                )
+            let key = TaxonomyMappedFactKey(
+                concept: mapping.targetConcept,
+                dimensions: dimensions
+            )
 
-                let key = TaxonomyMappedFactKey(
-                    concept: mapping.targetConcept,
-                    dimensions: dimensions
-                )
-
-                groupedAmountByKey[key, default: 0] += amount
-                groupedCodesByKey[key, default: []].insert(matchedCode)
-            }
+            groupedAmountByKey[key, default: 0] += amount
+            groupedCodesByKey[key, default: []].insert(mapping.matchedCode)
         }
 
         var out: [TaxonomyMappedFactKey: TaxonomyComputedMappedFact] = [:]

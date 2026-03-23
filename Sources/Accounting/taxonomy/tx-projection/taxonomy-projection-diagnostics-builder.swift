@@ -5,17 +5,18 @@ public enum TaxonomyProjectionDiagnosticsBuilder {
         bootstrap: LoadedTaxonomy,
         genericMapping: LoadedTaxonomyGenericMapping,
         presentation: [String],
-        currentBalances: [String: Decimal]
+        currentBalances: [String: Decimal],
+        canonicalMappings: [TaxonomyCanonicalResolvedMapping]
     ) -> TaxonomyProjectionDiagnostics {
-        let accountLookup = TaxonomyProjection.makeAccountLookup(
-            identifiers: Array(currentBalances.keys),
-            codes: Array(currentBalances.keys)
-        )
+        // let accountLookup = TaxonomyProjection.makeAccountLookup(
+        //     identifiers: Array(currentBalances.keys),
+        //     codes: Array(currentBalances.keys)
+        // )
 
-        let canonicalMappings = TaxonomyProjection.canonicalizeMappings(
-            genericMapping.resolvedMappings,
-            lookup: accountLookup
-        )
+        // let canonicalMappings = TaxonomyProjection.canonicalizeMappings(
+        //     genericMapping.resolvedMappings,
+        //     lookup: accountLookup
+        // )
 
         let factsByKey = TaxonomyProjection.compileMappedFacts(
             mappings: canonicalMappings,

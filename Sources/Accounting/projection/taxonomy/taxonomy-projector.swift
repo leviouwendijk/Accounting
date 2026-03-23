@@ -35,33 +35,51 @@ public enum TaxonomyProjector {
             try? FileManager.default.removeItem(at: mappingZIPFileURL)
         }
 
-        let accountCodes = output.chart.nodes
-            .map(\.codes.code)
-            .filter { !$0.isEmpty }
+        // let accountCodes = output.chart.nodes
+        //     .map(\.codes.code)
+        //     .filter { !$0.isEmpty }
 
-        let accountLookup = TaxonomyProjection.makeAccountLookup(
-            identifiers: accountCodes,
-            codes: accountCodes
-        )
+        // let accountLookup = TaxonomyProjection.makeAccountLookup(
+        //     identifiers: accountCodes,
+        //     codes: accountCodes
+        // )
 
-        let loadedMapping = try TaxonomyLoader.loadGenericMapping(
-            zipFileURL: mappingZIPFileURL,
-            taxonomy: bootstrap
-        )
 
         // let canonicalMappings = TaxonomyProjection.canonicalizeMappings(
         //     loadedMapping.resolvedMappings,
         //     lookup: accountLookup
         // )
 
-        let canonicalMappings = dedupeCanonicalMappings(
-            TaxonomyProjection.canonicalizeMappings(
-                loadedMapping.resolvedMappings,
-                lookup: accountLookup
-            )
-        )
+        // let canonicalMappings = dedupeCanonicalMappings(
+        //     TaxonomyProjection.canonicalizeMappings(
+        //         loadedMapping.resolvedMappings,
+        //         lookup: accountLookup
+        //     )
+        // )
 
         let balances = TaxonomyNativeBalanceExtractor.balances(output)
+
+        let loadedMapping = try TaxonomyLoader.loadGenericMapping(
+            zipFileURL: mappingZIPFileURL,
+            taxonomy: bootstrap
+        )
+
+        let accountLookup = TaxonomyProjection.makeAccountLookup(
+            identifiers: Array(balances.keys),
+            codes: Array(balances.keys)
+        )
+
+        let canonicalMappingsRaw = TaxonomyProjection.canonicalizeMappings(
+            loadedMapping.resolvedMappings,
+            lookup: accountLookup
+        )
+
+        let normalization = TaxonomySourceNormalizer.normalizeCanonicalMappings(
+            canonicalMappingsRaw,
+            chart: output.chart
+        )
+
+        let canonicalMappings = normalization.kept
 
         let factsByKey = TaxonomyProjection.compileMappedFacts(
             mappings: canonicalMappings,
@@ -80,7 +98,8 @@ public enum TaxonomyProjector {
             bootstrap: bootstrap,
             genericMapping: loadedMapping,
             presentation: presentation,
-            currentBalances: balances
+            currentBalances: balances,
+            canonicalMappings: canonicalMappings
         )
 
         return .init(
@@ -130,14 +149,14 @@ public enum TaxonomyProjector {
             try? FileManager.default.removeItem(at: mappingZIPFileURL)
         }
 
-        let accountCodes = output.chart.nodes
-            .map(\.codes.code)
-            .filter { !$0.isEmpty }
+        // let accountCodes = output.chart.nodes
+        //     .map(\.codes.code)
+        //     .filter { !$0.isEmpty }
 
-        let accountLookup = TaxonomyProjection.makeAccountLookup(
-            identifiers: accountCodes,
-            codes: accountCodes
-        )
+        // let accountLookup = TaxonomyProjection.makeAccountLookup(
+        //     identifiers: accountCodes,
+        //     codes: accountCodes
+        // )
 
         let loadedMapping = try TaxonomyLoader.loadGenericMapping(
             zipFileURL: mappingZIPFileURL,
@@ -154,17 +173,35 @@ public enum TaxonomyProjector {
         //     lookup: accountLookup
         // )
 
-        let canonicalMappings = dedupeCanonicalMappings(
-            TaxonomyProjection.canonicalizeMappings(
-                loadedMapping.resolvedMappings,
-                lookup: accountLookup
-            )
-        )
+        // let canonicalMappings = dedupeCanonicalMappings(
+        //     TaxonomyProjection.canonicalizeMappings(
+        //         loadedMapping.resolvedMappings,
+        //         lookup: accountLookup
+        //     )
+        // )
 
         let currentBalances = TaxonomyNativeBalanceExtractor.balances(
             period: output.assembled.current,
             chart: output.chart
         )
+
+        let accountLookup = TaxonomyProjection.makeAccountLookup(
+            identifiers: Array(currentBalances.keys),
+            codes: Array(currentBalances.keys)
+        )
+
+        let canonicalMappingsRaw = TaxonomyProjection.canonicalizeMappings(
+            loadedMapping.resolvedMappings,
+            lookup: accountLookup
+        )
+
+        let normalization = TaxonomySourceNormalizer.normalizeCanonicalMappings(
+            canonicalMappingsRaw,
+            chart: output.chart
+        )
+
+        let canonicalMappings = normalization.kept
+
 
         let currentFactsByKey = TaxonomyProjection.compileMappedFacts(
             mappings: canonicalMappings,
@@ -184,7 +221,8 @@ public enum TaxonomyProjector {
             bootstrap: bootstrap,
             genericMapping: loadedMapping,
             presentation: presentation,
-            currentBalances: currentBalances
+            currentBalances: currentBalances,
+            canonicalMappings: canonicalMappings
         )
 
         let previousBalances = output.assembled.previous.map {
