@@ -261,8 +261,10 @@ public enum ECDocumentRenderer {
             rules: [
                 CSS.rule(":root",
                     CSS.decl("--ink", "#111111"),
-                    CSS.decl("--muted", "#555555"),
-                    CSS.decl("--paper", "#ffffff")
+                    // CSS.decl("--muted", "#555555"),
+                    CSS.decl("--paper", "#ffffff"),
+                    CSS.decl("--muted", "#6b7280"),
+                    CSS.decl("--border", "#e5e7eb"),
                 ),
                 CSS.rule("body",
                     CSS.decl("margin", "0"),
