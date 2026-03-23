@@ -186,8 +186,15 @@ extension ECDocumentRenderer {
                             }
 
                             if !document.footerLines.isEmpty || !document.administratorLines.isEmpty {
-                                HTML.div(["class": "footer-block"]) {
-                                    if !document.footerLines.isEmpty {
+                                let hasFooter = !document.footerLines.isEmpty
+                                let hasAdministrator = !document.administratorLines.isEmpty
+
+                                HTML.div([
+                                    "class": hasFooter && hasAdministrator
+                                        ? "footer-block has-divider"
+                                        : "footer-block"
+                                ]) {
+                                    if hasFooter {
                                         HTML.div(["class": "footer-column"]) {
                                             for line in document.footerLines {
                                                 HTML.div(["class": "footer-line"]) {
@@ -197,8 +204,12 @@ extension ECDocumentRenderer {
                                         }
                                     }
 
-                                    if !document.administratorLines.isEmpty {
-                                        HTML.div(["class": "footer-column administrator-column"]) {
+                                    if hasAdministrator {
+                                        HTML.div([
+                                            "class": hasFooter
+                                                ? "footer-column administrator-column"
+                                                : "footer-column"
+                                        ]) {
                                             for line in document.administratorLines {
                                                 HTML.div(["class": "administrator-line"]) {
                                                     HTML.text(line)
@@ -494,8 +505,15 @@ extension ECDocumentRenderer {
                             }
 
                             if !document.footerLines.isEmpty || !document.administratorLines.isEmpty {
-                                HTML.div(["class": "footer-block"]) {
-                                    if !document.footerLines.isEmpty {
+                                let hasFooter = !document.footerLines.isEmpty
+                                let hasAdministrator = !document.administratorLines.isEmpty
+
+                                HTML.div([
+                                    "class": hasFooter && hasAdministrator
+                                        ? "footer-block has-divider"
+                                        : "footer-block"
+                                ]) {
+                                    if hasFooter {
                                         HTML.div(["class": "footer-column"]) {
                                             for line in document.footerLines {
                                                 HTML.div(["class": "footer-line"]) {
@@ -505,8 +523,12 @@ extension ECDocumentRenderer {
                                         }
                                     }
 
-                                    if !document.administratorLines.isEmpty {
-                                        HTML.div(["class": "footer-column administrator-column"]) {
+                                    if hasAdministrator {
+                                        HTML.div([
+                                            "class": hasFooter
+                                                ? "footer-column administrator-column"
+                                                : "footer-column"
+                                        ]) {
                                             for line in document.administratorLines {
                                                 HTML.div(["class": "administrator-line"]) {
                                                     HTML.text(line)

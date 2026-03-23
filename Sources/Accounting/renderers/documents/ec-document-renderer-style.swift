@@ -72,7 +72,8 @@ extension ECDocumentRenderer {
                     CSS.rule(".footer-column",
                         CSS.decl("min-width", "0")
                     ),
-                    CSS.rule(".administrator-column",
+                    CSS.rule(
+                        ".footer-block.has-divider .administrator-column",
                         CSS.decl("padding-left", "24px"),
                         CSS.decl("border-left", "1px solid var(--border)")
                     ),
