@@ -135,15 +135,6 @@ public enum TaxonomyProjector {
             try? FileManager.default.removeItem(at: mappingZIPFileURL)
         }
 
-        // let accountCodes = output.chart.nodes
-        //     .map(\.codes.code)
-        //     .filter { !$0.isEmpty }
-
-        // let accountLookup = TaxonomyProjection.makeAccountLookup(
-        //     identifiers: accountCodes,
-        //     codes: accountCodes
-        // )
-
         let loadedMapping = try TaxonomyLoader.loadGenericMapping(
             zipFileURL: mappingZIPFileURL,
             taxonomy: bootstrap
@@ -170,13 +161,13 @@ public enum TaxonomyProjector {
 
         let canonicalMappings = normalization.kept
 
-        let currentNodeMappings = TaxonomySourceNormalizer.normalizeMappingsToNodeIds(
+        let nodeMappings = TaxonomySourceNormalizer.normalizeMappingsToNodeIds(
             canonicalMappings,
             chart: output.chart
         )
 
         let currentFactsByKey = TaxonomyProjection.compileMappedFactsFromNodeMappings(
-            mappings: currentNodeMappings,
+            mappings: nodeMappings,
             chart: output.chart,
             rgsBalances: currentBalances
         )
@@ -189,7 +180,6 @@ public enum TaxonomyProjector {
             currentFactsByKey
         )
 
-        // diagnostics based on current
         let diagnostics = TaxonomyProjectionDiagnosticsBuilder.build(
             bootstrap: bootstrap,
             genericMapping: loadedMapping,
@@ -203,13 +193,8 @@ public enum TaxonomyProjector {
         )
 
         let previousFactsByKey = previousBalances.map { balances in
-            let previousNodeMappings = TaxonomySourceNormalizer.normalizeMappingsToNodeIds(
-                canonicalMappings,
-                chart: output.chart
-            )
-
-            return TaxonomyProjection.compileMappedFactsFromNodeMappings(
-                mappings: previousNodeMappings,
+            TaxonomyProjection.compileMappedFactsFromNodeMappings(
+                mappings: nodeMappings,
                 chart: output.chart,
                 rgsBalances: balances
             )

@@ -310,7 +310,17 @@ public enum ECDocumentRenderer {
                     CSS.decl("font-weight", "700")
                 ),
                 CSS.rule(".signature-wrap",
-                    CSS.decl("margin-top", "30px")
+                    CSS.decl("margin-top", "30px"),
+                    CSS.decl("display", "grid"),
+                    CSS.decl("gap", "8px")
+                ),
+                CSS.rule(".signature-image",
+                    CSS.decl("display", "block"),
+                    CSS.decl("max-width", "220px"),
+                    CSS.decl("width", "100%"),
+                    CSS.decl("height", "auto"),
+                    CSS.decl("max-height", "64px"),
+                    CSS.decl("object-fit", "contain")
                 ),
                 CSS.rule(".signature-image-placeholder",
                     CSS.decl("margin-bottom", "8px"),
