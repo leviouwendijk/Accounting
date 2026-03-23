@@ -59,7 +59,7 @@ extension ECDocumentRenderer {
                     ),
                     CSS.rule(".footer-block",
                         CSS.decl("display", "grid"),
-                        CSS.decl("grid-template-columns", "1.5fr 0.9fr"),
+                        CSS.decl("grid-template-columns", "1fr 1fr"),
                         CSS.decl("gap", "24px"),
                         CSS.decl("align-items", "start"),
                         CSS.decl("margin-top", "24px"),
