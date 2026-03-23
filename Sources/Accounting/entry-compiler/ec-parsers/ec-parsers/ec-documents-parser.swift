@@ -67,6 +67,7 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
         var id: String?
         var kind: ECDocumentKind?
         var title: String?
+        var subtitle: String?
         var recipient: String?
         var subjectPrefix: String?
         var senderName: String?
@@ -75,6 +76,8 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
         var periods: [String] = []
         var footerLines: [String] = []
         var administratorLines: [String] = []
+        var footerNote: String?
+        var metaRows: [ECDocumentMetaRow] = []
         var blocks: [ECDocumentBlock] = []
         var assets: ECDocumentAssets?
 
@@ -101,6 +104,10 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
             case .ident("title"), .keyword("title"):
                 try expectFieldEquals("title")
                 title = try parseScalarStringLike()
+
+            case .ident("subtitle"), .keyword("subtitle"):
+                try expectFieldEquals("subtitle")
+                subtitle = try parseScalarStringLike()
 
             case .ident("recipient"), .keyword("recipient"):
                 try expectFieldEquals("recipient")
@@ -134,8 +141,21 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
             case .ident("administrator_lines"), .keyword("administrator_lines"):
                 administratorLines = try parseStringListBlock(named: "administrator_lines")
 
+            case .ident("footer_note"), .keyword("footer_note"):
+                try expectFieldEquals("footer_note")
+                footerNote = try parseScalarStringLike()
+
+            case .ident("meta_row"), .keyword("meta_row"):
+                metaRows.append(try parseMetaRow())
+
             case .ident("section"), .keyword("section"):
                 blocks.append(.section(try parseSection()))
+
+            case .ident("discrepancy"), .keyword("discrepancy"):
+                blocks.append(.discrepancy(try parseDiscrepancy()))
+
+            case .ident("attachments"), .keyword("attachments"):
+                blocks.append(.attachments(try parseAttachments()))
 
             case .ident("signature"), .keyword("signature"):
                 blocks.append(.signature(try parseSignature()))
@@ -171,6 +191,7 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
             id: finalID,
             kind: finalKind,
             title: title,
+            subtitle: subtitle,
             recipient: recipient,
             subjectPrefix: subjectPrefix,
             senderName: senderName,
@@ -179,8 +200,142 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
             periods: periods,
             footerLines: footerLines,
             administratorLines: administratorLines,
+            footerNote: footerNote,
+            metaRows: metaRows,
             blocks: blocks,
             assets: assets
+        )
+    }
+
+    private func parseMetaRow() throws -> ECDocumentMetaRow {
+        try expectKeywordLike("meta_row")
+        try beginBlock()
+
+        var label: String?
+        var value: String?
+
+        while current != .rBrace && current != .eof {
+            switch current {
+            case .ident("label"), .keyword("label"):
+                try expectFieldEquals("label")
+                label = try parseScalarStringLike()
+
+            case .ident("value"), .keyword("value"):
+                try expectFieldEquals("value")
+                value = try parseScalarStringLike()
+
+            default:
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "label or value",
+                    at: loc()
+                )
+            }
+        }
+
+        try endBlock()
+
+        guard let finalLabel = label else {
+            throw ParserError.unexpectedToken(
+                current,
+                expected: "meta_row label",
+                at: loc()
+            )
+        }
+
+        guard let finalValue = value else {
+            throw ParserError.unexpectedToken(
+                current,
+                expected: "meta_row value",
+                at: loc()
+            )
+        }
+
+        return ECDocumentMetaRow(
+            label: finalLabel,
+            value: finalValue
+        )
+    }
+
+    private func parseDiscrepancy() throws -> ECDocumentDiscrepancyBlock {
+        try expectKeywordLike("discrepancy")
+        try beginBlock()
+
+        var heading: String?
+        var label: String?
+        var paragraphs: [String] = []
+
+        while current != .rBrace && current != .eof {
+            switch current {
+            case .ident("heading"), .keyword("heading"):
+                try expectFieldEquals("heading")
+                heading = try parseScalarStringLike()
+
+            case .ident("label"), .keyword("label"):
+                try expectFieldEquals("label")
+                label = try parseScalarStringLike()
+
+            case .ident("paragraph"), .keyword("paragraph"):
+                try expectFieldEquals("paragraph")
+                paragraphs.append(try parseScalarStringLike())
+
+            default:
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "heading, label or paragraph",
+                    at: loc()
+                )
+            }
+        }
+
+        try endBlock()
+
+        guard let finalHeading = heading else {
+            throw ParserError.unexpectedToken(
+                current,
+                expected: "discrepancy heading",
+                at: loc()
+            )
+        }
+
+        return ECDocumentDiscrepancyBlock(
+            heading: finalHeading,
+            label: label,
+            paragraphs: paragraphs
+        )
+    }
+
+    private func parseAttachments() throws -> ECDocumentAttachmentsBlock {
+        try expectKeywordLike("attachments")
+        try beginBlock()
+
+        var title: String?
+        var items: [String] = []
+
+        while current != .rBrace && current != .eof {
+            switch current {
+            case .ident("title"), .keyword("title"):
+                try expectFieldEquals("title")
+                title = try parseScalarStringLike()
+
+            case .ident("item"), .keyword("item"):
+                try expectFieldEquals("item")
+                items.append(try parseScalarStringLike())
+
+            default:
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "title or item",
+                    at: loc()
+                )
+            }
+        }
+
+        try endBlock()
+
+        return ECDocumentAttachmentsBlock(
+            title: title,
+            items: items
         )
     }
 

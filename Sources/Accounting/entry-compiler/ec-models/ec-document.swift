@@ -12,6 +12,7 @@ public struct ECDocument: Sendable {
     public let id: String
     public let kind: ECDocumentKind
     public let title: String?
+    public let subtitle: String?
     public let recipient: String?
     public let subjectPrefix: String?
     public let senderName: String?
@@ -20,6 +21,8 @@ public struct ECDocument: Sendable {
     public let periods: [String]
     public let footerLines: [String]
     public let administratorLines: [String]
+    public let footerNote: String?
+    public let metaRows: [ECDocumentMetaRow]
     public let blocks: [ECDocumentBlock]
     public let assets: ECDocumentAssets?
 
@@ -27,6 +30,7 @@ public struct ECDocument: Sendable {
         id: String,
         kind: ECDocumentKind,
         title: String?,
+        subtitle: String?,
         recipient: String?,
         subjectPrefix: String?,
         senderName: String?,
@@ -35,12 +39,15 @@ public struct ECDocument: Sendable {
         periods: [String],
         footerLines: [String],
         administratorLines: [String],
+        footerNote: String?,
+        metaRows: [ECDocumentMetaRow],
         blocks: [ECDocumentBlock],
         assets: ECDocumentAssets?
     ) {
         self.id = id
         self.kind = kind
         self.title = title
+        self.subtitle = subtitle
         self.recipient = recipient
         self.subjectPrefix = subjectPrefix
         self.senderName = senderName
@@ -49,6 +56,8 @@ public struct ECDocument: Sendable {
         self.periods = periods
         self.footerLines = footerLines
         self.administratorLines = administratorLines
+        self.footerNote = footerNote
+        self.metaRows = metaRows
         self.blocks = blocks
         self.assets = assets
     }
@@ -64,10 +73,26 @@ public struct ECDocument: Sendable {
 
 public enum ECDocumentKind: String, Sendable {
     case declaration_of_truthfulness
+    case discrepancy_statement
+}
+
+public struct ECDocumentMetaRow: Sendable {
+    public let label: String
+    public let value: String
+
+    public init(
+        label: String,
+        value: String
+    ) {
+        self.label = label
+        self.value = value
+    }
 }
 
 public enum ECDocumentBlock: Sendable {
     case section(ECDocumentSection)
+    case discrepancy(ECDocumentDiscrepancyBlock)
+    case attachments(ECDocumentAttachmentsBlock)
     case signature(ECDocumentSignatureBlock)
 }
 
@@ -92,6 +117,35 @@ public struct ECDocumentSection: Sendable {
         self.header = header
         self.paragraphs = paragraphs
         self.template = template
+    }
+}
+
+public struct ECDocumentDiscrepancyBlock: Sendable {
+    public let heading: String
+    public let label: String?
+    public let paragraphs: [String]
+
+    public init(
+        heading: String,
+        label: String?,
+        paragraphs: [String]
+    ) {
+        self.heading = heading
+        self.label = label
+        self.paragraphs = paragraphs
+    }
+}
+
+public struct ECDocumentAttachmentsBlock: Sendable {
+    public let title: String?
+    public let items: [String]
+
+    public init(
+        title: String?,
+        items: [String]
+    ) {
+        self.title = title
+        self.items = items
     }
 }
 

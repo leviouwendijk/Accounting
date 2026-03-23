@@ -11,9 +11,14 @@ public enum ECDocumentRenderer {
         switch document.kind {
         case .declaration_of_truthfulness:
             return try renderTruthfulness(document)
+
+        case .discrepancy_statement:
+            return try renderDiscrepancyStatement(document)
         }
     }
+}
 
+extension ECDocumentRenderer {
     private static func expandTemplate(
         _ template: String,
         senderName: String,
@@ -119,6 +124,38 @@ public enum ECDocumentRenderer {
                                     for paragraph in section.paragraphs {
                                         HTML.p {
                                             HTML.text(paragraph)
+                                        }
+                                    }
+
+                                case .discrepancy(let discrepancy):
+                                    HTML.h2(["class": "section-title"]) {
+                                        HTML.text(discrepancy.heading)
+                                    }
+
+                                    if let label = discrepancy.label, !label.isEmpty {
+                                        HTML.p {
+                                            HTML.text(label)
+                                        }
+                                    }
+
+                                    for paragraph in discrepancy.paragraphs {
+                                        HTML.p {
+                                            HTML.text(paragraph)
+                                        }
+                                    }
+
+                                case .attachments(let attachments):
+                                    if let title = attachments.title, !title.isEmpty {
+                                        HTML.h2(["class": "section-title"]) {
+                                            HTML.text(title)
+                                        }
+                                    }
+
+                                    HTML.ul {
+                                        for item in attachments.items {
+                                            HTML.li {
+                                                HTML.text(item)
+                                            }
                                         }
                                     }
 
@@ -365,3 +402,320 @@ public enum ECDocumentRenderer {
     }
 }
 
+extension ECDocumentRenderer {
+    private static func renderDiscrepancyStatement(
+        _ document: ECDocument
+    ) throws -> String {
+        let date = document.date.map(formatDateNL) ?? formatDateNL(Date())
+        let title = document.title ?? "Toelichting inkomsten-aanslag"
+        let subtitle = document.subtitle ?? ""
+        let senderName = document.senderName ?? "Onbekende afzender"
+        let senderRole = document.senderRole ?? "Ondertekenaar"
+
+        let metaRows: [ECDocumentMetaRow] = {
+            if !document.metaRows.isEmpty {
+                return document.metaRows
+            }
+
+            return [
+                ECDocumentMetaRow(label: "Datum", value: date)
+            ]
+        }()
+
+        let css = renderDiscrepancyStylesheet()
+
+        let doc = HTML.document {
+            HTML.html(["lang": "nl"]) {
+                HTML.head {
+                    HTML.meta(["charset": "utf-8"])
+                    HTML.meta([
+                        "name": "viewport",
+                        "content": "width=device-width, initial-scale=1"
+                    ])
+                    HTML.title(title)
+                    HTML.style(css)
+                }
+
+                HTML.body {
+                    HTML.div(["class": "page"]) {
+                        HTML.article(["class": "discrepancy-doc"]) {
+                            HTML.header {
+                                HTML.h1(["class": "doc-title"]) {
+                                    HTML.text(title)
+                                }
+
+                                if !subtitle.isEmpty {
+                                    HTML.p(["class": "doc-sub"]) {
+                                        HTML.text(subtitle)
+                                    }
+                                }
+                            }
+
+                            if !metaRows.isEmpty {
+                                HTML.div(["class": "kv-block"]) {
+                                    for row in metaRows {
+                                        HTML.div(["class": "kv-row"]) {
+                                            HTML.span(["class": "kv-label"]) {
+                                                HTML.text("\(row.label):")
+                                            }
+                                            HTML.span(["class": "kv-value"]) {
+                                                HTML.text(row.value)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            for block in document.blocks {
+                                switch block {
+                                case .section(let section):
+                                    if let header = section.header {
+                                        HTML.h2(["class": "section-title"]) {
+                                            HTML.text(header)
+                                        }
+                                    }
+
+                                    if let template = section.template {
+                                        HTML.p(["class": "para"]) {
+                                            HTML.text(
+                                                expandTemplate(
+                                                    template,
+                                                    senderName: senderName,
+                                                    senderRole: senderRole,
+                                                    recipient: document.recipient ?? "",
+                                                    subjectPrefix: document.subjectPrefix ?? "",
+                                                    periodsSentence: joinedForSentenceNl(document.periods),
+                                                    periodPrefix: document.periods.count == 1 ? "periode" : "periodes",
+                                                    date: date
+                                                )
+                                            )
+                                        }
+                                    }
+
+                                    for paragraph in section.paragraphs {
+                                        HTML.p(["class": "para"]) {
+                                            HTML.text(paragraph)
+                                        }
+                                    }
+
+                                case .discrepancy(let discrepancy):
+                                    HTML.p(["class": "heading"]) {
+                                        HTML.text(discrepancy.heading)
+                                    }
+
+                                    HTML.div(["class": "indent"]) {
+                                        if let label = discrepancy.label, !label.isEmpty {
+                                            HTML.span(["class": "label"]) {
+                                                HTML.text(label)
+                                            }
+                                        }
+
+                                        for paragraph in discrepancy.paragraphs {
+                                            HTML.p(["class": "para"]) {
+                                                HTML.text(paragraph)
+                                            }
+                                        }
+                                    }
+
+                                case .attachments(let attachments):
+                                    HTML.div(["class": "attachments"]) {
+                                        if let title = attachments.title, !title.isEmpty {
+                                            HTML.p(["class": "attachments-title"]) {
+                                                HTML.text(title)
+                                            }
+                                        }
+
+                                        HTML.ul {
+                                            for item in attachments.items {
+                                                HTML.li {
+                                                    HTML.text(item)
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                case .signature(let signature):
+                                    HTML.div(["class": "sign"]) {
+                                        HTML.div(["class": "box"]) {
+                                            HTML.strong {
+                                                HTML.text("Ondertekening verantwoordelijke")
+                                            }
+
+                                            if signature.includeSignatureImage,
+                                               let rawPath = document.assets?.signatureImagePath,
+                                               !rawPath.isEmpty {
+
+                                                let src: String = {
+                                                    if rawPath.contains("://") {
+                                                        return rawPath
+                                                    }
+
+                                                    return URL(fileURLWithPath: rawPath).absoluteString
+                                                }()
+
+                                                HTML.img(
+                                                    src: src,
+                                                    [
+                                                        "alt": "Handtekening",
+                                                        "class": "signature-image"
+                                                    ]
+                                                )
+                                            }
+
+                                            HTML.div(["class": "sig-line"]) {}
+                                            HTML.div { HTML.text("Naam: \(senderName)") }
+                                            HTML.div { HTML.text("Rol: \(senderRole)") }
+                                        }
+
+                                        HTML.div(["class": "box"]) {
+                                            HTML.strong {
+                                                HTML.text("Plaats / Datum")
+                                            }
+
+                                            HTML.div {
+                                                HTML.text("Plaats: ____________________________")
+                                            }
+
+                                            HTML.div {
+                                                HTML.text(
+                                                    signature.includeDate
+                                                        ? "Datum: \(date)"
+                                                        : "Datum: ______ / ____ / ____"
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if let footerNote = document.footerNote, !footerNote.isEmpty {
+                                HTML.div(["class": "muted-footer"]) {
+                                    HTML.text(footerNote)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return doc.render()
+    }
+
+    private static func renderDiscrepancyStylesheet() -> String {
+        let sheet = CSSStyleSheet(
+            rules: [
+                CSS.rule(":root",
+                    CSS.decl("--ink", "#111111"),
+                    CSS.decl("--muted", "#6b7280"),
+                    CSS.decl("--line", "#d9dee4"),
+                    CSS.decl("--paper", "#ffffff")
+                ),
+                CSS.rule("body",
+                    CSS.decl("margin", "0"),
+                    CSS.decl("background", "#ffffff"),
+                    CSS.decl("color", "var(--ink)"),
+                    CSS.decl("font-family", "\"Times New Roman\", Times, serif"),
+                    CSS.decl("font-size", "11pt"),
+                    CSS.decl("line-height", "1.4")
+                ),
+                CSS.rule(".page",
+                    CSS.decl("padding", "0")
+                ),
+                CSS.rule(".doc-title",
+                    CSS.decl("margin", "0 0 4px 0"),
+                    CSS.decl("font-size", "18px"),
+                    CSS.decl("font-weight", "700")
+                ),
+                CSS.rule(".doc-sub",
+                    CSS.decl("margin", "0 0 16px 0"),
+                    CSS.decl("font-size", "11pt"),
+                    CSS.decl("color", "var(--muted)")
+                ),
+                CSS.rule(".discrepancy-doc",
+                    CSS.decl("width", "100%"),
+                    CSS.decl("margin", "0"),
+                    CSS.decl("padding", "0")
+                ),
+                CSS.rule(".kv-block",
+                    CSS.decl("margin", "0 0 14px 0"),
+                    CSS.decl("font-size", "10.5pt"),
+                    CSS.decl("color", "var(--muted)")
+                ),
+                CSS.rule(".kv-row",
+                    CSS.decl("margin", "0 0 4px 0")
+                ),
+                CSS.rule(".kv-label",
+                    CSS.decl("font-weight", "700"),
+                    CSS.decl("color", "var(--ink)")
+                ),
+                CSS.rule(".heading",
+                    CSS.decl("margin", "16px 0 6px 0"),
+                    CSS.decl("font-size", "12pt"),
+                    CSS.decl("font-weight", "700")
+                ),
+                CSS.rule(".indent",
+                    CSS.decl("padding-left", "12px"),
+                    CSS.decl("border-left", "2px solid var(--line)"),
+                    CSS.decl("margin", "0 0 12px 0")
+                ),
+                CSS.rule(".label",
+                    CSS.decl("display", "block"),
+                    CSS.decl("font-weight", "700"),
+                    CSS.decl("margin-bottom", "4px")
+                ),
+                CSS.rule(".para",
+                    CSS.decl("margin", "0 0 10px 0")
+                ),
+                CSS.rule(".attachments",
+                    CSS.decl("margin-top", "14px"),
+                    CSS.decl("padding", "10px 12px"),
+                    CSS.decl("border", "1px solid var(--line)"),
+                    CSS.decl("border-radius", "8px")
+                ),
+                CSS.rule(".attachments-title",
+                    CSS.decl("margin", "0 0 6px 0"),
+                    CSS.decl("font-weight", "700")
+                ),
+                CSS.rule(".sign",
+                    CSS.decl("margin-top", "18px"),
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "1fr 1fr"),
+                    CSS.decl("gap", "12px")
+                ),
+                CSS.rule(".box",
+                    CSS.decl("border", "1px dashed var(--line)"),
+                    CSS.decl("border-radius", "8px"),
+                    CSS.decl("padding", "10px 12px"),
+                    CSS.decl("min-height", "72px")
+                ),
+                CSS.rule(".signature-image",
+                    CSS.decl("display", "block"),
+                    CSS.decl("max-width", "220px"),
+                    CSS.decl("width", "220px"),
+                    CSS.decl("height", "auto"),
+                    CSS.decl("max-height", "64px"),
+                    CSS.decl("object-fit", "contain"),
+                    CSS.decl("margin", "8px 0 8px 0")
+                ),
+                CSS.rule(".sig-line",
+                    CSS.decl("margin", "8px 0 8px 0"),
+                    CSS.decl("width", "220px"),
+                    CSS.decl("max-width", "100%"),
+                    CSS.decl("border-bottom", "1px solid var(--ink)")
+                ),
+                CSS.rule(".muted-footer",
+                    CSS.decl("margin-top", "14px"),
+                    CSS.decl("color", "var(--muted)"),
+                    CSS.decl("font-size", "10pt")
+                ),
+                CSS.rule("@page",
+                    CSS.decl("size", "A4"),
+                    CSS.decl("margin", "20mm 18mm 20mm 18mm")
+                ),
+            ]
+        )
+
+        return sheet.render()
+    }
+}
