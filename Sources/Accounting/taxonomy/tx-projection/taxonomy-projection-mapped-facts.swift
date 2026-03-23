@@ -34,7 +34,7 @@ extension TaxonomyProjection {
         return computedByKey
     }
 
-    @available(*, deprecated, message: "Superseded by compileMappedFactsFromNodeMappings(_:chart:rgsBalances:).")
+    // @available(*, deprecated, message: "Superseded by compileMappedFactsFromNodeMappings(_:chart:rgsBalances:).")
     public static func compileMappedFacts(
         mappings: [TaxonomyCanonicalResolvedMapping],
         rgsBalances: [String: Decimal]
