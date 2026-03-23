@@ -318,7 +318,8 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
         try beginBlock()
 
         var title: String?
-        var items: [String] = []
+        var groups: [ECDocumentAttachmentGroup] = []
+        var legacyItems: [String] = []
 
         while current != .rBrace && current != .eof {
             switch current {
@@ -328,12 +329,15 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
 
             case .ident("item"), .keyword("item"):
                 try expectFieldEquals("item")
-                items.append(try parseScalarStringLike())
+                legacyItems.append(try parseScalarStringLike())
+
+            case .ident("group"), .keyword("group"):
+                groups.append(try parseAttachmentGroup())
 
             default:
                 throw ParserError.unexpectedToken(
                     current,
-                    expected: "title or item",
+                    expected: "title, item or group",
                     at: loc()
                 )
             }
@@ -341,8 +345,43 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
 
         try endBlock()
 
+        if !legacyItems.isEmpty {
+            groups.insert(
+                ECDocumentAttachmentGroup(items: legacyItems),
+                at: 0
+            )
+        }
+
         return ECDocumentAttachmentsBlock(
             title: title,
+            groups: groups
+        )
+    }
+
+    private func parseAttachmentGroup() throws -> ECDocumentAttachmentGroup {
+        try expectKeywordLike("group")
+        try beginBlock()
+
+        var items: [String] = []
+
+        while current != .rBrace && current != .eof {
+            switch current {
+            case .ident("item"), .keyword("item"):
+                try expectFieldEquals("item")
+                items.append(try parseScalarStringLike())
+
+            default:
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "item",
+                    at: loc()
+                )
+            }
+        }
+
+        try endBlock()
+
+        return ECDocumentAttachmentGroup(
             items: items
         )
     }

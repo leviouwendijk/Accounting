@@ -139,16 +139,26 @@ public struct ECDocumentDiscrepancyBlock: Sendable {
     }
 }
 
-public struct ECDocumentAttachmentsBlock: Sendable {
-    public let title: String?
+public struct ECDocumentAttachmentGroup: Sendable {
     public let items: [String]
 
     public init(
-        title: String?,
         items: [String]
     ) {
-        self.title = title
         self.items = items
+    }
+}
+
+public struct ECDocumentAttachmentsBlock: Sendable {
+    public let title: String?
+    public let groups: [ECDocumentAttachmentGroup]
+
+    public init(
+        title: String?,
+        groups: [ECDocumentAttachmentGroup]
+    ) {
+        self.title = title
+        self.groups = groups
     }
 }
 

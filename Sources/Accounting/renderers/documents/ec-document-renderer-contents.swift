@@ -136,10 +136,18 @@ extension ECDocumentRenderer {
                                         }
                                     }
 
-                                    HTML.ul {
-                                        for item in attachments.items {
-                                            HTML.li {
-                                                HTML.text(item)
+                                    HTML.div(["class": "attachments-block"]) {
+                                        for group in attachments.groups {
+                                            if !group.items.isEmpty {
+                                                HTML.div(["class": "attachments-group"]) {
+                                                    HTML.ul(["class": "attachments-list"]) {
+                                                        for item in group.items {
+                                                            HTML.li {
+                                                                HTML.text(item)
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -379,7 +387,27 @@ extension ECDocumentRenderer {
                 CSS.rule(".administrator-line",
                     CSS.decl("margin", "0 0 2px 0"),
                     CSS.decl("color", "inherit")
-                )
+                ),
+                CSS.rule(".attachments-block",
+                    CSS.decl("margin-top", "8px")
+                ),
+                CSS.rule(".attachments-group",
+                    CSS.decl("margin", "12px 0 0 0"),
+                    CSS.decl("padding", "12px 0 0 0"),
+                    CSS.decl("border-top", "1px solid var(--border)")
+                ),
+                CSS.rule(".attachments-group:first-child",
+                    CSS.decl("margin-top", "0"),
+                    CSS.decl("padding-top", "0"),
+                    CSS.decl("border-top", "none")
+                ),
+                CSS.rule(".attachments-list",
+                    CSS.decl("margin", "0"),
+                    CSS.decl("padding-left", "20px")
+                ),
+                CSS.rule(".attachments-list li",
+                    CSS.decl("margin", "0 0 4px 0")
+                ),
             ]
         )
 
@@ -511,10 +539,16 @@ extension ECDocumentRenderer {
                                             }
                                         }
 
-                                        HTML.ul {
-                                            for item in attachments.items {
-                                                HTML.li {
-                                                    HTML.text(item)
+                                        for group in attachments.groups {
+                                            if !group.items.isEmpty {
+                                                HTML.div(["class": "attachments-group"]) {
+                                                    HTML.ul(["class": "attachments-list"]) {
+                                                        for item in group.items {
+                                                            HTML.li {
+                                                                HTML.text(item)
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -698,6 +732,23 @@ extension ECDocumentRenderer {
                 CSS.rule("@page",
                     CSS.decl("size", "A4"),
                     CSS.decl("margin", "20mm 18mm 20mm 18mm")
+                ),
+                CSS.rule(".attachments-group",
+                    CSS.decl("margin", "10px 0 0 0"),
+                    CSS.decl("padding", "10px 0 0 0"),
+                    CSS.decl("border-top", "1px solid var(--line)")
+                ),
+                CSS.rule(".attachments-group:first-child",
+                    CSS.decl("margin-top", "0"),
+                    CSS.decl("padding-top", "0"),
+                    CSS.decl("border-top", "none")
+                ),
+                CSS.rule(".attachments-list",
+                    CSS.decl("margin", "0"),
+                    CSS.decl("padding-left", "18px")
+                ),
+                CSS.rule(".attachments-list li",
+                    CSS.decl("margin", "0 0 4px 0")
                 ),
             ]
         )
