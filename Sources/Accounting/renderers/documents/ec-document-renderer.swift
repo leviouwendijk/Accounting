@@ -263,8 +263,18 @@ public enum ECDocumentRenderer {
                     CSS.decl("background", "#ffffff"),
                     CSS.decl("color", "var(--ink)"),
                     CSS.decl("font-family", "\"Times New Roman\", Times, serif"),
-                    CSS.decl("font-size", "12pt"),
-                    CSS.decl("line-height", "1.45")
+                    CSS.decl("font-size", "11pt"),
+                    CSS.decl("line-height", "1.38")
+                ),
+                CSS.rule(".letter-title",
+                    CSS.decl("margin", "0 0 6px 0"),
+                    CSS.decl("font-size", "16px"),
+                    CSS.decl("font-weight", "700")
+                ),
+                CSS.rule(".section-title",
+                    CSS.decl("margin", "24px 0 8px 0"),
+                    CSS.decl("font-size", "14px"),
+                    CSS.decl("font-weight", "700")
                 ),
                 CSS.rule(".page",
                     CSS.decl("padding", "0")
@@ -285,11 +295,6 @@ public enum ECDocumentRenderer {
                     CSS.decl("gap", "18px"),
                     CSS.decl("align-items", "flex-start")
                 ),
-                CSS.rule(".letter-title",
-                    CSS.decl("margin", "0 0 6px 0"),
-                    CSS.decl("font-size", "18px"),
-                    CSS.decl("font-weight", "700")
-                ),
                 CSS.rule(".meta",
                     CSS.decl("display", "grid"),
                     CSS.decl("gap", "8px"),
@@ -303,11 +308,6 @@ public enum ECDocumentRenderer {
                     CSS.decl("min-width", "100px"),
                     CSS.decl("font-weight", "600"),
                     CSS.decl("color", "var(--muted)")
-                ),
-                CSS.rule(".section-title",
-                    CSS.decl("margin", "28px 0 10px 0"),
-                    CSS.decl("font-size", "16px"),
-                    CSS.decl("font-weight", "700")
                 ),
                 CSS.rule(".signature-wrap",
                     CSS.decl("margin-top", "30px")
@@ -331,9 +331,17 @@ public enum ECDocumentRenderer {
                     CSS.decl("border-top", "1px solid var(--border)"),
                     CSS.decl("color", "var(--muted)")
                 ),
+                CSS.rule(".footer-block",
+                    CSS.decl("margin-top", "24px"),
+                    CSS.decl("font-size", "10pt"),
+                    CSS.decl("line-height", "1.3")
+                ),
                 CSS.rule(".footer-line",
-                    CSS.decl("margin", "3px 0")
-                )
+                    CSS.decl("margin", "0 0 2px 0")
+                ),
+                CSS.rule(".administrator-line",
+                    CSS.decl("margin", "6px 0 0 0")
+                ),
             ]
         )
 
