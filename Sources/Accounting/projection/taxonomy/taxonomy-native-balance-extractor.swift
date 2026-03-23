@@ -1,5 +1,13 @@
 import Foundation
 
+@available(
+    *, 
+    message: """
+    This is now being superseded by the TaxonomyBalanceSourceBuilder.
+    Since auto-close and roll-up logic interferes with accurate concept fact balances in foreign taxonomies.
+    """
+)
+
 enum TaxonomyNativeBalanceExtractor {
     static func balances(
         chart: CompiledChart,
