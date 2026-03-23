@@ -168,7 +168,7 @@ public struct ECDocumentSignatureBlock: Sendable {
 
     public init(
         includeSignatureImage: Bool,
-        includeDate: Bool = true
+        includeDate: Bool = false
     ) {
         self.includeSignatureImage = includeSignatureImage
         self.includeDate = includeDate
