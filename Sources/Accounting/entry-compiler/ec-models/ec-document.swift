@@ -21,6 +21,7 @@ public struct ECDocument: Sendable {
     public let footerLines: [String]
     public let administratorLines: [String]
     public let blocks: [ECDocumentBlock]
+    public let assets: ECDocumentAssets?
 
     public init(
         id: String,
@@ -34,7 +35,8 @@ public struct ECDocument: Sendable {
         periods: [String],
         footerLines: [String],
         administratorLines: [String],
-        blocks: [ECDocumentBlock]
+        blocks: [ECDocumentBlock],
+        assets: ECDocumentAssets?
     ) {
         self.id = id
         self.kind = kind
@@ -48,6 +50,7 @@ public struct ECDocument: Sendable {
         self.footerLines = footerLines
         self.administratorLines = administratorLines
         self.blocks = blocks
+        self.assets = assets
     }
 
     public var outputFilename: String {
@@ -68,23 +71,39 @@ public enum ECDocumentBlock: Sendable {
     case signature(ECDocumentSignatureBlock)
 }
 
+public struct ECDocumentAssets: Sendable {
+    public let signatureImagePath: String?
+
+    public init(signatureImagePath: String?) {
+        self.signatureImagePath = signatureImagePath
+    }
+}
+
 public struct ECDocumentSection: Sendable {
     public let header: String?
     public let paragraphs: [String]
+    public let template: String?
 
     public init(
         header: String?,
-        paragraphs: [String]
+        paragraphs: [String],
+        template: String? = nil
     ) {
         self.header = header
         self.paragraphs = paragraphs
+        self.template = template
     }
 }
 
 public struct ECDocumentSignatureBlock: Sendable {
     public let includeSignatureImage: Bool
+    public let includeDate: Bool
 
-    public init(includeSignatureImage: Bool = true) {
+    public init(
+        includeSignatureImage: Bool,
+        includeDate: Bool = true
+    ) {
         self.includeSignatureImage = includeSignatureImage
+        self.includeDate = includeDate
     }
 }

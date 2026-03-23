@@ -1,5 +1,25 @@
 import Foundation
 
+// new type for node reducer:
+public struct TaxonomyNormalizedResolvedMapping: Sendable {
+    public let targetConcept: String
+    public let dimensions: [TaxonomyExplicitDimension]
+    public let sourceNodeId: Int
+    public let sourceCode: String
+
+    public init(
+        targetConcept: String,
+        dimensions: [TaxonomyExplicitDimension],
+        sourceNodeId: Int,
+        sourceCode: String
+    ) {
+        self.targetConcept = targetConcept
+        self.dimensions = dimensions
+        self.sourceNodeId = sourceNodeId
+        self.sourceCode = sourceCode
+    }
+}
+
 public struct TaxonomyResolvedMapping: Sendable, Hashable {
     public let sourceHref: String
     public let sourceLocatorLabel: String

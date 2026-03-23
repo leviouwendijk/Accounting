@@ -76,6 +76,7 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
         var footerLines: [String] = []
         var administratorLines: [String] = []
         var blocks: [ECDocumentBlock] = []
+        var assets: ECDocumentAssets?
 
         while current != .rBrace && current != .eof {
             switch current {
@@ -120,6 +121,9 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
             case .ident("date"), .keyword("date"):
                 try expectFieldEquals("date")
                 date = try parseAbsoluteDate()
+
+            case .ident("assets"), .keyword("assets"):
+                assets = try parseAssets()
 
             case .ident("periods"), .keyword("periods"):
                 periods = try parseStringListBlock(named: "periods")
@@ -175,7 +179,8 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
             periods: periods,
             footerLines: footerLines,
             administratorLines: administratorLines,
-            blocks: blocks
+            blocks: blocks,
+            assets: assets
         )
     }
 
@@ -185,6 +190,7 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
 
         var header: String?
         var paragraphs: [String] = []
+        var template: String?
 
         while current != .rBrace && current != .eof {
             switch current {
@@ -196,10 +202,14 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
                 try expectFieldEquals("paragraph")
                 paragraphs.append(try parseScalarStringLike())
 
+            case .ident("template"), .keyword("template"):
+                try expectFieldEquals("template")
+                template = try parseScalarStringLike()
+
             default:
                 throw ParserError.unexpectedToken(
                     current,
-                    expected: "header or paragraph",
+                    expected: "header, paragraph or template",
                     at: loc()
                 )
             }
@@ -209,7 +219,50 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
 
         return ECDocumentSection(
             header: header,
-            paragraphs: paragraphs
+            paragraphs: paragraphs,
+            template: template
+        )
+    }
+
+    private func parseAssets() throws -> ECDocumentAssets {
+        try expectKeywordLike("assets")
+        try beginBlock()
+
+        var signatureImagePath: String?
+        var signatureSymbol: String?
+        var logoSymbol: String?
+
+        while current != .rBrace && current != .eof {
+            switch current {
+            case .ident("signature_image_path"), .keyword("signature_image_path"):
+                try expectFieldEquals("signature_image_path")
+                signatureImagePath = try parseScalarStringLike()
+
+            case .ident("signature_symbol"), .keyword("signature_symbol"):
+                try expectFieldEquals("signature_symbol")
+                signatureSymbol = try parseScalarStringLike()
+
+            case .ident("logo_symbol"), .keyword("logo_symbol"):
+                try expectFieldEquals("logo_symbol")
+                logoSymbol = try parseScalarStringLike()
+
+            default:
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "signature_image_path, signature_symbol or logo_symbol",
+                    at: loc()
+                )
+            }
+        }
+
+        try endBlock()
+
+        let resolvedSignatureImagePath = signatureImagePath ?? signatureSymbol
+
+        _ = logoSymbol
+
+        return ECDocumentAssets(
+            signatureImagePath: resolvedSignatureImagePath
         )
     }
 
@@ -218,6 +271,7 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
         try beginBlock()
 
         var includeSignatureImage = true
+        var includeDate = true
 
         while current != .rBrace && current != .eof {
             switch current {
@@ -225,10 +279,14 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
                 try expectFieldEquals("include_image")
                 includeSignatureImage = try parseBoolLike()
 
+            case .ident("include_date"), .keyword("include_date"):
+                try expectFieldEquals("include_date")
+                includeDate = try parseBoolLike()
+
             default:
                 throw ParserError.unexpectedToken(
                     current,
-                    expected: "include_image",
+                    expected: "include_image or include_date",
                     at: loc()
                 )
             }
@@ -237,7 +295,8 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
         try endBlock()
 
         return ECDocumentSignatureBlock(
-            includeSignatureImage: includeSignatureImage
+            includeSignatureImage: includeSignatureImage,
+            includeDate: includeDate
         )
     }
 

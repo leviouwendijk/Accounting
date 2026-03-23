@@ -92,3 +92,4 @@ public struct TaxonomyPeriodProjectionOutput: Sendable {
         self.diagnostics = diagnostics
     }
 }
+

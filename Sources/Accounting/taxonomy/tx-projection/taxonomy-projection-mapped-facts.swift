@@ -79,50 +79,60 @@ extension TaxonomyProjection {
         return out
     }
 
-    // public static func compileMappedFacts(
-    //     mappings: [TaxonomyCanonicalResolvedMapping],
-    //     rgsBalances: [String: Decimal]
-    // ) -> [TaxonomyMappedFactKey: TaxonomyComputedMappedFact] {
-    //     var groupedAmountByKey: [TaxonomyMappedFactKey: Decimal] = [:]
-    //     var groupedCodesByKey: [TaxonomyMappedFactKey: Set<String>] = [:]
+    public static func compileMappedFactsFromNodeMappings(
+        mappings: [TaxonomyNormalizedResolvedMapping],
+        chart: CompiledChart,
+        rgsBalances: [String: Decimal]
+    ) -> [TaxonomyMappedFactKey: TaxonomyComputedMappedFact] {
+        let codeById = Dictionary(
+            uniqueKeysWithValues: chart.nodes.map { ($0.id, $0.codes.code) }
+        )
 
-    //     for mapping in mappings {
-    //         let amount = rgsBalances[mapping.matchedCode] ?? 0
-    //         guard amount != 0 else {
-    //             continue
-    //         }
+        var groupedAmountByKey: [TaxonomyMappedFactKey: Decimal] = [:]
+        var groupedCodesByKey: [TaxonomyMappedFactKey: Set<String>] = [:]
 
-    //         let dimensions = TaxonomyShared.sortDimensions(
-    //             mapping.dimensions.map {
-    //                 TaxonomyDimensionBinding(
-    //                     axis: $0.axis,
-    //                     member: $0.member
-    //                 )
-    //             }
-    //         )
+        for mapping in mappings {
+            let sourceCode: String = codeById[mapping.sourceNodeId] ?? mapping.sourceCode
+            guard !sourceCode.isEmpty else {
+                continue
+            }
 
-    //         let key = TaxonomyMappedFactKey(
-    //             concept: mapping.targetConcept,
-    //             dimensions: dimensions
-    //         )
+            let amount = rgsBalances[sourceCode] ?? 0
+            guard amount != 0 else {
+                continue
+            }
 
-    //         groupedAmountByKey[key, default: 0] += amount
-    //         groupedCodesByKey[key, default: []].insert(mapping.matchedCode)
-    //     }
+            let dimensions = TaxonomyShared.sortDimensions(
+                mapping.dimensions.map {
+                    TaxonomyDimensionBinding(
+                        axis: $0.axis,
+                        member: $0.member
+                    )
+                }
+            )
 
-    //     var out: [TaxonomyMappedFactKey: TaxonomyComputedMappedFact] = [:]
+            let key = TaxonomyMappedFactKey(
+                concept: mapping.targetConcept,
+                dimensions: dimensions
+            )
 
-    //     for (key, amount) in groupedAmountByKey {
-    //         out[key] = TaxonomyComputedMappedFact(
-    //             concept: key.concept,
-    //             amount: amount,
-    //             dimensions: key.dimensions,
-    //             sourceCodes: Array(groupedCodesByKey[key] ?? []).sorted()
-    //         )
-    //     }
+            groupedAmountByKey[key, default: 0] += amount
+            groupedCodesByKey[key, default: []].insert(sourceCode)
+        }
 
-    //     return out
-    // }
+        var out: [TaxonomyMappedFactKey: TaxonomyComputedMappedFact] = [:]
+
+        for (key, amount) in groupedAmountByKey {
+            out[key] = TaxonomyComputedMappedFact(
+                concept: key.concept,
+                amount: amount,
+                dimensions: key.dimensions,
+                sourceCodes: Array(groupedCodesByKey[key] ?? []).sorted()
+            )
+        }
+
+        return out
+    }
 
     public static func unmatchedRGSCodes(
         mappings: [TaxonomyCanonicalResolvedMapping],

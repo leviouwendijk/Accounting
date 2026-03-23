@@ -184,3 +184,79 @@ public enum TaxonomySourceNormalizer {
         return false
     }
 }
+
+extension TaxonomySourceNormalizer {
+    public static func normalizeMappingsToNodeIds(
+        _ mappings: [TaxonomyCanonicalResolvedMapping],
+        chart: CompiledChart
+    ) -> [TaxonomyNormalizedResolvedMapping] {
+        let deduped = dedupeExactMappings(mappings)
+
+        let idByCode: [String: Int] = Dictionary(
+            uniqueKeysWithValues: chart.nodes.compactMap { node -> (String, Int)? in
+                let code = node.codes.code
+                guard !code.isEmpty else {
+                    return nil
+                }
+
+                return (code, node.id)
+            }
+        )
+
+        let maps = try? RGSAssembler.makeMaps(from: chart)
+        let parentById = maps?.parentById ?? [:]
+
+        let grouped = Dictionary(
+            grouping: deduped.kept,
+            by: { mapping in
+                TaxonomyMappedFactKey(
+                    concept: mapping.targetConcept,
+                    dimensions: TaxonomyShared.sortDimensions(
+                        mapping.dimensions.map {
+                            TaxonomyDimensionBinding(
+                                axis: $0.axis,
+                                member: $0.member
+                            )
+                        }
+                    )
+                )
+            }
+        )
+
+        var out: [TaxonomyNormalizedResolvedMapping] = []
+
+        for (key, group) in grouped {
+            let nodeIds = group.compactMap { idByCode[$0.matchedCode] }
+            let reduced = TaxonomyNodeReducer.reduceToTopLevelUniqueNodes(
+                nodeIds,
+                parentById: parentById
+            )
+
+            let codeById = Dictionary(
+                uniqueKeysWithValues: chart.nodes.map { ($0.id, $0.codes.code) }
+            )
+
+            for nodeId in reduced {
+                guard let sourceCode = codeById[nodeId], !sourceCode.isEmpty else {
+                    continue
+                }
+
+                out.append(
+                    TaxonomyNormalizedResolvedMapping(
+                        targetConcept: key.concept,
+                        dimensions: key.dimensions.map {
+                            TaxonomyExplicitDimension(
+                                axis: $0.axis,
+                                member: $0.member
+                            )
+                        },
+                        sourceNodeId: nodeId,
+                        sourceCode: sourceCode
+                    )
+                )
+            }
+        }
+
+        return out
+    }
+}

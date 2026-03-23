@@ -79,6 +79,12 @@ public enum ECDocumentRenderer {
                                         }
                                     }
 
+                                    if let template = section.template {
+                                        HTML.p {
+                                            HTML.text(template)
+                                        }
+                                    }
+
                                     for paragraph in section.paragraphs {
                                         HTML.p {
                                             HTML.text(paragraph)
@@ -95,6 +101,10 @@ public enum ECDocumentRenderer {
 
                                         HTML.div { HTML.text(senderName) }
                                         HTML.div { HTML.text(senderRole) }
+
+                                        if signature.includeDate {
+                                            HTML.div { HTML.text(date) }
+                                        }
                                     }
                                 }
                             }
