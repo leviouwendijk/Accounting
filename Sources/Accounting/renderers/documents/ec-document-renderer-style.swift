@@ -157,7 +157,7 @@ extension ECDocumentRenderer {
                     ),
                     CSS.rule(".doc-title",
                         CSS.decl("margin", "0 0 4px 0"),
-                        CSS.decl("font-size", "18px"),
+                        CSS.decl("font-size", "16px"),
                         CSS.decl("font-weight", "700")
                     ),
                     CSS.rule(".doc-sub",
