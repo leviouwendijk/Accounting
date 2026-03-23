@@ -1,13 +1,13 @@
 import Foundation
 
 @available(
-    *, 
+    *,
+    deprecated,
     message: """
-    This is now being superseded by the TaxonomyBalanceSourceBuilder.
-    Since auto-close and roll-up logic interferes with accurate concept fact balances in foreign taxonomies.
+    Superseded by TaxonomyBalanceSourceBuilder.
+    Auto-close and roll-up logic interferes with accurate concept fact balances in taxonomy projection.
     """
 )
-
 enum TaxonomyNativeBalanceExtractor {
     static func balances(
         chart: CompiledChart,

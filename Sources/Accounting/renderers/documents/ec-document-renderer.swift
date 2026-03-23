@@ -14,6 +14,26 @@ public enum ECDocumentRenderer {
         }
     }
 
+    private static func expandTemplate(
+        _ template: String,
+        senderName: String,
+        senderRole: String,
+        recipient: String,
+        subjectPrefix: String,
+        periodsSentence: String,
+        periodPrefix: String,
+        date: String
+    ) -> String {
+        template
+            .replacingOccurrences(of: "{{sender_name}}", with: senderName)
+            .replacingOccurrences(of: "{{sender_role}}", with: senderRole)
+            .replacingOccurrences(of: "{{recipient}}", with: recipient)
+            .replacingOccurrences(of: "{{subject_prefix}}", with: subjectPrefix)
+            .replacingOccurrences(of: "{{periods_sentence}}", with: periodsSentence)
+            .replacingOccurrences(of: "{{period_prefix}}", with: periodPrefix)
+            .replacingOccurrences(of: "{{date}}", with: date)
+    }
+
     private static func renderTruthfulness(
         _ document: ECDocument
     ) throws -> String {
@@ -81,7 +101,18 @@ public enum ECDocumentRenderer {
 
                                     if let template = section.template {
                                         HTML.p {
-                                            HTML.text(template)
+                                            HTML.text(
+                                                expandTemplate(
+                                                    template,
+                                                    senderName: senderName,
+                                                    senderRole: senderRole,
+                                                    recipient: recipient,
+                                                    subjectPrefix: subjectPrefix,
+                                                    periodsSentence: periodsSentence,
+                                                    periodPrefix: periodPrefix,
+                                                    date: date
+                                                )
+                                            )
                                         }
                                     }
 
@@ -93,10 +124,16 @@ public enum ECDocumentRenderer {
 
                                 case .signature(let signature):
                                     HTML.div(["class": "signature-wrap"]) {
-                                        if signature.includeSignatureImage {
-                                            HTML.div(["class": "signature-image-placeholder"]) {
-                                                HTML.text("[signature]")
-                                            }
+                                        if signature.includeSignatureImage,
+                                           let path = document.assets?.signatureImagePath,
+                                           !path.isEmpty {
+                                            HTML.img(
+                                                src: path, 
+                                                [
+                                                "alt": "Handtekening",
+                                                "class": "signature-image"
+                                                ]
+                                            )
                                         }
 
                                         HTML.div { HTML.text(senderName) }
@@ -208,35 +245,30 @@ public enum ECDocumentRenderer {
         let sheet = CSSStyleSheet(
             rules: [
                 CSS.rule(":root",
-                    CSS.decl("--ink", "#0f1720"),
-                    CSS.decl("--muted", "#6b7280"),
-                    CSS.decl("--bg", "#f6f7f9"),
-                    CSS.decl("--paper", "#ffffff"),
-                    CSS.decl("--border", "#e5e7eb")
-                ),
-                CSS.rule("*",
-                    CSS.decl("box-sizing", "border-box")
+                    CSS.decl("--ink", "#111111"),
+                    CSS.decl("--muted", "#555555"),
+                    CSS.decl("--paper", "#ffffff")
                 ),
                 CSS.rule("body",
                     CSS.decl("margin", "0"),
-                    CSS.decl("background", "var(--bg)"),
+                    CSS.decl("background", "#ffffff"),
                     CSS.decl("color", "var(--ink)"),
-                    CSS.decl("font-family", "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif"),
-                    CSS.decl("font-size", "14px"),
-                    CSS.decl("line-height", "1.55")
+                    CSS.decl("font-family", "\"Times New Roman\", Times, serif"),
+                    CSS.decl("font-size", "12pt"),
+                    CSS.decl("line-height", "1.45")
                 ),
                 CSS.rule(".page",
-                    CSS.decl("padding", "40px 18px")
+                    CSS.decl("padding", "0")
                 ),
                 CSS.rule(".letter",
                     CSS.decl("width", "100%"),
-                    CSS.decl("max-width", "780px"),
-                    CSS.decl("margin", "0 auto"),
-                    CSS.decl("background", "var(--paper)"),
-                    CSS.decl("border", "1px solid var(--border)"),
-                    CSS.decl("border-radius", "16px"),
-                    CSS.decl("box-shadow", "0 18px 44px rgba(0, 0, 0, 0.10)"),
-                    CSS.decl("padding", "34px 40px")
+                    CSS.decl("max-width", "none"),
+                    CSS.decl("margin", "0"),
+                    CSS.decl("background", "#ffffff"),
+                    CSS.decl("border", "none"),
+                    CSS.decl("border-radius", "0"),
+                    CSS.decl("box-shadow", "none"),
+                    CSS.decl("padding", "0")
                 ),
                 CSS.rule(".top-row",
                     CSS.decl("display", "flex"),
@@ -290,3 +322,4 @@ public enum ECDocumentRenderer {
         return sheet.render()
     }
 }
+

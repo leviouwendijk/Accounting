@@ -35,29 +35,9 @@ public enum TaxonomyProjector {
             try? FileManager.default.removeItem(at: mappingZIPFileURL)
         }
 
-        // let accountCodes = output.chart.nodes
-        //     .map(\.codes.code)
-        //     .filter { !$0.isEmpty }
-
-        // let accountLookup = TaxonomyProjection.makeAccountLookup(
-        //     identifiers: accountCodes,
-        //     codes: accountCodes
-        // )
-
-
-        // let canonicalMappings = TaxonomyProjection.canonicalizeMappings(
-        //     loadedMapping.resolvedMappings,
-        //     lookup: accountLookup
-        // )
-
-        // let canonicalMappings = dedupeCanonicalMappings(
-        //     TaxonomyProjection.canonicalizeMappings(
-        //         loadedMapping.resolvedMappings,
-        //         lookup: accountLookup
-        //     )
-        // )
-
-        let balances = TaxonomyNativeBalanceExtractor.balances(output)
+        let balances = TaxonomyBalanceSourceBuilder.compileBalances(
+            from: output
+        )
 
         let loadedMapping = try TaxonomyLoader.loadGenericMapping(
             zipFileURL: mappingZIPFileURL,
@@ -81,8 +61,14 @@ public enum TaxonomyProjector {
 
         let canonicalMappings = normalization.kept
 
-        let factsByKey = TaxonomyProjection.compileMappedFacts(
-            mappings: canonicalMappings,
+        let nodeMappings = TaxonomySourceNormalizer.normalizeMappingsToNodeIds(
+            canonicalMappings,
+            chart: output.chart
+        )
+
+        let factsByKey = TaxonomyProjection.compileMappedFactsFromNodeMappings(
+            mappings: nodeMappings,
+            chart: output.chart,
             rgsBalances: balances
         )
 
@@ -163,26 +149,8 @@ public enum TaxonomyProjector {
             taxonomy: bootstrap
         )
 
-        // let canonicalMappings = TaxonomyProjection.canonicalizeMappings(
-        //     loadedMapping.resolvedMappings,
-        //     lookup: accountLookup
-        // )
-
-        // let canonicalMappings = TaxonomyProjection.canonicalizeMappings(
-        //     loadedMapping.resolvedMappings,
-        //     lookup: accountLookup
-        // )
-
-        // let canonicalMappings = dedupeCanonicalMappings(
-        //     TaxonomyProjection.canonicalizeMappings(
-        //         loadedMapping.resolvedMappings,
-        //         lookup: accountLookup
-        //     )
-        // )
-
-        let currentBalances = TaxonomyNativeBalanceExtractor.balances(
-            period: output.assembled.current,
-            chart: output.chart
+        let currentBalances = TaxonomyBalanceSourceBuilder.currentPeriodBalances(
+            from: output
         )
 
         let accountLookup = TaxonomyProjection.makeAccountLookup(
@@ -202,9 +170,14 @@ public enum TaxonomyProjector {
 
         let canonicalMappings = normalization.kept
 
+        let currentNodeMappings = TaxonomySourceNormalizer.normalizeMappingsToNodeIds(
+            canonicalMappings,
+            chart: output.chart
+        )
 
-        let currentFactsByKey = TaxonomyProjection.compileMappedFacts(
-            mappings: canonicalMappings,
+        let currentFactsByKey = TaxonomyProjection.compileMappedFactsFromNodeMappings(
+            mappings: currentNodeMappings,
+            chart: output.chart,
             rgsBalances: currentBalances
         )
 
@@ -225,17 +198,20 @@ public enum TaxonomyProjector {
             canonicalMappings: canonicalMappings
         )
 
-        let previousBalances = output.assembled.previous.map {
-            TaxonomyNativeBalanceExtractor.balances(
-                period: $0,
+        let previousBalances = TaxonomyBalanceSourceBuilder.previousPeriodBalances(
+            from: output
+        )
+
+        let previousFactsByKey = previousBalances.map { balances in
+            let previousNodeMappings = TaxonomySourceNormalizer.normalizeMappingsToNodeIds(
+                canonicalMappings,
                 chart: output.chart
             )
-        }
 
-        let previousFactsByKey = previousBalances.map {
-            TaxonomyProjection.compileMappedFacts(
-                mappings: canonicalMappings,
-                rgsBalances: $0
+            return TaxonomyProjection.compileMappedFactsFromNodeMappings(
+                mappings: previousNodeMappings,
+                chart: output.chart,
+                rgsBalances: balances
             )
         }
 
