@@ -13,16 +13,36 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
 
     private let stringKeywordSet: Set<String>
 
+    // public init(
+    //     source: String,
+    //     flavor: EntryCompilerLexingFlavor
+    // ) {
+    //     self.scalars = Array(source.unicodeScalars)
+    //     // self.lexingSets = aggregateLexingSets(flavor: flavor)
+    //     self.lexingSets = EntryCompilerLexingSetsCache.pointer(for: flavor)
+
+    //     // self.stringKeywordSet = aggregateLexingSets(flavor: .string).keywords
+    //     self.stringKeywordSet = EntryCompilerLexingSetsCache.string.keywords
+
+    // }
+
     public init(
         source: String,
         flavor: EntryCompilerLexingFlavor
     ) {
         self.scalars = Array(source.unicodeScalars)
-        // self.lexingSets = aggregateLexingSets(flavor: flavor)
         self.lexingSets = EntryCompilerLexingSetsCache.pointer(for: flavor)
 
-        // self.stringKeywordSet = aggregateLexingSets(flavor: .string).keywords
-        self.stringKeywordSet = EntryCompilerLexingSetsCache.string.keywords
+        switch flavor {
+        case .entries, .transactions:
+            self.stringKeywordSet = EntryCompilerLexingSetsCache.string.keywords
+
+        case .settings, .accounts, .entities, .string, .fallback:
+            self.stringKeywordSet = EntryCompilerLexingSetsCache.string.keywords
+
+        case .documents:
+            self.stringKeywordSet = []
+        }
     }
 
     public mutating func nextToken() -> EntryCompilerToken {

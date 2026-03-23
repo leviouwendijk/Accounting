@@ -18,7 +18,7 @@ public enum ECDocumentLoader {
 
         for url in urls {
             let src = try String(contentsOf: url, encoding: .utf8)
-            var lx = EntryCompilerLexer(source: src, flavor: .entries)
+            var lx = EntryCompilerLexer(source: src, flavor: .documents)
 
             let toks: [EntryCompilerToken]
             let lineMap: [Int]?

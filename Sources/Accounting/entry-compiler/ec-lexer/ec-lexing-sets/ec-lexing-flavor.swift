@@ -6,6 +6,8 @@ public enum EntryCompilerLexingFlavor: Sendable {
     case entities
     case entries
     case transactions
+    case documents
+
     case string
     case fallback
 }

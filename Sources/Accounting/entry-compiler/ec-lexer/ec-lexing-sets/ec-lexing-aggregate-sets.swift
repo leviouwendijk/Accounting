@@ -218,6 +218,11 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
         let idents: Set<String> = ["account", "entity"]
         return .init(keywords: keywords, idents: idents)
 
+    case .documents:
+        let keywords = union(global, shared, date)
+        let idents: Set<String> = baseIdents
+        return .init(keywords: keywords, idents: idents)
+
     case .string:
         return .init(keywords: stringBlocks, idents: [])
 
