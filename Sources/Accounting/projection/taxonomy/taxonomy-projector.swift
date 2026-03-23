@@ -49,9 +49,16 @@ public enum TaxonomyProjector {
             taxonomy: bootstrap
         )
 
-        let canonicalMappings = TaxonomyProjection.canonicalizeMappings(
-            loadedMapping.resolvedMappings,
-            lookup: accountLookup
+        // let canonicalMappings = TaxonomyProjection.canonicalizeMappings(
+        //     loadedMapping.resolvedMappings,
+        //     lookup: accountLookup
+        // )
+
+        let canonicalMappings = dedupeCanonicalMappings(
+            TaxonomyProjection.canonicalizeMappings(
+                loadedMapping.resolvedMappings,
+                lookup: accountLookup
+            )
         )
 
         let balances = TaxonomyNativeBalanceExtractor.balances(output)
@@ -137,9 +144,21 @@ public enum TaxonomyProjector {
             taxonomy: bootstrap
         )
 
-        let canonicalMappings = TaxonomyProjection.canonicalizeMappings(
-            loadedMapping.resolvedMappings,
-            lookup: accountLookup
+        // let canonicalMappings = TaxonomyProjection.canonicalizeMappings(
+        //     loadedMapping.resolvedMappings,
+        //     lookup: accountLookup
+        // )
+
+        // let canonicalMappings = TaxonomyProjection.canonicalizeMappings(
+        //     loadedMapping.resolvedMappings,
+        //     lookup: accountLookup
+        // )
+
+        let canonicalMappings = dedupeCanonicalMappings(
+            TaxonomyProjection.canonicalizeMappings(
+                loadedMapping.resolvedMappings,
+                lookup: accountLookup
+            )
         )
 
         let currentBalances = TaxonomyNativeBalanceExtractor.balances(
@@ -217,6 +236,45 @@ public enum TaxonomyProjector {
         }
         return profile
     }
+
+    private static func dedupeCanonicalMappings(
+        _ mappings: [TaxonomyCanonicalResolvedMapping]
+    ) -> [TaxonomyCanonicalResolvedMapping] {
+        struct Key: Hashable {
+            let matchedCode: String
+            let targetConcept: String
+            let dimensions: [TaxonomyDimensionKey]
+        }
+
+        var seen = Set<Key>()
+        var out: [TaxonomyCanonicalResolvedMapping] = []
+
+        for mapping in mappings {
+            let dims = mapping.dimensions.map {
+                TaxonomyDimensionKey(
+                    axis: $0.axis,
+                    member: $0.member
+                )
+            }
+
+            let key = Key(
+                matchedCode: mapping.matchedCode,
+                targetConcept: mapping.targetConcept,
+                dimensions: dims
+            )
+
+            if seen.insert(key).inserted {
+                out.append(mapping)
+            }
+        }
+
+        return out
+    }
+}
+
+private struct TaxonomyDimensionKey: Hashable {
+    let axis: String
+    let member: String
 }
 
 public enum TaxonomyProjectionError: LocalizedError, Sendable {
