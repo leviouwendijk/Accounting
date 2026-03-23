@@ -19,10 +19,10 @@ extension ECDocumentRenderer {
                         CSS.decl("font-family", "\"Times New Roman\", Times, serif"),
                         CSS.decl("font-size", "11pt")
                     ),
-                    CSS.rule("@page",
-                        CSS.decl("size", "A4"),
-                        CSS.decl("margin", "20mm 18mm 20mm 18mm")
-                    ),
+                    // CSS.rule("@page",
+                    //     CSS.decl("size", "A4"),
+                    //     CSS.decl("margin", "20mm 18mm 20mm 18mm")
+                    // ),
                     CSS.rule(".page",
                         CSS.decl("padding", "0")
                     ),
