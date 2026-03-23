@@ -125,13 +125,22 @@ public enum ECDocumentRenderer {
                                 case .signature(let signature):
                                     HTML.div(["class": "signature-wrap"]) {
                                         if signature.includeSignatureImage,
-                                           let path = document.assets?.signatureImagePath,
-                                           !path.isEmpty {
+                                           let rawPath = document.assets?.signatureImagePath,
+                                           !rawPath.isEmpty {
+
+                                            let src: String = {
+                                                if rawPath.contains("://") {
+                                                    return rawPath
+                                                }
+
+                                                return URL(fileURLWithPath: rawPath).absoluteString
+                                            }()
+
                                             HTML.img(
-                                                src: path, 
+                                                src: src,
                                                 [
-                                                "alt": "Handtekening",
-                                                "class": "signature-image"
+                                                    "alt": "Handtekening",
+                                                    "class": "signature-image"
                                                 ]
                                             )
                                         }
