@@ -72,6 +72,7 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
         var subjectPrefix: String?
         var senderName: String?
         var senderRole: String?
+        var place: String?
         var date: Date?
         var periods: [String] = []
         var footerLines: [String] = []
@@ -124,6 +125,12 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
             case .ident("sender_role"), .keyword("sender_role"):
                 try expectFieldEquals("sender_role")
                 senderRole = try parseScalarStringLike()
+
+            case .ident("place"), .keyword("place"),
+                 .ident("plaats"), .keyword("plaats"):
+                advance()
+                try expect(.equals)
+                place = try parseScalarStringLike()
 
             case .ident("date"), .keyword("date"):
                 try expectFieldEquals("date")
@@ -196,6 +203,7 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
             subjectPrefix: subjectPrefix,
             senderName: senderName,
             senderRole: senderRole,
+            place: place,
             date: date,
             periods: periods,
             footerLines: footerLines,

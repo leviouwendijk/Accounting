@@ -17,6 +17,7 @@ public struct ECDocument: Sendable {
     public let subjectPrefix: String?
     public let senderName: String?
     public let senderRole: String?
+    public let place: String?
     public let date: Date?
     public let periods: [String]
     public let footerLines: [String]
@@ -35,6 +36,7 @@ public struct ECDocument: Sendable {
         subjectPrefix: String?,
         senderName: String?,
         senderRole: String?,
+        place: String?,
         date: Date?,
         periods: [String],
         footerLines: [String],
@@ -52,6 +54,7 @@ public struct ECDocument: Sendable {
         self.subjectPrefix = subjectPrefix
         self.senderName = senderName
         self.senderRole = senderRole
+        self.place = place
         self.date = date
         self.periods = periods
         self.footerLines = footerLines
