@@ -24,6 +24,10 @@ public enum AssetsOverviewBuilder {
         var diagnosticCounts: [String: Int] = [:]
 
         for (key, entity) in entities.pairs() {
+            if shouldExcludeFromAssetsOverview(entity: entity) {
+                continue
+            }
+
             guard isAssetCandidate(
                 key: key,
                 entity: entity
@@ -219,11 +223,26 @@ public enum AssetsOverviewBuilder {
     }
 
     @inline(__always)
+    private static func shouldExcludeFromAssetsOverview(
+        entity: EntityDef
+    ) -> Bool {
+        guard let raw = cleaned(entity.metadata["asset_overview"])?.lowercased() else {
+            return false
+        }
+
+        return raw == "exclude"
+    }
+
+    @inline(__always)
     private static func isAssetCandidate(
         key: EntityKey,
         entity: EntityDef
     ) -> Bool {
-        if key.class == "objects" {
+        if shouldExcludeFromAssetsOverview(entity: entity) {
+            return false
+        }
+
+        if key.class == "objects" && key.family == "usable" {
             return true
         }
 
@@ -231,17 +250,11 @@ public enum AssetsOverviewBuilder {
             return true
         }
 
-        if entity.depreciation != nil {
+        if entity.kia != nil || entity.kiaDraft != nil {
             return true
         }
 
-        if entity.depreciationDraft != nil {
-            return true
-        }
-
-        if let type = cleaned(entity.metadata["type"])?.lowercased(),
-           type == "tangible"
-        {
+        if entity.depreciation != nil || entity.depreciationDraft != nil {
             return true
         }
 
