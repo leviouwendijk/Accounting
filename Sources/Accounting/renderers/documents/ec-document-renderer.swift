@@ -340,22 +340,22 @@ public enum ECDocumentRenderer {
                 CSS.rule(".footer-block",
                     CSS.decl("margin-top", "24px"),
                     CSS.decl("font-size", "10pt"),
-                    CSS.decl("line-height", "1.28")
+                    CSS.decl("line-height", "1.28"),
+                    CSS.decl("color", "var(--muted)")
                 ),
                 CSS.rule(".footer-line",
-                    CSS.decl("margin", "0 0 2px 0")
+                    CSS.decl("margin", "0 0 2px 0"),
+                    CSS.decl("color", "inherit")
                 ),
-                // CSS.rule(".administrator-line",
-                //     CSS.decl("margin", "6px 0 0 0")
-                // ),
                 CSS.rule(".footer-separator",
                     CSS.decl("border", "none"),
-                    CSS.decl("border-top", "1px solid #666666"),
+                    CSS.decl("border-top", "1px solid var(--border)"),
                     CSS.decl("margin", "12px 0 10px 0")
                 ),
                 CSS.rule(".administrator-line",
-                    CSS.decl("margin", "0 0 2px 0")
-                ),
+                    CSS.decl("margin", "0 0 2px 0"),
+                    CSS.decl("color", "inherit")
+                )
             ]
         )
 
