@@ -46,6 +46,14 @@ public enum AssetsOverviewPrinter {
             )
         }
 
+        if !overview.groups.isEmpty {
+            lines.append("")
+            lines.append("Totaal activa")
+            lines.append("────────────")
+            lines.append("Boekwaarde begin boekjaar | \(fmt(totalOpeningAcrossVisibleSections(overview)))")
+            lines.append("Boekwaarde einde boekjaar | \(fmt(totalClosingAcrossVisibleSections(overview)))")
+        }
+
         while lines.last == "" {
             lines.removeLast()
         }
@@ -61,121 +69,34 @@ public enum AssetsOverviewPrinter {
         lines.append(group.name)
         lines.append(String(repeating: "─", count: max(group.name.count, 8)))
 
-        switch group.section {
-        case .tangibleFixedAssets:
-            lines.append("Kosten van aanschaf of voortbrenging | Boekwaarde begin boekjaar | Boekwaarde einde boekjaar | Restwaarde")
+        let columnProfile = AssetsOverviewColumnProfile.forSection(group.section)
+        lines.append(columnProfile.headers.joined(separator: " | "))
 
-            for line in group.lines {
-                appendTangibleFixedAssetsLine(
-                    name: line.name,
-                    totals: line.totals,
-                    into: &lines
-                )
-            }
-
-            appendTangibleFixedAssetsLine(
-                name: group.totalLabel,
-                totals: group.totals,
+        for line in group.lines {
+            appendLine(
+                name: line.name,
+                totals: line.totals,
+                profile: columnProfile,
                 into: &lines
             )
+        }
 
-        case .inventory:
-            lines.append("Boekwaarde begin boekjaar | Boekwaarde einde boekjaar")
+        appendLine(
+            name: group.totalLabel,
+            totals: group.totals,
+            profile: columnProfile,
+            into: &lines
+        )
 
-            for line in group.lines {
-                appendTwoColumnLine(
-                    name: line.name,
-                    first: line.totals.openingCarryingAmount,
-                    second: line.totals.closingCarryingAmount,
-                    into: &lines
-                )
-            }
-
-            appendTwoColumnLine(
-                name: group.totalLabel,
-                first: group.totals.openingCarryingAmount,
-                second: group.totals.closingCarryingAmount,
-                into: &lines
-            )
-
-        case .receivables:
-            lines.append("Nominale waarde | Boekwaarde begin boekjaar | Boekwaarde einde boekjaar")
-
-            for line in group.lines {
-                appendThreeColumnLine(
-                    name: line.name,
-                    first: line.totals.acquisitionCost,
-                    second: line.totals.openingCarryingAmount,
-                    third: line.totals.closingCarryingAmount,
-                    into: &lines
-                )
-            }
-
-            appendThreeColumnLine(
-                name: group.totalLabel,
-                first: group.totals.acquisitionCost,
-                second: group.totals.openingCarryingAmount,
-                third: group.totals.closingCarryingAmount,
-                into: &lines
-            )
-
-            if let vatLine = group.lines.first(where: { $0.category == .vat_receivable }) {
-                lines.append("")
-                lines.append("Specificatie vordering omzetbelasting")
-                lines.append("Vordering omzetbelasting over het vorige boekjaar | Totaal boekwaarde omzetbelasting")
-                appendTwoColumnLine(
-                    name: vatLine.name,
-                    first: vatLine.totals.openingCarryingAmount,
-                    second: vatLine.totals.closingCarryingAmount,
-                    into: &lines
-                )
-            }
-
-        case .liquidAssets:
-            lines.append("Boekwaarde begin boekjaar | Boekwaarde einde boekjaar")
-
-            for line in group.lines {
-                appendTwoColumnLine(
-                    name: line.name,
-                    first: line.totals.openingCarryingAmount,
-                    second: line.totals.closingCarryingAmount,
-                    into: &lines
-                )
-            }
-
-            appendTwoColumnLine(
-                name: group.totalLabel,
-                first: group.totals.openingCarryingAmount,
-                second: group.totals.closingCarryingAmount,
-                into: &lines
-            )
-
-        case .unclassified:
-            lines.append("Kosten / nominale waarde | Boekwaarde begin boekjaar | Boekwaarde einde boekjaar | Restwaarde")
-
-            for line in group.lines {
-                appendFourColumnLine(
-                    name: line.name,
-                    first: line.totals.acquisitionCost,
-                    second: line.totals.openingCarryingAmount,
-                    third: line.totals.closingCarryingAmount,
-                    fourth: line.totals.residualAmount,
-                    into: &lines
-                )
-            }
-
-            appendFourColumnLine(
-                name: group.totalLabel,
-                first: group.totals.acquisitionCost,
-                second: group.totals.openingCarryingAmount,
-                third: group.totals.closingCarryingAmount,
-                fourth: group.totals.residualAmount,
+        if group.section == .receivables {
+            renderVATSpecification(
+                from: group,
                 into: &lines
             )
         }
 
         if diagnostics {
-            for line in group.lines {
+            for line in group.lines where !line.rows.isEmpty {
                 lines.append("")
                 lines.append("Underlying assets — \(line.name)")
                 lines.append(String(repeating: "·", count: max(18, line.name.count + 20)))
@@ -195,50 +116,78 @@ public enum AssetsOverviewPrinter {
         }
     }
 
-    private static func appendTangibleFixedAssetsLine(
+    private static func appendLine(
         name: String,
         totals: AssetsOverviewAmounts,
+        profile: AssetsOverviewColumnProfile,
         into lines: inout [String]
     ) {
-        lines.append(
-            "\(name) | \(fmt(totals.acquisitionCost)) | \(fmt(totals.openingCarryingAmount)) | \(fmt(totals.closingCarryingAmount)) | \(fmt(totals.residualAmount))"
-        )
+        switch profile {
+        case .intangibleFixedAssets:
+            lines.append(
+                "\(name) | \(fmt(totals.acquisitionCost)) | \(fmt(totals.openingCarryingAmount)) | \(fmt(totals.closingCarryingAmount))"
+            )
+
+        case .tangibleFixedAssets:
+            lines.append(
+                "\(name) | \(fmt(totals.acquisitionCost)) | \(fmt(totals.openingCarryingAmount)) | \(fmt(totals.closingCarryingAmount)) | \(fmt(totals.residualAmount))"
+            )
+
+        case .financialFixedAssets, .inventory, .securities, .liquidAssets:
+            lines.append(
+                "\(name) | \(fmt(totals.openingCarryingAmount)) | \(fmt(totals.closingCarryingAmount))"
+            )
+
+        case .receivables:
+            lines.append(
+                "\(name) | \(fmt(totals.acquisitionCost)) | \(fmt(totals.openingCarryingAmount)) | \(fmt(totals.closingCarryingAmount))"
+            )
+
+        case .unclassified:
+            lines.append(
+                "\(name) | \(fmt(totals.acquisitionCost)) | \(fmt(totals.openingCarryingAmount)) | \(fmt(totals.closingCarryingAmount)) | \(fmt(totals.residualAmount))"
+            )
+        }
     }
 
-    private static func appendTwoColumnLine(
-        name: String,
-        first: Decimal,
-        second: Decimal,
+    private static func renderVATSpecification(
+        from group: AssetsOverviewGroup,
         into lines: inout [String]
     ) {
-        lines.append(
-            "\(name) | \(fmt(first)) | \(fmt(second))"
-        )
+        guard let vatLine = group.lines.first(where: { $0.category == .vat_receivable }) else {
+            return
+        }
+
+        lines.append("")
+        lines.append("Specificatie vordering omzetbelasting")
+        lines.append("Vordering omzetbelasting over dit boekjaar | \(fmt(0))")
+        lines.append("Vordering omzetbelasting over het vorige boekjaar | \(fmt(vatLine.totals.openingCarryingAmount))")
+        lines.append("Vordering omzetbelasting over oudere boekjaren | \(fmt(0))")
+        lines.append("Totaal boekwaarde omzetbelasting | \(fmt(vatLine.totals.closingCarryingAmount))")
     }
 
-    private static func appendThreeColumnLine(
-        name: String,
-        first: Decimal,
-        second: Decimal,
-        third: Decimal,
-        into lines: inout [String]
-    ) {
-        lines.append(
-            "\(name) | \(fmt(first)) | \(fmt(second)) | \(fmt(third))"
-        )
+    private static func totalOpeningAcrossVisibleSections(
+        _ overview: AssetsOverview
+    ) -> Decimal {
+        overview.groups.reduce(0) { partial, group in
+            if group.section == .unclassified {
+                return partial
+            }
+
+            return partial + group.totals.openingCarryingAmount
+        }
     }
 
-    private static func appendFourColumnLine(
-        name: String,
-        first: Decimal,
-        second: Decimal,
-        third: Decimal,
-        fourth: Decimal,
-        into lines: inout [String]
-    ) {
-        lines.append(
-            "\(name) | \(fmt(first)) | \(fmt(second)) | \(fmt(third)) | \(fmt(fourth))"
-        )
+    private static func totalClosingAcrossVisibleSections(
+        _ overview: AssetsOverview
+    ) -> Decimal {
+        overview.groups.reduce(0) { partial, group in
+            if group.section == .unclassified {
+                return partial
+            }
+
+            return partial + group.totals.closingCarryingAmount
+        }
     }
 
     private static func renderDiagnosticRow(

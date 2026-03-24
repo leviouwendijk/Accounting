@@ -1,56 +1,6 @@
 import Foundation
 
 extension StatementHTMLRenderer {
-    @inline(__always)
-    static func rowLabelClass(
-        indent: Int
-    ) -> String {
-        "sr-label \(levelClass(indent)) \(weightClass(indent))"
-    }
-
-    @inline(__always)
-    static func rowAmountClass(
-        indent: Int
-    ) -> String {
-        "sr-amount \(weightClass(indent))"
-    }
-
-    @inline(__always)
-    static func indentationPrefix(
-        _ indent: Int
-    ) -> String {
-        String(
-            repeating: "\u{00a0}\u{00a0}",
-            count: max(0, indent)
-        )
-    }
-}
-
-extension StatementHTMLRenderer {
-    // @inline(__always)
-    // static func escape(_ s: String) -> String {
-    //     var out = String()
-    //     out.reserveCapacity(s.count)
-    //     for ch in s {
-    //         switch ch {
-    //         case "&": out += "&amp;"
-    //         case "<": out += "&lt;"
-    //         case ">": out += "&gt;"
-    //         case "\"": out += "&quot;"
-    //         case "'": out += "&#39;"
-    //         default: out.append(ch)
-    //         }
-    //     }
-    //     return out
-    // }
-
-    // // Formatter + escape identical to before (but used only inside renderer).
-    // func escape(_ s: String) -> String {
-    //     s.replacingOccurrences(of: "&", with: "&amp;")
-    //      .replacingOccurrences(of: "<", with: "&lt;")
-    //      .replacingOccurrences(of: ">", with: "&gt;")
-    // }
-
     static func fmt(_ d: Decimal) -> String {
         let nf = NumberFormatter()
         nf.locale = Locale(identifier: "nl_NL")
@@ -87,82 +37,68 @@ extension StatementHTMLRenderer {
     static func weightClass(_ level: Int) -> String {
         "sr-weight-\(min(3, max(0, level)))"
     }
+}
+
+extension StatementHTMLRenderer {
+    @inline(__always)
+    static func rowLabelClass(
+        depth: Int
+    ) -> String {
+        "sr-label \(levelClass(depth)) \(weightClass(depth))"
+    }
 
     @inline(__always)
-    static func hasSiblingAfter(
-        index: Int,
-        at level: Int,
-        in indents: [Int]
-    ) -> Bool {
-        guard index + 1 < indents.count else {
-            return false
-        }
+    static func rowAmountClass(
+        depth: Int
+    ) -> String {
+        "sr-amount \(weightClass(depth))"
+    }
 
-        for j in (index + 1)..<indents.count {
-            let next = indents[j]
-
-            if next < level {
-                return false
-            }
-
-            if next == level {
-                return true
-            }
-        }
-
-        return false
+    @inline(__always)
+    static func spacingPrefix(
+        depth: Int
+    ) -> String {
+        String(
+            repeating: "\u{00a0}\u{00a0}",
+            count: max(0, depth)
+        )
     }
 
     @inline(__always)
     static func treePrefix(
-        index: Int,
-        indents: [Int]
+        depth: Int,
+        hasNextSibling: Bool,
+        ancestorHasNextSiblings: [Bool]
     ) -> String {
-        let level = max(0, indents[index])
-
-        guard level > 0 else {
+        guard depth > 0 else {
             return ""
         }
 
         var out = ""
 
-        if level > 1 {
-            for ancestor in 1..<level {
-                out += hasSiblingAfter(
-                    index: index,
-                    at: ancestor,
-                    in: indents
-                ) ? "│  " : "   "
-            }
+        for hasNext in ancestorHasNextSiblings {
+            out += hasNext ? "│  " : "   "
         }
 
-        out += hasSiblingAfter(
-            index: index,
-            at: level,
-            in: indents
-        ) ? "├─ " : "└─ "
-
+        out += hasNextSibling ? "├─ " : "└─ "
         return out
     }
 
-    @inline(__always)
     static func hierarchyPrefix(
-        index: Int,
-        indent: Int,
-        indents: [Int],
+        depth: Int,
+        hasNextSibling: Bool,
+        ancestorHasNextSiblings: [Bool],
         options: StatementHTMLRenderer.Options
     ) -> String {
         switch options.hierarchyPrefixStyle {
         case .spacing:
-            return String(
-                repeating: "\u{00a0}\u{00a0}",
-                count: max(0, indent)
-            )
+            return spacingPrefix(depth: depth)
 
         case .tree:
             return treePrefix(
-                index: index,
-                indents: indents
+                depth: depth,
+                hasNextSibling: hasNextSibling,
+                ancestorHasNextSiblings: ancestorHasNextSiblings
             )
         }
     }

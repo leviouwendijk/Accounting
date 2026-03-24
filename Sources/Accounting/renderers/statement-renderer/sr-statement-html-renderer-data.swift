@@ -34,18 +34,27 @@ extension StatementHTMLRenderer {
     }
 
     struct TableRow: Sendable {
-        let indent: Int
+        let id: Int?
+        let parentId: Int?
+        let depth: Int
+        let prefix: String
         let label: String
         let amount: Decimal
         let isTotal: Bool
 
         init(
-            indent: Int,
+            id: Int? = nil,
+            parentId: Int? = nil,
+            depth: Int,
+            prefix: String = "",
             label: String,
             amount: Decimal,
             isTotal: Bool = false
         ) {
-            self.indent = indent
+            self.id = id
+            self.parentId = parentId
+            self.depth = depth
+            self.prefix = prefix
             self.label = label
             self.amount = amount
             self.isTotal = isTotal

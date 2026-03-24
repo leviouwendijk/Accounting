@@ -229,31 +229,48 @@ public enum AssetsOverviewBuilder {
 
         rows.sort(by: sortRows)
 
-        let rowsByCategory = Dictionary(grouping: rows, by: \.category)
+        let rowsByCategory: [AssetsOverviewCategory: [AssetsOverviewRow]] = Dictionary(
+            grouping: rows,
+            by: { (row: AssetsOverviewRow) in row.category }
+        )
 
-        let lines = rowsByCategory.keys
-            .sorted { $0.sortOrder < $1.sortOrder }
-            .map { category in
-                let categoryRows = rowsByCategory[category] ?? []
+        let lines: [AssetsOverviewLine] = AssetsOverviewFormLine.all.compactMap {
+            (formLine: AssetsOverviewFormLine) -> AssetsOverviewLine? in
+            let categoryRows: [AssetsOverviewRow] = rowsByCategory[formLine.category] ?? []
 
-                return AssetsOverviewLine(
-                    category: category,
-                    name: category.lineLabel,
-                    rows: categoryRows,
-                    flaggedAssetCount: categoryRows.filter { !$0.flags.isEmpty }.count,
-                    totals: makeAmounts(from: categoryRows)
-                )
+            if formLine.category == .unclassified && categoryRows.isEmpty {
+                return nil
             }
 
-        let linesBySection = Dictionary(grouping: lines, by: \.category.section)
+            return AssetsOverviewLine(
+                category: formLine.category,
+                name: formLine.label,
+                rows: categoryRows,
+                flaggedAssetCount: categoryRows.filter { !$0.flags.isEmpty }.count,
+                totals: makeAmounts(from: categoryRows)
+            )
+        }
 
-        let groups = linesBySection.keys
-            .sorted { $0.sortOrder < $1.sortOrder }
-            .map { section in
-                let sectionLines = (linesBySection[section] ?? [])
-                    .sorted { $0.category.sortOrder < $1.category.sortOrder }
+        let linesBySection: [AssetsOverviewSection: [AssetsOverviewLine]] = Dictionary(
+            grouping: lines,
+            by: { (line: AssetsOverviewLine) in line.category.section }
+        )
 
-                let sectionRows = sectionLines.flatMap(\.rows)
+        let groups: [AssetsOverviewGroup] = AssetsOverviewSection.allCases
+            .sorted { (lhs: AssetsOverviewSection, rhs: AssetsOverviewSection) -> Bool in
+                lhs.sortOrder < rhs.sortOrder
+            }
+            .compactMap { (section: AssetsOverviewSection) -> AssetsOverviewGroup? in
+                let sectionLines: [AssetsOverviewLine] = (linesBySection[section] ?? [])
+                    .sorted { (lhs: AssetsOverviewLine, rhs: AssetsOverviewLine) -> Bool in
+                        lhs.category.sortOrder < rhs.category.sortOrder
+                    }
+
+                if section == .unclassified && sectionLines.isEmpty {
+                    return nil
+                }
+
+                let sectionRows: [AssetsOverviewRow] = sectionLines.flatMap(\.rows)
 
                 return AssetsOverviewGroup(
                     section: section,

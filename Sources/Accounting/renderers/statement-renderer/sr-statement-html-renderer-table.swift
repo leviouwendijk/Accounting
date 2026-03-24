@@ -81,54 +81,46 @@ extension StatementHTMLRenderer {
     ) -> [any HTMLNode] {
         HTML.tr {
             HTML.td(["class": "label"]) {
-                renderLabelCell(
-                    label: row.label,
-                    indent: row.indent,
-                    isTotal: row.isTotal
-                )
+                renderLabelCell(row: row)
             }
 
             HTML.td(["class": "amt"]) {
-                renderAmountCell(
-                    amount: row.amount,
-                    indent: row.indent,
-                    isTotal: row.isTotal
-                )
+                renderAmountCell(row: row)
             }
         }
     }
 
     static func renderLabelCell(
-        label: String,
-        indent: Int,
-        isTotal: Bool
+        row: TableRow
     ) -> any HTMLNode {
         HTML.div([
-            "class": rowLabelClass(indent: indent)
+            "class": rowLabelClass(depth: row.depth)
         ]) {
-            HTML.raw(indentationPrefix(indent))
+            if !row.prefix.isEmpty {
+                HTML.span(["class": "sr-hierarchy-prefix"]) {
+                    HTML.raw(row.prefix)
+                }
+            }
 
-            if isTotal {
+            if row.isTotal {
                 HTML.strong {
-                    HTML.text(label)
+                    HTML.text(row.label)
                 }
             } else {
-                HTML.text(label)
+                HTML.text(row.label)
             }
         }
     }
 
     static func renderAmountCell(
-        amount: Decimal,
-        indent: Int,
-        isTotal: Bool
+        row: TableRow
     ) -> any HTMLNode {
-        let text = fmt(amount)
+        let text = fmt(row.amount)
 
         return HTML.span([
-            "class": rowAmountClass(indent: indent)
+            "class": rowAmountClass(depth: row.depth)
         ]) {
-            if isTotal {
+            if row.isTotal {
                 HTML.strong {
                     HTML.text(text)
                 }

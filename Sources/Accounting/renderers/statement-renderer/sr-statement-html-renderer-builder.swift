@@ -7,6 +7,8 @@ extension StatementHTMLRenderer {
         equityCode: String,
         options: Options
     ) throws -> DocumentModel {
+        let maps = try RGSAssembler.makeMaps(from: chart)
+
         let balanceSections = try RGSPrinter.computeBalanceByL2Sections(
             bundle: bundle,
             chart: chart,
@@ -22,6 +24,7 @@ extension StatementHTMLRenderer {
 
         let income = buildIncomeSection(
             from: incomeSections.first?.lines ?? [],
+            maps: maps,
             options: options
         )
 
@@ -29,21 +32,27 @@ extension StatementHTMLRenderer {
 
         if let assets = buildBalanceSection(
             title: "Balans: Activa",
-            source: balanceSections.assets
+            source: balanceSections.assets,
+            maps: maps,
+            options: options
         ) {
             balances.append(assets)
         }
 
         if let equity = buildBalanceSection(
             title: "Balans: Eigen Vermogen",
-            source: balanceSections.equity
+            source: balanceSections.equity,
+            maps: maps,
+            options: options
         ) {
             balances.append(equity)
         }
 
         if let liabilities = buildBalanceSection(
             title: "Balans: Passiva",
-            source: balanceSections.liabilities
+            source: balanceSections.liabilities,
+            maps: maps,
+            options: options
         ) {
             balances.append(liabilities)
         }
@@ -51,7 +60,9 @@ extension StatementHTMLRenderer {
         if options.includeOtherBucket,
            let other = buildBalanceSection(
                 title: "Balance Sheet — Other",
-                source: balanceSections.other
+                source: balanceSections.other,
+                maps: maps,
+                options: options
            ) {
             balances.append(other)
         }
@@ -73,24 +84,44 @@ extension StatementHTMLRenderer {
 
     static func buildIncomeSection(
         from lines: [StatementLine],
+        maps: RGSAssemblerResult,
         options: Options
     ) -> TableSection {
-        let rows = lines
-            .filter { line in
-                options.minAbsIncome == 0
-                    ? true
-                    : absDec(line.amount) >= options.minAbsIncome
-            }
-            .map { line in
-                let base = options.omitIncomeLevel1Root ? 2 : 1
+        let filtered = lines.filter { line in
+            options.minAbsIncome == 0
+                ? true
+                : absDec(line.amount) >= options.minAbsIncome
+        }
 
-                return TableRow(
-                    indent: max(0, line.level - base),
-                    label: line.label,
-                    amount: line.amount,
-                    isTotal: false
-                )
-            }
+        let ids = filtered.map(\.id)
+        let hierarchy = makeRowHierarchyMap(
+            idsInOrder: ids,
+            parentById: maps.parentById
+        )
+
+        let fallbackBase = options.omitIncomeLevel1Root ? 2 : 1
+
+        let rows = filtered.map { line in
+            let h = hierarchy[line.id]
+            let depth = h?.depth ?? max(0, line.level - fallbackBase)
+
+            let prefix = hierarchyPrefix(
+                depth: depth,
+                hasNextSibling: h?.hasNextSibling ?? false,
+                ancestorHasNextSiblings: h?.ancestorHasNextSiblings ?? [],
+                options: options
+            )
+
+            return TableRow(
+                id: line.id,
+                parentId: h?.parentId,
+                depth: depth,
+                prefix: prefix,
+                label: line.label,
+                amount: line.amount,
+                isTotal: false
+            )
+        }
 
         return TableSection(
             title: "Winst- en Verliesrekening",
@@ -100,15 +131,39 @@ extension StatementHTMLRenderer {
 
     static func buildBalanceSection(
         title: String,
-        source: RGSBalanceBucketsOutput.Section?
+        source: RGSBalanceBucketsOutput.Section?,
+        maps: RGSAssemblerResult,
+        options: Options
     ) -> TableSection? {
         guard let source else {
             return nil
         }
 
+        let ids = source.lines.map(\.id)
+        let rootId = ids.first
+
+        let hierarchy = makeRowHierarchyMap(
+            idsInOrder: ids,
+            parentById: maps.parentById,
+            sectionRootId: rootId
+        )
+
         let rows = source.lines.map { line in
-            TableRow(
-                indent: line.relativeIndent,
+            let h = hierarchy[line.id]
+            let depth = h?.depth ?? line.relativeIndent
+
+            let prefix = hierarchyPrefix(
+                depth: depth,
+                hasNextSibling: h?.hasNextSibling ?? false,
+                ancestorHasNextSiblings: h?.ancestorHasNextSiblings ?? [],
+                options: options
+            )
+
+            return TableRow(
+                id: line.id,
+                parentId: h?.parentId,
+                depth: depth,
+                prefix: prefix,
                 label: line.label,
                 amount: line.amount,
                 isTotal: false

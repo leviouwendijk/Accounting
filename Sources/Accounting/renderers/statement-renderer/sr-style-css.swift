@@ -91,7 +91,9 @@ public enum StatementStyleCSS {
                     ".sr-hierarchy-prefix",
                     CSS.decl("font-family", "ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace"),
                     CSS.decl("white-space", "pre"),
-                    CSS.decl("display", "inline-block")
+                    CSS.decl("display", "inline-block"),
+                    CSS.decl("vertical-align", "top"),
+                    CSS.decl("margin-right", "2px")
                 ),
 
                 // addition
