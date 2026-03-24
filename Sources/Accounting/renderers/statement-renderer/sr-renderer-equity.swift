@@ -34,11 +34,11 @@ public extension StatementHTMLRenderer {
                     }
                     HTML.body(["class": "sr-eq"]) {
                         HTML.h1 {
-                            HTML.text(escape(title))
+                            HTML.text(title)
                         }
                         if let sub = options.subtitle {
                             HTML.div(["class": "sr-eq-sub"]) {
-                                HTML.text(escape(sub))
+                                HTML.text(sub)
                             }
                         }
                         HTML.p {
@@ -158,22 +158,22 @@ public extension StatementHTMLRenderer {
 
                 HTML.body(["class": "sr-eq"]) {
                     HTML.h1 {
-                        HTML.text(escape(title))
+                        HTML.text((title))
                     }
                     if let sub = options.subtitle {
                         HTML.div(["class": "sr-eq-sub"]) {
-                            HTML.text(escape(sub))
+                            HTML.text((sub))
                         }
                     }
 
                     for periodView in periodViews {
                         HTML.div(["class": "sr-eq-period"]) {
                             HTML.h2 {
-                                HTML.text(escape(periodView.label))
+                                HTML.text((periodView.label))
                             }
 
                             HTML.div(["class": "sr-eq-summary"]) {
-                                HTML.text("Winst bron: \(escape(periodView.winstSourceDescription))")
+                                HTML.text("Winst bron: \((periodView.winstSourceDescription))")
                             }
                             HTML.div(["class": "sr-eq-summary"]) {
                                 HTML.text("• Nettowinst (totaal, geïnjecteerd): \(fmt(periodView.niTotal))")
@@ -206,7 +206,7 @@ public extension StatementHTMLRenderer {
                                     for row in periodView.rows {
                                         HTML.tr {
                                             HTML.td(["class": "sr-eq-left"]) {
-                                                HTML.text(escape(row.name))
+                                                HTML.text((row.name))
                                             }
                                             HTML.td(["class": amountClass(row.begin)]) {
                                                 HTML.text(fmt(row.begin))

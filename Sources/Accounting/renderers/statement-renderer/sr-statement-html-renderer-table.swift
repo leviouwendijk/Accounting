@@ -110,10 +110,10 @@ extension StatementHTMLRenderer {
 
             if isTotal {
                 HTML.strong {
-                    HTML.text(escape(label))
+                    HTML.text(label)
                 }
             } else {
-                HTML.text(escape(label))
+                HTML.text(label)
             }
         }
     }

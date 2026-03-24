@@ -36,7 +36,7 @@ extension StatementHTMLRenderer {
                                     "class": "sr-label \(levelClass(line.relativeIndent)) \(weightClass(line.relativeIndent))"
                                 ]) {
                                     HTML.raw(pad)
-                                    HTML.text(escape(line.label))
+                                    HTML.text(line.label)
                                 }
                             }
                             HTML.td(["class": "amt"]) {

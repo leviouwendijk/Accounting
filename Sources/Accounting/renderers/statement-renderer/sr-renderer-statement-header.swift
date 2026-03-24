@@ -21,12 +21,12 @@ extension StatementHTMLRenderer {
         options: Options
     ) -> [any HTMLNode] {
         HTML.h1 {
-            HTML.text(escape(options.title))
+            HTML.text(options.title)
         }
 
         if let subtitle = options.subtitle {
             HTML.div(["class": "subtitle"]) {
-                HTML.text(escape(subtitle))
+                HTML.text(subtitle)
             }
         }
     }
@@ -40,12 +40,12 @@ extension StatementHTMLRenderer {
                 let leftTitle = nonEmpty(company.name) ?? options.title
 
                 HTML.h1 {
-                    HTML.text(escape(leftTitle))
+                    HTML.text(leftTitle)
                 }
 
                 if let kvk = company.kvk {
                     HTML.div(["class": "small"]) {
-                        HTML.text(escape(kvk))
+                        HTML.text(kvk)
                     }
                 }
 
@@ -53,7 +53,7 @@ extension StatementHTMLRenderer {
                    !address.isEmpty {
                     for line in address.split(separator: "\n") {
                         HTML.div(["class": "small"]) {
-                            HTML.text(escape(String(line)))
+                            HTML.text(String(line))
                         }
                     }
                 }
@@ -61,12 +61,12 @@ extension StatementHTMLRenderer {
 
             HTML.div(["class": "meta"]) {
                 HTML.div(["class": "title"]) {
-                    HTML.text(escape(options.title))
+                    HTML.text(options.title)
                 }
 
                 if let subtitle = options.subtitle {
                     HTML.div(["class": "subtitle"]) {
-                        HTML.text(escape(subtitle))
+                        HTML.text(subtitle)
                     }
                 }
             }
