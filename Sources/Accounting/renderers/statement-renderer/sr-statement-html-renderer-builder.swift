@@ -96,9 +96,22 @@ extension StatementHTMLRenderer {
         let ids = filtered.map(\.id)
         let fallbackBase = options.omitIncomeLevel1Root ? 2 : 1
 
-        let presentationDepthById: [Int: Int] = Dictionary(
+        let rawDepthById: [Int: Int] = Dictionary(
             uniqueKeysWithValues: filtered.map { line in
                 (line.id, max(0, line.level - fallbackBase))
+            }
+        )
+
+        let distinctDepths = Array(Set(rawDepthById.values)).sorted()
+        let compactDepthIndex = Dictionary(
+            uniqueKeysWithValues: distinctDepths.enumerated().map { offset, depth in
+                (depth, offset)
+            }
+        )
+
+        let presentationDepthById: [Int: Int] = Dictionary(
+            uniqueKeysWithValues: rawDepthById.map { id, rawDepth in
+                (id, compactDepthIndex[rawDepth] ?? 0)
             }
         )
 
