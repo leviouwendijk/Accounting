@@ -5,9 +5,18 @@ public enum FinancialRatiosBuilder {
         assets: Decimal,
         equity: Decimal,
         liabilities: Decimal,
-        netIncome: Decimal?
+        netIncome: Decimal?,
+        omslag: OmslagMode
     ) -> FinancialRatios? {
-        if assets == 0, equity == 0, liabilities == 0, netIncome == nil {
+        let presentedNetIncome = netIncome.map {
+            RGSAssembler.present(
+                $0,
+                direction: .credit,
+                mode: omslag
+            )
+        }
+
+        if assets == 0, equity == 0, liabilities == 0, presentedNetIncome == nil {
             return nil
         }
 
@@ -15,12 +24,12 @@ public enum FinancialRatiosBuilder {
             assets: assets,
             equity: equity,
             liabilities: liabilities,
-            netIncome: netIncome,
+            netIncome: presentedNetIncome,
             equityRatio: ratio(equity, over: assets),
             debtRatio: ratio(liabilities, over: assets),
             debtToEquity: ratio(liabilities, over: equity),
-            returnOnAssets: netIncome.flatMap { ratio($0, over: assets) },
-            returnOnEquity: netIncome.flatMap { ratio($0, over: equity) }
+            returnOnAssets: presentedNetIncome.flatMap { ratio($0, over: assets) },
+            returnOnEquity: presentedNetIncome.flatMap { ratio($0, over: equity) }
         )
     }
 

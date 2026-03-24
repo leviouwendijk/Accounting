@@ -37,7 +37,8 @@ extension RGSAssembler {
             assets: totals.assets,
             equity: totals.equity,
             liabilities: totals.liabilities,
-            netIncome: netIncome
+            netIncome: netIncome,
+            omslag: omslag
         )
 
         return BundleAnalytics(
