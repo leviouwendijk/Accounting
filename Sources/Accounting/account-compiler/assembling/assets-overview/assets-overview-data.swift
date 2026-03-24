@@ -22,48 +22,98 @@ public struct AssetsOverview: PresentableOutput {
     }
 }
 
+public struct AssetsOverviewAmounts: Sendable {
+    public let acquisitionCost: Decimal
+    public let openingCarryingAmount: Decimal
+    public let periodInvestment: Decimal
+    public let periodDepreciation: Decimal
+    public let closingCarryingAmount: Decimal
+    public let residualAmount: Decimal
+
+    public init(
+        acquisitionCost: Decimal,
+        openingCarryingAmount: Decimal,
+        periodInvestment: Decimal,
+        periodDepreciation: Decimal,
+        closingCarryingAmount: Decimal,
+        residualAmount: Decimal
+    ) {
+        self.acquisitionCost = acquisitionCost
+        self.openingCarryingAmount = openingCarryingAmount
+        self.periodInvestment = periodInvestment
+        self.periodDepreciation = periodDepreciation
+        self.closingCarryingAmount = closingCarryingAmount
+        self.residualAmount = residualAmount
+    }
+}
+
+public struct AssetsOverviewLine: Sendable {
+    public let category: AssetsOverviewCategory
+    public let name: String
+    public let rows: [AssetsOverviewRow]
+    public let flaggedAssetCount: Int
+    public let totals: AssetsOverviewAmounts
+
+    public init(
+        category: AssetsOverviewCategory,
+        name: String,
+        rows: [AssetsOverviewRow],
+        flaggedAssetCount: Int,
+        totals: AssetsOverviewAmounts
+    ) {
+        self.category = category
+        self.name = name
+        self.rows = rows
+        self.flaggedAssetCount = flaggedAssetCount
+        self.totals = totals
+    }
+}
+
 public struct AssetsOverviewSummary: Sendable {
     public let assetCount: Int
     public let flaggedAssetCount: Int
+    public let totals: AssetsOverviewAmounts
 
-    public let acquisitionCostTotal: Decimal
-    public let openingCarryingAmountTotal: Decimal
-    public let periodInvestmentTotal: Decimal
-    public let periodDepreciationTotal: Decimal
-    public let closingCarryingAmountTotal: Decimal
+    public let unclassifiedNonZeroAssetCount: Int
+    public let unclassifiedNonZeroTotals: AssetsOverviewAmounts
 
     public init(
         assetCount: Int,
         flaggedAssetCount: Int,
-        acquisitionCostTotal: Decimal,
-        openingCarryingAmountTotal: Decimal,
-        periodInvestmentTotal: Decimal,
-        periodDepreciationTotal: Decimal,
-        closingCarryingAmountTotal: Decimal
+        totals: AssetsOverviewAmounts,
+        unclassifiedNonZeroAssetCount: Int,
+        unclassifiedNonZeroTotals: AssetsOverviewAmounts
     ) {
         self.assetCount = assetCount
         self.flaggedAssetCount = flaggedAssetCount
-        self.acquisitionCostTotal = acquisitionCostTotal
-        self.openingCarryingAmountTotal = openingCarryingAmountTotal
-        self.periodInvestmentTotal = periodInvestmentTotal
-        self.periodDepreciationTotal = periodDepreciationTotal
-        self.closingCarryingAmountTotal = closingCarryingAmountTotal
+        self.totals = totals
+        self.unclassifiedNonZeroAssetCount = unclassifiedNonZeroAssetCount
+        self.unclassifiedNonZeroTotals = unclassifiedNonZeroTotals
     }
 }
 
 public struct AssetsOverviewGroup: Sendable {
-    public let category: AssetsOverviewCategory
+    public let section: AssetsOverviewSection
     public let name: String
-    public let rows: [AssetsOverviewRow]
+    public let totalLabel: String
+    public let lines: [AssetsOverviewLine]
+    public let flaggedAssetCount: Int
+    public let totals: AssetsOverviewAmounts
 
     public init(
+        section: AssetsOverviewSection,
         name: String,
-        category: AssetsOverviewCategory,
-        rows: [AssetsOverviewRow]
+        totalLabel: String,
+        lines: [AssetsOverviewLine],
+        flaggedAssetCount: Int,
+        totals: AssetsOverviewAmounts
     ) {
+        self.section = section
         self.name = name
-        self.category = category
-        self.rows = rows
+        self.totalLabel = totalLabel
+        self.lines = lines
+        self.flaggedAssetCount = flaggedAssetCount
+        self.totals = totals
     }
 }
 

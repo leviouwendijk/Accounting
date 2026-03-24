@@ -129,8 +129,6 @@ public enum AssetsOverviewBuilder {
                 flags.append("unassigned owner-share allocation")
             }
 
-            flags = unique(flags)
-
             let openingCarryingAmount = carryingAmount(
                 asOf: openingAsOf,
                 acquisitionCost: acquisitionCost,
@@ -159,6 +157,41 @@ public enum AssetsOverviewBuilder {
                 availableFrom: effectiveStartDate,
                 calendar: calendar
             )
+
+            if category == .unclassified {
+                let syntheticRow = AssetsOverviewRow(
+                    entityKey: key,
+                    displayName: displayName,
+                    details: details,
+                    category: category,
+                    type: typeLabel(
+                        key: key,
+                        entity: entity
+                    ),
+                    acquisitionDate: acquisitionDate,
+                    commissionDate: commissionDate,
+                    acquisitionCost: acquisitionCost,
+                    usefulLifeYears: depreciation?.schedule.usefulLifeYears,
+                    residualPercentage: depreciation.map {
+                        $0.residual.percentNormalized * 100
+                    },
+                    residualAmount: depreciation?.residual.amount,
+                    depreciationAccountCode: depreciation?.account.code,
+                    contraAccountCode: depreciation?.contra.code,
+                    openingCarryingAmount: openingCarryingAmount,
+                    periodInvestment: periodInvestment,
+                    periodDepreciation: periodDepreciation,
+                    closingCarryingAmount: closingCarryingAmount,
+                    ownerShares: ownerShares,
+                    flags: []
+                )
+
+                if hasNonZeroFilingAmounts(row: syntheticRow) {
+                    flags.append("unclassified non-zero filing asset")
+                }
+            }
+
+            flags = unique(flags)
 
             let row = AssetsOverviewRow(
                 entityKey: key,
@@ -196,37 +229,56 @@ public enum AssetsOverviewBuilder {
 
         rows.sort(by: sortRows)
 
-        let grouped = Dictionary(grouping: rows, by: \.category)
-        let groups = grouped.keys
-            .sorted {
-                $0.label.localizedCaseInsensitiveCompare($1.label) == .orderedAscending
-            }
+        let rowsByCategory = Dictionary(grouping: rows, by: \.category)
+
+        let lines = rowsByCategory.keys
+            .sorted { $0.sortOrder < $1.sortOrder }
             .map { category in
-                AssetsOverviewGroup(
-                    name: category.label,
+                let categoryRows = rowsByCategory[category] ?? []
+
+                return AssetsOverviewLine(
                     category: category,
-                    rows: grouped[category] ?? []
+                    name: category.lineLabel,
+                    rows: categoryRows,
+                    flaggedAssetCount: categoryRows.filter { !$0.flags.isEmpty }.count,
+                    totals: makeAmounts(from: categoryRows)
                 )
             }
+
+        let linesBySection = Dictionary(grouping: lines, by: \.category.section)
+
+        let groups = linesBySection.keys
+            .sorted { $0.sortOrder < $1.sortOrder }
+            .map { section in
+                let sectionLines = (linesBySection[section] ?? [])
+                    .sorted { $0.category.sortOrder < $1.category.sortOrder }
+
+                let sectionRows = sectionLines.flatMap(\.rows)
+
+                return AssetsOverviewGroup(
+                    section: section,
+                    name: section.label,
+                    totalLabel: section.totalLabel,
+                    lines: sectionLines,
+                    flaggedAssetCount: sectionRows.filter { !$0.flags.isEmpty }.count,
+                    totals: makeAmounts(from: sectionRows)
+                )
+            }
+
+        let unclassifiedNonZeroRows = rows.filter { row in
+            row.category == .unclassified && hasNonZeroFilingAmounts(row: row)
+        }
+
+        if !unclassifiedNonZeroRows.isEmpty {
+            diagnosticCounts["unclassified non-zero assets"] = unclassifiedNonZeroRows.count
+        }
 
         let summary = AssetsOverviewSummary(
             assetCount: rows.count,
             flaggedAssetCount: rows.filter { !$0.flags.isEmpty }.count,
-            acquisitionCostTotal: rows.reduce(0) { partial, row in
-                partial + (row.acquisitionCost ?? 0)
-            },
-            openingCarryingAmountTotal: rows.reduce(0) { partial, row in
-                partial + row.openingCarryingAmount
-            },
-            periodInvestmentTotal: rows.reduce(0) { partial, row in
-                partial + row.periodInvestment
-            },
-            periodDepreciationTotal: rows.reduce(0) { partial, row in
-                partial + row.periodDepreciation
-            },
-            closingCarryingAmountTotal: rows.reduce(0) { partial, row in
-                partial + row.closingCarryingAmount
-            }
+            totals: makeAmounts(from: rows),
+            unclassifiedNonZeroAssetCount: unclassifiedNonZeroRows.count,
+            unclassifiedNonZeroTotals: makeAmounts(from: unclassifiedNonZeroRows)
         )
 
         return AssetsOverview(
@@ -236,6 +288,30 @@ public enum AssetsOverviewBuilder {
             summary: summary,
             diagnosticCounts: diagnosticCounts
         )
+    }
+
+    private static func makeAmounts(
+        from rows: [AssetsOverviewRow]
+    ) -> AssetsOverviewAmounts {
+        AssetsOverviewAmounts(
+            acquisitionCost: rows.reduce(0) { $0 + ($1.acquisitionCost ?? 0) },
+            openingCarryingAmount: rows.reduce(0) { $0 + $1.openingCarryingAmount },
+            periodInvestment: rows.reduce(0) { $0 + $1.periodInvestment },
+            periodDepreciation: rows.reduce(0) { $0 + $1.periodDepreciation },
+            closingCarryingAmount: rows.reduce(0) { $0 + $1.closingCarryingAmount },
+            residualAmount: rows.reduce(0) { $0 + ($1.residualAmount ?? 0) }
+        )
+    }
+
+    private static func hasNonZeroFilingAmounts(
+        row: AssetsOverviewRow
+    ) -> Bool {
+        (row.acquisitionCost ?? 0) != 0
+            || row.openingCarryingAmount != 0
+            || row.periodInvestment != 0
+            || row.periodDepreciation != 0
+            || row.closingCarryingAmount != 0
+            || (row.residualAmount ?? 0) != 0
     }
 
     @inline(__always)
@@ -609,13 +685,25 @@ public enum AssetsOverviewBuilder {
         lhs: AssetsOverviewRow,
         rhs: AssetsOverviewRow
     ) -> Bool {
-        let categoryOrder = lhs.category.label.localizedCaseInsensitiveCompare(rhs.category.label)
-        if categoryOrder != .orderedSame {
-            return categoryOrder == .orderedAscending
+        if lhs.category.section.sortOrder != rhs.category.section.sortOrder {
+            return lhs.category.section.sortOrder < rhs.category.section.sortOrder
         }
 
-        let nameOrder = lhs.displayName.localizedCaseInsensitiveCompare(rhs.displayName)
-        if nameOrder != .orderedSame {
+        if lhs.category.sortOrder != rhs.category.sortOrder {
+            return lhs.category.sortOrder < rhs.category.sortOrder
+        }
+
+        let lineOrder = lhs.category.lineLabel.localizedCaseInsensitiveCompare(
+            rhs.category.lineLabel
+        )
+        if lineOrder != ComparisonResult.orderedSame {
+            return lineOrder == .orderedAscending
+        }
+
+        let nameOrder = lhs.displayName.localizedCaseInsensitiveCompare(
+            rhs.displayName
+        )
+        if nameOrder != ComparisonResult.orderedSame {
             return nameOrder == .orderedAscending
         }
 
