@@ -7,18 +7,36 @@ extension StatementHTMLRenderer {
         _ summary: BalanceSummary?
     ) -> [any HTMLNode] {
         if let summary {
-            HTML.div(["class": "summary"]) {
-                HTML.text("Som Activa: \(fmt(summary.assets))")
-            }
+            HTML.section(["class": "sr-summary"]) {
+                HTML.div(["class": "sr-summary-row"]) {
+                    HTML.span(["class": "sr-summary-label"]) {
+                        HTML.text("Som activa")
+                    }
 
-            HTML.div(["class": "summary"]) {
-                HTML.text("Som Eigen Vermogen + Passiva: \(fmt(summary.equityPlusLiabilities))")
-            }
+                    HTML.span(["class": "sr-summary-value"]) {
+                        HTML.text(fmt(summary.assets))
+                    }
+                }
 
-            if !summary.isBalanced {
-                HTML.div(["class": "summary"]) {
-                    HTML.span(["class": "warn"]) {
-                        HTML.text("DIFF: " + fmt(summary.diff))
+                HTML.div(["class": "sr-summary-row"]) {
+                    HTML.span(["class": "sr-summary-label"]) {
+                        HTML.text("Som eigen vermogen + passiva")
+                    }
+
+                    HTML.span(["class": "sr-summary-value"]) {
+                        HTML.text(fmt(summary.equityPlusLiabilities))
+                    }
+                }
+
+                if !summary.isBalanced {
+                    HTML.div(["class": "sr-summary-row sr-summary-row-diff"]) {
+                        HTML.span(["class": "sr-summary-label"]) {
+                            HTML.text("Verschil")
+                        }
+
+                        HTML.span(["class": "sr-summary-value sr-summary-value-warn"]) {
+                            HTML.text(fmt(summary.diff))
+                        }
                     }
                 }
             }

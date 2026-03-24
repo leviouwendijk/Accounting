@@ -313,7 +313,55 @@ public enum StatementStyleCSS {
                     CSS.decl("color", "#666"),
                     CSS.decl("font-size", "11px"),
                     CSS.decl("margin-top", "6px")
-                )
+                ),
+
+                // Summary panel
+                CSS.rule(
+                    ".sr-summary",
+                    CSS.decl("margin-top", "18px"),
+                    CSS.decl("margin-left", "auto"),
+                    CSS.decl("width", "min(420px, 100%)"),
+                    CSS.decl("padding", "10px 12px"),
+                    CSS.decl("border", "1px solid #e5e7eb"),
+                    CSS.decl("border-radius", "10px"),
+                    CSS.decl("background", "#fafafa")
+                ),
+                CSS.rule(
+                    ".sr-summary-row",
+                    CSS.decl("display", "grid"),
+                    CSS.decl("grid-template-columns", "minmax(0, 1fr) auto"),
+                    CSS.decl("gap", "16px"),
+                    CSS.decl("align-items", "baseline"),
+                    CSS.decl("padding", "4px 0")
+                ),
+                CSS.rule(
+                    ".sr-summary-row + .sr-summary-row",
+                    CSS.decl("border-top", "1px solid #eceff3")
+                ),
+                CSS.rule(
+                    ".sr-summary-label",
+                    CSS.decl("color", "#4b5563"),
+                    CSS.decl("font-size", "12px"),
+                    CSS.decl("line-height", "1.35")
+                ),
+                CSS.rule(
+                    ".sr-summary-value",
+                    CSS.decl("text-align", "right"),
+                    CSS.decl("font-size", "12px"),
+                    CSS.decl("font-weight", "600"),
+                    CSS.decl("font-variant-numeric", "tabular-nums"),
+                    CSS.decl("font-feature-settings", "\"tnum\""),
+                    CSS.decl("color", "#111827"),
+                    CSS.decl("white-space", "nowrap")
+                ),
+                CSS.rule(
+                    ".sr-summary-row-diff",
+                    CSS.decl("padding-top", "6px")
+                ),
+                CSS.rule(
+                    ".sr-summary-value-warn",
+                    CSS.decl("color", "#92400e")
+                ),
             ]
         )
     }
