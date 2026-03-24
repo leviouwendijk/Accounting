@@ -13,4 +13,19 @@ public enum DepreciationAuditHorizon {
         let nextMonth    = calendar.date(byAdding: DateComponents(month: 1), to: startOfMonth)!
         return calendar.date(byAdding: .day, value: -1, to: nextMonth)!
     }
+
+    // new for going past entries end?
+    public static func endOfMonth(
+        containing date: Date,
+        calendar: Calendar = .init(identifier: .gregorian)
+    ) -> Date {
+        let startOfMonth = calendar.date(
+            from: calendar.dateComponents([.year, .month], from: date)
+        )!
+        let nextMonth = calendar.date(
+            byAdding: DateComponents(month: 1),
+            to: startOfMonth
+        )!
+        return calendar.date(byAdding: .day, value: -1, to: nextMonth)!
+    }
 }

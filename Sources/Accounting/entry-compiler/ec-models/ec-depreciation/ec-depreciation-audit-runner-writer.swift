@@ -46,7 +46,11 @@ public extension DepreciationAuditRunner {
             entities: compiled.entities,
             accounts: compiled.accounts,
             resolvedEntries: compiled.resolved,
-            through: nil,
+            // through: nil,
+            through: DepreciationAuditHorizon.endOfMonth(
+                containing: monthStart,
+                calendar: cal
+            ),
             options: .init(
                 granularity: .monthly,
                 tolerance: tolerance,
