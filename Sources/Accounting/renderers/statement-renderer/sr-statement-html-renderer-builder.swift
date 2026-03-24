@@ -94,16 +94,23 @@ extension StatementHTMLRenderer {
         }
 
         let ids = filtered.map(\.id)
-        let hierarchy = makeRowHierarchyMap(
-            idsInOrder: ids,
-            parentById: maps.parentById
+        let fallbackBase = options.omitIncomeLevel1Root ? 2 : 1
+
+        let presentationDepthById: [Int: Int] = Dictionary(
+            uniqueKeysWithValues: filtered.map { line in
+                (line.id, max(0, line.level - fallbackBase))
+            }
         )
 
-        let fallbackBase = options.omitIncomeLevel1Root ? 2 : 1
+        let hierarchy = makePresentationHierarchyMap(
+            idsInOrder: ids,
+            canonicalParentById: maps.parentById,
+            presentationDepthById: presentationDepthById
+        )
 
         let rows = filtered.map { line in
             let h = hierarchy[line.id]
-            let depth = h?.depth ?? max(0, line.level - fallbackBase)
+            let depth = h?.depth ?? presentationDepthById[line.id] ?? 0
 
             let prefix = hierarchyPrefix(
                 depth: depth,

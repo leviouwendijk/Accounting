@@ -69,65 +69,10 @@ public enum AssetsOverviewBuilder {
                 continue
             }
 
-            var flags: [String] = []
-
-            if entity.profile == nil {
-                flags.append("missing profile")
-            }
-
-            if depreciation == nil {
-                flags.append("missing depreciation config")
-            }
-
-            if acquisitionDate == nil && effectiveStartDate == nil {
-                flags.append("missing commission/acquisition date")
-            }
-
-            if acquisitionCost == nil || acquisitionCost == 0 {
-                flags.append("missing acquisition cost")
-            }
-
-            if details == nil {
-                flags.append("missing details")
-            }
-
-            if rawCategory == nil {
-                flags.append("missing asset_category")
-            } else if category == .unclassified,
-                      rawCategory?.lowercased() != "unclassified" {
-                flags.append("invalid asset_category: \(rawCategory!)")
-            }
-
-            if hasRollforwardMetadata(entity: entity) {
-                flags.append("contains depreciation rollforward metadata; not yet applied in this view")
-            }
-
-            if hasPrivateUseSignal(
-                key: key,
-                entity: entity
-            ) {
-                flags.append("possible private-use / bijtelling relevance")
-            }
-
-            if hasPlaceholderIdentity(
-                key: key,
-                entity: entity
-            ) {
-                flags.append("placeholder-like asset identity")
-            }
-
-            let (ownerShares, shareFlags) = resolveShares(
+            let (ownerShares, shareIssues) = resolveShares(
                 entity: entity,
                 totalAmount: acquisitionCost
             )
-
-            flags.append(contentsOf: shareFlags)
-
-            if ownerShares.isEmpty {
-                flags.append("no owner-share allocation")
-            } else if ownerShares.allSatisfy({ $0.owner == nil }) {
-                flags.append("unassigned owner-share allocation")
-            }
 
             let openingCarryingAmount = carryingAmount(
                 asOf: openingAsOf,
@@ -158,40 +103,60 @@ public enum AssetsOverviewBuilder {
                 calendar: calendar
             )
 
-            if category == .unclassified {
-                let syntheticRow = AssetsOverviewRow(
-                    entityKey: key,
-                    displayName: displayName,
-                    details: details,
-                    category: category,
-                    type: typeLabel(
-                        key: key,
-                        entity: entity
-                    ),
-                    acquisitionDate: acquisitionDate,
-                    commissionDate: commissionDate,
-                    acquisitionCost: acquisitionCost,
-                    usefulLifeYears: depreciation?.schedule.usefulLifeYears,
-                    residualPercentage: depreciation.map {
-                        $0.residual.percentNormalized * 100
-                    },
-                    residualAmount: depreciation?.residual.amount,
-                    depreciationAccountCode: depreciation?.account.code,
-                    contraAccountCode: depreciation?.contra.code,
-                    openingCarryingAmount: openingCarryingAmount,
-                    periodInvestment: periodInvestment,
-                    periodDepreciation: periodDepreciation,
-                    closingCarryingAmount: closingCarryingAmount,
-                    ownerShares: ownerShares,
-                    flags: []
-                )
+            var issues: [AssetsOverviewIssue] = []
 
-                if hasNonZeroFilingAmounts(row: syntheticRow) {
-                    flags.append("unclassified non-zero filing asset")
-                }
+            issues.append(contentsOf: schemaIssues(
+                key: key,
+                entity: entity,
+                depreciation: depreciation,
+                profileAccessResolved: profileAccess != nil,
+                rawCategory: rawCategory,
+                category: category,
+                details: details,
+                acquisitionDate: acquisitionDate,
+                effectiveStartDate: effectiveStartDate,
+                acquisitionCost: acquisitionCost,
+                ownerShares: ownerShares,
+                shareIssues: shareIssues
+            ))
+
+            let preRow = AssetsOverviewRow(
+                entityKey: key,
+                displayName: displayName,
+                details: details,
+                category: category,
+                type: typeLabel(
+                    key: key,
+                    entity: entity
+                ),
+                acquisitionDate: acquisitionDate,
+                commissionDate: commissionDate,
+                acquisitionCost: acquisitionCost,
+                usefulLifeYears: depreciation?.schedule.usefulLifeYears,
+                residualPercentage: depreciation.map {
+                    $0.residual.percentNormalized * 100
+                },
+                residualAmount: depreciation?.residual.amount,
+                depreciationAccountCode: depreciation?.account.code,
+                contraAccountCode: depreciation?.contra.code,
+                openingCarryingAmount: openingCarryingAmount,
+                periodInvestment: periodInvestment,
+                periodDepreciation: periodDepreciation,
+                closingCarryingAmount: closingCarryingAmount,
+                ownerShares: ownerShares,
+                issues: []
+            )
+
+            if category == .unclassified && hasNonZeroFilingAmounts(row: preRow) {
+                issues.append(
+                    .init(
+                        severity: .error,
+                        message: "unclassified non-zero filing asset"
+                    )
+                )
             }
 
-            flags = unique(flags)
+            issues = uniqueIssues(issues)
 
             let row = AssetsOverviewRow(
                 entityKey: key,
@@ -217,13 +182,17 @@ public enum AssetsOverviewBuilder {
                 periodDepreciation: periodDepreciation,
                 closingCarryingAmount: closingCarryingAmount,
                 ownerShares: ownerShares,
-                flags: flags
+                issues: issues
             )
+
+            if shouldSuppressDiagnosticNoise(row: row, entity: entity) {
+                continue
+            }
 
             rows.append(row)
 
-            for flag in flags {
-                diagnosticCounts[flag, default: 0] += 1
+            for issue in row.issues {
+                diagnosticCounts[issue.message, default: 0] += 1
             }
         }
 
@@ -246,7 +215,7 @@ public enum AssetsOverviewBuilder {
                 category: formLine.category,
                 name: formLine.label,
                 rows: categoryRows,
-                flaggedAssetCount: categoryRows.filter { !$0.flags.isEmpty }.count,
+                flaggedAssetCount: categoryRows.filter(\.hasIssues).count,
                 totals: makeAmounts(from: categoryRows)
             )
         }
@@ -257,12 +226,12 @@ public enum AssetsOverviewBuilder {
         )
 
         let groups: [AssetsOverviewGroup] = AssetsOverviewSection.allCases
-            .sorted { (lhs: AssetsOverviewSection, rhs: AssetsOverviewSection) -> Bool in
+            .sorted { lhs, rhs in
                 lhs.sortOrder < rhs.sortOrder
             }
-            .compactMap { (section: AssetsOverviewSection) -> AssetsOverviewGroup? in
+            .compactMap { section in
                 let sectionLines: [AssetsOverviewLine] = (linesBySection[section] ?? [])
-                    .sorted { (lhs: AssetsOverviewLine, rhs: AssetsOverviewLine) -> Bool in
+                    .sorted { lhs, rhs in
                         lhs.category.sortOrder < rhs.category.sortOrder
                     }
 
@@ -277,7 +246,7 @@ public enum AssetsOverviewBuilder {
                     name: section.label,
                     totalLabel: section.totalLabel,
                     lines: sectionLines,
-                    flaggedAssetCount: sectionRows.filter { !$0.flags.isEmpty }.count,
+                    flaggedAssetCount: sectionRows.filter(\.hasIssues).count,
                     totals: makeAmounts(from: sectionRows)
                 )
             }
@@ -287,15 +256,16 @@ public enum AssetsOverviewBuilder {
         }
 
         if !unclassifiedNonZeroRows.isEmpty {
-            diagnosticCounts["unclassified non-zero assets"] = unclassifiedNonZeroRows.count
+            diagnosticCounts["unclassified non-zero assets", default: 0] = unclassifiedNonZeroRows.count
         }
 
         let summary = AssetsOverviewSummary(
             assetCount: rows.count,
-            flaggedAssetCount: rows.filter { !$0.flags.isEmpty }.count,
+            flaggedAssetCount: rows.filter(\.hasIssues).count,
             totals: makeAmounts(from: rows),
             unclassifiedNonZeroAssetCount: unclassifiedNonZeroRows.count,
-            unclassifiedNonZeroTotals: makeAmounts(from: unclassifiedNonZeroRows)
+            unclassifiedNonZeroTotals: makeAmounts(from: unclassifiedNonZeroRows),
+            unclassifiedNonZeroRows: unclassifiedNonZeroRows
         )
 
         return AssetsOverview(
@@ -318,6 +288,147 @@ public enum AssetsOverviewBuilder {
             closingCarryingAmount: rows.reduce(0) { $0 + $1.closingCarryingAmount },
             residualAmount: rows.reduce(0) { $0 + ($1.residualAmount ?? 0) }
         )
+    }
+
+    private static func schemaIssues(
+        key: EntityKey,
+        entity: EntityDef,
+        depreciation: DepreciationConfig?,
+        profileAccessResolved: Bool,
+        rawCategory: String?,
+        category: AssetsOverviewCategory,
+        details: String?,
+        acquisitionDate: Date?,
+        effectiveStartDate: Date?,
+        acquisitionCost: Decimal?,
+        ownerShares: [KIAAssetShare],
+        shareIssues: [AssetsOverviewIssue]
+    ) -> [AssetsOverviewIssue] {
+        var issues: [AssetsOverviewIssue] = []
+
+        if !profileAccessResolved {
+            issues.append(
+                .init(
+                    severity: .error,
+                    message: "missing depreciation/profile data"
+                )
+            )
+        } else {
+            if entity.profile == nil {
+                issues.append(
+                    .init(
+                        severity: .warning,
+                        message: "uses legacy depreciation fallback"
+                    )
+                )
+            }
+
+            if depreciation == nil {
+                issues.append(
+                    .init(
+                        severity: .warning,
+                        message: "missing depreciation config"
+                    )
+                )
+            }
+        }
+
+        if acquisitionDate == nil && effectiveStartDate == nil {
+            issues.append(
+                .init(
+                    severity: .error,
+                    message: "missing commission/acquisition date"
+                )
+            )
+        }
+
+        if acquisitionCost == nil || acquisitionCost == 0 {
+            issues.append(
+                .init(
+                    severity: .error,
+                    message: "missing acquisition cost"
+                )
+            )
+        }
+
+        if details == nil {
+            issues.append(
+                .init(
+                    severity: .warning,
+                    message: "missing details"
+                )
+            )
+        }
+
+        if rawCategory == nil {
+            issues.append(
+                .init(
+                    severity: .error,
+                    message: "missing asset_category"
+                )
+            )
+        } else if category == .unclassified,
+                  rawCategory?.lowercased() != "unclassified" {
+            issues.append(
+                .init(
+                    severity: .error,
+                    message: "invalid asset_category: \(rawCategory!)"
+                )
+            )
+        }
+
+        if hasRollforwardMetadata(entity: entity) {
+            issues.append(
+                .init(
+                    severity: .warning,
+                    message: "contains depreciation rollforward metadata; not yet applied in this view"
+                )
+            )
+        }
+
+        if hasPrivateUseSignal(
+            key: key,
+            entity: entity
+        ) {
+            issues.append(
+                .init(
+                    severity: .warning,
+                    message: "possible private-use / bijtelling relevance"
+                )
+            )
+        }
+
+        if hasPlaceholderIdentity(
+            key: key,
+            entity: entity
+        ) {
+            issues.append(
+                .init(
+                    severity: .info,
+                    message: "placeholder-like asset identity"
+                )
+            )
+        }
+
+        issues.append(contentsOf: shareIssues)
+
+        if ownerShares.isEmpty {
+            issues.append(
+                .init(
+                    severity: .warning,
+                    message: "no owner-share allocation"
+                )
+            )
+        } else if ownerShares.allSatisfy({ $0.owner == nil }) {
+            issues.append(
+                .init(
+                    severity: .warning,
+                    message: "unassigned owner-share allocation"
+                )
+            )
+        }
+
+        return issues
     }
 
     private static func hasNonZeroFilingAmounts(
@@ -364,6 +475,47 @@ public enum AssetsOverviewBuilder {
         }
 
         return false
+    }
+
+    private static func shouldSuppressDiagnosticNoise(
+        row: AssetsOverviewRow,
+        entity: EntityDef
+    ) -> Bool {
+        if hasNonZeroFilingAmounts(row: row) {
+            return false
+        }
+
+        if row.category != .unclassified {
+            return false
+        }
+
+        if entity.profile != nil || entity.depreciation != nil || entity.kia != nil || entity.kiaDraft != nil {
+            return false
+        }
+
+        if row.ownerShares.isEmpty == false {
+            return false
+        }
+
+        let onlyNoise = row.issues.allSatisfy { issue in
+            switch issue.message {
+            case "uses legacy depreciation fallback",
+                 "missing depreciation config",
+                 "missing depreciation/profile data",
+                 "missing commission/acquisition date",
+                 "missing acquisition cost",
+                 "missing details",
+                 "missing asset_category",
+                 "no owner-share allocation",
+                 "placeholder-like asset identity":
+                return true
+
+            default:
+                return false
+            }
+        }
+
+        return onlyNoise
     }
 
     private static func carryingAmount(
@@ -466,7 +618,7 @@ public enum AssetsOverviewBuilder {
     private static func resolveShares(
         entity: EntityDef,
         totalAmount: Decimal?
-    ) -> ([KIAAssetShare], [String]) {
+    ) -> ([KIAAssetShare], [AssetsOverviewIssue]) {
         if let kia = entity.kia {
             let shares = kia.shares.map { share in
                 KIAAssetShare(
@@ -486,7 +638,12 @@ public enum AssetsOverviewBuilder {
             else {
                 return (
                     [],
-                    ["cannot resolve draft owner-share allocation without acquisition cost"]
+                    [
+                        .init(
+                            severity: .error,
+                            message: "cannot resolve draft owner-share allocation without acquisition cost"
+                        )
+                    ]
                 )
             }
 
@@ -508,7 +665,12 @@ public enum AssetsOverviewBuilder {
             } catch {
                 return (
                     [],
-                    ["invalid owner-share configuration: \(error.localizedDescription)"]
+                    [
+                        .init(
+                            severity: .error,
+                            message: "invalid owner-share configuration: \(error.localizedDescription)"
+                        )
+                    ]
                 )
             }
         }
@@ -728,11 +890,11 @@ public enum AssetsOverviewBuilder {
             < rhs.entityKey.identifier(displaying: .fullchain)
     }
 
-    private static func unique(
-        _ values: [String]
-    ) -> [String] {
-        var seen = Set<String>()
-        var result: [String] = []
+    private static func uniqueIssues(
+        _ values: [AssetsOverviewIssue]
+    ) -> [AssetsOverviewIssue] {
+        var seen = Set<AssetsOverviewIssue>()
+        var result: [AssetsOverviewIssue] = []
 
         for value in values {
             if seen.insert(value).inserted {

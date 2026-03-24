@@ -5,6 +5,22 @@ public enum AssetsOverviewPrinter {
         _ overview: AssetsOverview,
         diagnostics: Bool = false
     ) -> String {
+        renderText(
+            overview,
+            options: .init(
+                diagnostics: diagnostics,
+                showUnderlyingRows: true,
+                showOnlyFlaggedUnderlyingRows: false,
+                showZeroUnderlyingRows: false,
+                diagnosticsOnlyForFlaggedRows: true
+            )
+        )
+    }
+
+    public static func renderText(
+        _ overview: AssetsOverview,
+        options: AssetsOverviewRenderOptions
+    ) -> String {
         var lines: [String] = []
 
         let title = "Assets filing overview"
@@ -25,9 +41,13 @@ public enum AssetsOverviewPrinter {
             lines.append("Unclassified depreciation in period: \(fmt(overview.summary.unclassifiedNonZeroTotals.periodDepreciation))")
             lines.append("Unclassified closing carrying amount total: \(fmt(overview.summary.unclassifiedNonZeroTotals.closingCarryingAmount))")
             lines.append("Unclassified residual amount total: \(fmt(overview.summary.unclassifiedNonZeroTotals.residualAmount))")
+
+            for row in overview.summary.unclassifiedNonZeroRows {
+                lines.append("    · \(row.displayName) (\(row.entityKey.identifier(displaying: .fullchain)))")
+            }
         }
 
-        if diagnostics && !overview.diagnosticCounts.isEmpty {
+        if options.diagnostics && !overview.diagnosticCounts.isEmpty {
             lines.append("")
             lines.append("Diagnostics")
             lines.append("───────────")
@@ -41,7 +61,7 @@ public enum AssetsOverviewPrinter {
             lines.append("")
             render(
                 section: group,
-                diagnostics: diagnostics,
+                options: options,
                 into: &lines
             )
         }
@@ -63,7 +83,7 @@ public enum AssetsOverviewPrinter {
 
     private static func render(
         section group: AssetsOverviewGroup,
-        diagnostics: Bool,
+        options: AssetsOverviewRenderOptions,
         into lines: inout [String]
     ) {
         lines.append(group.name)
@@ -79,6 +99,28 @@ public enum AssetsOverviewPrinter {
                 profile: columnProfile,
                 into: &lines
             )
+
+            if options.showUnderlyingRows {
+                let filteredRows = line.rows.filter { row in
+                    if options.showOnlyFlaggedUnderlyingRows && !row.hasIssues {
+                        return false
+                    }
+
+                    if !options.showZeroUnderlyingRows && !hasVisibleUnderlyingAmounts(row) {
+                        return false
+                    }
+
+                    return true
+                }
+
+                for row in filteredRows {
+                    renderUnderlyingRow(
+                        row,
+                        profile: columnProfile,
+                        into: &lines
+                    )
+                }
+            }
         }
 
         appendLine(
@@ -95,13 +137,33 @@ public enum AssetsOverviewPrinter {
             )
         }
 
-        if diagnostics {
-            for line in group.lines where !line.rows.isEmpty {
+        if options.diagnostics {
+            let diagnosticLines = group.lines.filter { line in
+                let rows = line.rows.filter { row in
+                    if options.diagnosticsOnlyForFlaggedRows {
+                        return row.hasIssues
+                    }
+
+                    return true
+                }
+
+                return !rows.isEmpty
+            }
+
+            for line in diagnosticLines {
                 lines.append("")
                 lines.append("Underlying assets — \(line.name)")
                 lines.append(String(repeating: "·", count: max(18, line.name.count + 20)))
 
-                for row in line.rows {
+                let rows = line.rows.filter { row in
+                    if options.diagnosticsOnlyForFlaggedRows {
+                        return row.hasIssues
+                    }
+
+                    return true
+                }
+
+                for row in rows {
                     renderDiagnosticRow(
                         row,
                         into: &lines
@@ -148,6 +210,68 @@ public enum AssetsOverviewPrinter {
                 "\(name) | \(fmt(totals.acquisitionCost)) | \(fmt(totals.openingCarryingAmount)) | \(fmt(totals.closingCarryingAmount)) | \(fmt(totals.residualAmount))"
             )
         }
+    }
+
+    private static func renderUnderlyingRow(
+        _ row: AssetsOverviewRow,
+        profile: AssetsOverviewColumnProfile,
+        into lines: inout [String]
+    ) {
+        let marker = issueMarker(for: row)
+        let label = "    · \(row.displayName)\(marker.isEmpty ? "" : " \(marker)")"
+
+        switch profile {
+        case .intangibleFixedAssets:
+            lines.append(
+                "\(label) | \(fmt(row.acquisitionCost ?? 0)) | \(fmt(row.openingCarryingAmount)) | \(fmt(row.closingCarryingAmount))"
+            )
+
+        case .tangibleFixedAssets:
+            lines.append(
+                "\(label) | \(fmt(row.acquisitionCost ?? 0)) | \(fmt(row.openingCarryingAmount)) | \(fmt(row.closingCarryingAmount)) | \(fmt(row.residualAmount ?? 0))"
+            )
+
+        case .financialFixedAssets, .inventory, .securities, .liquidAssets:
+            lines.append(
+                "\(label) | \(fmt(row.openingCarryingAmount)) | \(fmt(row.closingCarryingAmount))"
+            )
+
+        case .receivables:
+            lines.append(
+                "\(label) | \(fmt(row.acquisitionCost ?? 0)) | \(fmt(row.openingCarryingAmount)) | \(fmt(row.closingCarryingAmount))"
+            )
+
+        case .unclassified:
+            lines.append(
+                "\(label) | \(fmt(row.acquisitionCost ?? 0)) | \(fmt(row.openingCarryingAmount)) | \(fmt(row.closingCarryingAmount)) | \(fmt(row.residualAmount ?? 0))"
+            )
+        }
+    }
+
+    private static func issueMarker(
+        for row: AssetsOverviewRow
+    ) -> String {
+        switch row.highestIssueSeverity {
+        case .error:
+            return "[!]"
+        case .warning:
+            return "[~]"
+        case .info:
+            return "[i]"
+        case nil:
+            return ""
+        }
+    }
+
+    private static func hasVisibleUnderlyingAmounts(
+        _ row: AssetsOverviewRow
+    ) -> Bool {
+        (row.acquisitionCost ?? 0) != 0
+            || row.openingCarryingAmount != 0
+            || row.periodInvestment != 0
+            || row.periodDepreciation != 0
+            || row.closingCarryingAmount != 0
+            || (row.residualAmount ?? 0) != 0
     }
 
     private static func renderVATSpecification(
@@ -234,8 +358,7 @@ public enum AssetsOverviewPrinter {
         }
 
         if let residualPercentage = row.residualPercentage,
-           let residualAmount = row.residualAmount
-        {
+           let residualAmount = row.residualAmount {
             lines.append("    Residual: \(fmtPct(residualPercentage)) → \(fmt(residualAmount))")
         } else {
             lines.append("    Residual: —")
@@ -270,11 +393,39 @@ public enum AssetsOverviewPrinter {
             lines.append("    Shares: —")
         }
 
-        if row.flags.isEmpty {
-            lines.append("    Flags: none")
+        if row.issues.isEmpty {
+            lines.append("    Issues: none")
         } else {
-            lines.append("    Flags: \(row.flags.joined(separator: "; "))")
+            lines.append("    Issues:")
+
+            for issue in row.issues.sorted(by: issueSort) {
+                lines.append("        - [\(severityLabel(issue.severity))] \(issue.message)")
+            }
         }
+    }
+
+    private static func severityLabel(
+        _ severity: AssetsOverviewIssueSeverity
+    ) -> String {
+        switch severity {
+        case .error:
+            return "error"
+        case .warning:
+            return "warning"
+        case .info:
+            return "info"
+        }
+    }
+
+    private static func issueSort(
+        lhs: AssetsOverviewIssue,
+        rhs: AssetsOverviewIssue
+    ) -> Bool {
+        if lhs.severity != rhs.severity {
+            return lhs.severity > rhs.severity
+        }
+
+        return lhs.message.localizedCaseInsensitiveCompare(rhs.message) == .orderedAscending
     }
 
     private static func diagnosticSort(

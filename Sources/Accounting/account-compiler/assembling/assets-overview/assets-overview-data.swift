@@ -76,19 +76,22 @@ public struct AssetsOverviewSummary: Sendable {
 
     public let unclassifiedNonZeroAssetCount: Int
     public let unclassifiedNonZeroTotals: AssetsOverviewAmounts
+    public let unclassifiedNonZeroRows: [AssetsOverviewRow]
 
     public init(
         assetCount: Int,
         flaggedAssetCount: Int,
         totals: AssetsOverviewAmounts,
         unclassifiedNonZeroAssetCount: Int,
-        unclassifiedNonZeroTotals: AssetsOverviewAmounts
+        unclassifiedNonZeroTotals: AssetsOverviewAmounts,
+        unclassifiedNonZeroRows: [AssetsOverviewRow]
     ) {
         self.assetCount = assetCount
         self.flaggedAssetCount = flaggedAssetCount
         self.totals = totals
         self.unclassifiedNonZeroAssetCount = unclassifiedNonZeroAssetCount
         self.unclassifiedNonZeroTotals = unclassifiedNonZeroTotals
+        self.unclassifiedNonZeroRows = unclassifiedNonZeroRows
     }
 }
 
@@ -117,12 +120,59 @@ public struct AssetsOverviewGroup: Sendable {
     }
 }
 
+public enum AssetsOverviewIssueSeverity: Int, Sendable, Codable, Comparable, CaseIterable {
+    case info = 0
+    case warning = 1
+    case error = 2
+
+    public static func < (
+        lhs: AssetsOverviewIssueSeverity,
+        rhs: AssetsOverviewIssueSeverity
+    ) -> Bool {
+        lhs.rawValue < rhs.rawValue
+    }
+}
+
+public struct AssetsOverviewIssue: Sendable, Codable, Hashable {
+    public let severity: AssetsOverviewIssueSeverity
+    public let message: String
+
+    public init(
+        severity: AssetsOverviewIssueSeverity,
+        message: String
+    ) {
+        self.severity = severity
+        self.message = message
+    }
+}
+
+public struct AssetsOverviewRenderOptions: Sendable {
+    public var diagnostics: Bool
+    public var showUnderlyingRows: Bool
+    public var showOnlyFlaggedUnderlyingRows: Bool
+    public var showZeroUnderlyingRows: Bool
+    public var diagnosticsOnlyForFlaggedRows: Bool
+
+    public init(
+        diagnostics: Bool = false,
+        showUnderlyingRows: Bool = true,
+        showOnlyFlaggedUnderlyingRows: Bool = false,
+        showZeroUnderlyingRows: Bool = false,
+        diagnosticsOnlyForFlaggedRows: Bool = true
+    ) {
+        self.diagnostics = diagnostics
+        self.showUnderlyingRows = showUnderlyingRows
+        self.showOnlyFlaggedUnderlyingRows = showOnlyFlaggedUnderlyingRows
+        self.showZeroUnderlyingRows = showZeroUnderlyingRows
+        self.diagnosticsOnlyForFlaggedRows = diagnosticsOnlyForFlaggedRows
+    }
+}
+
 public struct AssetsOverviewRow: Sendable {
     public let entityKey: EntityKey
     public let displayName: String
     public let details: String?
 
-    // public let group: String
     public let category: AssetsOverviewCategory
     public let type: String?
 
@@ -143,6 +193,8 @@ public struct AssetsOverviewRow: Sendable {
     public let closingCarryingAmount: Decimal
 
     public let ownerShares: [KIAAssetShare]
+
+    public let issues: [AssetsOverviewIssue]
     public let flags: [String]
 
     public init(
@@ -164,7 +216,7 @@ public struct AssetsOverviewRow: Sendable {
         periodDepreciation: Decimal,
         closingCarryingAmount: Decimal,
         ownerShares: [KIAAssetShare],
-        flags: [String]
+        issues: [AssetsOverviewIssue]
     ) {
         self.entityKey = entityKey
         self.displayName = displayName
@@ -184,6 +236,23 @@ public struct AssetsOverviewRow: Sendable {
         self.periodDepreciation = periodDepreciation
         self.closingCarryingAmount = closingCarryingAmount
         self.ownerShares = ownerShares
-        self.flags = flags
+        self.issues = issues
+        self.flags = issues.map(\.message)
+    }
+
+    public var highestIssueSeverity: AssetsOverviewIssueSeverity? {
+        issues.map(\.severity).max()
+    }
+
+    public var hasIssues: Bool {
+        !issues.isEmpty
+    }
+
+    public var hasErrorIssues: Bool {
+        issues.contains { $0.severity == .error }
+    }
+
+    public var hasWarningOrHigherIssues: Bool {
+        issues.contains { $0.severity >= .warning }
     }
 }
