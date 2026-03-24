@@ -1,20 +1,42 @@
+import Foundation
+import HTML
+
 public enum StatementHTMLRenderer {}
 
 extension StatementHTMLRenderer {
-    @inline(__always)
-    static func escape(_ s: String) -> String {
-        var out = String()
-        out.reserveCapacity(s.count)
-        for ch in s {
-            switch ch {
-            case "&": out += "&amp;"
-            case "<": out += "&lt;"
-            case ">": out += "&gt;"
-            case "\"": out += "&quot;"
-            case "'": out += "&#39;"
-            default: out.append(ch)
-            }
-        }
-        return out
+    public static func render(
+        period: PeriodAssembleResultPeriod,
+        chart: CompiledChart,
+        equityCode: String = "BEiv",
+        options: Options = .init()
+    ) throws -> String {
+        var opts = options
+        opts.subtitle = period.range.string()
+
+        return try render(
+            bundle: period.bundle,
+            chart: chart,
+            equityCode: equityCode,
+            options: opts
+        )
+    }
+
+    public static func render(
+        bundle: StatementBundle,
+        chart: CompiledChart,
+        equityCode: String = "BEiv",
+        options: Options = .init()
+    ) throws -> String {
+        let model = try buildDocumentModel(
+            bundle: bundle,
+            chart: chart,
+            equityCode: equityCode,
+            options: options
+        )
+
+        return renderDocument(
+            model: model,
+            options: options
+        )
     }
 }

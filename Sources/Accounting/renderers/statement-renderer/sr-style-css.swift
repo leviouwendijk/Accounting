@@ -87,6 +87,13 @@ public enum StatementStyleCSS {
                     CSS.decl("display", "block")
                 ),
 
+                CSS.rule(
+                    ".sr-hierarchy-prefix",
+                    CSS.decl("font-family", "ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace"),
+                    CSS.decl("white-space", "pre"),
+                    CSS.decl("display", "inline-block")
+                ),
+
                 // addition
                 CSS.rule(
                     ".sr-amount",

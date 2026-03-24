@@ -9,6 +9,7 @@ extension StatementHTMLRenderer {
         public var includeOtherBucket: Bool = false
         public var omitIncomeLevel1Root: Bool = true
         public var company: Company? = nil
+        public var hierarchyPrefixStyle: HierarchyPrefixStyle = .spacing
 
         public init(
             title: String = "Financial Statements",
@@ -17,7 +18,8 @@ extension StatementHTMLRenderer {
             minAbsIncome: Decimal = 0,
             includeOtherBucket: Bool = false,
             omitIncomeLevel1Root: Bool = true,
-            company: Company? = nil
+            company: Company? = nil,
+            hierarchyPrefixStyle: HierarchyPrefixStyle = .spacing
         ) {
             self.title = title
             self.subtitle = subtitle
@@ -26,6 +28,12 @@ extension StatementHTMLRenderer {
             self.includeOtherBucket = includeOtherBucket
             self.omitIncomeLevel1Root = omitIncomeLevel1Root
             self.company = company
+            self.hierarchyPrefixStyle = hierarchyPrefixStyle
         }
+    }
+
+    public enum HierarchyPrefixStyle: Sendable, Codable {
+        case spacing
+        case tree
     }
 }

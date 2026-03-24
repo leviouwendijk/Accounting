@@ -1,5 +1,5 @@
 {
-  "originHash" : "ca40e0e78ca5bf70b5abaecfab304a76cc77dd628603dd873589d189da645d95",
+  "originHash" : "2c957b956e940734a49874bc73de9739cf938f4f6a829d535d7c34f83791728b",
   "pins" : [
     {
       "identity" : "css",
@@ -34,7 +34,7 @@
       "location" : "https://github.com/leviouwendijk/Methods.git",
       "state" : {
         "branch" : "master",
-        "revision" : "c8f7182aa3ddffa106e7d35aa5dd12f0873f63d4"
+        "revision" : "232c028e073017ea429ba71a5e0b09dbe7f98e29"
       }
     },
     {
@@ -70,7 +70,7 @@
       "location" : "https://github.com/leviouwendijk/Primitives.git",
       "state" : {
         "branch" : "master",
-        "revision" : "603a359847ab61c469c1a72ae40e73f8fd79cee3"
+        "revision" : "88c0aad7d912d13fcc9131ac271d1691da998355"
       }
     },
     {
