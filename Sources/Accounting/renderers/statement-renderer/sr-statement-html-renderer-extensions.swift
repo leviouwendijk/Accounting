@@ -7,8 +7,20 @@ extension StatementHTMLRenderer {
         nf.numberStyle = .decimal
         nf.minimumFractionDigits = 2
         nf.maximumFractionDigits = 2
-        return nf.string(from: d as NSDecimalNumber) ?? d.description
+
+        let absValue = d < 0 ? -d : d
+        let base = nf.string(from: absValue as NSDecimalNumber) ?? absValue.description
+
+        return d < 0 ? "(\(base))" : base
     }
+    // static func fmt(_ d: Decimal) -> String {
+    //     let nf = NumberFormatter()
+    //     nf.locale = Locale(identifier: "nl_NL")
+    //     nf.numberStyle = .decimal
+    //     nf.minimumFractionDigits = 2
+    //     nf.maximumFractionDigits = 2
+    //     return nf.string(from: d as NSDecimalNumber) ?? d.description
+    // }
 
     static func nonEmpty(_ s: String?) -> String? {
         guard 
@@ -105,5 +117,34 @@ extension StatementHTMLRenderer {
         }
 
         return "padding-left: \(Double(depth) * 1.25)em;"
+    }
+}
+
+extension StatementHTMLRenderer {
+    @inline(__always)
+    static func directionBadgeText(
+        direction: Direction,
+        orientation: AccountOrientation
+    ) -> String {
+        let base = direction == .debit ? "D" : "C"
+
+        switch orientation {
+        case .regular:
+            return base
+        case .contra:
+            return "\(base)-contra"
+        }
+    }
+
+    @inline(__always)
+    static func directionBadgeClass(
+        orientation: AccountOrientation
+    ) -> String {
+        switch orientation {
+        case .regular:
+            return "sr-balance-badge"
+        case .contra:
+            return "sr-balance-badge sr-balance-badge-contra"
+        }
     }
 }

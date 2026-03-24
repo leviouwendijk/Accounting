@@ -399,6 +399,34 @@ public enum StatementStyleCSS {
                     CSS.decl("break-after", "avoid-page"),
                     CSS.decl("page-break-after", "avoid")
                 ),
+                // balance orientation
+                CSS.rule(
+                    ".sr-balance-badge",
+                    CSS.decl("display", "inline-block"),
+                    CSS.decl("margin-left", "0.5em"),
+                    CSS.decl("padding", "0.05em 0.45em"),
+                    CSS.decl("border", "1px solid #d1d5db"),
+                    CSS.decl("border-radius", "999px"),
+                    CSS.decl("font-size", "0.72em"),
+                    CSS.decl("font-weight", "500"),
+                    CSS.decl("line-height", "1.2"),
+                    CSS.decl("vertical-align", "baseline"),
+                    CSS.decl("color", "#6b7280"),
+                    CSS.decl("background", "#f9fafb")
+                ),
+                CSS.rule(
+                    ".sr-balance-badge-contra",
+                    CSS.decl("border-style", "dashed"),
+                    CSS.decl("font-style", "italic"),
+                    CSS.decl("color", "#374151")
+                ),
+
+                // negative:
+                CSS.rule(
+                    ".sr-amount-negative",
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("font-variant-numeric", "tabular-nums")
+                ),
             ],
 
             // adding page breaking:

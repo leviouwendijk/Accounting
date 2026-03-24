@@ -138,6 +138,8 @@ extension StatementHTMLRenderer {
         let prefix: String
         let label: String
         let amount: Decimal
+        let direction: Direction
+        let orientation: AccountOrientation
         let isTotal: Bool
 
         init(
@@ -147,6 +149,8 @@ extension StatementHTMLRenderer {
             prefix: String = "",
             label: String,
             amount: Decimal,
+            direction: Direction,
+            orientation: AccountOrientation,
             isTotal: Bool = false
         ) {
             self.id = id
@@ -155,6 +159,8 @@ extension StatementHTMLRenderer {
             self.prefix = prefix
             self.label = label
             self.amount = amount
+            self.direction = direction
+            self.orientation = orientation
             self.isTotal = isTotal
         }
     }

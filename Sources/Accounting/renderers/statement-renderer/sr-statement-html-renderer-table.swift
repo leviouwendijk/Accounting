@@ -136,6 +136,19 @@ extension StatementHTMLRenderer {
             } else {
                 HTML.text(row.label)
             }
+
+            // HTML.span([
+            //     "class": directionBadgeClass(
+            //         orientation: row.orientation
+            //     )
+            // ]) {
+            //     HTML.text(
+            //         directionBadgeText(
+            //             direction: row.direction,
+            //             orientation: row.orientation
+            //         )
+            //     )
+            // }
         }
     }
 
@@ -143,9 +156,12 @@ extension StatementHTMLRenderer {
         row: TableRow
     ) -> any HTMLNode {
         let text = fmt(row.amount)
+        let cls = row.amount < 0
+            ? "\(rowAmountClass(depth: row.depth)) sr-amount-negative"
+            : rowAmountClass(depth: row.depth)
 
         return HTML.span([
-            "class": rowAmountClass(depth: row.depth)
+            "class": cls
         ]) {
             if row.isTotal {
                 HTML.strong {

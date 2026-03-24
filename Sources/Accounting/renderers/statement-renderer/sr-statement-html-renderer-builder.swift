@@ -148,6 +148,8 @@ extension StatementHTMLRenderer {
                 prefix: prefix,
                 label: line.label,
                 amount: line.amount,
+                direction: line.direction,
+                orientation: line.orientation,
                 isTotal: false
             )
         }
@@ -215,6 +217,8 @@ extension StatementHTMLRenderer {
                 prefix: prefix,
                 label: line.label,
                 amount: line.amount,
+                direction: line.direction,
+                orientation: line.orientation,
                 isTotal: false
             )
         }
