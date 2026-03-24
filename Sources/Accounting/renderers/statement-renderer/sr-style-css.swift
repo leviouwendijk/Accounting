@@ -11,6 +11,11 @@ public enum StatementStyleCSS {
                 CSS.rule(".sr-level-2", CSS.decl("color", "#4b5563")),
                 CSS.rule(".sr-level-3", CSS.decl("color", "#6b7280")),
 
+                CSS.rule(".sr-weight-0", CSS.decl("font-weight", "600")),
+                CSS.rule(".sr-weight-1", CSS.decl("font-weight", "500")),
+                CSS.rule(".sr-weight-2", CSS.decl("font-weight", "400")),
+                CSS.rule(".sr-weight-3", CSS.decl("font-weight", "400")),
+
                 // ------------------------------------------------------------
                 // Base layout used by main statements renderer
                 // ------------------------------------------------------------
@@ -81,6 +86,13 @@ public enum StatementStyleCSS {
                     ".sr-label",
                     CSS.decl("display", "block")
                 ),
+
+                // addition
+                CSS.rule(
+                    ".sr-amount",
+                    CSS.decl("display", "inline-block")
+                ),
+
                 // CSS.rule(
                 //     "tr.total td",
                 //     CSS.decl("border-top", "1px solid #ddd"),

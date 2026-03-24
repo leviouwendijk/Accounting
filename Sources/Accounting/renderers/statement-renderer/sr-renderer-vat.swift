@@ -85,6 +85,7 @@ public extension StatementHTMLRenderer {
                                     let cls = amountClass(r.amount)
 
                                     let levelClass = "sr-level-\(min(3, lvl))"
+                                    let weightClass = "sr-weight-\(min(3, lvl))"
 
                                     // HTML.tr {
                                     //     HTML.td(["class": "sr-vat-label"]) {
@@ -102,7 +103,7 @@ public extension StatementHTMLRenderer {
                                     HTML.tr {
                                         HTML.td(["class": "sr-vat-label"]) {
                                             HTML.div([
-                                                "class": "sr-label \(levelClass)",
+                                                "class": "sr-label \(levelClass) \(weightClass)",
                                                 "style": indent
                                             ]) {
                                                 HTML.text(r.label)
@@ -112,7 +113,11 @@ public extension StatementHTMLRenderer {
                                             HTML.text(r.code)
                                         }
                                         HTML.td(["class": cls]) {
-                                            HTML.text(fmt(r.amount))
+                                            HTML.span([
+                                                "class": "sr-amount \(weightClass)"
+                                            ]) {
+                                                HTML.text(fmt(r.amount))
+                                            }
                                         }
                                     }
                                 }

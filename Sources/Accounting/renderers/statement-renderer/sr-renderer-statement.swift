@@ -45,6 +45,11 @@ extension StatementHTMLRenderer {
             return "sr-level-\(min(3, max(0, level)))"
         }
 
+        @inline(__always)
+        func weightClass(_ level: Int) -> String {
+            "sr-weight-\(min(3, max(0, level)))"
+        }
+
         // Filter + indent, same logic as before.
         let plRows: [(indent: Int, label: String, amount: Decimal, isTotal: Bool)] =
             incomeLines
@@ -128,14 +133,18 @@ extension StatementHTMLRenderer {
                             HTML.tr {
                                 HTML.td(["class": "label"]) {
                                     HTML.div([
-                                        "class": "sr-label \(levelClass(line.relativeIndent))"
+                                        "class": "sr-label \(levelClass(line.relativeIndent)) \(weightClass(line.relativeIndent))"
                                     ]) {
                                         HTML.raw(pad)
                                         HTML.text(escape(line.label))
                                     }
                                 }
                                 HTML.td(["class": "amt"]) {
-                                    HTML.text(fmt(line.amount))
+                                    HTML.span([
+                                        "class": "sr-amount \(weightClass(line.relativeIndent))"
+                                    ]) {
+                                        HTML.text(fmt(line.amount))
+                                    }
                                 }
                             }
                         }
@@ -274,7 +283,7 @@ extension StatementHTMLRenderer {
                                 HTML.tr {
                                     HTML.td(["class": "label"]) {
                                         HTML.div([
-                                            "class": "sr-label \(levelClass(r.indent))"
+                                            "class": "sr-label \(levelClass(r.indent)) \(weightClass(r.indent))"
                                         ]) {
                                             HTML.raw(pad)
                                             if r.isTotal {
@@ -288,13 +297,17 @@ extension StatementHTMLRenderer {
                                     }
 
                                     HTML.td(["class": "amt"]) {
-                                        let txt = fmt(r.amount)
-                                        if r.isTotal {
-                                            HTML.strong {
+                                        HTML.span([
+                                            "class": "sr-amount \(weightClass(r.indent))"
+                                        ]) {
+                                            let txt = fmt(r.amount)
+                                            if r.isTotal {
+                                                HTML.strong {
+                                                    HTML.text(txt)
+                                                }
+                                            } else {
                                                 HTML.text(txt)
                                             }
-                                        } else {
-                                            HTML.text(txt)
                                         }
                                     }
                                 }
