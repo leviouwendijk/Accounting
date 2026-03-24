@@ -327,6 +327,10 @@ public enum StatementStyleCSS {
                     CSS.decl("background", "#fafafa")
                 ),
                 CSS.rule(
+                    ".sr-summary-group",
+                    CSS.decl("padding-top", "4px")
+                ),
+                CSS.rule(
                     ".sr-summary-row",
                     CSS.decl("display", "grid"),
                     CSS.decl("grid-template-columns", "minmax(0, 1fr) auto"),
@@ -335,7 +339,7 @@ public enum StatementStyleCSS {
                     CSS.decl("padding", "4px 0")
                 ),
                 CSS.rule(
-                    ".sr-summary-row + .sr-summary-row",
+                    ".sr-summary > .sr-summary-row + .sr-summary-group, .sr-summary-group + .sr-summary-row",
                     CSS.decl("border-top", "1px solid #eceff3")
                 ),
                 CSS.rule(
@@ -353,6 +357,28 @@ public enum StatementStyleCSS {
                     CSS.decl("font-feature-settings", "\"tnum\""),
                     CSS.decl("color", "#111827"),
                     CSS.decl("white-space", "nowrap")
+                ),
+                CSS.rule(
+                    ".sr-summary-children",
+                    CSS.decl("margin-top", "2px"),
+                    CSS.decl("margin-left", "10px"),
+                    CSS.decl("padding-left", "12px"),
+                    CSS.decl("border-left", "1px solid #e5e7eb")
+                ),
+                CSS.rule(
+                    ".sr-summary-row-child",
+                    CSS.decl("padding", "2px 0")
+                ),
+                CSS.rule(
+                    ".sr-summary-row-child .sr-summary-label",
+                    CSS.decl("color", "#6b7280"),
+                    CSS.decl("font-size", "11px")
+                ),
+                CSS.rule(
+                    ".sr-summary-value-child",
+                    CSS.decl("font-size", "11px"),
+                    CSS.decl("font-weight", "500"),
+                    CSS.decl("color", "#4b5563")
                 ),
                 CSS.rule(
                     ".sr-summary-row-diff",

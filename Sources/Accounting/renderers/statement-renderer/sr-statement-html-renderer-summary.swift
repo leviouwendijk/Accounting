@@ -18,13 +18,37 @@ extension StatementHTMLRenderer {
                     }
                 }
 
-                HTML.div(["class": "sr-summary-row"]) {
-                    HTML.span(["class": "sr-summary-label"]) {
-                        HTML.text("Som eigen vermogen + passiva")
+                HTML.div(["class": "sr-summary-group"]) {
+                    HTML.div(["class": "sr-summary-row sr-summary-row-parent"]) {
+                        HTML.span(["class": "sr-summary-label"]) {
+                            HTML.text("Som eigen vermogen + passiva")
+                        }
+
+                        HTML.span(["class": "sr-summary-value"]) {
+                            HTML.text(fmt(summary.equityPlusLiabilities))
+                        }
                     }
 
-                    HTML.span(["class": "sr-summary-value"]) {
-                        HTML.text(fmt(summary.equityPlusLiabilities))
+                    HTML.div(["class": "sr-summary-children"]) {
+                        HTML.div(["class": "sr-summary-row sr-summary-row-child"]) {
+                            HTML.span(["class": "sr-summary-label"]) {
+                                HTML.text("Eigen vermogen")
+                            }
+
+                            HTML.span(["class": "sr-summary-value sr-summary-value-child"]) {
+                                HTML.text(fmt(summary.equity))
+                            }
+                        }
+
+                        HTML.div(["class": "sr-summary-row sr-summary-row-child"]) {
+                            HTML.span(["class": "sr-summary-label"]) {
+                                HTML.text("Passiva")
+                            }
+
+                            HTML.span(["class": "sr-summary-value sr-summary-value-child"]) {
+                                HTML.text(fmt(summary.liabilities))
+                            }
+                        }
                     }
                 }
 
