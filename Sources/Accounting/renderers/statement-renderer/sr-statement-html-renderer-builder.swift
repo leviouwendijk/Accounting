@@ -79,10 +79,15 @@ extension StatementHTMLRenderer {
             )
         }
 
+        let ratios = buildRatiosSection(
+            from: bundle.analytics?.ratios
+        )
+
         return DocumentModel(
             income: income,
             balances: balances,
-            summary: summary
+            summary: summary,
+            ratios: ratios
         )
     }
 
@@ -219,6 +224,45 @@ extension StatementHTMLRenderer {
             title: title,
             rows: rows,
             subtotal: source.subtotal
+        )
+    }
+    
+    static func buildRatiosSection(
+        from ratios: FinancialRatios?
+    ) -> RatiosSection? {
+        guard let ratios else {
+            return nil
+        }
+
+        return RatiosSection(
+            title: "Financiële ratio’s",
+            rows: [
+                RatioRow(
+                    label: "Solvabiliteit",
+                    value: ratios.equityRatio,
+                    style: .percentage
+                ),
+                RatioRow(
+                    label: "Schuldratio",
+                    value: ratios.debtRatio,
+                    style: .percentage
+                ),
+                RatioRow(
+                    label: "Debt / Equity",
+                    value: ratios.debtToEquity,
+                    style: .multiple
+                ),
+                RatioRow(
+                    label: "ROA",
+                    value: ratios.returnOnAssets,
+                    style: .percentage
+                ),
+                RatioRow(
+                    label: "ROE",
+                    value: ratios.returnOnEquity,
+                    style: .percentage
+                )
+            ]
         )
     }
 }

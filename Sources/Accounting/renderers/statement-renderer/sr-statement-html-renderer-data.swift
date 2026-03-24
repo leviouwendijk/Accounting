@@ -5,16 +5,53 @@ extension StatementHTMLRenderer {
         let income: TableSection
         let balances: [TableSection]
         let summary: BalanceSummary?
+        let ratios: RatiosSection?
 
         init(
             income: TableSection,
             balances: [TableSection],
-            summary: BalanceSummary?
+            summary: BalanceSummary?,
+            ratios: RatiosSection?
         ) {
             self.income = income
             self.balances = balances
             self.summary = summary
+            self.ratios = ratios
         }
+    }
+
+    struct RatiosSection: Sendable {
+        let title: String
+        let rows: [RatioRow]
+
+        init(
+            title: String,
+            rows: [RatioRow]
+        ) {
+            self.title = title
+            self.rows = rows
+        }
+    }
+
+    struct RatioRow: Sendable {
+        let label: String
+        let value: Decimal?
+        let style: RatioValueStyle
+
+        init(
+            label: String,
+            value: Decimal?,
+            style: RatioValueStyle
+        ) {
+            self.label = label
+            self.value = value
+            self.style = style
+        }
+    }
+
+    enum RatioValueStyle: Sendable {
+        case percentage
+        case multiple
     }
 
     enum TableSectionKind: Sendable {
