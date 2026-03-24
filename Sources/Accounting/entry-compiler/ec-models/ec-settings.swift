@@ -89,6 +89,10 @@ public struct StatementCompanySettings: Codable, Sendable {
         self.address = address
         self.contact = contact
     }
+
+    public var statementCompany: StatementHTMLRenderer.Company {
+        .init(self)
+    }
 }
 
 public struct StatementCompanyAddressSettings: Codable, Sendable {
@@ -109,4 +113,3 @@ public struct StatementCompanyAddressSettings: Codable, Sendable {
         self.city = city
     }
 }
-
