@@ -45,38 +45,40 @@ extension StatementHTMLRenderer {
         _ section: TableSection,
         options: Options
     ) -> [any HTMLNode] {
-        HTML.h2 {
-            HTML.text(section.title)
-        }
-
-        HTML.table(["class": "tbl"]) {
-            HTML.thead {
-                HTML.tr {
-                    HTML.th(["class": "col-label"]) {
-                        HTML.text("Naam")
-                    }
-                    HTML.th(["class": "col-amt"]) {
-                        HTML.text("Bedrag")
-                    }
-                }
+        HTML.section(["class": section.renderedSectionClassName]) {
+            HTML.h2 {
+                HTML.text(section.title)
             }
 
-            HTML.tbody {
-                for row in section.rows {
-                    renderTableRow(
-                        row,
-                        options: options
-                    )
+            HTML.table(["class": "tbl"]) {
+                HTML.thead {
+                    HTML.tr {
+                        HTML.th(["class": "col-label"]) {
+                            HTML.text("Naam")
+                        }
+                        HTML.th(["class": "col-amt"]) {
+                            HTML.text("Bedrag")
+                        }
+                    }
                 }
 
-                if let subtotal = section.subtotal {
-                    HTML.tr(["class": "total"]) {
-                        HTML.td(["class": "label"]) {
-                            HTML.text("Som")
-                        }
-                        HTML.td(["class": "amt"]) {
-                            HTML.strong {
-                                HTML.text(fmt(subtotal))
+                HTML.tbody {
+                    for row in section.rows {
+                        renderTableRow(
+                            row,
+                            options: options
+                        )
+                    }
+
+                    if let subtotal = section.subtotal {
+                        HTML.tr(["class": "total"]) {
+                            HTML.td(["class": "label"]) {
+                                HTML.text("Som")
+                            }
+                            HTML.td(["class": "amt"]) {
+                                HTML.strong {
+                                    HTML.text(fmt(subtotal))
+                                }
                             }
                         }
                     }

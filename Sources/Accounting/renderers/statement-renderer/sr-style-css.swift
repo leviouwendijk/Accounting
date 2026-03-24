@@ -388,6 +388,34 @@ public enum StatementStyleCSS {
                     ".sr-summary-value-warn",
                     CSS.decl("color", "#92400e")
                 ),
+
+                // adding page breaking:
+                CSS.rule(
+                    ".sr-section",
+                    CSS.decl("margin-top", "0")
+                ),
+                CSS.rule(
+                    ".sr-section h2",
+                    CSS.decl("break-after", "avoid-page"),
+                    CSS.decl("page-break-after", "avoid")
+                ),
+            ],
+
+            // adding page breaking:
+            media: [
+                CSS.media(
+                    "print",
+                    CSS.rule(
+                        ".sr-print-page-break-before",
+                        CSS.decl("break-before", "page"),
+                        CSS.decl("page-break-before", "always")
+                    ),
+                    CSS.rule(
+                        ".sr-summary",
+                        CSS.decl("break-inside", "avoid-page"),
+                        CSS.decl("page-break-inside", "avoid")
+                    )
+                )
             ]
         )
     }

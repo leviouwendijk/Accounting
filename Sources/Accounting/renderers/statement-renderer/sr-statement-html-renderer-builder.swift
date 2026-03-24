@@ -31,6 +31,7 @@ extension StatementHTMLRenderer {
         var balances: [TableSection] = []
 
         if let assets = buildBalanceSection(
+            kind: .assets,
             title: "Balans: Activa",
             source: balanceSections.assets,
             maps: maps,
@@ -40,6 +41,7 @@ extension StatementHTMLRenderer {
         }
 
         if let equity = buildBalanceSection(
+            kind: .equity,
             title: "Balans: Eigen Vermogen",
             source: balanceSections.equity,
             maps: maps,
@@ -49,6 +51,7 @@ extension StatementHTMLRenderer {
         }
 
         if let liabilities = buildBalanceSection(
+            kind: .liabilities,
             title: "Balans: Passiva",
             source: balanceSections.liabilities,
             maps: maps,
@@ -59,7 +62,8 @@ extension StatementHTMLRenderer {
 
         if options.includeOtherBucket,
            let other = buildBalanceSection(
-                title: "Balance Sheet — Other",
+                kind: .other,
+                title: "Balans: Overig",
                 source: balanceSections.other,
                 maps: maps,
                 options: options
@@ -144,12 +148,14 @@ extension StatementHTMLRenderer {
         }
 
         return TableSection(
+            kind: .incomeStatement,
             title: "Winst- en Verliesrekening",
             rows: rows
         )
     }
 
     static func buildBalanceSection(
+        kind: BalanceSectionKind,
         title: String,
         source: RGSBalanceBucketsOutput.Section?,
         maps: RGSAssemblerResult,
@@ -209,6 +215,7 @@ extension StatementHTMLRenderer {
         }
 
         return TableSection(
+            kind: .balance(kind),
             title: title,
             rows: rows,
             subtotal: source.subtotal
