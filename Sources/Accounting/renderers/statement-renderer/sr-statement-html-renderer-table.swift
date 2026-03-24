@@ -32,10 +32,10 @@ extension StatementHTMLRenderer {
                         )
                     }
 
-                    // renderSummary(model.summary)
-                    renderSummary(
-                        renderedBalanceSummary(from: model.balances)
-                    )
+                    renderSummary(model.summary)
+                    // renderSummary(
+                    //     renderedBalanceSummary(from: model.balances)
+                    // )
                     renderRatiosSection(model.ratios)
                 }
             }
@@ -75,22 +75,7 @@ extension StatementHTMLRenderer {
                         )
                     }
 
-                    let renderedSubtotal: Decimal? = {
-                        switch section.kind {
-                        case .incomeStatement:
-                            return section.subtotal
-
-                        case .balance:
-                            return section.rows.reduce(Decimal(0)) { partial, row in
-                                partial + displayedAmount(
-                                    row: row,
-                                    sectionKind: section.kind
-                                )
-                            }
-                        }
-                    }()
-
-                    if let subtotal = renderedSubtotal {
+                    if let subtotal = section.subtotal {
                         HTML.tr(["class": "total"]) {
                             HTML.td(["class": "label"]) {
                                 HTML.text("Som")

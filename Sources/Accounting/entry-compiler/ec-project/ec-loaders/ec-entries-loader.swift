@@ -1,4 +1,11 @@
 import Foundation
+import Primitives
+
+public enum PlaceholderWarningMode: String, Sendable, StringParsableEnum {
+    case silent
+    case summary
+    case perEntry
+}
 
 public enum EntryCompilerEntriesLoader {
     public static func load(
@@ -9,7 +16,8 @@ public enum EntryCompilerEntriesLoader {
         onCollision: ((Int, String, String) -> Void)? = nil,
         trace: Bool = true,
 
-        verbose: Bool = false
+        verbose: Bool = false,
+        placeholderWarnings: PlaceholderWarningMode = .summary
     ) throws -> [Entry] {
         let root = project.url(.entries)
         var out: [Entry] = []
@@ -58,6 +66,10 @@ public enum EntryCompilerEntriesLoader {
                 out.append(contentsOf: entries)
             }
         }
+        emitPlaceholderWarnings(
+            out,
+            mode: placeholderWarnings
+        )
         return out
     }
 
@@ -68,7 +80,8 @@ public enum EntryCompilerEntriesLoader {
         onCollision: ((Int, String, String) -> Void)? = nil,
         trace: Bool = true,
 
-        verbose: Bool = false
+        verbose: Bool = false,
+        placeholderWarnings: PlaceholderWarningMode = .summary
     ) async throws -> [Entry] {
         let root = project.url(.entries)
         let urls = ecFiles(at: root)
@@ -142,6 +155,11 @@ public enum EntryCompilerEntriesLoader {
             out.append(contentsOf: fe.entries)
         }
 
+        emitPlaceholderWarnings(
+            out,
+            mode: placeholderWarnings
+        )
+
         return out
     }
 }
@@ -174,6 +192,46 @@ public final class CollisionReporter {
                 id: id, firstSeen: first, conflict: here
             )
             fputs(msg + "\n", stderr)
+        }
+    }
+}
+
+private func emitPlaceholderWarnings(
+    _ entries: [Entry],
+    mode: PlaceholderWarningMode
+) {
+    switch mode {
+    case .silent:
+        return
+
+    case .summary:
+        var affectedEntries = 0
+        var totalPlaceholders = 0
+
+        for entry in entries {
+            let (count, _) = entry.entityPlaceholderWarning()
+            guard count > 0 else { continue }
+            affectedEntries += 1
+            totalPlaceholders += count
+        }
+
+        guard affectedEntries > 0 else {
+            return
+        }
+
+        print("! WARNING: Placeholder entities detected")
+        print("entries affected: \(affectedEntries)")
+        print("total placeholders: \(totalPlaceholders)")
+        print()
+
+    case .perEntry:
+        for entry in entries {
+            let (count, report) = entry.entityPlaceholderWarning()
+            guard count > 0 else { continue }
+
+            print(report)
+            print("placeholders in entry (id: \(entry.id, default: "unknown")): \(count)")
+            print()
         }
     }
 }

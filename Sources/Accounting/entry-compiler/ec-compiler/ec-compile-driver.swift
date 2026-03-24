@@ -55,7 +55,8 @@ public struct EntryCompileDriver {
     public static func compile(
         projectRoot: URL,
         setting: CompileDriveSetting = CompileDriveSetting(),
-        verbose: Bool = false
+        verbose: Bool = false,
+        placeholderWarnings: PlaceholderWarningMode = .summary
     ) throws -> Result {
         vprint(verbose, "▶ Settings …")
         let project   = EntryCompilerProject(root: projectRoot)
@@ -113,6 +114,7 @@ public struct EntryCompileDriver {
                 trace: setting.loc_trace,
 
                 verbose: verbose,
+                placeholderWarnings: placeholderWarnings
             )
             vprint(verbose, "  ✓ \(entries.count) entries")
         }
@@ -161,7 +163,8 @@ extension EntryCompileDriver {
     public static func compile(
         projectRoot: URL,
         setting: CompileDriveSetting = CompileDriveSetting(),
-        verbose: Bool = false
+        verbose: Bool = false,
+        placeholderWarnings: PlaceholderWarningMode = .summary
     ) async throws -> Result {
         vprint(verbose, "▶ Settings …")
         let project   = EntryCompilerProject(root: projectRoot)
@@ -220,7 +223,8 @@ extension EntryCompileDriver {
                 onCollision: nil,
                 trace: setting.loc_trace,
 
-                verbose: verbose
+                verbose: verbose,
+                placeholderWarnings: placeholderWarnings
             )
             vprint(verbose, "  ✓ \(entries.count) entries")
         }
