@@ -53,17 +53,9 @@ extension StatementHTMLRenderer {
     ) -> String {
         "sr-amount \(weightClass(depth))"
     }
+}
 
-    @inline(__always)
-    static func spacingPrefix(
-        depth: Int
-    ) -> String {
-        String(
-            repeating: "\u{00a0}\u{00a0}",
-            count: max(0, depth)
-        )
-    }
-
+extension StatementHTMLRenderer {
     @inline(__always)
     static func treePrefix(
         depth: Int,
@@ -92,7 +84,7 @@ extension StatementHTMLRenderer {
     ) -> String {
         switch options.hierarchyPrefixStyle {
         case .spacing:
-            return spacingPrefix(depth: depth)
+            return ""
 
         case .tree:
             return treePrefix(
@@ -101,5 +93,17 @@ extension StatementHTMLRenderer {
                 ancestorHasNextSiblings: ancestorHasNextSiblings
             )
         }
+    }
+
+    @inline(__always)
+    static func spacingIndentStyle(
+        depth: Int,
+        options: StatementHTMLRenderer.Options
+    ) -> String? {
+        guard options.hierarchyPrefixStyle == .spacing, depth > 0 else {
+            return nil
+        }
+
+        return "padding-left: \(Double(depth) * 1.25)em;"
     }
 }

@@ -20,10 +20,16 @@ extension StatementHTMLRenderer {
                 HTML.body {
                     renderDocumentHeader(options: options)
 
-                    renderTableSection(model.income)
+                    renderTableSection(
+                        model.income,
+                        options: options
+                    )
 
                     for section in model.balances {
-                        renderTableSection(section)
+                        renderTableSection(
+                            section,
+                            options: options
+                        )
                     }
 
                     renderSummary(model.summary)
@@ -36,7 +42,8 @@ extension StatementHTMLRenderer {
 
     @HTMLBuilder
     static func renderTableSection(
-        _ section: TableSection
+        _ section: TableSection,
+        options: Options
     ) -> [any HTMLNode] {
         HTML.h2 {
             HTML.text(section.title)
@@ -56,7 +63,10 @@ extension StatementHTMLRenderer {
 
             HTML.tbody {
                 for row in section.rows {
-                    renderTableRow(row)
+                    renderTableRow(
+                        row,
+                        options: options
+                    )
                 }
 
                 if let subtotal = section.subtotal {
@@ -77,11 +87,15 @@ extension StatementHTMLRenderer {
 
     @HTMLBuilder
     static func renderTableRow(
-        _ row: TableRow
+        _ row: TableRow,
+        options: Options
     ) -> [any HTMLNode] {
         HTML.tr {
             HTML.td(["class": "label"]) {
-                renderLabelCell(row: row)
+                renderLabelCell(
+                    row: row,
+                    options: options
+                )
             }
 
             HTML.td(["class": "amt"]) {
@@ -91,11 +105,21 @@ extension StatementHTMLRenderer {
     }
 
     static func renderLabelCell(
-        row: TableRow
+        row: TableRow,
+        options: Options
     ) -> any HTMLNode {
-        HTML.div([
+        var attrs: HTMLAttribute = [
             "class": rowLabelClass(depth: row.depth)
-        ]) {
+        ]
+
+        if let style = spacingIndentStyle(
+            depth: row.depth,
+            options: options
+        ) {
+            attrs.merge(["style": style])
+        }
+
+        return HTML.div(attrs) {
             if !row.prefix.isEmpty {
                 HTML.span(["class": "sr-hierarchy-prefix"]) {
                     HTML.raw(row.prefix)
