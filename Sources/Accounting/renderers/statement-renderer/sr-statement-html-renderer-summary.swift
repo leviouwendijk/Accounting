@@ -21,7 +21,7 @@ extension StatementHTMLRenderer {
                 HTML.div(["class": "sr-summary-group"]) {
                     HTML.div(["class": "sr-summary-row sr-summary-row-parent"]) {
                         HTML.span(["class": "sr-summary-label"]) {
-                            HTML.text("Som eigen vermogen + passiva")
+                            HTML.text("Som vermogen + passiva")
                         }
 
                         HTML.span(["class": "sr-summary-value"]) {
@@ -32,7 +32,7 @@ extension StatementHTMLRenderer {
                     HTML.div(["class": "sr-summary-children"]) {
                         HTML.div(["class": "sr-summary-row sr-summary-row-child"]) {
                             HTML.span(["class": "sr-summary-label"]) {
-                                HTML.text("Eigen vermogen")
+                                HTML.text("vermogen")
                             }
 
                             HTML.span(["class": "sr-summary-value sr-summary-value-child"]) {
@@ -42,7 +42,7 @@ extension StatementHTMLRenderer {
 
                         HTML.div(["class": "sr-summary-row sr-summary-row-child"]) {
                             HTML.span(["class": "sr-summary-label"]) {
-                                HTML.text("Passiva")
+                                HTML.text("passiva")
                             }
 
                             HTML.span(["class": "sr-summary-value sr-summary-value-child"]) {
