@@ -157,7 +157,7 @@ extension StatementHTMLRenderer {
     ) -> Decimal {
         switch sectionKind {
         case .incomeStatement:
-            return row.amount
+            return displayedIncomeAmount(row: row)
 
         case .balance(.other):
             return row.amount
@@ -174,6 +174,16 @@ extension StatementHTMLRenderer {
                 normalDirection: .credit
             )
         }
+    }
+
+    @inline(__always)
+    static func displayedIncomeAmount(
+        row: TableRow
+    ) -> Decimal {
+        displayedBalanceAmount(
+            row: row,
+            normalDirection: .credit
+        )
     }
 
     @inline(__always)
