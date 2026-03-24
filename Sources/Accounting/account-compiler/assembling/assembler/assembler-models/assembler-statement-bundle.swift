@@ -21,8 +21,3 @@ public struct StatementBundle: Sendable, PresentableOutput {
         self.analytics = analytics
     }
 }
-
-public struct BundleAnalytics: Sendable {
-    public let l2Buckets: L2Buckets
-    public let l2Totals: PresentedBalanceTotals
-}
