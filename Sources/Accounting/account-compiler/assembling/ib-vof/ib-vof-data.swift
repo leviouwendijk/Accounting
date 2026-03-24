@@ -18,6 +18,8 @@ public extension RGSAssembler {
         let dirById = maps.directionById
         let totals = bundle.totalsById
 
+        let winst = shownAmount(for: businessEntity.autoCloseTargets().netIncomeCode)
+
         let analytics: BundleAnalytics
         if let existing = bundle.analytics {
             analytics = existing
@@ -25,7 +27,8 @@ public extension RGSAssembler {
             analytics = try RGSAssembler.makeAnalytics(
                 chart: chart,
                 bundle: bundle,
-                omslag: .apply
+                omslag: .apply,
+                netIncome: winst
             )
         }
 
@@ -62,7 +65,6 @@ public extension RGSAssembler {
         let bedrijfskosten = shownAmount(for: "WBed")
         let afschrijvingen = shownAmount(for: "WAfs")
         let financieel = shownAmount(for: "WFbe")
-        let winst = shownAmount(for: businessEntity.autoCloseTargets().netIncomeCode)
 
         if let omzet {
             resultRows.append(
