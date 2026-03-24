@@ -13,7 +13,6 @@ extension RGSAssembler {
     //     return BundleAnalytics(l2Buckets: l2, l2Totals: totals)
     // }
 
-    // with fin ratios
     @inline(__always)
     public static func makeAnalytics(
         chart: CompiledChart,
