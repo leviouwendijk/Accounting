@@ -1,4 +1,5 @@
 import Foundation
+import Methods
 
 extension RGSAssembler {
     @inline(__always)
@@ -19,7 +20,12 @@ extension RGSAssembler {
 
         // Assets == Equity + Liabilities  (display magnitudes)
         let diff = t.assets - (t.equity + t.liabilities)
-        if diff != 0 && abs((diff as NSDecimalNumber).doubleValue) > (eps as NSDecimalNumber).doubleValue {
+        // if diff != 0 && abs((diff as NSDecimalNumber).doubleValue) > (eps as NSDecimalNumber).doubleValue {
+        if Compare.Number.Decimal.exceeds(
+            diff,
+            tolerance: eps,
+            via: .direct
+        ) {
             throw RGSAssemblerError.unbalanced(diff: diff, assets: t.assets, equity: t.equity, liabilities: t.liabilities, eps: eps)
         }
     }
@@ -42,7 +48,12 @@ extension RGSAssembler {
             .reduce(0) { $0 + raw($1) }                           // typically negative
 
         let diff = debitSum + creditSum
-        if diff != 0 && abs((diff as NSDecimalNumber).doubleValue) > (eps as NSDecimalNumber).doubleValue {
+        // if diff != 0 && abs((diff as NSDecimalNumber).doubleValue) > (eps as NSDecimalNumber).doubleValue {
+        if Compare.Number.Decimal.exceeds(
+            diff,
+            tolerance: eps,
+            via: .direct
+        ) {
             throw RGSAssemblerError.unbalanced(diff: diff, assets: debitSum, equity: 0, liabilities: creditSum, eps: eps)
         }
     }

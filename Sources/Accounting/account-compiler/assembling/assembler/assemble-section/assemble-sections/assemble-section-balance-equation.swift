@@ -1,4 +1,5 @@
 import Foundation
+import Methods
 
 public enum BalanceEquationError: LocalizedError, Sendable {
     // case sectionRootNotFound(letter: String)
@@ -64,7 +65,16 @@ extension RGSAssembler {
     /// Optional assert: throws if A + J + K != 0 within epsilon.
     public static func assertBalanced(_ s: BalanceAlphaSections, eps: Decimal = 0) throws {
         let diff = s.diffRaw
-        if diff != 0 && abs((diff as NSDecimalNumber).doubleValue) > (eps as NSDecimalNumber).doubleValue {
+        // if diff != 0 && abs((diff as NSDecimalNumber).doubleValue) > (eps as NSDecimalNumber).doubleValue {
+        //     throw BalanceEquationError.unbalanced(
+        //         diff: diff, assets: s.assets, equity: s.equity, liabilities: s.liabilities, eps: eps
+        //     )
+        // }
+        if Compare.Number.Decimal.exceeds(
+            diff,
+            tolerance: eps,
+            via: .direct
+        ) {
             throw BalanceEquationError.unbalanced(
                 diff: diff, assets: s.assets, equity: s.equity, liabilities: s.liabilities, eps: eps
             )
