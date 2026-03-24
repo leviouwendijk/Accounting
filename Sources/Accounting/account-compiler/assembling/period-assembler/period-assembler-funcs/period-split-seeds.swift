@@ -329,6 +329,27 @@ public extension PeriodAssembler {
         let is_ = linesFor(.income,  roll: maps, totals: totalsIncome,  labels: labels,
                           cut: localCut, forcedIds: forcedIds, forcedChain: forcedChain, omslag: omslag)
 
-        return StatementBundle(balance: bs, income: is_, totalsById: totalsBalance, entity: breakdown)
+        // include analytics:
+        let bundle = StatementBundle(
+            balance: bs,
+            income: is_,
+            totalsById: totalsBalance,
+            entity: breakdown
+        )
+
+        let analytics = try RGSAssembler.makeAnalytics(
+            chart: chart,
+            bundle: bundle,
+            omslag: omslag,
+            netIncome: niWindow
+        )
+
+        return StatementBundle(
+            balance: bs,
+            income: is_,
+            totalsById: totalsBalance,
+            entity: breakdown,
+            analytics: analytics
+        )
     }
 }
