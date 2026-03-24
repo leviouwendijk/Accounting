@@ -148,3 +148,44 @@ extension StatementHTMLRenderer {
         }
     }
 }
+
+extension StatementHTMLRenderer {
+    @inline(__always)
+    static func displayedAmount(
+        row: TableRow,
+        sectionKind: TableSectionKind
+    ) -> Decimal {
+        switch sectionKind {
+        case .incomeStatement:
+            return row.amount
+
+        case .balance(.other):
+            return row.amount
+
+        case .balance(.assets):
+            return displayedBalanceAmount(
+                row: row,
+                normalDirection: .debit
+            )
+
+        case .balance(.equity), .balance(.liabilities):
+            return displayedBalanceAmount(
+                row: row,
+                normalDirection: .credit
+            )
+        }
+    }
+
+    @inline(__always)
+    static func displayedBalanceAmount(
+        row: TableRow,
+        normalDirection: Direction
+    ) -> Decimal {
+        let magnitude = absDec(row.amount)
+
+        let isPositive = (row.direction == normalDirection)
+            == (row.orientation == .regular)
+
+        return isPositive ? magnitude : -magnitude
+    }
+}

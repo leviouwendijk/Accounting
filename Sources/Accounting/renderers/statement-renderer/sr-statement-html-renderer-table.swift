@@ -32,7 +32,10 @@ extension StatementHTMLRenderer {
                         )
                     }
 
-                    renderSummary(model.summary)
+                    // renderSummary(model.summary)
+                    renderSummary(
+                        renderedBalanceSummary(from: model.balances)
+                    )
                     renderRatiosSection(model.ratios)
                 }
             }
@@ -67,11 +70,27 @@ extension StatementHTMLRenderer {
                     for row in section.rows {
                         renderTableRow(
                             row,
+                            sectionKind: section.kind,
                             options: options
                         )
                     }
 
-                    if let subtotal = section.subtotal {
+                    let renderedSubtotal: Decimal? = {
+                        switch section.kind {
+                        case .incomeStatement:
+                            return section.subtotal
+
+                        case .balance:
+                            return section.rows.reduce(Decimal(0)) { partial, row in
+                                partial + displayedAmount(
+                                    row: row,
+                                    sectionKind: section.kind
+                                )
+                            }
+                        }
+                    }()
+
+                    if let subtotal = renderedSubtotal {
                         HTML.tr(["class": "total"]) {
                             HTML.td(["class": "label"]) {
                                 HTML.text("Som")
@@ -91,6 +110,7 @@ extension StatementHTMLRenderer {
     @HTMLBuilder
     static func renderTableRow(
         _ row: TableRow,
+        sectionKind: TableSectionKind,
         options: Options
     ) -> [any HTMLNode] {
         HTML.tr {
@@ -102,7 +122,10 @@ extension StatementHTMLRenderer {
             }
 
             HTML.td(["class": "amt"]) {
-                renderAmountCell(row: row)
+                renderAmountCell(
+                    row: row,
+                    sectionKind: sectionKind
+                )
             }
         }
     }
@@ -136,27 +159,20 @@ extension StatementHTMLRenderer {
             } else {
                 HTML.text(row.label)
             }
-
-            // HTML.span([
-            //     "class": directionBadgeClass(
-            //         orientation: row.orientation
-            //     )
-            // ]) {
-            //     HTML.text(
-            //         directionBadgeText(
-            //             direction: row.direction,
-            //             orientation: row.orientation
-            //         )
-            //     )
-            // }
         }
     }
 
     static func renderAmountCell(
-        row: TableRow
+        row: TableRow,
+        sectionKind: TableSectionKind
     ) -> any HTMLNode {
-        let text = fmt(row.amount)
-        let cls = row.amount < 0
+        let shown = displayedAmount(
+            row: row,
+            sectionKind: sectionKind
+        )
+
+        let text = fmt(shown)
+        let cls = shown < 0
             ? "\(rowAmountClass(depth: row.depth)) sr-amount-negative"
             : rowAmountClass(depth: row.depth)
 
@@ -171,5 +187,49 @@ extension StatementHTMLRenderer {
                 HTML.text(text)
             }
         }
+    }
+}
+
+extension StatementHTMLRenderer {
+    static func renderedBalanceSummary(
+        from sections: [TableSection]
+    ) -> BalanceSummary? {
+        var assets: Decimal?
+        var equity: Decimal?
+        var liabilities: Decimal?
+
+        for section in sections {
+            guard case .balance(let kind) = section.kind else {
+                continue
+            }
+
+            let total = section.rows.reduce(Decimal(0)) { partial, row in
+                partial + displayedAmount(
+                    row: row,
+                    sectionKind: section.kind
+                )
+            }
+
+            switch kind {
+            case .assets:
+                assets = total
+            case .equity:
+                equity = total
+            case .liabilities:
+                liabilities = total
+            case .other:
+                break
+            }
+        }
+
+        guard let assets, let equity, let liabilities else {
+            return nil
+        }
+
+        return BalanceSummary(
+            assets: assets,
+            equity: equity,
+            liabilities: liabilities
+        )
     }
 }
