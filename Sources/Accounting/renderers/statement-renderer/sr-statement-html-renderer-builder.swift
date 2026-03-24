@@ -160,17 +160,35 @@ extension StatementHTMLRenderer {
         }
 
         let ids = source.lines.map(\.id)
-        let rootId = ids.first
 
-        let hierarchy = makeRowHierarchyMap(
+        let rawDepthById: [Int: Int] = Dictionary(
+            uniqueKeysWithValues: source.lines.map { line in
+                (line.id, max(0, line.relativeIndent))
+            }
+        )
+
+        let distinctDepths = Array(Set(rawDepthById.values)).sorted()
+        let compactDepthIndex: [Int: Int] = Dictionary(
+            uniqueKeysWithValues: distinctDepths.enumerated().map { offset, depth in
+                (depth, offset)
+            }
+        )
+
+        let presentationDepthById: [Int: Int] = Dictionary(
+            uniqueKeysWithValues: rawDepthById.map { id, rawDepth in
+                (id, compactDepthIndex[rawDepth] ?? 0)
+            }
+        )
+
+        let hierarchy = makePresentationHierarchyMap(
             idsInOrder: ids,
-            parentById: maps.parentById,
-            sectionRootId: rootId
+            canonicalParentById: maps.parentById,
+            presentationDepthById: presentationDepthById
         )
 
         let rows = source.lines.map { line in
             let h = hierarchy[line.id]
-            let depth = h?.depth ?? line.relativeIndent
+            let depth = h?.depth ?? presentationDepthById[line.id] ?? 0
 
             let prefix = hierarchyPrefix(
                 depth: depth,
