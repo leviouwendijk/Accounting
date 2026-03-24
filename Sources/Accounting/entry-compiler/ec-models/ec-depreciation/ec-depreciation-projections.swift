@@ -146,22 +146,23 @@ public extension DepreciationConfig {
         return slices
     }
 
-    // LEGACY ENTRY POINT KEPT FOR ROLLBACK TESTING.
-    // This preserves current callers until they are migrated.
-    @inline(__always)
-    func project(
-        through endDate: Date,
-        granularity: DepreciationGranularity = .monthly,
-        calendar: Calendar = .init(identifier: .gregorian)
-    ) -> [DepreciationSlice] {
-        return project(
-            through: endDate,
-            startDate: schedule.effectiveDate,
-            startConvention: .exactDate,
-            granularity: granularity,
-            calendar: calendar
-        )
-    }
+    // // LEGACY ENTRY POINT KEPT FOR ROLLBACK TESTING.
+    // // This preserves current callers until they are migrated.
+    // @available(*, unavailable, message: "Use project(through:startDate:startConvention:granularity:calendar:) instead.")
+    // @inline(__always)
+    // func project(
+    //     through endDate: Date,
+    //     granularity: DepreciationGranularity = .monthly,
+    //     calendar: Calendar = .init(identifier: .gregorian)
+    // ) -> [DepreciationSlice] {
+    //     return project(
+    //         through: endDate,
+    //         startDate: schedule.effectiveDate,
+    //         startConvention: .exactDate,
+    //         granularity: granularity,
+    //         calendar: calendar
+    //     )
+    // }
 }
 
 // public enum DepreciationGranularity: String, Codable, Sendable {

@@ -59,27 +59,19 @@ public extension EntityStore {
 
         for (k, cfg) in map {
             guard let entity = byFull[k] else {
-                out[k] = cfg.project(
-                    through: endDate,
-                    startDate: cfg.schedule.effectiveDate,
-                    startConvention: .exactDate,
-                    granularity: granularity,
-                    calendar: calendar
-                )
-                continue
+                throw DepreciationProfileAccessError.missingProfile(k)
             }
 
-            let profileAccess = try DepreciationProfileAccess.resolve(
+            let policy = try DepreciationProjectionPolicy.canonical(
                 for: k,
                 entity: entity,
-                fallbackSchedule: cfg.schedule,
-                fallbackAcquisition: cfg.acquistion
+                config: cfg
             )
 
             out[k] = cfg.project(
                 through: endDate,
-                startDate: profileAccess.commissionDate,
-                startConvention: .firstFullMonth,
+                startDate: policy.startDate,
+                startConvention: policy.startConvention,
                 granularity: granularity,
                 calendar: calendar
             )

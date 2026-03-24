@@ -44,6 +44,18 @@ public enum AssetsOverviewBuilder {
                 fallbackAcquisition: depreciation?.acquistion
             )
 
+            let projectionPolicy: DepreciationProjectionPolicy? = {
+                guard let depreciation else {
+                    return nil
+                }
+
+                return try? DepreciationProjectionPolicy.canonical(
+                    for: key,
+                    entity: entity,
+                    config: depreciation
+                )
+            }()
+
             let displayName = normalizedDisplayName(
                 key: key,
                 entity: entity
@@ -55,7 +67,8 @@ public enum AssetsOverviewBuilder {
 
             let acquisitionDate = profileAccess?.acquisitionDate
             let commissionDate = entity.profile?.commissionDate
-            let effectiveStartDate = profileAccess?.commissionDate
+            let effectiveStartDate = projectionPolicy?.startDate ?? profileAccess?.commissionDate
+            let startConvention = projectionPolicy?.startConvention ?? .firstFullMonth
             let acquisitionCost = profileAccess?.acquisition.cost
 
             let rawCategory = rawAssetCategory(
@@ -79,6 +92,7 @@ public enum AssetsOverviewBuilder {
                 acquisitionCost: acquisitionCost,
                 depreciation: depreciation,
                 availableFrom: effectiveStartDate,
+                startConvention: startConvention,
                 calendar: calendar
             )
 
@@ -91,10 +105,22 @@ public enum AssetsOverviewBuilder {
             let periodDepreciation = depreciationAmount(
                 depreciation: depreciation,
                 availableFrom: effectiveStartDate,
+                startConvention: startConvention,
                 in: period,
                 closingAsOf: closingAsOf,
                 calendar: calendar
             )
+
+            let closingCarryingAmount = carryingAmount(
+                asOf: closingAsOf,
+                acquisitionCost: acquisitionCost,
+                depreciation: depreciation,
+                availableFrom: effectiveStartDate,
+                startConvention: startConvention,
+                calendar: calendar
+            )
+
+            // let effectiveStartDate = profileAccess?.commissionDate
 
             // let periodDepreciation = depreciationAmount(
             //     depreciation: depreciation,
@@ -102,14 +128,6 @@ public enum AssetsOverviewBuilder {
             //     closingAsOf: closingAsOf,
             //     calendar: calendar
             // )
-
-            let closingCarryingAmount = carryingAmount(
-                asOf: closingAsOf,
-                acquisitionCost: acquisitionCost,
-                depreciation: depreciation,
-                availableFrom: effectiveStartDate,
-                calendar: calendar
-            )
 
             var issues: [AssetsOverviewIssue] = []
 
@@ -531,6 +549,7 @@ public enum AssetsOverviewBuilder {
         acquisitionCost: Decimal?,
         depreciation: DepreciationConfig?,
         availableFrom: Date?,
+        startConvention: DepreciationStartConvention,
         calendar: Calendar
     ) -> Decimal {
         guard let acquisitionCost,
@@ -558,51 +577,13 @@ public enum AssetsOverviewBuilder {
         let slices = depreciation.project(
             through: asOf,
             startDate: availableFrom,
-            startConvention: .firstFullMonth,
+            startConvention: startConvention,
             granularity: .monthly,
             calendar: calendar
         )
 
         return slices.last?.nbvClosing ?? acquisitionCost
     }
-
-    // private static func carryingAmount(
-    //     asOf: Date?,
-    //     acquisitionCost: Decimal?,
-    //     depreciation: DepreciationConfig?,
-    //     availableFrom: Date?,
-    //     calendar: Calendar
-    // ) -> Decimal {
-    //     guard let acquisitionCost,
-    //           acquisitionCost > 0
-    //     else {
-    //         return 0
-    //     }
-
-    //     guard let asOf else {
-    //         return 0
-    //     }
-
-    //     if let availableFrom, asOf < availableFrom {
-    //         return 0
-    //     }
-
-    //     guard let depreciation else {
-    //         return acquisitionCost
-    //     }
-
-    //     if asOf < depreciation.schedule.effectiveDate {
-    //         return acquisitionCost
-    //     }
-
-    //     let slices = depreciation.project(
-    //         through: asOf,
-    //         granularity: .monthly,
-    //         calendar: calendar
-    //     )
-
-    //     return slices.last?.nbvClosing ?? acquisitionCost
-    // }
 
     private static func investmentAmount(
         acquisitionCost: Decimal?,
@@ -624,6 +605,7 @@ public enum AssetsOverviewBuilder {
     private static func depreciationAmount(
         depreciation: DepreciationConfig?,
         availableFrom: Date?,
+        startConvention: DepreciationStartConvention,
         in period: PeriodWindow,
         closingAsOf: Date,
         calendar: Calendar
@@ -639,7 +621,7 @@ public enum AssetsOverviewBuilder {
         let slices = depreciation.project(
             through: closingAsOf,
             startDate: availableFrom,
-            startConvention: .firstFullMonth,
+            startConvention: startConvention,
             granularity: .monthly,
             calendar: calendar
         )
@@ -650,43 +632,11 @@ public enum AssetsOverviewBuilder {
                 calendar: calendar
             )
 
-            if contains(postingDate, in: period) {
-                return partial + slice.depreciation
-            }
-
-            return partial
+            return contains(postingDate, in: period)
+                ? partial + slice.depreciation
+                : partial
         }
     }
-
-    // private static func depreciationAmount(
-    //     depreciation: DepreciationConfig?,
-    //     in period: PeriodWindow,
-    //     closingAsOf: Date,
-    //     calendar: Calendar
-    // ) -> Decimal {
-    //     guard let depreciation else {
-    //         return 0
-    //     }
-
-    //     let slices = depreciation.project(
-    //         through: closingAsOf,
-    //         granularity: .monthly,
-    //         calendar: calendar
-    //     )
-
-    //     return slices.reduce(0) { partial, slice in
-    //         let postingDate = postingDate(
-    //             for: slice,
-    //             calendar: calendar
-    //         )
-
-    //         if contains(postingDate, in: period) {
-    //             return partial + slice.depreciation
-    //         }
-
-    //         return partial
-    //     }
-    // }
 
     @inline(__always)
     private static func postingDate(
