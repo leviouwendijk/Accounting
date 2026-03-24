@@ -35,8 +35,20 @@ public extension EntityStore {
         return depreciationMap
     }
 
-    // NOTE: 
-    // not using defaultTimeZone yet, from settings
+    // // NOTE: 
+    // // not using defaultTimeZone yet, from settings
+    // func projectDepreciation(
+    //     through endDate: Date,
+    //     granularity: DepreciationGranularity = .monthly,
+    //     calendar: Calendar = .init(identifier: .gregorian)
+    // ) throws -> [EntityKey: [DepreciationSlice]] {
+    //     let map = try collectDepreciationOrThrow()
+    //     var out: [EntityKey: [DepreciationSlice]] = [:]
+    //     for (k, cfg) in map {
+    //         out[k] = cfg.project(through: endDate, granularity: granularity, calendar: calendar)
+    //     }
+    //     return out
+    // }
     func projectDepreciation(
         through endDate: Date,
         granularity: DepreciationGranularity = .monthly,
@@ -44,9 +56,35 @@ public extension EntityStore {
     ) throws -> [EntityKey: [DepreciationSlice]] {
         let map = try collectDepreciationOrThrow()
         var out: [EntityKey: [DepreciationSlice]] = [:]
+
         for (k, cfg) in map {
-            out[k] = cfg.project(through: endDate, granularity: granularity, calendar: calendar)
+            guard let entity = byFull[k] else {
+                out[k] = cfg.project(
+                    through: endDate,
+                    startDate: cfg.schedule.effectiveDate,
+                    startConvention: .exactDate,
+                    granularity: granularity,
+                    calendar: calendar
+                )
+                continue
+            }
+
+            let profileAccess = try DepreciationProfileAccess.resolve(
+                for: k,
+                entity: entity,
+                fallbackSchedule: cfg.schedule,
+                fallbackAcquisition: cfg.acquistion
+            )
+
+            out[k] = cfg.project(
+                through: endDate,
+                startDate: profileAccess.commissionDate,
+                startConvention: .firstFullMonth,
+                granularity: granularity,
+                calendar: calendar
+            )
         }
+
         return out
     }
 }
