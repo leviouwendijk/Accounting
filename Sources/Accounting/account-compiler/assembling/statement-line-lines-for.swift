@@ -71,8 +71,16 @@ public func linesFor(
     }
 
     return rows.map { row in
-        StatementLine(
-            label: labels[row.key] ?? roll.nameById[row.id] ?? row.key,
+        let parentKey = row.key
+            .split(separator: ".")
+            .dropLast()
+            .joined(separator: ".")
+
+        return StatementLine(
+            label: roll.nameById[row.id]
+                ?? labels[row.key]
+                ?? labels[parentKey]
+                ?? row.key,
             rawAmount: row.raw,
             amount: row.shown,
             id: row.id,
