@@ -1,6 +1,5 @@
 import Foundation
 
-@inline(__always)
 public func vprint(_ verbose: Bool, _ s: String) {
     guard verbose else { return }
     FileHandle.standardError.write(Data((s + "\n").utf8))

@@ -52,14 +52,17 @@ public struct AssetsOverviewSummary: Sendable {
 }
 
 public struct AssetsOverviewGroup: Sendable {
+    public let category: AssetsOverviewCategory
     public let name: String
     public let rows: [AssetsOverviewRow]
 
     public init(
         name: String,
+        category: AssetsOverviewCategory,
         rows: [AssetsOverviewRow]
     ) {
         self.name = name
+        self.category = category
         self.rows = rows
     }
 }
@@ -69,7 +72,8 @@ public struct AssetsOverviewRow: Sendable {
     public let displayName: String
     public let details: String?
 
-    public let group: String
+    // public let group: String
+    public let category: AssetsOverviewCategory
     public let type: String?
 
     public let acquisitionDate: Date?
@@ -95,7 +99,7 @@ public struct AssetsOverviewRow: Sendable {
         entityKey: EntityKey,
         displayName: String,
         details: String?,
-        group: String,
+        category: AssetsOverviewCategory,
         type: String?,
         acquisitionDate: Date?,
         commissionDate: Date?,
@@ -115,7 +119,7 @@ public struct AssetsOverviewRow: Sendable {
         self.entityKey = entityKey
         self.displayName = displayName
         self.details = details
-        self.group = group
+        self.category = category
         self.type = type
         self.acquisitionDate = acquisitionDate
         self.commissionDate = commissionDate
