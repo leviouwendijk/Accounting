@@ -14,9 +14,9 @@ public extension Array where Element == ResolvedEntry {
         calendar: Calendar = .init(identifier: .gregorian),
         tolerance: Decimal = 0.01,
         tolerateAggregateIntraQuarter: Bool = true,
+        horizonEnd: Date,
         dateOf: (ResolvedEntry) -> Date
     ) -> DepreciationAuditReport {
-
         var items: [DepreciationAuditItem] = []
 
         func qkey(_ d: Date) -> QKey {
@@ -117,7 +117,11 @@ public extension Array where Element == ResolvedEntry {
             }
         }
 
-        return DepreciationAuditReport(items: items, tolerance: tolerance)
+        return DepreciationAuditReport(
+            items: items,
+            tolerance: tolerance,
+            horizonEnd: horizonEnd
+        )
     }
 
     private func actualsForPeriod(

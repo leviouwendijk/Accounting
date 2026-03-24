@@ -50,6 +50,7 @@ public struct DepreciationAuditItem: Codable, Sendable {
 public struct DepreciationAuditReport: Codable, Sendable {
     public let items: [DepreciationAuditItem]
     public let tolerance: Decimal
+    public let horizonEnd: Date
 
     public var failures: [DepreciationAuditItem] {
         items.filter { $0.coverage == .none }

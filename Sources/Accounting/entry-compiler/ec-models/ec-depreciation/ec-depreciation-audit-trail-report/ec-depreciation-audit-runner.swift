@@ -55,9 +55,10 @@ public struct DepreciationAuditRunner {
             calendar: options.calendar,
             tolerance: options.tolerance,
             tolerateAggregateIntraQuarter: options.tolerateAggregateIntraQuarter,
+            horizonEnd: end,
             dateOf: { re in
                 if case let .absolute(d) = re.date { return d }
-                return Date() // defensive; resolved pass should have made it absolute
+                return Date()
             }
         )
         return report
