@@ -36,7 +36,14 @@ extension StatementHTMLRenderer {
         let incomeLines = isSections.first?.lines ?? []
 
         @inline(__always)
-        func absDec(_ d: Decimal) -> Decimal { d < 0 ? -d : d }
+        func absDec(_ d: Decimal) -> Decimal { 
+            return d < 0 ? -d : d 
+        }
+
+        @inline(__always)
+        func levelClass(_ level: Int) -> String {
+            return "sr-level-\(min(3, max(0, level)))"
+        }
 
         // Filter + indent, same logic as before.
         let plRows: [(indent: Int, label: String, amount: Decimal, isTotal: Bool)] =
@@ -109,10 +116,23 @@ extension StatementHTMLRenderer {
                                 count: max(0, line.relativeIndent)
                             )
 
+                            // HTML.tr {
+                            //     HTML.td(["class": "label"]) {
+                            //         HTML.raw(pad)
+                            //         HTML.text(escape(line.label))
+                            //     }
+                            //     HTML.td(["class": "amt"]) {
+                            //         HTML.text(fmt(line.amount))
+                            //     }
+                            // }
                             HTML.tr {
                                 HTML.td(["class": "label"]) {
-                                    HTML.raw(pad)
-                                    HTML.text(escape(line.label))
+                                    HTML.div([
+                                        "class": "sr-label \(levelClass(line.relativeIndent))"
+                                    ]) {
+                                        HTML.raw(pad)
+                                        HTML.text(escape(line.label))
+                                    }
                                 }
                                 HTML.td(["class": "amt"]) {
                                     HTML.text(fmt(line.amount))
@@ -228,15 +248,42 @@ extension StatementHTMLRenderer {
                                     count: max(0, r.indent)
                                 )
 
+                                // HTML.tr {
+                                //     HTML.td(["class": "label"]) {
+                                //         HTML.raw(pad)
+                                //         if r.isTotal {
+                                //             HTML.strong {
+                                //                 HTML.text(escape(r.label))
+                                //             }
+                                //         } else {
+                                //             HTML.text(escape(r.label))
+                                //         }
+                                //     }
+
+                                //     HTML.td(["class": "amt"]) {
+                                //         let txt = fmt(r.amount)
+                                //         if r.isTotal {
+                                //             HTML.strong {
+                                //                 HTML.text(txt)
+                                //             }
+                                //         } else {
+                                //             HTML.text(txt)
+                                //         }
+                                //     }
+                                // }
                                 HTML.tr {
                                     HTML.td(["class": "label"]) {
-                                        HTML.raw(pad)
-                                        if r.isTotal {
-                                            HTML.strong {
+                                        HTML.div([
+                                            "class": "sr-label \(levelClass(r.indent))"
+                                        ]) {
+                                            HTML.raw(pad)
+                                            if r.isTotal {
+                                                HTML.strong {
+                                                    HTML.text(escape(r.label))
+                                                }
+                                            } else {
                                                 HTML.text(escape(r.label))
                                             }
-                                        } else {
-                                            HTML.text(escape(r.label))
                                         }
                                     }
 

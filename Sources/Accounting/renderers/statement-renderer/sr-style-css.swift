@@ -5,6 +5,12 @@ public enum StatementStyleCSS {
     public static func base() -> CSSStyleSheet {
         CSSStyleSheet(
             rules: [
+                // hierarchical color shades:
+                CSS.rule(".sr-level-0", CSS.decl("color", "#111827")),
+                CSS.rule(".sr-level-1", CSS.decl("color", "#374151")),
+                CSS.rule(".sr-level-2", CSS.decl("color", "#4b5563")),
+                CSS.rule(".sr-level-3", CSS.decl("color", "#6b7280")),
+
                 // ------------------------------------------------------------
                 // Base layout used by main statements renderer
                 // ------------------------------------------------------------
@@ -64,18 +70,36 @@ public enum StatementStyleCSS {
                     CSS.decl("line-height", "1.35"),
                     CSS.decl("padding-left", "12px")
                 ),
+                // CSS.rule(
+                //     ".tbl .label",
+                //     CSS.decl("white-space", "normal"),
+                //     CSS.decl("overflow-wrap", "anywhere"),
+                //     CSS.decl("hyphens", "auto"),
+                //     CSS.decl("line-height", "1.35")
+                // ),
                 CSS.rule(
-                    ".tbl .label",
-                    CSS.decl("white-space", "normal"),
-                    CSS.decl("overflow-wrap", "anywhere"),
-                    CSS.decl("hyphens", "auto"),
-                    CSS.decl("line-height", "1.35")
+                    ".sr-label",
+                    CSS.decl("display", "block")
                 ),
+                // CSS.rule(
+                //     "tr.total td",
+                //     CSS.decl("border-top", "1px solid #ddd"),
+                //     CSS.decl("padding-top", "8px"),
+                //     CSS.decl("font-weight", "600")
+                // ),
                 CSS.rule(
                     "tr.total td",
                     CSS.decl("border-top", "1px solid #ddd"),
                     CSS.decl("padding-top", "8px"),
                     CSS.decl("font-weight", "600")
+                ),
+                CSS.rule(
+                    ".total .sr-label",
+                    CSS.decl("color", "inherit")
+                ),
+                CSS.rule(
+                    ".label strong",
+                    CSS.decl("color", "inherit")
                 ),
 
                 // Summary + status

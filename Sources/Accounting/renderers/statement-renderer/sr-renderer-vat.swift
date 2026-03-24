@@ -84,9 +84,27 @@ public extension StatementHTMLRenderer {
                                     let indent = "padding-left: calc(16px * \(lvl));"
                                     let cls = amountClass(r.amount)
 
+                                    let levelClass = "sr-level-\(min(3, lvl))"
+
+                                    // HTML.tr {
+                                    //     HTML.td(["class": "sr-vat-label"]) {
+                                    //         HTML.div(["style": indent]) {
+                                    //             HTML.text(r.label)
+                                    //         }
+                                    //     }
+                                    //     HTML.td(["class": "sr-vat-code"]) {
+                                    //         HTML.text(r.code)
+                                    //     }
+                                    //     HTML.td(["class": cls]) {
+                                    //         HTML.text(fmt(r.amount))
+                                    //     }
+                                    // }
                                     HTML.tr {
                                         HTML.td(["class": "sr-vat-label"]) {
-                                            HTML.div(["style": indent]) {
+                                            HTML.div([
+                                                "class": "sr-label \(levelClass)",
+                                                "style": indent
+                                            ]) {
                                                 HTML.text(r.label)
                                             }
                                         }
