@@ -129,7 +129,18 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
 
     let settings: Set<String> = [
         "settings",
-        "entry"
+        "entry",
+
+        "statement_data",
+        "company",
+        "address",
+        "legal_form",
+        "area_code",
+        "kvk",
+        "rsin",
+        "btw",
+        "contact",
+        "nil"
     ]
 
     let aggregation: Set<String> = [

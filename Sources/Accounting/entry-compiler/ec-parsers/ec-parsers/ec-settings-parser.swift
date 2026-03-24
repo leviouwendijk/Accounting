@@ -33,15 +33,22 @@ public final class EntryCompilerSettingsParser: EntryCompilerParsing {
 
         var entrySettings: EntrySettings?
         var aggregationSettings: AggregationSettings?
+        var statementDataSettings: StatementDataSettings?
 
         while current != .rBrace && current != .eof {
             switch current {
             case .keyword("entry"):
                 core.trace("• settings entry block @ \(loc())")
                 entrySettings = try parseEntrySettings()
+
             case .keyword("aggregation"):
                 core.trace("• settings aggregation block @ \(loc())")
                 aggregationSettings = try parseAggregationSettings()
+
+            case .keyword("statement_data"), .ident("statement_data"):
+                core.trace("• settings statement_data block @ \(loc())")
+                statementDataSettings = try parseStatementDataSettings()
+
             default:
                 throw ParserError.unexpectedToken(current, expected: "entry or aggregation", at: loc())
             }
@@ -59,6 +66,10 @@ public final class EntryCompilerSettingsParser: EntryCompilerParsing {
         }
         core.trace("  → \(`as`.includePreviousPeriods)")
 
-        return EntryCompilerSettings(entry: es, aggregation: `as`)
+        return EntryCompilerSettings(
+            entry: es,
+            aggregation: `as`,
+            statementData: statementDataSettings
+        )
     }
 }
