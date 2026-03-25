@@ -1,8 +1,5 @@
 import Foundation
 
-// integrate into:
-// - source renderer
-// - terminal output printer (use lib Terminal for ANSI coloring API)
 public enum ECSyntaxHighlighter {
     public static func highlight(
         source: String,
@@ -138,6 +135,44 @@ private extension ECSyntaxHighlighter {
             return []
         }
 
+        if let commentStart = lineCommentStart(
+            in: lineRange,
+            scalars: scalars
+        ) {
+            var out = baseFragments(
+                in: lineRange.lowerBound..<commentStart,
+                scalars: scalars,
+                spans: spans
+            )
+
+            appendFragment(
+                text: string(
+                    from: commentStart..<lineRange.upperBound,
+                    scalars: scalars
+                ),
+                kind: .comment,
+                into: &out
+            )
+
+            return out
+        }
+
+        return baseFragments(
+            in: lineRange,
+            scalars: scalars,
+            spans: spans
+        )
+    }
+
+    static func baseFragments(
+        in lineRange: Range<Int>,
+        scalars: [UnicodeScalar],
+        spans: [TokenSpan]
+    ) -> [ECSyntaxFragment] {
+        guard !lineRange.isEmpty else {
+            return []
+        }
+
         var out: [ECSyntaxFragment] = []
         var cursor = lineRange.lowerBound
 
@@ -191,6 +226,27 @@ private extension ECSyntaxHighlighter {
         }
 
         return out
+    }
+
+    static func lineCommentStart(
+        in lineRange: Range<Int>,
+        scalars: [UnicodeScalar]
+    ) -> Int? {
+        guard lineRange.count >= 2 else {
+            return nil
+        }
+
+        var index = lineRange.lowerBound
+
+        while index + 1 < lineRange.upperBound {
+            if scalars[index] == "/", scalars[index + 1] == "/" {
+                return index
+            }
+
+            index += 1
+        }
+
+        return nil
     }
 
     static func appendFragment(

@@ -182,6 +182,9 @@ extension ECSourceHTMLRenderer {
 
         case .punctuation:
             return "tok-punct"
+
+        case .comment:
+            return "tok-comment"
         }
     }
 }

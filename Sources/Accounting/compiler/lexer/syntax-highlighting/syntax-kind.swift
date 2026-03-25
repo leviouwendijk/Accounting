@@ -8,4 +8,5 @@ public enum ECSyntaxKind: String, Sendable {
     case string
     case date
     case punctuation
+    case comment
 }

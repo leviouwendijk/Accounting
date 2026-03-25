@@ -197,6 +197,11 @@ enum ECSourceHTMLRendererCSS {
                 ),
 
                 rule(
+                    ".tok-comment",
+                    decl("color", "#6b7280")
+                ),
+
+                rule(
                     ".src-line-no-hidden",
                     decl("display", "none")
                 )
