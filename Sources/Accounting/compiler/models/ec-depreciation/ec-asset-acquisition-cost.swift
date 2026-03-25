@@ -13,6 +13,10 @@ public struct AssetAcquisitionCost: Sendable, Codable {
     }
 
     public var cost: Decimal {
-        return direct + indirect
+        AccountingMoney.round(direct + indirect)
     }
+
+    // public var cost: Decimal {
+    //     return direct + indirect
+    // }
 }

@@ -26,11 +26,16 @@ public enum DepreciationEntryWriter {
 
     @inline(__always)
     public static func roundDecimal(_ x: Decimal, scale: Int) -> Decimal {
-        var v = x
-        var out = Decimal()
-        NSDecimalRound(&out, &v, scale, .plain)
-        return out
+        AccountingMoney.round(x, scale: scale)
     }
+
+    // @inline(__always)
+    // public static func roundDecimal(_ x: Decimal, scale: Int) -> Decimal {
+    //     var v = x
+    //     var out = Decimal()
+    //     NSDecimalRound(&out, &v, scale, .plain)
+    //     return out
+    // }
 
     @inline(__always)
     public static func fmtDecimal(_ x: Decimal, digits: Int) -> String {
