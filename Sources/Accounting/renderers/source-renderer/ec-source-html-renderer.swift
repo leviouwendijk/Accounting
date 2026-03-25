@@ -62,7 +62,8 @@ extension ECSourceHTMLRenderer {
             }
         }
 
-        return doc.render(default: .pretty, doctype: true)
+        // return doc.render(default: .pretty, doctype: true)
+        return doc.render(default: .minified, doctype: true)
     }
 
     @HTMLBuilder
