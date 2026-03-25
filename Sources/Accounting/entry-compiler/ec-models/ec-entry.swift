@@ -17,6 +17,7 @@ public struct Entry: Hashable, Codable, Sendable {
     public var metadata: [String: String] = [:]
     public var location: SourceLocation?
     public var mistake: Mistake? = nil
+    public var select: EntrySelect? = nil
     public var verbose: Bool = false
 
     public init(
@@ -30,6 +31,7 @@ public struct Entry: Hashable, Codable, Sendable {
         metadata: [String: String] = [:],
         location: SourceLocation? = nil,
         mistake: Mistake? = nil,
+        select: EntrySelect? = nil,
         verbose: Bool = false
     ) {
         self.id = id
@@ -42,6 +44,7 @@ public struct Entry: Hashable, Codable, Sendable {
         self.metadata = metadata
         self.location = location
         self.mistake = mistake
+        self.select = select
         self.verbose = verbose
 
         // printPlaceholderWarning(verbose: verbose)
@@ -174,6 +177,7 @@ public struct Entry: Hashable, Codable, Sendable {
             out.append("\n")
             out.append(m.description)
         }
+        if let s = select { out.append("Select: \(s)") }
         return out.joined(separator: "\n")
     }
 

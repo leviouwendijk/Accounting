@@ -67,17 +67,20 @@ public struct ECSourceBlockSummary: Sendable {
     public let date: String?
     public let alias: String?
     public let code: String?
+    public let groups: [String]
 
     public init(
         id: Int? = nil,
         date: String? = nil,
         alias: String? = nil,
-        code: String? = nil
+        code: String? = nil,
+        groups: [String] = []
     ) {
         self.id = id
         self.date = date
         self.alias = alias
         self.code = code
+        self.groups = groups
     }
 
     public var compactDescription: String? {
@@ -97,6 +100,10 @@ public struct ECSourceBlockSummary: Sendable {
 
         if let code, !code.isEmpty {
             parts.append("code \(code)")
+        }
+
+        if !groups.isEmpty {
+            parts.append("groups \(groups.joined(separator: ", "))")
         }
 
         return parts.isEmpty ? nil : parts.joined(separator: " · ")

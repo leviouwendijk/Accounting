@@ -65,6 +65,9 @@ public extension EntryCompilerParsing {
             case .keyword("mistake"):
                 entry.mistake = try parseMistakeBlock()
 
+            case .keyword("select"):
+                entry.select = try parseSelectBlock()
+
             default:
                 throw ParserError.unexpectedToken(current, expected: "date, details, for, posting, or line", at: loc())
             }

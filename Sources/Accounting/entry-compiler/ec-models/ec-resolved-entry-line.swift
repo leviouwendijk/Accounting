@@ -39,6 +39,7 @@ public struct ResolvedEntry: Hashable, Codable, Sendable {
 
     public var location: SourceLocation?
     public var mistake: Mistake?
+    public var select: EntrySelect?
     public var verbose: Bool
 
     
@@ -53,6 +54,7 @@ public struct ResolvedEntry: Hashable, Codable, Sendable {
 
         location: SourceLocation? = nil,
         mistake: Mistake? = nil,
+        select: EntrySelect? = nil,
         verbose: Bool = false
     ) {
         self.id = id
@@ -65,6 +67,7 @@ public struct ResolvedEntry: Hashable, Codable, Sendable {
 
         self.location = location
         self.mistake = mistake
+        self.select = select
         self.verbose = verbose
     }
 

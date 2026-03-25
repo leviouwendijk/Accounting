@@ -175,19 +175,64 @@ enum ECSourceBlockExtractor {
         ).map(String.init)
 
         let id = captureValue(prefix: "id =", in: lines)
-            .flatMap(parseInteger)
+            .flatMap { Int($0.trimmingCharacters(in: .whitespacesAndNewlines)) }
+
         let date = captureValue(prefix: "date =", in: lines)
         let alias = captureValue(prefix: "use alias", in: lines)
         let code = captureValue(prefix: "use code", in: lines)
+        let groups = captureRepeatedValues(prefix: "group =", in: lines)
+            .map {
+                EntrySelect.normalizeGroup($0)
+            }
+            .filter { !$0.isEmpty }
 
         let summary = ECSourceBlockSummary(
             id: id,
             date: date,
             alias: alias,
-            code: code
+            code: code,
+            groups: uniqueStrings(groups)
         )
 
         return summary.compactDescription == nil ? nil : summary
+    }
+
+    private static func captureRepeatedValues(
+        prefix: String,
+        in lines: [String]
+    ) -> [String] {
+        var out: [String] = []
+
+        for raw in lines {
+            let line = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard line.hasPrefix(prefix) else {
+                continue
+            }
+
+            let value = String(line.dropFirst(prefix.count))
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+
+            if !value.isEmpty {
+                out.append(value)
+            }
+        }
+
+        return out
+    }
+
+    private static func uniqueStrings(
+        _ values: [String]
+    ) -> [String] {
+        var out: [String] = []
+        var seen = Set<String>()
+
+        for value in values {
+            if seen.insert(value).inserted {
+                out.append(value)
+            }
+        }
+
+        return out
     }
 
     private static func parseInteger(
