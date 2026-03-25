@@ -43,18 +43,29 @@ enum ECSourceHTMLRendererCSS {
                     decl("font-size", "13px")
                 ),
 
+                // rule(
+                //     ".src-file",
+                //     decl("margin-bottom", "22px"),
+                //     decl("page-break-inside", "avoid"),
+                //     decl("break-inside", "avoid")
+                // ),
+
+                // rule(
+                //     ".src-file-header",
+                //     decl("margin-bottom", "8px"),
+                //     decl("page-break-inside", "avoid"),
+                //     decl("break-inside", "avoid")
+                // ),
                 rule(
                     ".src-file",
-                    decl("margin-bottom", "22px"),
-                    decl("page-break-inside", "avoid"),
-                    decl("break-inside", "avoid")
+                    decl("margin-bottom", "22px")
                 ),
 
                 rule(
                     ".src-file-header",
                     decl("margin-bottom", "8px"),
-                    decl("page-break-inside", "avoid"),
-                    decl("break-inside", "avoid")
+                    decl("page-break-after", "avoid"),
+                    decl("break-after", "avoid")
                 ),
 
                 rule(
@@ -75,9 +86,7 @@ enum ECSourceHTMLRendererCSS {
                     decl("border", "1px solid #d1d5db"),
                     decl("border-radius", "8px"),
                     decl("overflow", "hidden"),
-                    decl("margin-top", blockSpacing),
-                    decl("page-break-inside", "avoid"),
-                    decl("break-inside", "avoid")
+                    decl("margin-top", blockSpacing)
                 ),
 
                 rule(
@@ -87,8 +96,31 @@ enum ECSourceHTMLRendererCSS {
                     decl("border-bottom", "1px solid #e5e7eb"),
                     decl("font-size", "12px"),
                     decl("font-weight", "600"),
-                    decl("color", "#374151")
+                    decl("color", "#374151"),
+                    decl("page-break-after", "avoid"),
+                    decl("break-after", "avoid")
                 ),
+
+
+                // rule(
+                //     ".src-block",
+                //     decl("border", "1px solid #d1d5db"),
+                //     decl("border-radius", "8px"),
+                //     decl("overflow", "hidden"),
+                //     decl("margin-top", blockSpacing),
+                //     decl("page-break-inside", "avoid"),
+                //     decl("break-inside", "avoid")
+                // ),
+
+                // rule(
+                //     ".src-block-header",
+                //     decl("padding", "8px 10px"),
+                //     decl("background", "#f9fafb"),
+                //     decl("border-bottom", "1px solid #e5e7eb"),
+                //     decl("font-size", "12px"),
+                //     decl("font-weight", "600"),
+                //     decl("color", "#374151")
+                // ),
 
                 rule(
                     ".src-lines",
