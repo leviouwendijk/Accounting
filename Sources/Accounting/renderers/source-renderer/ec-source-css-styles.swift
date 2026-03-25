@@ -43,16 +43,28 @@ enum ECSourceHTMLRendererCSS {
                     decl("font-size", "13px")
                 ),
 
+                // rule(
+                //     ".src-file",
+                //     decl("margin-bottom", "22px"),
+                //     decl("page-break-inside", "avoid"),
+                //     decl("break-inside", "avoid")
+                // ),
+
+                // rule(
+                //     ".src-file-header",
+                //     decl("margin-bottom", "8px")
+                // ),
+
                 rule(
                     ".src-file",
-                    decl("margin-bottom", "22px"),
-                    decl("page-break-inside", "avoid"),
-                    decl("break-inside", "avoid")
+                    decl("margin-bottom", "22px")
                 ),
 
                 rule(
                     ".src-file-header",
-                    decl("margin-bottom", "8px")
+                    decl("margin-bottom", "8px"),
+                    decl("page-break-after", "avoid"),
+                    decl("break-after", "avoid")
                 ),
 
                 rule(
@@ -68,12 +80,21 @@ enum ECSourceHTMLRendererCSS {
                     decl("font-size", "12px")
                 ),
 
+                // rule(
+                //     ".src-block",
+                //     decl("border", "1px solid #d1d5db"),
+                //     decl("border-radius", "8px"),
+                //     decl("overflow", "hidden"),
+                //     decl("margin-top", blockSpacing),
+                //     decl("page-break-inside", "avoid"),
+                //     decl("break-inside", "avoid")
+                // ),
+
                 rule(
                     ".src-block",
                     decl("border", "1px solid #d1d5db"),
                     decl("border-radius", "8px"),
                     decl("overflow", "hidden"),
-                    decl("margin-top", blockSpacing),
                     decl("page-break-inside", "avoid"),
                     decl("break-inside", "avoid")
                 ),
@@ -86,6 +107,11 @@ enum ECSourceHTMLRendererCSS {
                     decl("font-size", "12px"),
                     decl("font-weight", "600"),
                     decl("color", "#374151")
+                ),
+
+                rule(
+                    ".src-file > .src-block + .src-block",
+                    decl("margin-top", blockSpacing)
                 ),
 
                 rule(

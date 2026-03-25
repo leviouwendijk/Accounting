@@ -80,7 +80,7 @@ extension ECSourceHTMLRenderer {
 
                 if options.includeFileBlockCounts {
                     HTML.div(["class": "src-file-meta"]) {
-                        HTML.text("\(file.blockCount) block(s)")
+                        HTML.text(fileBlockCountLabel(file.blockCount))
                     }
                 }
             }
@@ -92,6 +92,12 @@ extension ECSourceHTMLRenderer {
                 )
             }
         }
+    }
+
+    static func fileBlockCountLabel(
+        _ count: Int
+    ) -> String {
+        count == 1 ? "1 block" : "\(count) blocks"
     }
 
     @HTMLBuilder
