@@ -16,7 +16,8 @@ public extension EntryCompilerParsing {
 
         while current != .rBrace && current != .eof {
             switch current {
-            case .ident("entity"):
+            // case .ident("entity"):
+            case .ident("entity"), .keyword("entity"):
                 advance(); try expect(.equals)
                 if current == .lPar {
                     entityRef = try parseEntityRefInParens()     // NEW: (…)
@@ -24,7 +25,8 @@ public extension EntryCompilerParsing {
                     entityRef = try parseEntityRefFlexible()     // NEW: 1..3 segments incl. alias-only
                 }
 
-            case .ident("account"):
+            // case .ident("account"):
+            case .ident("account"), .keyword("account"):
                 advance()
                 try expect(.equals)
                 accountRef = try parseAccountRefFlexible()
