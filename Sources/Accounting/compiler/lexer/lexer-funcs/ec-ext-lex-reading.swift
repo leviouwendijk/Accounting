@@ -74,26 +74,6 @@ public extension EntryCompilerLexing {
         }
         return buffer
     }
-    // mutating func readNumber() -> Decimal {
-    //     var buffer = ""
-    //     while let c = peek(), CharacterSet(charactersIn: "0123456789.").contains(c) {
-    //         buffer.append(Character(c))
-    //         advance()
-    //     }
-    //     return Decimal(string: buffer) ?? 0
-    // }
-
-    // mutating func readIdent() -> String {
-    //     var buffer = ""
-    //     // let extra = CharacterSet(charactersIn: "_")
-    //     // let extra = CharacterSet(charactersIn: "_/-")
-    //     let extra = CharacterSet(charactersIn: "_/")
-    //     while let c = peek(), CharacterSet.alphanumerics.union(extra) .contains(c) {
-    //         buffer.append(Character(c))
-    //         advance()
-    //     }
-    //     return buffer
-    // }
 
     mutating func readPattern(_ pattern: String) throws -> String {
         let regex = try NSRegularExpression(pattern: "^\(pattern)")
@@ -132,30 +112,6 @@ public extension EntryCompilerLexing {
         }
         return buffer.trimmingCharacters(in: .whitespacesAndNewlines)
     }
-
-    // mutating func readQuotedLiteral() -> String {
-    //     var out = ""
-    //     while let ch = peek() {
-    //         if ch == "\"" { advance(); break }
-    //         if ch == "\\" {
-    //             advance()
-    //             guard let esc = peek() else { break }
-    //             switch esc {
-    //             case "\"": out.append("\"")
-    //             case "\\": out.append("\\")
-    //             case "n":  out.append("\n")
-    //             case "t":  out.append("\t")
-    //             case "r":  out.append("\r")
-    //             default:   out.append(Character(esc))
-    //             }
-    //             advance()
-    //         } else {
-    //             out.append(Character(ch))
-    //             advance()
-    //         }
-    //     }
-    //     return out
-    // }
 
     // replacing with scalarsView for optimized performance
     mutating func readQuotedLiteral() -> String {

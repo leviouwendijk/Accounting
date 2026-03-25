@@ -171,6 +171,12 @@ extension ECSourceHTMLRenderer {
         case .identifier:
             return "tok-ident"
 
+        case .account:
+            return "tok-account"
+
+        case .entity:
+            return "tok-entity"
+
         case .number:
             return "tok-number"
 

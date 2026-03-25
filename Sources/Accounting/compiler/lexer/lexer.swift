@@ -98,12 +98,43 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
         case "}": 
             advance();
             return .rBrace
-        case "(": 
-            advance(); 
+
+        case "(":
+            advance()
+
+            switch referenceState {
+            case .awaitingEntityOpen:
+                referenceState = .entity
+
+            case .awaitingAccountOpen:
+                referenceState = .account
+
+            case .none, .entity, .account:
+                break
+            }
+
             return .lPar
-        case ")": 
-            advance(); 
+
+        case ")":
+            advance()
+
+            switch referenceState {
+            case .entity, .account:
+                referenceState = .none
+
+            case .none, .awaitingEntityOpen, .awaitingAccountOpen:
+                break
+            }
+
             return .rPar
+
+        // case "(": 
+        //     advance(); 
+        //     return .lPar
+        // case ")": 
+        //     advance(); 
+        //     return .rPar
+
         case "-":
             if peek(aheadBy: 1) == ">" {
                 advance()
@@ -126,22 +157,58 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
             break
         }
 
-        // 3) number
+        // // 3) number
+        // if CharacterSet.decimalDigits.contains(c) {
+        //     return .number(readNumber())
+        // }
+
         if CharacterSet.decimalDigits.contains(c) {
-            return .number(readNumber())
+            switch referenceState {
+            case .account:
+                return .account(readDigitsRaw())
+
+            case .none, .awaitingEntityOpen, .awaitingAccountOpen, .entity:
+                return .number(readNumber())
+            }
         }
 
         // 4) identifiers & keywords
         if CharacterSet.letters.union(CharacterSet(charactersIn: "_")).contains(c) {
             let ident = readIdent()
 
+            // if stringKeywordSet.contains(ident) {
+            //     detailsState = .awaitingOpen
+            //     return .keyword(ident)
+            // } else if lexingSets.keywords.contains(ident) {
+            //     return .keyword(ident)
+            // } else {
+            //     return .ident(ident)
+            // }
+
             if stringKeywordSet.contains(ident) {
                 detailsState = .awaitingOpen
                 return .keyword(ident)
             } else if lexingSets.keywords.contains(ident) {
+                if ident == "for" {
+                    referenceState = .awaitingEntityOpen
+                } else if ident == "in" {
+                    referenceState = .awaitingAccountOpen
+                }
+
                 return .keyword(ident)
             } else {
-                return .ident(ident)
+                switch referenceState {
+                case .entity:
+                    return .entity(ident)
+
+                case .account:
+                    return .account(ident)
+
+                case .none,
+                    .awaitingEntityOpen,
+                    .awaitingAccountOpen:
+                    return .ident(ident)
+                }
             }
         }
 

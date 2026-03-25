@@ -177,6 +177,18 @@ enum ECSourceHTMLRendererCSS {
                 ),
 
                 rule(
+                    ".tok-account",
+                    decl("color", "#5d4a2f"),
+                    decl("font-weight", "600")
+                ),
+
+                rule(
+                    ".tok-entity",
+                    decl("color", "#35576b"),
+                    decl("font-style", "italic")
+                ),
+
+                rule(
                     ".tok-number",
                     decl("color", "#8b5e34")
                 ),

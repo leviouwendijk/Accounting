@@ -80,6 +80,12 @@ private extension ECSyntaxHighlighter {
         case .number(_):
             return .number
 
+        case .account(_):
+            return .account
+
+        case .entity(_):
+            return .entity
+
         case .string(_):
             return .string
 
