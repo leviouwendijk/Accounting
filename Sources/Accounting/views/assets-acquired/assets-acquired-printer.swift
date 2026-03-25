@@ -95,10 +95,21 @@ public enum AcquiredAssetsPrinter {
             lines.append("    Acquisition cost: —")
         }
 
-        if let purchaseEntry = row.purchaseEntry {
-            lines.append("    Purchase entry: \(purchaseEntry)")
+        // if let purchaseEntry = row.purchaseEntry {
+        //     lines.append("    Purchase entry: \(purchaseEntry)")
+        // } else {
+        //     lines.append("    Purchase entry: —")
+        // }
+        if let acquisitionEntry = row.acquisitionEntry {
+            lines.append("    Acquisition entry: \(acquisitionEntry)")
         } else {
-            lines.append("    Purchase entry: —")
+            lines.append("    Acquisition entry: —")
+        }
+
+        if let acquisitionAccount = row.acquisitionAccount {
+            lines.append("    Acquisition account: \(acquisitionAccount.debugString)")
+        } else {
+            lines.append("    Acquisition account: —")
         }
 
         if !row.ownerShares.isEmpty {

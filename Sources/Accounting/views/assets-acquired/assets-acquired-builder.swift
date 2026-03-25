@@ -61,9 +61,11 @@ public enum AcquiredAssetsBuilder {
                 entity: entity
             )
 
-            let purchaseEntry = purchaseEntryValue(
-                entity: entity
-            )
+            // let purchaseEntry = purchaseEntryValue(
+            //     entity: entity
+            // )
+            let acquisitionEntry = profileAccess?.acquisitionEntry
+            let acquisitionAccount = profileAccess?.acquisitionAccount
 
             let purchaseDateInfo: (Date, AcquiredAssetPurchaseDateSource)? = {
                 if let acquisitionDate {
@@ -113,11 +115,20 @@ public enum AcquiredAssetsBuilder {
                 )
             }
 
-            if purchaseEntry == nil {
+            if acquisitionEntry == nil {
                 issues.append(
                     .init(
                         severity: .info,
-                        message: "missing purchase entry metadata"
+                        message: "missing acquisition entry"
+                    )
+                )
+            }
+
+            if acquisitionAccount == nil {
+                issues.append(
+                    .init(
+                        severity: .info,
+                        message: "missing acquisition account"
                     )
                 )
             }
@@ -135,7 +146,8 @@ public enum AcquiredAssetsBuilder {
                 acquisitionDate: acquisitionDate,
                 commissionDate: commissionDate,
                 acquisitionCost: acquisitionCost,
-                purchaseEntry: purchaseEntry,
+                acquisitionEntry: acquisitionEntry,
+                acquisitionAccount: acquisitionAccount,
                 ownerShares: ownerShares,
                 issues: issues
             )

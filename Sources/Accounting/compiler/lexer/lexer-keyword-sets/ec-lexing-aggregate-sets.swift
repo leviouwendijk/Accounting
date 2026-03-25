@@ -101,7 +101,10 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
         "residual_value",
         "linked_entry",
         // "book_value"
-        "capex"
+        "capex",
+
+        "acquisition",
+        "acquisition_date",
     ]
 
     let transaction: Set<String> = [
