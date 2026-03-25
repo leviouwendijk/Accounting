@@ -184,8 +184,8 @@ enum ECSourceHTMLRendererCSS {
 
                 rule(
                     ".tok-entity",
-                    decl("color", "#35576b"),
-                    decl("font-style", "italic")
+                    decl("color", "#b45309"),
+                    decl("font-weight", "600")
                 ),
 
                 rule(
