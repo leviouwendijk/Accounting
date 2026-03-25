@@ -1,37 +1,37 @@
 import Foundation
 
-extension ECSourceHTMLRenderer {
-    static func buildDocumentModel(
+public enum ECSourcePresenter {
+    public static func present(
         files: [ECSourceFile],
-        options: Options
-    ) -> ECSourceDocumentModel {
-        ECSourceDocumentModel(
+        options: ECSourcePresentationOptions = .init()
+    ) -> ECSourceDocument {
+        ECSourceDocument(
             title: options.title,
             subtitle: options.subtitle,
-            files: files.map(renderedFile)
+            files: files.map(presentedFile)
         )
     }
 
-    private static func renderedFile(
+    private static func presentedFile(
         from file: ECSourceFile
-    ) -> ECSourceRenderedFile {
-        ECSourceRenderedFile(
+    ) -> ECSourcePresentedFile {
+        ECSourcePresentedFile(
             relativePath: file.relativePath,
             blockCount: file.blocks.count,
-            blocks: file.blocks.map(renderedBlock)
+            blocks: file.blocks.map(presentedBlock)
         )
     }
 
-    private static func renderedBlock(
+    private static func presentedBlock(
         from block: ECSourceBlock
-    ) -> ECSourceRenderedBlock {
+    ) -> ECSourcePresentedBlock {
         let lineTexts = block.source.split(
             separator: "\n",
             omittingEmptySubsequences: false
         ).map(String.init)
 
         let lines = lineTexts.enumerated().map { offset, text in
-            ECSourceRenderedLine(
+            ECSourcePresentedLine(
                 number: block.renderStartLine + offset,
                 text: text
             )
@@ -44,10 +44,14 @@ extension ECSourceHTMLRenderer {
             caption += " · \(summary)"
         }
 
-        return ECSourceRenderedBlock(
+        return ECSourcePresentedBlock(
             kind: block.kind,
             caption: caption,
-            lines: lines
+            lines: lines,
+            renderStartLine: block.renderStartLine,
+            semanticStartLine: block.semanticStartLine,
+            endLine: block.endLine,
+            summary: block.summary
         )
     }
 }

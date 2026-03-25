@@ -139,6 +139,4 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
         advance()
         return nextToken()
     }
-
-
 }

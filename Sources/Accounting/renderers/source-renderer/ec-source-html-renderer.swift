@@ -5,24 +5,26 @@ import CSS
 public enum ECSourceHTMLRenderer {}
 
 extension ECSourceHTMLRenderer {
+    public typealias Options = ECSourcePresentationOptions
+
     public static func render(
         files: [ECSourceFile],
         options: Options = .init()
     ) -> String {
-        let model = buildDocumentModel(
+        let document = ECSourcePresenter.present(
             files: files,
             options: options
         )
 
-        return renderDocument(
-            model: model,
+        return render(
+            document: document,
             options: options
         )
     }
 
-    static func renderDocument(
-        model: ECSourceDocumentModel,
-        options: Options
+    public static func render(
+        document: ECSourceDocument,
+        options: Options = .init()
     ) -> String {
         let css = ECSourceHTMLRendererCSS
             .base(compact: options.compact)
@@ -37,22 +39,22 @@ extension ECSourceHTMLRenderer {
                 HTML.head {
                     HTML.meta(.charset())
                     HTML.meta(.viewport())
-                    HTML.title(model.title)
+                    HTML.title(document.title)
                     HTML.style(css)
                 }
 
                 HTML.body {
                     HTML.h1 {
-                        HTML.text(model.title)
+                        HTML.text(document.title)
                     }
 
-                    if let subtitle = model.subtitle {
+                    if let subtitle = document.subtitle {
                         HTML.div(["class": "subtitle"]) {
                             HTML.text(subtitle)
                         }
                     }
 
-                    for file in model.files {
+                    for file in document.files {
                         renderFile(
                             file,
                             options: options
@@ -62,13 +64,12 @@ extension ECSourceHTMLRenderer {
             }
         }
 
-        // return doc.render(default: .pretty, doctype: true)
         return doc.render(default: .minified, doctype: true)
     }
 
     @HTMLBuilder
     static func renderFile(
-        _ file: ECSourceRenderedFile,
+        _ file: ECSourcePresentedFile,
         options: Options
     ) -> [any HTMLNode] {
         HTML.section(["class": "src-file"]) {
@@ -95,7 +96,7 @@ extension ECSourceHTMLRenderer {
 
     @HTMLBuilder
     static func renderBlock(
-        _ block: ECSourceRenderedBlock,
+        _ block: ECSourcePresentedBlock,
         options: Options
     ) -> [any HTMLNode] {
         HTML.div(["class": "src-block"]) {
@@ -115,7 +116,7 @@ extension ECSourceHTMLRenderer {
     }
 
     static func renderLine(
-        _ line: ECSourceRenderedLine,
+        _ line: ECSourcePresentedLine,
         showLineNumbers: Bool
     ) -> any HTMLNode {
         HTML.div(["class": "src-line"]) {

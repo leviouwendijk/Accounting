@@ -109,26 +109,3 @@ public struct ECSourceBlockSummary: Sendable {
         return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 }
-
-struct ECSourceDocumentModel: Sendable {
-    let title: String
-    let subtitle: String?
-    let files: [ECSourceRenderedFile]
-}
-
-struct ECSourceRenderedFile: Sendable {
-    let relativePath: String
-    let blockCount: Int
-    let blocks: [ECSourceRenderedBlock]
-}
-
-struct ECSourceRenderedBlock: Sendable {
-    let kind: ECSourceBlockKind
-    let caption: String
-    let lines: [ECSourceRenderedLine]
-}
-
-struct ECSourceRenderedLine: Sendable {
-    let number: Int
-    let text: String
-}
