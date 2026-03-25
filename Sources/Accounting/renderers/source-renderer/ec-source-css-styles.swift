@@ -166,6 +166,37 @@ enum ECSourceHTMLRendererCSS {
                 ),
 
                 rule(
+                    ".tok-keyword",
+                    decl("color", "#7c3aed"),
+                    decl("font-weight", "600")
+                ),
+
+                rule(
+                    ".tok-ident",
+                    decl("color", "inherit")
+                ),
+
+                rule(
+                    ".tok-number",
+                    decl("color", "#b45309")
+                ),
+
+                rule(
+                    ".tok-string",
+                    decl("color", "#047857")
+                ),
+
+                rule(
+                    ".tok-date",
+                    decl("color", "#0369a1")
+                ),
+
+                rule(
+                    ".tok-punct",
+                    decl("color", "#6b7280")
+                ),
+
+                rule(
                     ".src-line-no-hidden",
                     decl("display", "none")
                 )

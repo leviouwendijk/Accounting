@@ -72,13 +72,17 @@ public struct ECSourcePresentedBlock: Sendable {
 
 public struct ECSourcePresentedLine: Sendable {
     public let number: Int
-    public let text: String
+    public let fragments: [ECSyntaxFragment]
 
     public init(
         number: Int,
-        text: String
+        fragments: [ECSyntaxFragment]
     ) {
         self.number = number
-        self.text = text
+        self.fragments = fragments
+    }
+
+    public var text: String {
+        fragments.map(\.text).joined()
     }
 }

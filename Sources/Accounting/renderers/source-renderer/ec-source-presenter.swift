@@ -8,34 +8,39 @@ public enum ECSourcePresenter {
         ECSourceDocument(
             title: options.title,
             subtitle: options.subtitle,
-            files: files.map(presentedFile)
+            files: files.map {
+                presentedFile(
+                    from: $0,
+                    options: options
+                )
+            }
         )
     }
 
     private static func presentedFile(
-        from file: ECSourceFile
+        from file: ECSourceFile,
+        options: ECSourcePresentationOptions
     ) -> ECSourcePresentedFile {
         ECSourcePresentedFile(
             relativePath: file.relativePath,
             blockCount: file.blocks.count,
-            blocks: file.blocks.map(presentedBlock)
+            blocks: file.blocks.map {
+                presentedBlock(
+                    from: $0,
+                    options: options
+                )
+            }
         )
     }
 
     private static func presentedBlock(
-        from block: ECSourceBlock
+        from block: ECSourceBlock,
+        options: ECSourcePresentationOptions
     ) -> ECSourcePresentedBlock {
-        let lineTexts = block.source.split(
-            separator: "\n",
-            omittingEmptySubsequences: false
-        ).map(String.init)
-
-        let lines = lineTexts.enumerated().map { offset, text in
-            ECSourcePresentedLine(
-                number: block.renderStartLine + offset,
-                text: text
-            )
-        }
+        let lines = presentedLines(
+            from: block,
+            options: options
+        )
 
         let lineRange = "\(block.renderStartLine)–\(block.endLine)"
         var caption = "\(block.kind.rawValue) · lines \(lineRange)"
@@ -53,5 +58,67 @@ public enum ECSourcePresenter {
             endLine: block.endLine,
             summary: block.summary
         )
+    }
+
+    private static func presentedLines(
+        from block: ECSourceBlock,
+        options: ECSourcePresentationOptions
+    ) -> [ECSourcePresentedLine] {
+        if options.syntaxHighlighting {
+            return ECSyntaxHighlighter.highlight(
+                source: block.source,
+                flavor: lexingFlavor(for: block.kind),
+                startingAtLine: block.renderStartLine
+            ).map { line in
+                ECSourcePresentedLine(
+                    number: line.number,
+                    fragments: line.fragments
+                )
+            }
+        }
+
+        let lineTexts = block.source.split(
+            separator: "\n",
+            omittingEmptySubsequences: false
+        ).map(String.init)
+
+        return lineTexts.enumerated().map { offset, text in
+            ECSourcePresentedLine(
+                number: block.renderStartLine + offset,
+                fragments: [
+                    ECSyntaxFragment(
+                        text: text,
+                        kind: .plain
+                    )
+                ]
+            )
+        }
+    }
+
+    private static func lexingFlavor(
+        for kind: ECSourceBlockKind
+    ) -> EntryCompilerLexingFlavor {
+        switch kind {
+        case .entry:
+            return .entries
+
+        case .entity:
+            return .entities
+
+        case .account:
+            return .accounts
+
+        case .transaction:
+            return .transactions
+
+        case .document:
+            return .documents
+
+        case .settings:
+            return .settings
+
+        case .assertion, .unknown:
+            return .fallback
+        }
     }
 }
