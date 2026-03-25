@@ -71,7 +71,7 @@ enum ECSourceBlockExtractor {
 
             let blockLines = Array(lines[clampedRenderStart...endIndex])
             let blockSource = blockLines.joined(separator: "\n")
-            let summarySource = Array(lines[semanticStartIndex...min(endIndex, semanticStartIndex + 12)])
+            let summarySource = Array(lines[semanticStartIndex...endIndex])
                 .joined(separator: "\n")
 
             out.append(
