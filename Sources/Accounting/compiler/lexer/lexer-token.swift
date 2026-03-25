@@ -8,6 +8,11 @@ public enum EntryCompilerToken: Equatable, Sendable {
     case string(String)           // details { … }
     case dateLiteral(String)   // e.g. "2025-02-03" or "03/02/2025"
 
+    // adding enriched semantics:
+    case account(String) // account { } / in (Wasdfasdf) {..
+    case entity(String) // entity { asdf } / for (owners.levi) {...
+
+
     case lBrace                   // {
     case rBrace                   // }
     case lPar                     // (

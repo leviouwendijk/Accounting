@@ -181,4 +181,14 @@ public extension EntryCompilerLexing {
         }
         return String(scalarsOut)
     }
+
+    mutating func readDigitsRaw() -> String {
+        let start = index
+
+        while let c = peek(), CharacterSet.decimalDigits.contains(c) {
+            advance()
+        }
+
+        return String(String.UnicodeScalarView(scalars[start..<index]))
+    }
 }

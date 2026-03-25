@@ -167,7 +167,7 @@ enum ECSourceHTMLRendererCSS {
 
                 rule(
                     ".tok-keyword",
-                    decl("color", "#7c3aed"),
+                    decl("color", "#5b4b8a"),
                     decl("font-weight", "600")
                 ),
 
@@ -178,27 +178,28 @@ enum ECSourceHTMLRendererCSS {
 
                 rule(
                     ".tok-number",
-                    decl("color", "#b45309")
+                    decl("color", "#8b5e34")
                 ),
 
                 rule(
                     ".tok-string",
-                    decl("color", "#047857")
+                    decl("color", "#2f6f5e")
                 ),
 
                 rule(
                     ".tok-date",
-                    decl("color", "#0369a1")
+                    decl("color", "#4b647d")
                 ),
 
                 rule(
                     ".tok-punct",
-                    decl("color", "#6b7280")
+                    decl("color", "#727985")
                 ),
 
                 rule(
                     ".tok-comment",
-                    decl("color", "#6b7280")
+                    decl("color", "#6b7280"),
+                    decl("font-style", "italic")
                 ),
 
                 rule(

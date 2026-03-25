@@ -5,6 +5,7 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
     public var index: Int = 0
 
     public var detailsState: EntryCompilerDetailsState = .none
+    public var referenceState: EntryCompilerReferenceState = .none
 
     public var line: Int = 1
     public var column: Int = 1
@@ -76,20 +77,14 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
             break
         }
 
-        // replace regex computations with func
-        if let lit = scanDateLiteral() { return .dateLiteral(lit) }
+        if let lit = scanDateLiteral() { 
+            return .dateLiteral(lit) 
+        }
 
-        // if let lit = try? readPattern("\\d{4}[-/.]\\d{2}[-/.]\\d{2}") {
-        //     return .dateLiteral(lit)
-        // }
-        // if let lit = try? readPattern("\\d{2}[-/.]\\d{2}[-/.]\\d{4}") {
-        //     return .dateLiteral(lit)
-        // }
+        guard let c = peek() else { 
+            return .eof 
+        }
 
-        guard let c = peek() else { return .eof }
-
-        
-        // Experimental: catch quote literals before entering punctuation switch
         if c == "\"" {
             advance()
             return .string(readQuotedLiteral())
@@ -97,20 +92,38 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
 
         // 2) punctuation
         switch c {
-        case "{": advance(); return .lBrace
-        case "}": advance(); return .rBrace
-        case "(": advance(); return .lPar
-        case ")": advance(); return .rPar
+        case "{": 
+            advance();
+            return .lBrace
+        case "}": 
+            advance();
+            return .rBrace
+        case "(": 
+            advance(); 
+            return .lPar
+        case ")": 
+            advance(); 
+            return .rPar
         case "-":
             if peek(aheadBy: 1) == ">" {
-                advance(); advance()
+                advance()
+                advance()
                 return .arrow
             }
-        case ".": advance(); return .dot
-        case "=": advance(); return .equals
-        case ",": advance(); return .comma
-        case "#": advance(); return .hash
-        default: break
+        case ".": 
+            advance();
+            return .dot
+        case "=": 
+            advance();
+            return .equals
+        case ",": 
+            advance();
+            return .comma
+        case "#": 
+            advance();
+            return .hash
+        default: 
+            break
         }
 
         // 3) number
@@ -121,10 +134,6 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
         // 4) identifiers & keywords
         if CharacterSet.letters.union(CharacterSet(charactersIn: "_")).contains(c) {
             let ident = readIdent()
-
-            // stop rebuilding set everytime in scope
-            // replaced by lexer lifetime stored
-            // let stringSet = aggregateLexingSets(flavor: .string).keywords
 
             if stringKeywordSet.contains(ident) {
                 detailsState = .awaitingOpen
