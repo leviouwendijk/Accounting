@@ -67,7 +67,7 @@ extension AssetViews {
                 )
 
                 let acquisitionDate = profileAccess?.acquisitionDate
-                let commissionDate = entity.profile?.commissionDate
+                let commissionDate = profileAccess?.commissionDate
                 let effectiveStartDate = projectionPolicy?.startDate ?? profileAccess?.commissionDate
                 let startConvention = projectionPolicy?.startConvention ?? .firstFullMonth
                 let acquisitionCost = profileAccess?.acquisition.cost
