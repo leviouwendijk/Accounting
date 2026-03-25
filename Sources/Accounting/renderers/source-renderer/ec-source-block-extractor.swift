@@ -175,6 +175,7 @@ enum ECSourceBlockExtractor {
         ).map(String.init)
 
         let id = captureValue(prefix: "id =", in: lines)
+            .flatMap(parseInteger)
         let date = captureValue(prefix: "date =", in: lines)
         let alias = captureValue(prefix: "use alias", in: lines)
         let code = captureValue(prefix: "use code", in: lines)
@@ -187,6 +188,16 @@ enum ECSourceBlockExtractor {
         )
 
         return summary.compactDescription == nil ? nil : summary
+    }
+
+    private static func parseInteger(
+        _ raw: String
+    ) -> Int? {
+        Int(
+            raw.trimmingCharacters(
+                in: .whitespacesAndNewlines
+            )
+        )
     }
 
     private static func captureValue(

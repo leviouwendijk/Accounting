@@ -3,19 +3,26 @@ import Foundation
 public struct ECSourceFile: Sendable {
     public let relativePath: String
     public let absolutePath: String
-    public let rawSource: String
     public let blocks: [ECSourceBlock]
 
     public init(
         relativePath: String,
         absolutePath: String,
-        rawSource: String,
         blocks: [ECSourceBlock]
     ) {
         self.relativePath = relativePath
         self.absolutePath = absolutePath
-        self.rawSource = rawSource
         self.blocks = blocks
+    }
+
+    public func replacingBlocks(
+        _ blocks: [ECSourceBlock]
+    ) -> ECSourceFile {
+        ECSourceFile(
+            relativePath: relativePath,
+            absolutePath: absolutePath,
+            blocks: blocks
+        )
     }
 }
 
@@ -56,13 +63,13 @@ public enum ECSourceBlockKind: String, Sendable, CaseIterable {
 }
 
 public struct ECSourceBlockSummary: Sendable {
-    public let id: String?
+    public let id: Int?
     public let date: String?
     public let alias: String?
     public let code: String?
 
     public init(
-        id: String? = nil,
+        id: Int? = nil,
         date: String? = nil,
         alias: String? = nil,
         code: String? = nil
@@ -76,7 +83,7 @@ public struct ECSourceBlockSummary: Sendable {
     public var compactDescription: String? {
         var parts: [String] = []
 
-        if let id, !id.isEmpty {
+        if let id {
             parts.append("id \(id)")
         }
 

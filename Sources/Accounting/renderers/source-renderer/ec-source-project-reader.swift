@@ -10,16 +10,24 @@ public enum ECSourceProjectReader {
         let targetURL = url.standardizedFileURL
 
         var fileURLs: [URL] = []
+        var seenPaths = Set<String>()
 
         var isDirectory: ObjCBool = false
         if fm.fileExists(atPath: targetURL.path, isDirectory: &isDirectory) {
             if isDirectory.boolValue {
                 if let enumerator = fm.enumerator(
                     at: targetURL,
-                    includingPropertiesForKeys: nil
+                    includingPropertiesForKeys: nil,
+                    options: [.skipsHiddenFiles]
                 ) {
-                    for case let fileURL as URL in enumerator {
+                    for case let rawFileURL as URL in enumerator {
+                        let fileURL = rawFileURL.standardizedFileURL
+
                         guard fileURL.pathExtension.lowercased() == "ec" else {
+                            continue
+                        }
+
+                        guard seenPaths.insert(fileURL.path).inserted else {
                             continue
                         }
 
@@ -27,7 +35,9 @@ public enum ECSourceProjectReader {
                     }
                 }
             } else if targetURL.pathExtension.lowercased() == "ec" {
-                fileURLs.append(targetURL)
+                if seenPaths.insert(targetURL.path).inserted {
+                    fileURLs.append(targetURL)
+                }
             }
         }
 
@@ -51,7 +61,6 @@ public enum ECSourceProjectReader {
             return ECSourceFile(
                 relativePath: relativePath,
                 absolutePath: fileURL.path,
-                rawSource: normalized,
                 blocks: ECSourceBlockExtractor.extract(from: normalized)
             )
         }
