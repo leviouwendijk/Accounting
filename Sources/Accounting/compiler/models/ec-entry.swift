@@ -9,7 +9,7 @@ public enum EntrySort: String, RawRepresentable, Hashable, Codable, Sendable, St
 public struct Entry: Hashable, Codable, Sendable {
     public var id: Int?
     public var date: DateSpecification
-    public var administrationDate: DateSpecification?
+    public var history: EntryHistory?
     public var sort: EntrySort?
     public var lines: [Line]
     public var details: String? = nil
@@ -24,7 +24,7 @@ public struct Entry: Hashable, Codable, Sendable {
     public init(
         id: Int? = nil,
         date: DateSpecification = .absolute(Date()),
-        administrationDate: DateSpecification? = nil,
+        history: EntryHistory? = nil,
         sort: EntrySort? = nil,
         lines: [Line] = [],
         details: String? = nil,
@@ -38,7 +38,7 @@ public struct Entry: Hashable, Codable, Sendable {
     ) {
         self.id = id
         self.date = date
-        self.administrationDate = administrationDate
+        self.history = history
         self.sort = sort
         self.lines = lines
         self.details = details
@@ -120,26 +120,40 @@ public struct Entry: Hashable, Codable, Sendable {
     }
 
     public var viewableString: String {
+        // let fmt = DateFormatter()
+        // fmt.dateStyle = .short
+        // fmt.timeStyle = .none
+        // let dateStr: String = {
+        //     switch date {
+        //     case .absolute(let d): return fmt.string(from: d)
+        //     case .infer(let day):  return "inferred-day \(day)"
+        //     }
+        // }()
         let fmt = DateFormatter()
         fmt.dateStyle = .short
         fmt.timeStyle = .none
-        let dateStr: String = {
-            switch date {
-            case .absolute(let d): return fmt.string(from: d)
-            case .infer(let day):  return "inferred-day \(day)"
+
+        func fmtDateSpec(_ spec: DateSpecification) -> String {
+            switch spec {
+            case .absolute(let d):
+                return fmt.string(from: d)
+            case .infer(let day):
+                return "inferred-day \(day)"
             }
-        }()
+        }
+
+        let dateStr = fmtDateSpec(date)
 
         var out = ["Entry on \(dateStr):"]
 
-        if let adminDate = administrationDate {
-            let adminDateStr: String = {
-                switch adminDate {
-                case .absolute(let d): return fmt.string(from: d)
-                case .infer(let day):  return "inferred-day \(day)"
+        if let history, !history.events.isEmpty {
+            out.append("History:")
+            for event in history.events {
+                out.append("  - \(event.kind.rawValue): \(fmtDateSpec(event.date))")
+                if let details = event.details, !details.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    out.append("    \(details)")
                 }
-            }()
-            out.append("Administration date: \(adminDateStr)")
+            }
         }
         
         for line in lines {

@@ -26,8 +26,16 @@ public extension EntryCompilerParsing {
             case .keyword("date"):
                 entry.date = try parseDateOrInfer(tz: tz, allowUnixEpoch: true)
 
-            case .keyword("administration_date"):
-                entry.administrationDate = try parseDateOrInfer(tz: tz, allowUnixEpoch: true)
+            case .keyword("history"):
+                if entry.history != nil {
+                    throw ParserError.unexpectedToken(
+                        current,
+                        expected: "single history block",
+                        at: loc()
+                    )
+                }
+
+                entry.history = try parseHistoryBlock(tz: tz)
 
             case .keyword("sort"):
                 if entry.sort != nil {
@@ -72,12 +80,15 @@ public extension EntryCompilerParsing {
                 entry.select = try parseSelectBlock()
 
             default:
-                throw ParserError.unexpectedToken(current, expected: "date, details, for, posting, or line", at: loc())
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "id|timezone|date|history|sort|details|for|in|posting|line|transactions|metadata|mistake|select",
+                    at: loc()
+                )
             }
         }
 
         try expect(.rBrace)
-
         // entry.printPlaceholderWarning(verbose: core.verbose)
         return entry
     }
