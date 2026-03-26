@@ -7,7 +7,7 @@ extension StatementHTMLRenderer {
         _ section: RatiosSection?
     ) -> [any HTMLNode] {
         if let section {
-            HTML.section(["class": "sr-section sr-section-ratios"]) {
+            HTML.section(["class": "sr-section sr-section-ratios sr-print-page-break-before"]) {
                 HTML.h2 {
                     HTML.text(section.title)
                 }
