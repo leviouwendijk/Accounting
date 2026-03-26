@@ -9,6 +9,7 @@ public enum EntrySort: String, RawRepresentable, Hashable, Codable, Sendable, St
 public struct Entry: Hashable, Codable, Sendable {
     public var id: Int?
     public var date: DateSpecification
+    public var administrationDate: DateSpecification?
     public var sort: EntrySort?
     public var lines: [Line]
     public var details: String? = nil
@@ -23,6 +24,7 @@ public struct Entry: Hashable, Codable, Sendable {
     public init(
         id: Int? = nil,
         date: DateSpecification = .absolute(Date()),
+        administrationDate: DateSpecification? = nil,
         sort: EntrySort? = nil,
         lines: [Line] = [],
         details: String? = nil,
@@ -36,6 +38,7 @@ public struct Entry: Hashable, Codable, Sendable {
     ) {
         self.id = id
         self.date = date
+        self.administrationDate = administrationDate
         self.sort = sort
         self.lines = lines
         self.details = details
@@ -116,33 +119,6 @@ public struct Entry: Hashable, Codable, Sendable {
         return (count, matches.joined(separator: "\n"))
     }
 
-    // public func entityPlaceholderWarning(
-    //     for values: [String] = ["asset_placeholder"]
-    // ) -> (Int, String) {
-    //     var count = 0
-    //     var matches: [String] = []
-
-    //     func match(_ match: String, at location: SourceLocation? = nil) {
-    //         matches.append("! WARNING: Placeholder detected\n")
-    //         matches.append("    value: \"match\"\n")
-    //         if let l = location {
-    //             matches.append("    at: \(l.description)\n")
-    //         }
-    //     }
-
-    //     for l in lines {
-    //         for v in values {
-    //             if l.entity.alias.name.contains(v) {
-    //                 count += 1
-    //                 match(v, at: l.location)
-    //             }
-    //         }
-            
-    //     }
-    //     let result = matches.joined(separator: "\n")
-    //     return (count, result)
-    // }
-
     public var viewableString: String {
         let fmt = DateFormatter()
         fmt.dateStyle = .short
@@ -153,7 +129,19 @@ public struct Entry: Hashable, Codable, Sendable {
             case .infer(let day):  return "inferred-day \(day)"
             }
         }()
+
         var out = ["Entry on \(dateStr):"]
+
+        if let adminDate = administrationDate {
+            let adminDateStr: String = {
+                switch adminDate {
+                case .absolute(let d): return fmt.string(from: d)
+                case .infer(let day):  return "inferred-day \(day)"
+                }
+            }()
+            out.append("Administration date: \(adminDateStr)")
+        }
+        
         for line in lines {
             let ent = line.entity.printable
             let acc: String = {
