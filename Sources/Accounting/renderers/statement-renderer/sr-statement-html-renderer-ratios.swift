@@ -28,7 +28,23 @@ extension StatementHTMLRenderer {
                         for row in section.rows {
                             HTML.tr(["class": "ratio-row"]) {
                                 HTML.td(["class": "label"]) {
-                                    HTML.text(row.label)
+                                    HTML.div(["class": "ratio-label-stack"]) {
+                                        HTML.div(["class": "ratio-label-main"]) {
+                                            HTML.text(row.label)
+                                        }
+
+                                        if let description = row.description, !description.isEmpty {
+                                            HTML.div(["class": "ratio-description"]) {
+                                                HTML.text(description)
+                                            }
+                                        }
+
+                                        if let formula = row.formula, !formula.isEmpty {
+                                            HTML.div(["class": "ratio-formula"]) {
+                                                HTML.text(formula)
+                                            }
+                                        }
+                                    }
                                 }
 
                                 HTML.td(["class": "amt"]) {

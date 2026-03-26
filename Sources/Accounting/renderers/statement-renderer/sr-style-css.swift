@@ -427,6 +427,33 @@ public enum StatementStyleCSS {
                     CSS.decl("white-space", "nowrap"),
                     CSS.decl("font-variant-numeric", "tabular-nums")
                 ),
+
+                // ratios
+                CSS.rule(
+                    ".ratio-label-stack",
+                    CSS.decl("display", "flex"),
+                    CSS.decl("flex-direction", "column"),
+                    CSS.decl("gap", "1px")
+                ),
+                CSS.rule(
+                    ".ratio-label-main",
+                    CSS.decl("color", "#111827"),
+                    CSS.decl("font-weight", "500"),
+                    CSS.decl("line-height", "1.35")
+                ),
+                CSS.rule(
+                    ".ratio-description",
+                    CSS.decl("color", "#6b7280"),
+                    CSS.decl("font-size", "11px"),
+                    CSS.decl("line-height", "1.3")
+                ),
+                CSS.rule(
+                    ".ratio-formula",
+                    CSS.decl("color", "#9ca3af"),
+                    CSS.decl("font-size", "10px"),
+                    CSS.decl("line-height", "1.3"),
+                    CSS.decl("font-family", "ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace")
+                ),
             ],
 
             // adding page breaking:

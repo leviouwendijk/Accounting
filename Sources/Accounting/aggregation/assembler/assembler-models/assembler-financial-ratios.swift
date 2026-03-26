@@ -9,6 +9,7 @@ public struct FinancialRatios: Sendable {
     public let equityRatio: Decimal?
     public let debtRatio: Decimal?
     public let debtToEquity: Decimal?
+    public let equityMultiplier: Decimal?
     public let returnOnAssets: Decimal?
     public let returnOnEquity: Decimal?
 
@@ -20,6 +21,7 @@ public struct FinancialRatios: Sendable {
         equityRatio: Decimal?,
         debtRatio: Decimal?,
         debtToEquity: Decimal?,
+        equityMultiplier: Decimal?,
         returnOnAssets: Decimal?,
         returnOnEquity: Decimal?
     ) {
@@ -30,6 +32,7 @@ public struct FinancialRatios: Sendable {
         self.equityRatio = equityRatio
         self.debtRatio = debtRatio
         self.debtToEquity = debtToEquity
+        self.equityMultiplier = equityMultiplier
         self.returnOnAssets = returnOnAssets
         self.returnOnEquity = returnOnEquity
     }

@@ -28,6 +28,7 @@ public enum FinancialRatiosBuilder {
             equityRatio: ratio(equity, over: assets),
             debtRatio: ratio(liabilities, over: assets),
             debtToEquity: ratio(liabilities, over: equity),
+            equityMultiplier: ratio(assets, over: equity),
             returnOnAssets: presentedNetIncome.flatMap { ratio($0, over: assets) },
             returnOnEquity: presentedNetIncome.flatMap { ratio($0, over: equity) }
         )

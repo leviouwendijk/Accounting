@@ -35,15 +35,21 @@ extension StatementHTMLRenderer {
 
     struct RatioRow: Sendable {
         let label: String
+        let description: String?
+        let formula: String?
         let value: Decimal?
         let style: RatioValueStyle
-
-        init(
+        
+        public init(
             label: String,
+            description: String? = nil,
+            formula: String? = nil,
             value: Decimal?,
             style: RatioValueStyle
         ) {
             self.label = label
+            self.description = description
+            self.formula = formula
             self.value = value
             self.style = style
         }

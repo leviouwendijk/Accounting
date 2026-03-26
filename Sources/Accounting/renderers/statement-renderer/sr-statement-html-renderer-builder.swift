@@ -342,26 +342,43 @@ extension StatementHTMLRenderer {
             rows: [
                 RatioRow(
                     label: "Solvabiliteit",
+                    description: "Aandeel van de activa dat met eigen vermogen is gefinancierd.",
+                    formula: "Eigen vermogen / Activa",
                     value: ratios.equityRatio,
                     style: .percentage
                 ),
                 RatioRow(
                     label: "Schuldratio",
+                    description: "Aandeel van de activa dat met schulden is gefinancierd.",
+                    formula: "Schulden / Activa",
                     value: ratios.debtRatio,
                     style: .percentage
                 ),
                 RatioRow(
                     label: "Debt / Equity",
+                    description: "Verhouding tussen vreemd vermogen en eigen vermogen.",
+                    formula: "Schulden / Eigen vermogen",
                     value: ratios.debtToEquity,
                     style: .multiple
                 ),
                 RatioRow(
+                    label: "Equity multiplier",
+                    description: "Mate van financiële hefboom op basis van activa versus eigen vermogen.",
+                    formula: "Activa / Eigen vermogen",
+                    value: ratios.equityMultiplier,
+                    style: .multiple
+                ),
+                RatioRow(
                     label: "ROA",
+                    description: "Rendement op het totaal aan ingezette activa.",
+                    formula: "Nettowinst / Activa",
                     value: ratios.returnOnAssets,
                     style: .percentage
                 ),
                 RatioRow(
                     label: "ROE",
+                    description: "Rendement op het eigen vermogen.",
+                    formula: "Nettowinst / Eigen vermogen",
                     value: ratios.returnOnEquity,
                     style: .percentage
                 )
