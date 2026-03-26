@@ -2,36 +2,68 @@ import Foundation
 
 public enum FinancialRatiosBuilder {
     public static func build(
-        assets: Decimal,
-        equity: Decimal,
-        liabilities: Decimal,
-        netIncome: Decimal?,
-        omslag: OmslagMode
+        from inputs: FinancialRatioInputs
     ) -> FinancialRatios? {
-        let presentedNetIncome = netIncome.map {
-            RGSAssembler.present(
-                $0,
-                direction: .credit,
-                mode: omslag
-            )
-        }
-
-        if assets == 0, equity == 0, liabilities == 0, presentedNetIncome == nil {
+        if inputs.assets == 0,
+           inputs.equity == 0,
+           inputs.liabilities == 0,
+           inputs.netIncome == nil,
+           inputs.netTurnover == nil,
+           inputs.totalCurrentAssets == nil,
+           inputs.totalCurrentLiabilities == nil {
             return nil
         }
 
         return FinancialRatios(
-            assets: assets,
-            equity: equity,
-            liabilities: liabilities,
-            netIncome: presentedNetIncome,
-            equityRatio: ratio(equity, over: assets),
-            debtRatio: ratio(liabilities, over: assets),
-            debtToEquity: ratio(liabilities, over: equity),
-            equityMultiplier: ratio(assets, over: equity),
-            returnOnAssets: presentedNetIncome.flatMap { ratio($0, over: assets) },
-            returnOnEquity: presentedNetIncome.flatMap { ratio($0, over: equity) }
+            assets: inputs.assets,
+            equity: inputs.equity,
+            liabilities: inputs.liabilities,
+            netIncome: inputs.netIncome,
+            equityRatio: ratio(inputs.equity, over: inputs.assets),
+            debtRatio: ratio(inputs.liabilities, over: inputs.assets),
+            debtToEquity: ratio(inputs.liabilities, over: inputs.equity),
+            equityMultiplier: ratio(inputs.assets, over: inputs.equity),
+            currentRatio: ratio(
+                inputs.totalCurrentAssets,
+                over: inputs.totalCurrentLiabilities
+            ),
+            quickRatio: ratio(
+                inputs.quickAssets,
+                over: inputs.totalCurrentLiabilities
+            ),
+            grossMargin: ratio(
+                inputs.grossProfit,
+                over: inputs.netTurnover
+            ),
+            operatingMargin: ratio(
+                inputs.operatingResult,
+                over: inputs.netTurnover
+            ),
+            netMargin: ratio(
+                inputs.netIncome,
+                over: inputs.netTurnover
+            ),
+            returnOnAssets: ratio(
+                inputs.netIncome,
+                over: inputs.assets
+            ),
+            returnOnEquity: ratio(
+                inputs.netIncome,
+                over: inputs.equity
+            )
         )
+    }
+
+    @inline(__always)
+    private static func ratio(
+        _ numerator: Decimal?,
+        over denominator: Decimal?
+    ) -> Decimal? {
+        guard let numerator, let denominator, denominator != 0 else {
+            return nil
+        }
+
+        return numerator / denominator
     }
 
     @inline(__always)

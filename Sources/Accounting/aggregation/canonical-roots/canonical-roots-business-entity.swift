@@ -23,14 +23,24 @@ public extension CanonicalRoots {
             operatingExpensesCode: "WBed",
             depreciationExpensesCode: "WAfs",
             financialResultCode: "WFbe",
-            liquidAssetsCode: "BLim",
-            shortTermSecuritiesCode: "BEff",
-            receivablesCode: nil,
-            accruedCurrentAssetsCode: nil,
-            inventoryCode: "BVrd",
-            workInProgressCode: nil,
-            currentLiabilitiesCode: "BSch",
-            accruedCurrentLiabilitiesCode: nil
+
+            liquidAssetsCodes: ["BLim"],
+            shortTermSecuritiesCodes: ["BEff"],
+
+            receivablesCodes: ["BVor"],
+            tradeReceivablesCodes: ["BVorDeb"],
+            otherReceivablesCodes: ["BVorOvr"],
+            accruedCurrentAssetsCodes: ["BVorOva"],
+
+            inventoryCodes: ["BVrd"],
+            workInProgressCodes: ["BPro"],
+
+            currentLiabilitiesCodes: ["BSch"],
+            tradeCreditorsCodes: ["BSchCre"],
+            taxAndSocialChargesCodes: ["BSchBep"],
+            otherCurrentLiabilitiesCodes: ["BSchOvs"],
+            accruedCurrentLiabilitiesCodes: ["BSchOpa"],
+            workInProgressLiabilityCodes: ["BSchOpp"]
         )
     )
 }

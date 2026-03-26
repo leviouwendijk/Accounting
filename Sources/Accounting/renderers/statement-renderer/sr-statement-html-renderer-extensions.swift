@@ -13,14 +13,6 @@ extension StatementHTMLRenderer {
 
         return d < 0 ? "(\(base))" : base
     }
-    // static func fmt(_ d: Decimal) -> String {
-    //     let nf = NumberFormatter()
-    //     nf.locale = Locale(identifier: "nl_NL")
-    //     nf.numberStyle = .decimal
-    //     nf.minimumFractionDigits = 2
-    //     nf.maximumFractionDigits = 2
-    //     return nf.string(from: d as NSDecimalNumber) ?? d.description
-    // }
 
     static func nonEmpty(_ s: String?) -> String? {
         guard 
@@ -35,11 +27,6 @@ extension StatementHTMLRenderer {
 }
 
 extension StatementHTMLRenderer {
-    @inline(__always)
-    static func absDec(_ d: Decimal) -> Decimal { 
-        return d < 0 ? -d : d 
-    }
-
     @inline(__always)
     static func levelClass(_ level: Int) -> String {
         return "sr-level-\(min(3, max(0, level)))"
@@ -191,7 +178,7 @@ extension StatementHTMLRenderer {
         row: TableRow,
         normalDirection: Direction
     ) -> Decimal {
-        let magnitude = absDec(row.amount)
+        let magnitude = DecimalFuncs.absDec(row.amount)
 
         let isPositive = (row.direction == normalDirection)
             == (row.orientation == .regular)
