@@ -1,6 +1,7 @@
 import Foundation
 
 extension StatementHTMLRenderer {
+    @available(*, message: "superseded by RenderedRowHierarchyBuilder")
     struct RowHierarchy: Sendable {
         let id: Int
         let parentId: Int?
@@ -23,6 +24,7 @@ extension StatementHTMLRenderer {
         }
     }
 
+    @available(*, message: "superseded by RenderedRowHierarchyBuilder")
     static func makeRowHierarchyMap(
         idsInOrder: [Int],
         parentById: [Int: Int],
@@ -88,6 +90,7 @@ extension StatementHTMLRenderer {
 }
 
 extension StatementHTMLRenderer {
+    @available(*, message: "superseded by RenderedRowHierarchyBuilder")
     struct PresentationHierarchy: Sendable {
         let id: Int
         let parentId: Int?
@@ -110,6 +113,7 @@ extension StatementHTMLRenderer {
         }
     }
 
+    @available(*, message: "superseded by RenderedRowHierarchyBuilder")
     static func makePresentationHierarchyMap(
         idsInOrder: [Int],
         canonicalParentById: [Int: Int],

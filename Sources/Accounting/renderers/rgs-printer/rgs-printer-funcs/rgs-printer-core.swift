@@ -41,7 +41,8 @@ public extension RGSPrinter {
     static func printLines(
         _ title: String,
         lines: [StatementLine],
-        chart: CompiledChart
+        chart: CompiledChart,
+        legacy_logic: Bool // adding custom arg for legacy overload
     ) throws {
         let maps = try RGSAssembler.makeMaps(from: chart)
         print("\n\(title)")
@@ -49,6 +50,32 @@ public extension RGSPrinter {
         for r in lines {
             let indent = String(repeating: "  ", count: max(0, graphDepth(of: r.id, parentById: maps.parentById) - 1))
             print("\(indent)• \(r.label)  \(r.amount)")
+        }
+    }
+
+    // new using shared builder
+    static func printLines(
+        _ title: String,
+        lines: [StatementLine],
+        chart: CompiledChart
+    ) throws {
+        let maps = try RGSAssembler.makeMaps(from: chart)
+        let ids = lines.map(\.id)
+
+        let hierarchy = RenderedRowHierarchyBuilder.makeMap(
+            idsInOrder: ids,
+            parentById: maps.parentById
+        )
+
+        print("\n\(title)")
+        print(String(repeating: "—", count: title.count))
+
+        for line in lines {
+            let h = hierarchy[line.id]
+            let depth = h?.depth ?? 0
+            let indent = String(repeating: "  ", count: depth)
+
+            print("\(indent)• \(line.label)  \(line.amount)")
         }
     }
 }
