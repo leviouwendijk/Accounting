@@ -61,3 +61,53 @@ public final class EntryCompilerEntitiesFileParser: EntryCompilerParsing {
         return out
     }
 }
+
+// // indexing
+// public extension EntryCompilerEntitiesFileParser {
+//     func parseEntitiesFileIndexed() throws -> [ECIndexedEntityDefinition] {
+//         core.trace("parsing entities file indexed: \(fileURL?.lastPathComponent ?? "<memory>")")
+
+//         var out: [ECIndexedEntityDefinition] = []
+
+//         while current != .eof {
+//             let before = core.index
+
+//             if current == .keyword("entity") {
+//                 let start = loc()
+//                 core.trace("• entity block @ \(start)")
+
+//                 let defs = try parseEntityBlock(
+//                     fileURL: fileURL,
+//                     defaultTZ: defaultTZ
+//                 )
+
+//                 let file = start.file ?? fileURL?.path ?? "<memory>"
+
+//                 for def in defs {
+//                     out.append(
+//                         ECIndexedEntityDefinition(
+//                             def: def,
+//                             location: ECDefinitionResult(
+//                                 file: file,
+//                                 line: start.line,
+//                                 column: start.column
+//                             )
+//                         )
+//                     )
+//                 }
+//             } else {
+//                 advance()
+//             }
+
+//             if core.index == before {
+//                 throw ParserError.unexpectedToken(
+//                     current,
+//                     expected: "parser progress",
+//                     at: loc()
+//                 )
+//             }
+//         }
+
+//         return out
+//     }
+// }

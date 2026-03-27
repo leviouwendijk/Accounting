@@ -12,6 +12,8 @@ public struct EntityDef: Sendable, Codable {
     public var kia: KIAConfigAssetAllocation?
     public var kiaDraft: KIADraft?
 
+    public var location: SourceLocation?
+
     public init(
         key: EntityKey,
         displayName: String? = nil,
@@ -22,6 +24,8 @@ public struct EntityDef: Sendable, Codable {
         ownerEquity: OwnerEquity? = nil,
         kia: KIAConfigAssetAllocation? = nil,
         kiaDraft: KIADraft? = nil,
+
+        location: SourceLocation? = nil
     ) {
         self.key = key
         self.displayName = displayName
@@ -32,5 +36,6 @@ public struct EntityDef: Sendable, Codable {
         self.ownerEquity = ownerEquity
         self.kia = kia
         self.kiaDraft = kiaDraft
+        self.location = location
     }
 }

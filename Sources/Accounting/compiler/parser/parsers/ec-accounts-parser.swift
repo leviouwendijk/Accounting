@@ -48,6 +48,45 @@ public final class EntryCompilerAccountsFileParser: EntryCompilerParsing {
     }
 }
 
+// // indexing for ec-editor/
+// public extension EntryCompilerAccountsFileParser {
+//     func parseAccountsFileIndexed() throws -> [ECIndexedAccountDefinition] {
+//         core.trace("parsing accounts file indexed: \(fileURL?.lastPathComponent ?? "<memory>")")
+
+//         var out: [ECIndexedAccountDefinition] = []
+
+//         while current != .eof {
+//             switch current {
+//             case .keyword("account"):
+//                 let start = loc()
+//                 core.trace("• account override block @ \(start)")
+
+//                 let def = try parseAccountOverrideBlock()
+
+//                 out.append(
+//                     ECIndexedAccountDefinition(
+//                         def: def,
+//                         location: ECDefinitionResult(
+//                             file: start.file ?? fileURL?.path ?? "<memory>",
+//                             line: start.line,
+//                             column: start.column
+//                         )
+//                     )
+//                 )
+
+//             default:
+//                 throw ParserError.unexpectedToken(
+//                     current,
+//                     expected: "account { … }",
+//                     at: loc()
+//                 )
+//             }
+//         }
+
+//         return out
+//     }
+// }
+
 public extension EntryCompilerParsing {
     @inlinable
     func parseAccountOverrideBlock() throws -> AccountDef {
