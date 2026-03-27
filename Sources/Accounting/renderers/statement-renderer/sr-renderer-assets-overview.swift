@@ -143,23 +143,25 @@ public extension StatementHTMLRenderer {
                             HTML.text("Totaal activa")
                         }
 
-                        HTML.table(["class": "tbl"]) {
+                        HTML.table(["class": "tbl tbl-assets-summary"]) {
                             HTML.thead {
                                 HTML.tr {
-                                    HTML.th {
+                                    HTML.th(["class": "col-label"]) {
                                         HTML.text("Label")
                                     }
-                                    HTML.th(["style": "text-align: right;"]) {
+                                    HTML.th(["class": "col-money"]) {
                                         HTML.text("Bedrag")
                                     }
                                 }
                             }
                             HTML.tbody {
                                 HTML.tr {
-                                    HTML.td {
-                                        HTML.text("Boekwaarde begin boekjaar")
+                                    HTML.td(["class": "col-label cell-wrap"]) {
+                                        HTML.span(["class": "cell-main"]) {
+                                            HTML.text("Boekwaarde begin boekjaar")
+                                        }
                                     }
-                                    HTML.td(["style": "text-align: right; white-space: nowrap;"]) {
+                                    HTML.td(["class": "col-money"]) {
                                         HTML.strong {
                                             HTML.text(
                                                 fmtAssetsOverviewAmount(
@@ -172,10 +174,12 @@ public extension StatementHTMLRenderer {
                                 }
 
                                 HTML.tr {
-                                    HTML.td {
-                                        HTML.text("Boekwaarde einde boekjaar")
+                                    HTML.td(["class": "col-label cell-wrap"]) {
+                                        HTML.span(["class": "cell-main"]) {
+                                            HTML.text("Boekwaarde einde boekjaar")
+                                        }
                                     }
-                                    HTML.td(["style": "text-align: right; white-space: nowrap;"]) {
+                                    HTML.td(["class": "col-money"]) {
                                         HTML.strong {
                                             HTML.text(
                                                 fmtAssetsOverviewAmount(
@@ -223,15 +227,15 @@ extension StatementHTMLRenderer {
             HTML.text(group.name)
         }
 
-        HTML.table(["class": "tbl"]) {
+        HTML.table(["class": "tbl tbl-assets-overview"]) {
             HTML.thead {
                 HTML.tr {
-                    HTML.th {
+                    HTML.th(["class": "col-label"]) {
                         HTML.text("Post")
                     }
 
                     for header in headerCells {
-                        HTML.th(["style": "text-align: right;"]) {
+                        HTML.th(["class": "col-money"]) {
                             HTML.text(header)
                         }
                     }
@@ -247,12 +251,14 @@ extension StatementHTMLRenderer {
                     )
 
                     HTML.tr {
-                        HTML.td {
-                            HTML.text(line.name)
+                        HTML.td(["class": "col-label cell-wrap"]) {
+                            HTML.span(["class": "cell-main"]) {
+                                HTML.text(line.name)
+                            }
                         }
 
                         for value in lineCells {
-                            HTML.td(["style": "text-align: right; white-space: nowrap;"]) {
+                            HTML.td(["class": "col-money"]) {
                                 HTML.text(value)
                             }
                         }
@@ -280,30 +286,30 @@ extension StatementHTMLRenderer {
                             )
 
                             HTML.tr {
-                                HTML.td {
-                                    HTML.div {
+                                HTML.td(["class": "col-label cell-wrap"]) {
+                                    HTML.span(["class": "cell-main"]) {
                                         HTML.text(row.displayName)
                                     }
 
-                                    HTML.div(["style": "font-size: 11px; color: #666;"]) {
+                                    HTML.span(["class": "cell-meta"]) {
                                         HTML.text(row.entityKey.identifier(displaying: .fullchain))
                                     }
 
                                     if let details = row.details, !details.isEmpty {
-                                        HTML.div(["style": "font-size: 11px; color: #666;"]) {
+                                        HTML.span(["class": "cell-meta"]) {
                                             HTML.text(details)
                                         }
                                     }
 
                                     if row.hasIssues {
-                                        HTML.div(["style": "font-size: 11px; color: #b45309;"]) {
+                                        HTML.span(["class": "cell-flags"]) {
                                             HTML.text(row.flags.joined(separator: " | "))
                                         }
                                     }
                                 }
 
                                 for value in rowCells {
-                                    HTML.td(["style": "text-align: right; white-space: nowrap; color: #555;"]) {
+                                    HTML.td(["class": "col-money"]) {
                                         HTML.text(value)
                                     }
                                 }
@@ -319,14 +325,16 @@ extension StatementHTMLRenderer {
                 )
 
                 HTML.tr {
-                    HTML.td {
+                    HTML.td(["class": "col-label cell-wrap"]) {
                         HTML.strong {
-                            HTML.text(group.totalLabel)
+                            HTML.span(["class": "cell-main"]) {
+                                HTML.text(group.totalLabel)
+                            }
                         }
                     }
 
                     for value in totalCells {
-                        HTML.td(["style": "text-align: right; white-space: nowrap;"]) {
+                        HTML.td(["class": "col-money"]) {
                             HTML.strong {
                                 HTML.text(value)
                             }

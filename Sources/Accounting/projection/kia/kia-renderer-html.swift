@@ -54,16 +54,16 @@ public extension KIARenderer {
                             HTML.text("Deduction by owner")
                         }
 
-                        HTML.table(["class": "tbl"]) {
+                        HTML.table(["class": "tbl tbl-kia-owner"]) {
                             HTML.thead {
                                 HTML.tr {
-                                    HTML.th {
+                                    HTML.th(["class": "col-owner"]) {
                                         HTML.text("Owner")
                                     }
-                                    HTML.th(["style": "text-align: right;"]) {
+                                    HTML.th(["class": "col-money"]) {
                                         HTML.text("Qualifying amount")
                                     }
-                                    HTML.th(["style": "text-align: right;"]) {
+                                    HTML.th(["class": "col-money"]) {
                                         HTML.text("Deduction amount")
                                     }
                                 }
@@ -71,14 +71,26 @@ public extension KIARenderer {
                             HTML.tbody {
                                 for owner in ownerSummaries {
                                     HTML.tr {
-                                        HTML.td {
-                                            HTML.text(owner.ownerLabel)
+                                        HTML.td(["class": "col-owner kia-cell-wrap"]) {
+                                            HTML.span(["class": "kia-cell-main"]) {
+                                                HTML.text(owner.ownerLabel)
+                                            }
                                         }
-                                        HTML.td(["style": "text-align: right; white-space: nowrap;"]) {
-                                            HTML.text(kiaFmt(owner.qualifyingAmount, currencySymbol: currencySymbol))
+                                        HTML.td(["class": "col-money"]) {
+                                            HTML.text(
+                                                kiaFmt(
+                                                    owner.qualifyingAmount,
+                                                    currencySymbol: currencySymbol
+                                                )
+                                            )
                                         }
-                                        HTML.td(["style": "text-align: right; white-space: nowrap;"]) {
-                                            HTML.text(kiaFmt(owner.deductionAmount, currencySymbol: currencySymbol))
+                                        HTML.td(["class": "col-money"]) {
+                                            HTML.text(
+                                                kiaFmt(
+                                                    owner.deductionAmount,
+                                                    currencySymbol: currencySymbol
+                                                )
+                                            )
                                         }
                                     }
                                 }
@@ -147,22 +159,22 @@ public extension KIARenderer {
                             HTML.text("Qualified assets")
                         }
 
-                        HTML.table(["class": "tbl"]) {
+                        HTML.table(["class": "tbl tbl-kia-qualified"]) {
                             HTML.thead {
                                 HTML.tr {
-                                    HTML.th {
+                                    HTML.th(["class": "col-asset"]) {
                                         HTML.text("Asset")
                                     }
-                                    HTML.th {
+                                    HTML.th(["class": "col-date"]) {
                                         HTML.text("Acquisition date")
                                     }
-                                    HTML.th(["style": "text-align: right;"]) {
+                                    HTML.th(["class": "col-money"]) {
                                         HTML.text("Total amount")
                                     }
-                                    HTML.th(["style": "text-align: right;"]) {
+                                    HTML.th(["class": "col-money"]) {
                                         HTML.text("Qualifying amount")
                                     }
-                                    HTML.th {
+                                    HTML.th(["class": "col-shares"]) {
                                         HTML.text("Shares")
                                     }
                                 }
@@ -170,41 +182,59 @@ public extension KIARenderer {
                             HTML.tbody {
                                 for asset in result.qualifiedAssets {
                                     HTML.tr {
-                                        HTML.td {
-                                            HTML.div {
+                                        HTML.td(["class": "col-asset kia-cell-wrap"]) {
+                                            HTML.span(["class": "kia-cell-main"]) {
                                                 HTML.text(asset.displayName)
                                             }
 
-                                            HTML.div(["style": "font-size: 11px; color: #666;"]) {
-                                                HTML.text(asset.entityKey.identifier(displaying: .fullchain))
+                                            HTML.span(["class": "kia-cell-meta"]) {
+                                                HTML.text(
+                                                    asset.entityKey.identifier(
+                                                        displaying: .fullchain
+                                                    )
+                                                )
                                             }
 
                                             if let details = asset.details, !details.isEmpty {
-                                                HTML.div(["style": "font-size: 11px; color: #666;"]) {
+                                                HTML.span(["class": "kia-cell-meta"]) {
                                                     HTML.text(details)
                                                 }
                                             }
                                         }
 
-                                        HTML.td(["style": "white-space: nowrap;"]) {
+                                        HTML.td(["class": "col-date"]) {
                                             HTML.text(kiaDateString(asset.acquisitionDate))
                                         }
 
-                                        HTML.td(["style": "text-align: right; white-space: nowrap;"]) {
-                                            HTML.text(kiaFmt(asset.totalAmount, currencySymbol: currencySymbol))
+                                        HTML.td(["class": "col-money"]) {
+                                            HTML.text(
+                                                kiaFmt(
+                                                    asset.totalAmount,
+                                                    currencySymbol: currencySymbol
+                                                )
+                                            )
                                         }
 
-                                        HTML.td(["style": "text-align: right; white-space: nowrap;"]) {
-                                            HTML.text(kiaFmt(asset.qualifyingAmount, currencySymbol: currencySymbol))
+                                        HTML.td(["class": "col-money"]) {
+                                            HTML.text(
+                                                kiaFmt(
+                                                    asset.qualifyingAmount,
+                                                    currencySymbol: currencySymbol
+                                                )
+                                            )
                                         }
 
-                                        HTML.td {
+                                        HTML.td(["class": "col-shares kia-cell-wrap"]) {
                                             if asset.shares.isEmpty {
-                                                HTML.text("none")
+                                                HTML.span(["class": "kia-cell-main"]) {
+                                                    HTML.text("none")
+                                                }
                                             } else {
                                                 for share in asset.shares {
-                                                    HTML.div {
-                                                        HTML.text("\(share.ownerLabel): \(kiaNumber(share.percentage))% → \(kiaFmt(share.amount, currencySymbol: currencySymbol))")
+                                                    HTML.div(["class": "kia-share-line"]) {
+                                                        HTML.text(
+                                                            "\(share.ownerLabel): \(kiaNumber(share.percentage))% → \(kiaFmt(share.amount, currencySymbol: currencySymbol))"
+                                                        )
                                                     }
                                                 }
                                             }

@@ -454,6 +454,147 @@ public enum StatementStyleCSS {
                     CSS.decl("line-height", "1.3"),
                     CSS.decl("font-family", "ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace")
                 ),
+
+                // ------------------------------------------------------------
+                // Assets overview tables (scoped under body.sr-assets)
+                // ------------------------------------------------------------
+                CSS.rule(
+                    "body.sr-assets table.tbl-assets-overview, body.sr-assets table.tbl-assets-summary",
+                    CSS.decl("width", "100%"),
+                    CSS.decl("table-layout", "fixed"),
+                    CSS.decl("border-collapse", "collapse")
+                ),
+                CSS.rule(
+                    "body.sr-assets table.tbl-assets-overview th.col-label, body.sr-assets table.tbl-assets-overview td.col-label",
+                    CSS.decl("width", "56%"),
+                    CSS.decl("min-width", "0")
+                ),
+                CSS.rule(
+                    "body.sr-assets table.tbl-assets-summary th.col-label, body.sr-assets table.tbl-assets-summary td.col-label",
+                    CSS.decl("width", "72%"),
+                    CSS.decl("min-width", "0")
+                ),
+                CSS.rule(
+                    "body.sr-assets table.tbl-assets-overview th.col-money, body.sr-assets table.tbl-assets-overview td.col-money, body.sr-assets table.tbl-assets-summary th.col-money, body.sr-assets table.tbl-assets-summary td.col-money",
+                    CSS.decl("text-align", "right"),
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("font-variant-numeric", "tabular-nums"),
+                    CSS.decl("font-feature-settings", "\"tnum\"")
+                ),
+                CSS.rule(
+                    "body.sr-assets .cell-wrap",
+                    CSS.decl("min-width", "0")
+                ),
+                CSS.rule(
+                    "body.sr-assets .cell-main",
+                    CSS.decl("display", "block"),
+                    CSS.decl("min-width", "0"),
+                    CSS.decl("overflow-wrap", "anywhere"),
+                    CSS.decl("word-break", "break-word"),
+                    CSS.decl("hyphens", "auto")
+                ),
+                CSS.rule(
+                    "body.sr-assets .cell-meta",
+                    CSS.decl("display", "block"),
+                    CSS.decl("min-width", "0"),
+                    CSS.decl("margin-top", "2px"),
+                    CSS.decl("font-size", "11px"),
+                    CSS.decl("color", "#666"),
+                    CSS.decl("overflow-wrap", "anywhere"),
+                    CSS.decl("word-break", "break-word"),
+                    CSS.decl("hyphens", "auto")
+                ),
+                CSS.rule(
+                    "body.sr-assets .cell-flags",
+                    CSS.decl("display", "block"),
+                    CSS.decl("min-width", "0"),
+                    CSS.decl("margin-top", "2px"),
+                    CSS.decl("font-size", "11px"),
+                    CSS.decl("color", "#b45309"),
+                    CSS.decl("overflow-wrap", "anywhere"),
+                    CSS.decl("word-break", "break-word"),
+                    CSS.decl("hyphens", "auto")
+                ),
+
+                // ------------------------------------------------------------
+                // KIA tables (scoped under body.sr-kia)
+                // ------------------------------------------------------------
+                CSS.rule(
+                    "body.sr-kia table.tbl-kia-owner, body.sr-kia table.tbl-kia-qualified",
+                    CSS.decl("width", "100%"),
+                    CSS.decl("table-layout", "fixed"),
+                    CSS.decl("border-collapse", "collapse")
+                ),
+
+                CSS.rule(
+                    "body.sr-kia table.tbl-kia-owner th.col-owner, body.sr-kia table.tbl-kia-owner td.col-owner",
+                    CSS.decl("width", "48%"),
+                    CSS.decl("min-width", "0")
+                ),
+                CSS.rule(
+                    "body.sr-kia table.tbl-kia-owner th.col-money, body.sr-kia table.tbl-kia-owner td.col-money",
+                    CSS.decl("width", "26%"),
+                    CSS.decl("text-align", "right"),
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("font-variant-numeric", "tabular-nums"),
+                    CSS.decl("font-feature-settings", "\"tnum\"")
+                ),
+
+                CSS.rule(
+                    "body.sr-kia table.tbl-kia-qualified th.col-asset, body.sr-kia table.tbl-kia-qualified td.col-asset",
+                    CSS.decl("width", "42%"),
+                    CSS.decl("min-width", "0")
+                ),
+                CSS.rule(
+                    "body.sr-kia table.tbl-kia-qualified th.col-date, body.sr-kia table.tbl-kia-qualified td.col-date",
+                    CSS.decl("width", "12%"),
+                    CSS.decl("white-space", "nowrap")
+                ),
+                CSS.rule(
+                    "body.sr-kia table.tbl-kia-qualified th.col-money, body.sr-kia table.tbl-kia-qualified td.col-money",
+                    CSS.decl("width", "11%"),
+                    CSS.decl("text-align", "right"),
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("font-variant-numeric", "tabular-nums"),
+                    CSS.decl("font-feature-settings", "\"tnum\"")
+                ),
+                CSS.rule(
+                    "body.sr-kia table.tbl-kia-qualified th.col-shares, body.sr-kia table.tbl-kia-qualified td.col-shares",
+                    CSS.decl("width", "24%"),
+                    CSS.decl("min-width", "0")
+                ),
+
+                CSS.rule(
+                    "body.sr-kia .kia-cell-wrap",
+                    CSS.decl("min-width", "0")
+                ),
+                CSS.rule(
+                    "body.sr-kia .kia-cell-main",
+                    CSS.decl("display", "block"),
+                    CSS.decl("min-width", "0"),
+                    CSS.decl("overflow-wrap", "anywhere"),
+                    CSS.decl("word-break", "break-word"),
+                    CSS.decl("hyphens", "auto")
+                ),
+                CSS.rule(
+                    "body.sr-kia .kia-cell-meta",
+                    CSS.decl("display", "block"),
+                    CSS.decl("min-width", "0"),
+                    CSS.decl("margin-top", "2px"),
+                    CSS.decl("font-size", "11px"),
+                    CSS.decl("color", "#666"),
+                    CSS.decl("overflow-wrap", "anywhere"),
+                    CSS.decl("word-break", "break-word"),
+                    CSS.decl("hyphens", "auto")
+                ),
+                CSS.rule(
+                    "body.sr-kia .kia-share-line",
+                    CSS.decl("display", "block"),
+                    CSS.decl("min-width", "0"),
+                    CSS.decl("overflow-wrap", "anywhere"),
+                    CSS.decl("word-break", "break-word"),
+                    CSS.decl("hyphens", "auto")
+                ),
             ],
 
             // adding page breaking:
