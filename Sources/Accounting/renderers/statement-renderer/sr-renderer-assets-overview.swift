@@ -11,6 +11,7 @@ public extension StatementHTMLRenderer {
         public var showOnlyFlaggedUnderlyingRows: Bool
         public var showZeroUnderlyingRows: Bool
         public var showReconciliation: Bool
+        public var omitZeroOnlySupplementarySections: Bool
 
         public init(
             title: String = "Assets filing overview",
@@ -20,7 +21,8 @@ public extension StatementHTMLRenderer {
             showUnderlyingRows: Bool = true,
             showOnlyFlaggedUnderlyingRows: Bool = false,
             showZeroUnderlyingRows: Bool = false,
-            showReconciliation: Bool = true
+            showReconciliation: Bool = true,
+            omitZeroOnlySupplementarySections: Bool = true
         ) {
             self.title = title
             self.subtitle = subtitle
@@ -30,6 +32,7 @@ public extension StatementHTMLRenderer {
             self.showOnlyFlaggedUnderlyingRows = showOnlyFlaggedUnderlyingRows
             self.showZeroUnderlyingRows = showZeroUnderlyingRows
             self.showReconciliation = showReconciliation
+            self.omitZeroOnlySupplementarySections = omitZeroOnlySupplementarySections
         }
     }
 
@@ -39,10 +42,31 @@ public extension StatementHTMLRenderer {
         options: AssetsOverviewOptions = .init()
     ) -> String {
         let css = StatementStyleCSS.base().render()
-        let visibleOpeningTotal = overview.groups.reduce(Decimal(0)) {
+
+        let visibleGroups = overview.groups.filter { group in
+            !shouldOmitAssetsOverviewGroup(
+                group,
+                options: options
+            )
+        }
+        let omittedGroups = overview.groups.filter { group in
+            shouldOmitAssetsOverviewGroup(
+                group,
+                options: options
+            )
+        }
+
+        let visibleOpeningTotal = visibleGroups.reduce(Decimal(0)) {
             $0 + $1.totals.openingCarryingAmount
         }
-        let visibleClosingTotal = overview.groups.reduce(Decimal(0)) {
+        let visibleClosingTotal = visibleGroups.reduce(Decimal(0)) {
+            $0 + $1.totals.closingCarryingAmount
+        }
+
+        let omittedOpeningTotal = omittedGroups.reduce(Decimal(0)) {
+            $0 + $1.totals.openingCarryingAmount
+        }
+        let omittedClosingTotal = omittedGroups.reduce(Decimal(0)) {
             $0 + $1.totals.closingCarryingAmount
         }
 
@@ -131,7 +155,23 @@ public extension StatementHTMLRenderer {
                         }
                     }
 
-                    for group in overview.groups {
+                    if !omittedGroups.isEmpty {
+                        HTML.h2 {
+                            HTML.text("Weggelaten nul-secties")
+                        }
+
+                        HTML.div(["class": "summary"]) {
+                            HTML.text("De volgende secties zijn standaard weggelaten omdat alle getoonde bedragen € 0,00 zijn: \(omittedGroups.map(\.name).joined(separator: ", ")).")
+                        }
+                        HTML.div(["class": "summary"]) {
+                            HTML.text("Weggelaten boekwaarde begin boekjaar: \(fmtAssetsOverviewAmount(omittedOpeningTotal, currencySymbol: options.currencySymbol))")
+                        }
+                        HTML.div(["class": "summary"]) {
+                            HTML.text("Weggelaten boekwaarde einde boekjaar: \(fmtAssetsOverviewAmount(omittedClosingTotal, currencySymbol: options.currencySymbol))")
+                        }
+                    }
+
+                    for group in visibleGroups {
                         renderAssetsOverviewGroup(
                             group,
                             options: options
@@ -500,16 +540,67 @@ extension StatementHTMLRenderer {
 }
 
 @inline(__always)
+private func shouldOmitAssetsOverviewGroup(
+    _ group: AssetsOverviewGroup,
+    options: StatementHTMLRenderer.AssetsOverviewOptions
+) -> Bool {
+    guard options.omitZeroOnlySupplementarySections else {
+        return false
+    }
+
+    guard isSupplementaryAssetsOverviewSection(group.section) else {
+        return false
+    }
+
+    return !hasVisibleAssetsOverviewAmounts(group.totals)
+}
+
+@inline(__always)
+private func isSupplementaryAssetsOverviewSection(
+    _ section: AssetsOverviewSection
+) -> Bool {
+    switch section {
+    case .financialFixedAssets,
+         .inventory,
+         .receivables,
+         .securities,
+         .liquidAssets:
+        return true
+
+    case .intangibleFixedAssets,
+         .tangibleFixedAssets,
+         .unclassified:
+        return false
+    }
+}
+
+@inline(__always)
+private func hasVisibleAssetsOverviewAmounts(
+    _ amounts: AssetsOverviewAmounts
+) -> Bool {
+    if amounts.acquisitionCost != 0 { return true }
+    if amounts.openingCarryingAmount != 0 { return true }
+    if amounts.periodInvestment != 0 { return true }
+    if amounts.periodDepreciation != 0 { return true }
+    if amounts.closingCarryingAmount != 0 { return true }
+    if amounts.residualAmount != 0 { return true }
+    return false
+}
+
+@inline(__always)
 private func hasVisibleAssetsOverviewAmounts(
     _ row: AssetsOverviewRow
 ) -> Bool {
-    if (row.acquisitionCost ?? 0) != 0 { return true }
-    if row.openingCarryingAmount != 0 { return true }
-    if row.periodInvestment != 0 { return true }
-    if row.periodDepreciation != 0 { return true }
-    if row.closingCarryingAmount != 0 { return true }
-    if (row.residualAmount ?? 0) != 0 { return true }
-    return false
+    hasVisibleAssetsOverviewAmounts(
+        AssetsOverviewAmounts(
+            acquisitionCost: row.acquisitionCost ?? 0,
+            openingCarryingAmount: row.openingCarryingAmount,
+            periodInvestment: row.periodInvestment,
+            periodDepreciation: row.periodDepreciation,
+            closingCarryingAmount: row.closingCarryingAmount,
+            residualAmount: row.residualAmount ?? 0
+        )
+    )
 }
 
 @inline(__always)
