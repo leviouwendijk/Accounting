@@ -2,6 +2,331 @@ import Foundation
 import HTML
 
 public extension KIARenderer {
+    @HTMLBuilder
+    static func renderBody(
+        _ result: KIAProjectionResult,
+        title: String? = nil,
+        subtitle: String? = nil,
+        verbose: Bool = false,
+        diagnostics: Bool = false,
+        currencySymbol: String = "€"
+    ) -> [any HTMLNode] {
+        let resolvedTitle = title ?? "KIA \(result.taxYear)"
+        let ownerSummaries = kiaOwnerDeductionSummaries(result)
+        let diagnosticSummary = kiaSummarizeDiagnostics(result.diagnostics)
+
+        HTML.h1 {
+            HTML.text(resolvedTitle)
+        }
+
+        if let subtitle {
+            HTML.div(["class": "subtitle"]) {
+                HTML.text(subtitle)
+            }
+        }
+
+        HTML.div(["class": "summary"]) {
+            HTML.text("Qualifying investment total: \(kiaFmt(result.qualifyingInvestmentTotal, currencySymbol: currencySymbol))")
+        }
+        HTML.div(["class": "summary"]) {
+            HTML.text("Deduction: \(kiaFmt(result.deduction, currencySymbol: currencySymbol))")
+        }
+        HTML.div(["class": "summary"]) {
+            HTML.text("Qualified assets: \(result.qualifiedAssets.count)")
+        }
+        HTML.div(["class": "summary"]) {
+            HTML.text("Excluded assets: \(result.excludedAssets.count)")
+        }
+
+        if !ownerSummaries.isEmpty {
+            HTML.h2 {
+                HTML.text("Deduction by owner")
+            }
+
+            HTML.table(["class": "tbl tbl-kia-owner"]) {
+                HTML.thead {
+                    HTML.tr {
+                        HTML.th(["class": "col-owner"]) {
+                            HTML.text("Owner")
+                        }
+                        HTML.th(["class": "col-money"]) {
+                            HTML.text("Qualifying amount")
+                        }
+                        HTML.th(["class": "col-money"]) {
+                            HTML.text("Deduction amount")
+                        }
+                    }
+                }
+                HTML.tbody {
+                    for owner in ownerSummaries {
+                        HTML.tr {
+                            HTML.td(["class": "col-owner kia-cell-wrap"]) {
+                                HTML.span(["class": "kia-cell-main"]) {
+                                    HTML.text(owner.ownerLabel)
+                                }
+                            }
+                            HTML.td(["class": "col-money"]) {
+                                HTML.text(
+                                    kiaFmt(
+                                        owner.qualifyingAmount,
+                                        currencySymbol: currencySymbol
+                                    )
+                                )
+                            }
+                            HTML.td(["class": "col-money"]) {
+                                HTML.text(
+                                    kiaFmt(
+                                        owner.deductionAmount,
+                                        currencySymbol: currencySymbol
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if diagnostics {
+            HTML.h2 {
+                HTML.text("Diagnostics summary")
+            }
+
+            HTML.div(["class": "summary"]) {
+                HTML.text("Inspected entities: \(result.diagnostics.count)")
+            }
+            HTML.div(["class": "summary"]) {
+                HTML.text("Candidate entities: \(result.diagnostics.filter { $0.wasCandidate }.count)")
+            }
+            HTML.div(["class": "summary"]) {
+                HTML.text("Qualified outcomes: \(diagnosticSummary.qualifiedCount)")
+            }
+            HTML.div(["class": "summary"]) {
+                HTML.text("Excluded outcomes: \(diagnosticSummary.excludedCount)")
+            }
+
+            if !diagnosticSummary.reasonCounts.isEmpty {
+                HTML.h2 {
+                    HTML.text("Exclusion reasons")
+                }
+
+                HTML.table(["class": "tbl"]) {
+                    HTML.thead {
+                        HTML.tr {
+                            HTML.th {
+                                HTML.text("Reason")
+                            }
+                            HTML.th(["style": "text-align: right;"]) {
+                                HTML.text("Count")
+                            }
+                        }
+                    }
+                    HTML.tbody {
+                        for item in diagnosticSummary.reasonCounts.sorted(by: { lhs, rhs in
+                            if lhs.value == rhs.value {
+                                return lhs.key < rhs.key
+                            }
+
+                            return lhs.value > rhs.value
+                        }) {
+                            HTML.tr {
+                                HTML.td {
+                                    HTML.text(item.key)
+                                }
+                                HTML.td(["style": "text-align: right; white-space: nowrap;"]) {
+                                    HTML.text(String(item.value))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if !result.qualifiedAssets.isEmpty {
+            HTML.h2 {
+                HTML.text("Qualified assets")
+            }
+
+            HTML.table(["class": "tbl tbl-kia-qualified"]) {
+                HTML.thead {
+                    HTML.tr {
+                        HTML.th(["class": "col-asset"]) {
+                            HTML.text("Asset")
+                        }
+                        HTML.th(["class": "col-date"]) {
+                            HTML.text("Acquisition date")
+                        }
+                        HTML.th(["class": "col-money"]) {
+                            HTML.text("Total amount")
+                        }
+                        HTML.th(["class": "col-money"]) {
+                            HTML.text("Qualifying amount")
+                        }
+                        HTML.th(["class": "col-shares"]) {
+                            HTML.text("Shares")
+                        }
+                    }
+                }
+                HTML.tbody {
+                    for asset in result.qualifiedAssets {
+                        HTML.tr {
+                            HTML.td(["class": "col-asset kia-cell-wrap"]) {
+                                HTML.span(["class": "kia-cell-main"]) {
+                                    HTML.text(asset.displayName)
+                                }
+
+                                HTML.span(["class": "kia-cell-meta"]) {
+                                    HTML.text(
+                                        asset.entityKey.identifier(
+                                            displaying: .fullchain
+                                        )
+                                    )
+                                }
+
+                                if let details = asset.details, !details.isEmpty {
+                                    HTML.span(["class": "kia-cell-meta"]) {
+                                        HTML.text(details)
+                                    }
+                                }
+                            }
+
+                            HTML.td(["class": "col-date"]) {
+                                HTML.text(kiaDateString(asset.acquisitionDate))
+                            }
+
+                            HTML.td(["class": "col-money"]) {
+                                HTML.text(
+                                    kiaFmt(
+                                        asset.totalAmount,
+                                        currencySymbol: currencySymbol
+                                    )
+                                )
+                            }
+
+                            HTML.td(["class": "col-money"]) {
+                                HTML.text(
+                                    kiaFmt(
+                                        asset.qualifyingAmount,
+                                        currencySymbol: currencySymbol
+                                    )
+                                )
+                            }
+
+                            HTML.td(["class": "col-shares kia-cell-wrap"]) {
+                                if asset.shares.isEmpty {
+                                    HTML.span(["class": "kia-cell-main"]) {
+                                        HTML.text("none")
+                                    }
+                                } else {
+                                    for share in asset.shares {
+                                        HTML.div(["class": "kia-share-line"]) {
+                                            HTML.text(
+                                                "\(share.ownerLabel): \(kiaNumber(share.percentage))% → \(kiaFmt(share.amount, currencySymbol: currencySymbol))"
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if verbose && !result.excludedAssets.isEmpty {
+            HTML.h2 {
+                HTML.text("Excluded assets")
+            }
+
+            HTML.table(["class": "tbl"]) {
+                HTML.thead {
+                    HTML.tr {
+                        HTML.th {
+                            HTML.text("Asset")
+                        }
+                        HTML.th {
+                            HTML.text("Reason")
+                        }
+                    }
+                }
+                HTML.tbody {
+                    for excluded in result.excludedAssets {
+                        HTML.tr {
+                            HTML.td {
+                                HTML.text(excluded.entityKey.identifier(displaying: .fullchain))
+                            }
+                            HTML.td {
+                                HTML.text(kiaReasonString(excluded.reason, currencySymbol: currencySymbol))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if diagnostics {
+            HTML.h2 {
+                HTML.text("Per-entity diagnostics")
+            }
+
+            HTML.table(["class": "tbl"]) {
+                HTML.thead {
+                    HTML.tr {
+                        HTML.th {
+                            HTML.text("Entity")
+                        }
+                        HTML.th {
+                            HTML.text("Display name")
+                        }
+                        HTML.th {
+                            HTML.text("Candidate")
+                        }
+                        HTML.th {
+                            HTML.text("Commission date")
+                        }
+                        HTML.th(["style": "text-align: right;"]) {
+                            HTML.text("Acquisition cost")
+                        }
+                        HTML.th {
+                            HTML.text("Share summary")
+                        }
+                        HTML.th {
+                            HTML.text("Outcome")
+                        }
+                    }
+                }
+                HTML.tbody {
+                    for record in result.diagnostics {
+                        HTML.tr {
+                            HTML.td {
+                                HTML.text(record.entityKey.identifier(displaying: .fullchain))
+                            }
+                            HTML.td {
+                                HTML.text(record.displayName)
+                            }
+                            HTML.td {
+                                HTML.text(record.wasCandidate ? "yes" : "no")
+                            }
+                            HTML.td(["style": "white-space: nowrap;"]) {
+                                HTML.text(record.commissionDate.map(kiaDateString) ?? "—")
+                            }
+                            HTML.td(["style": "text-align: right; white-space: nowrap;"]) {
+                                HTML.text(record.acquisitionCost.map { kiaFmt($0, currencySymbol: currencySymbol) } ?? "—")
+                            }
+                            HTML.td {
+                                HTML.text(record.shareSummary ?? "—")
+                            }
+                            HTML.td {
+                                HTML.text(kiaOutcomeString(record.outcome, currencySymbol: currencySymbol))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     static func renderHTML(
         _ result: KIAProjectionResult,
         title: String? = nil,
@@ -13,9 +338,6 @@ public extension KIARenderer {
         let resolvedTitle = title ?? "KIA \(result.taxYear)"
         let css = StatementStyleCSS.base().render()
 
-        let ownerSummaries = kiaOwnerDeductionSummaries(result)
-        let diagnosticSummary = kiaSummarizeDiagnostics(result.diagnostics)
-
         let doc: HTMLDocument = HTML.document {
             HTML.html(["lang": "nl"]) {
                 HTML.head {
@@ -26,316 +348,14 @@ public extension KIARenderer {
                 }
 
                 HTML.body(["class": "sr-kia"]) {
-                    HTML.h1 {
-                        HTML.text(resolvedTitle)
-                    }
-
-                    if let subtitle {
-                        HTML.div(["class": "subtitle"]) {
-                            HTML.text(subtitle)
-                        }
-                    }
-
-                    HTML.div(["class": "summary"]) {
-                        HTML.text("Qualifying investment total: \(kiaFmt(result.qualifyingInvestmentTotal, currencySymbol: currencySymbol))")
-                    }
-                    HTML.div(["class": "summary"]) {
-                        HTML.text("Deduction: \(kiaFmt(result.deduction, currencySymbol: currencySymbol))")
-                    }
-                    HTML.div(["class": "summary"]) {
-                        HTML.text("Qualified assets: \(result.qualifiedAssets.count)")
-                    }
-                    HTML.div(["class": "summary"]) {
-                        HTML.text("Excluded assets: \(result.excludedAssets.count)")
-                    }
-
-                    if !ownerSummaries.isEmpty {
-                        HTML.h2 {
-                            HTML.text("Deduction by owner")
-                        }
-
-                        HTML.table(["class": "tbl tbl-kia-owner"]) {
-                            HTML.thead {
-                                HTML.tr {
-                                    HTML.th(["class": "col-owner"]) {
-                                        HTML.text("Owner")
-                                    }
-                                    HTML.th(["class": "col-money"]) {
-                                        HTML.text("Qualifying amount")
-                                    }
-                                    HTML.th(["class": "col-money"]) {
-                                        HTML.text("Deduction amount")
-                                    }
-                                }
-                            }
-                            HTML.tbody {
-                                for owner in ownerSummaries {
-                                    HTML.tr {
-                                        HTML.td(["class": "col-owner kia-cell-wrap"]) {
-                                            HTML.span(["class": "kia-cell-main"]) {
-                                                HTML.text(owner.ownerLabel)
-                                            }
-                                        }
-                                        HTML.td(["class": "col-money"]) {
-                                            HTML.text(
-                                                kiaFmt(
-                                                    owner.qualifyingAmount,
-                                                    currencySymbol: currencySymbol
-                                                )
-                                            )
-                                        }
-                                        HTML.td(["class": "col-money"]) {
-                                            HTML.text(
-                                                kiaFmt(
-                                                    owner.deductionAmount,
-                                                    currencySymbol: currencySymbol
-                                                )
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if diagnostics {
-                        HTML.h2 {
-                            HTML.text("Diagnostics summary")
-                        }
-
-                        HTML.div(["class": "summary"]) {
-                            HTML.text("Inspected entities: \(result.diagnostics.count)")
-                        }
-                        HTML.div(["class": "summary"]) {
-                            HTML.text("Candidate entities: \(result.diagnostics.filter { $0.wasCandidate }.count)")
-                        }
-                        HTML.div(["class": "summary"]) {
-                            HTML.text("Qualified outcomes: \(diagnosticSummary.qualifiedCount)")
-                        }
-                        HTML.div(["class": "summary"]) {
-                            HTML.text("Excluded outcomes: \(diagnosticSummary.excludedCount)")
-                        }
-
-                        if !diagnosticSummary.reasonCounts.isEmpty {
-                            HTML.h2 {
-                                HTML.text("Exclusion reasons")
-                            }
-
-                            HTML.table(["class": "tbl"]) {
-                                HTML.thead {
-                                    HTML.tr {
-                                        HTML.th {
-                                            HTML.text("Reason")
-                                        }
-                                        HTML.th(["style": "text-align: right;"]) {
-                                            HTML.text("Count")
-                                        }
-                                    }
-                                }
-                                HTML.tbody {
-                                    for item in diagnosticSummary.reasonCounts.sorted(by: { lhs, rhs in
-                                        if lhs.value == rhs.value {
-                                            return lhs.key < rhs.key
-                                        }
-
-                                        return lhs.value > rhs.value
-                                    }) {
-                                        HTML.tr {
-                                            HTML.td {
-                                                HTML.text(item.key)
-                                            }
-                                            HTML.td(["style": "text-align: right; white-space: nowrap;"]) {
-                                                HTML.text(String(item.value))
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if !result.qualifiedAssets.isEmpty {
-                        HTML.h2 {
-                            HTML.text("Qualified assets")
-                        }
-
-                        HTML.table(["class": "tbl tbl-kia-qualified"]) {
-                            HTML.thead {
-                                HTML.tr {
-                                    HTML.th(["class": "col-asset"]) {
-                                        HTML.text("Asset")
-                                    }
-                                    HTML.th(["class": "col-date"]) {
-                                        HTML.text("Acquisition date")
-                                    }
-                                    HTML.th(["class": "col-money"]) {
-                                        HTML.text("Total amount")
-                                    }
-                                    HTML.th(["class": "col-money"]) {
-                                        HTML.text("Qualifying amount")
-                                    }
-                                    HTML.th(["class": "col-shares"]) {
-                                        HTML.text("Shares")
-                                    }
-                                }
-                            }
-                            HTML.tbody {
-                                for asset in result.qualifiedAssets {
-                                    HTML.tr {
-                                        HTML.td(["class": "col-asset kia-cell-wrap"]) {
-                                            HTML.span(["class": "kia-cell-main"]) {
-                                                HTML.text(asset.displayName)
-                                            }
-
-                                            HTML.span(["class": "kia-cell-meta"]) {
-                                                HTML.text(
-                                                    asset.entityKey.identifier(
-                                                        displaying: .fullchain
-                                                    )
-                                                )
-                                            }
-
-                                            if let details = asset.details, !details.isEmpty {
-                                                HTML.span(["class": "kia-cell-meta"]) {
-                                                    HTML.text(details)
-                                                }
-                                            }
-                                        }
-
-                                        HTML.td(["class": "col-date"]) {
-                                            HTML.text(kiaDateString(asset.acquisitionDate))
-                                        }
-
-                                        HTML.td(["class": "col-money"]) {
-                                            HTML.text(
-                                                kiaFmt(
-                                                    asset.totalAmount,
-                                                    currencySymbol: currencySymbol
-                                                )
-                                            )
-                                        }
-
-                                        HTML.td(["class": "col-money"]) {
-                                            HTML.text(
-                                                kiaFmt(
-                                                    asset.qualifyingAmount,
-                                                    currencySymbol: currencySymbol
-                                                )
-                                            )
-                                        }
-
-                                        HTML.td(["class": "col-shares kia-cell-wrap"]) {
-                                            if asset.shares.isEmpty {
-                                                HTML.span(["class": "kia-cell-main"]) {
-                                                    HTML.text("none")
-                                                }
-                                            } else {
-                                                for share in asset.shares {
-                                                    HTML.div(["class": "kia-share-line"]) {
-                                                        HTML.text(
-                                                            "\(share.ownerLabel): \(kiaNumber(share.percentage))% → \(kiaFmt(share.amount, currencySymbol: currencySymbol))"
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if verbose && !result.excludedAssets.isEmpty {
-                        HTML.h2 {
-                            HTML.text("Excluded assets")
-                        }
-
-                        HTML.table(["class": "tbl"]) {
-                            HTML.thead {
-                                HTML.tr {
-                                    HTML.th {
-                                        HTML.text("Asset")
-                                    }
-                                    HTML.th {
-                                        HTML.text("Reason")
-                                    }
-                                }
-                            }
-                            HTML.tbody {
-                                for excluded in result.excludedAssets {
-                                    HTML.tr {
-                                        HTML.td {
-                                            HTML.text(excluded.entityKey.identifier(displaying: .fullchain))
-                                        }
-                                        HTML.td {
-                                            HTML.text(kiaReasonString(excluded.reason, currencySymbol: currencySymbol))
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if diagnostics {
-                        HTML.h2 {
-                            HTML.text("Per-entity diagnostics")
-                        }
-
-                        HTML.table(["class": "tbl"]) {
-                            HTML.thead {
-                                HTML.tr {
-                                    HTML.th {
-                                        HTML.text("Entity")
-                                    }
-                                    HTML.th {
-                                        HTML.text("Display name")
-                                    }
-                                    HTML.th {
-                                        HTML.text("Candidate")
-                                    }
-                                    HTML.th {
-                                        HTML.text("Commission date")
-                                    }
-                                    HTML.th(["style": "text-align: right;"]) {
-                                        HTML.text("Acquisition cost")
-                                    }
-                                    HTML.th {
-                                        HTML.text("Share summary")
-                                    }
-                                    HTML.th {
-                                        HTML.text("Outcome")
-                                    }
-                                }
-                            }
-                            HTML.tbody {
-                                for record in result.diagnostics {
-                                    HTML.tr {
-                                        HTML.td {
-                                            HTML.text(record.entityKey.identifier(displaying: .fullchain))
-                                        }
-                                        HTML.td {
-                                            HTML.text(record.displayName)
-                                        }
-                                        HTML.td {
-                                            HTML.text(record.wasCandidate ? "yes" : "no")
-                                        }
-                                        HTML.td(["style": "white-space: nowrap;"]) {
-                                            HTML.text(record.commissionDate.map(kiaDateString) ?? "—")
-                                        }
-                                        HTML.td(["style": "text-align: right; white-space: nowrap;"]) {
-                                            HTML.text(record.acquisitionCost.map { kiaFmt($0, currencySymbol: currencySymbol) } ?? "—")
-                                        }
-                                        HTML.td {
-                                            HTML.text(record.shareSummary ?? "—")
-                                        }
-                                        HTML.td {
-                                            HTML.text(kiaOutcomeString(record.outcome, currencySymbol: currencySymbol))
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    renderBody(
+                        result,
+                        title: resolvedTitle,
+                        subtitle: subtitle,
+                        verbose: verbose,
+                        diagnostics: diagnostics,
+                        currencySymbol: currencySymbol
+                    )
                 }
             }
         }

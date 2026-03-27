@@ -36,13 +36,12 @@ public extension StatementHTMLRenderer {
         }
     }
 
-    static func renderAssetsOverviewHTML(
+    @HTMLBuilder
+    static func renderAssetsOverviewBody(
         overview: AssetsOverview,
         reconciliation: AssetFilingReconciliationReport? = nil,
         options: AssetsOverviewOptions = .init()
-    ) -> String {
-        let css = StatementStyleCSS.base().render()
-
+    ) -> [any HTMLNode] {
         let visibleGroups = overview.groups.filter { group in
             !shouldOmitAssetsOverviewGroup(
                 group,
@@ -79,6 +78,166 @@ public extension StatementHTMLRenderer {
                 return lhs.value > rhs.value
             }
 
+        HTML.h1 {
+            HTML.text(options.title)
+        }
+
+        if let subtitle = options.subtitle {
+            HTML.div(["class": "subtitle"]) {
+                HTML.text(subtitle)
+            }
+        }
+
+        HTML.div(["class": "summary"]) {
+            HTML.text("Period: \(overview.period.string())")
+        }
+        HTML.div(["class": "summary"]) {
+            HTML.text("Assets inspected: \(overview.summary.assetCount)")
+        }
+        HTML.div(["class": "summary"]) {
+            HTML.text("Flagged assets: \(overview.summary.flaggedAssetCount)")
+        }
+
+        if overview.summary.unclassifiedNonZeroAssetCount > 0 {
+            HTML.h2 {
+                HTML.text("Warning")
+            }
+
+            HTML.div(["class": "summary"]) {
+                HTML.text("Unclassified non-zero assets: \(overview.summary.unclassifiedNonZeroAssetCount)")
+            }
+            HTML.div(["class": "summary"]) {
+                HTML.text("Unclassified acquisition cost total: \(fmtAssetsOverviewAmount(overview.summary.unclassifiedNonZeroTotals.acquisitionCost, currencySymbol: options.currencySymbol))")
+            }
+            HTML.div(["class": "summary"]) {
+                HTML.text("Unclassified opening carrying amount total: \(fmtAssetsOverviewAmount(overview.summary.unclassifiedNonZeroTotals.openingCarryingAmount, currencySymbol: options.currencySymbol))")
+            }
+            HTML.div(["class": "summary"]) {
+                HTML.text("Unclassified investments in period: \(fmtAssetsOverviewAmount(overview.summary.unclassifiedNonZeroTotals.periodInvestment, currencySymbol: options.currencySymbol))")
+            }
+            HTML.div(["class": "summary"]) {
+                HTML.text("Unclassified depreciation in period: \(fmtAssetsOverviewAmount(overview.summary.unclassifiedNonZeroTotals.periodDepreciation, currencySymbol: options.currencySymbol))")
+            }
+            HTML.div(["class": "summary"]) {
+                HTML.text("Unclassified closing carrying amount total: \(fmtAssetsOverviewAmount(overview.summary.unclassifiedNonZeroTotals.closingCarryingAmount, currencySymbol: options.currencySymbol))")
+            }
+            HTML.div(["class": "summary"]) {
+                HTML.text("Unclassified residual amount total: \(fmtAssetsOverviewAmount(overview.summary.unclassifiedNonZeroTotals.residualAmount, currencySymbol: options.currencySymbol))")
+            }
+
+            for row in overview.summary.unclassifiedNonZeroRows {
+                HTML.div(["class": "summary"]) {
+                    HTML.text("• \(row.displayName) (\(row.entityKey.identifier(displaying: .fullchain)))")
+                }
+            }
+        }
+
+        if options.showDiagnostics && !diagnosticPairs.isEmpty {
+            HTML.h2 {
+                HTML.text("Diagnostics")
+            }
+
+            for pair in diagnosticPairs {
+                HTML.div(["class": "summary"]) {
+                    HTML.text("• \(pair.key): \(pair.value)")
+                }
+            }
+        }
+
+        if !omittedGroups.isEmpty {
+            HTML.h2 {
+                HTML.text("Weggelaten nul-secties")
+            }
+
+            HTML.div(["class": "summary"]) {
+                HTML.text("De volgende secties zijn standaard weggelaten omdat alle getoonde bedragen € 0,00 zijn: \(omittedGroups.map(\.name).joined(separator: ", ")).")
+            }
+            HTML.div(["class": "summary"]) {
+                HTML.text("Weggelaten boekwaarde begin boekjaar: \(fmtAssetsOverviewAmount(omittedOpeningTotal, currencySymbol: options.currencySymbol))")
+            }
+            HTML.div(["class": "summary"]) {
+                HTML.text("Weggelaten boekwaarde einde boekjaar: \(fmtAssetsOverviewAmount(omittedClosingTotal, currencySymbol: options.currencySymbol))")
+            }
+        }
+
+        for group in visibleGroups {
+            renderAssetsOverviewGroup(
+                group,
+                options: options
+            )
+        }
+
+        if !overview.groups.isEmpty {
+            HTML.h2 {
+                HTML.text("Totaal activa")
+            }
+
+            HTML.table(["class": "tbl tbl-assets-summary"]) {
+                HTML.thead {
+                    HTML.tr {
+                        HTML.th(["class": "col-label"]) {
+                            HTML.text("Label")
+                        }
+                        HTML.th(["class": "col-money"]) {
+                            HTML.text("Bedrag")
+                        }
+                    }
+                }
+                HTML.tbody {
+                    HTML.tr {
+                        HTML.td(["class": "col-label cell-wrap"]) {
+                            HTML.span(["class": "cell-main"]) {
+                                HTML.text("Boekwaarde begin boekjaar")
+                            }
+                        }
+                        HTML.td(["class": "col-money"]) {
+                            HTML.strong {
+                                HTML.text(
+                                    fmtAssetsOverviewAmount(
+                                        visibleOpeningTotal,
+                                        currencySymbol: options.currencySymbol
+                                    )
+                                )
+                            }
+                        }
+                    }
+
+                    HTML.tr {
+                        HTML.td(["class": "col-label cell-wrap"]) {
+                            HTML.span(["class": "cell-main"]) {
+                                HTML.text("Boekwaarde einde boekjaar")
+                            }
+                        }
+                        HTML.td(["class": "col-money"]) {
+                            HTML.strong {
+                                HTML.text(
+                                    fmtAssetsOverviewAmount(
+                                        visibleClosingTotal,
+                                        currencySymbol: options.currencySymbol
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if options.showReconciliation, let reconciliation {
+            renderAssetsReconciliationSection(
+                reconciliation,
+                currencySymbol: options.currencySymbol
+            )
+        }
+    }
+
+    static func renderAssetsOverviewHTML(
+        overview: AssetsOverview,
+        reconciliation: AssetFilingReconciliationReport? = nil,
+        options: AssetsOverviewOptions = .init()
+    ) -> String {
+        let css = StatementStyleCSS.base().render()
+
         let doc: HTMLDocument = HTML.document {
             HTML.html(["lang": "nl"]) {
                 HTML.head {
@@ -89,160 +248,11 @@ public extension StatementHTMLRenderer {
                 }
 
                 HTML.body(["class": "sr-assets"]) {
-                    HTML.h1 {
-                        HTML.text(options.title)
-                    }
-
-                    if let subtitle = options.subtitle {
-                        HTML.div(["class": "subtitle"]) {
-                            HTML.text(subtitle)
-                        }
-                    }
-
-                    HTML.div(["class": "summary"]) {
-                        HTML.text("Period: \(overview.period.string())")
-                    }
-                    HTML.div(["class": "summary"]) {
-                        HTML.text("Assets inspected: \(overview.summary.assetCount)")
-                    }
-                    HTML.div(["class": "summary"]) {
-                        HTML.text("Flagged assets: \(overview.summary.flaggedAssetCount)")
-                    }
-
-                    if overview.summary.unclassifiedNonZeroAssetCount > 0 {
-                        HTML.h2 {
-                            HTML.text("Warning")
-                        }
-
-                        HTML.div(["class": "summary"]) {
-                            HTML.text("Unclassified non-zero assets: \(overview.summary.unclassifiedNonZeroAssetCount)")
-                        }
-                        HTML.div(["class": "summary"]) {
-                            HTML.text("Unclassified acquisition cost total: \(fmtAssetsOverviewAmount(overview.summary.unclassifiedNonZeroTotals.acquisitionCost, currencySymbol: options.currencySymbol))")
-                        }
-                        HTML.div(["class": "summary"]) {
-                            HTML.text("Unclassified opening carrying amount total: \(fmtAssetsOverviewAmount(overview.summary.unclassifiedNonZeroTotals.openingCarryingAmount, currencySymbol: options.currencySymbol))")
-                        }
-                        HTML.div(["class": "summary"]) {
-                            HTML.text("Unclassified investments in period: \(fmtAssetsOverviewAmount(overview.summary.unclassifiedNonZeroTotals.periodInvestment, currencySymbol: options.currencySymbol))")
-                        }
-                        HTML.div(["class": "summary"]) {
-                            HTML.text("Unclassified depreciation in period: \(fmtAssetsOverviewAmount(overview.summary.unclassifiedNonZeroTotals.periodDepreciation, currencySymbol: options.currencySymbol))")
-                        }
-                        HTML.div(["class": "summary"]) {
-                            HTML.text("Unclassified closing carrying amount total: \(fmtAssetsOverviewAmount(overview.summary.unclassifiedNonZeroTotals.closingCarryingAmount, currencySymbol: options.currencySymbol))")
-                        }
-                        HTML.div(["class": "summary"]) {
-                            HTML.text("Unclassified residual amount total: \(fmtAssetsOverviewAmount(overview.summary.unclassifiedNonZeroTotals.residualAmount, currencySymbol: options.currencySymbol))")
-                        }
-
-                        for row in overview.summary.unclassifiedNonZeroRows {
-                            HTML.div(["class": "summary"]) {
-                                HTML.text("• \(row.displayName) (\(row.entityKey.identifier(displaying: .fullchain)))")
-                            }
-                        }
-                    }
-
-                    if options.showDiagnostics && !diagnosticPairs.isEmpty {
-                        HTML.h2 {
-                            HTML.text("Diagnostics")
-                        }
-
-                        for pair in diagnosticPairs {
-                            HTML.div(["class": "summary"]) {
-                                HTML.text("• \(pair.key): \(pair.value)")
-                            }
-                        }
-                    }
-
-                    if !omittedGroups.isEmpty {
-                        HTML.h2 {
-                            HTML.text("Weggelaten nul-secties")
-                        }
-
-                        HTML.div(["class": "summary"]) {
-                            HTML.text("De volgende secties zijn standaard weggelaten omdat alle getoonde bedragen € 0,00 zijn: \(omittedGroups.map(\.name).joined(separator: ", ")).")
-                        }
-                        HTML.div(["class": "summary"]) {
-                            HTML.text("Weggelaten boekwaarde begin boekjaar: \(fmtAssetsOverviewAmount(omittedOpeningTotal, currencySymbol: options.currencySymbol))")
-                        }
-                        HTML.div(["class": "summary"]) {
-                            HTML.text("Weggelaten boekwaarde einde boekjaar: \(fmtAssetsOverviewAmount(omittedClosingTotal, currencySymbol: options.currencySymbol))")
-                        }
-                    }
-
-                    for group in visibleGroups {
-                        renderAssetsOverviewGroup(
-                            group,
-                            options: options
-                        )
-                    }
-
-                    if !overview.groups.isEmpty {
-                        HTML.h2 {
-                            HTML.text("Totaal activa")
-                        }
-
-                        HTML.table(["class": "tbl tbl-assets-summary"]) {
-                            HTML.thead {
-                                HTML.tr {
-                                    HTML.th(["class": "col-label"]) {
-                                        HTML.text("Label")
-                                    }
-                                    HTML.th(["class": "col-money"]) {
-                                        HTML.text("Bedrag")
-                                    }
-                                }
-                            }
-                            HTML.tbody {
-                                HTML.tr {
-                                    HTML.td(["class": "col-label cell-wrap"]) {
-                                        HTML.span(["class": "cell-main"]) {
-                                            HTML.text("Boekwaarde begin boekjaar")
-                                        }
-                                    }
-                                    HTML.td(["class": "col-money"]) {
-                                        HTML.strong {
-                                            HTML.text(
-                                                fmtAssetsOverviewAmount(
-                                                    visibleOpeningTotal,
-                                                    currencySymbol: options.currencySymbol
-                                                )
-                                            )
-                                        }
-                                    }
-                                }
-
-                                HTML.tr {
-                                    HTML.td(["class": "col-label cell-wrap"]) {
-                                        HTML.span(["class": "cell-main"]) {
-                                            HTML.text("Boekwaarde einde boekjaar")
-                                        }
-                                    }
-                                    HTML.td(["class": "col-money"]) {
-                                        HTML.strong {
-                                            HTML.text(
-                                                fmtAssetsOverviewAmount(
-                                                    visibleClosingTotal,
-                                                    currencySymbol: options.currencySymbol
-                                                )
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if
-                        options.showReconciliation,
-                        let reconciliation
-                    {
-                        renderAssetsReconciliationSection(
-                            reconciliation,
-                            currencySymbol: options.currencySymbol
-                        )
-                    }
+                    renderAssetsOverviewBody(
+                        overview: overview,
+                        reconciliation: reconciliation,
+                        options: options
+                    )
                 }
             }
         }
