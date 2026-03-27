@@ -16,7 +16,8 @@ public enum AssetsOverviewColumnProfile: String, Codable, Sendable {
             return [
                 "Kosten van aanschaf of voortbrenging",
                 "Boekwaarde begin boekjaar",
-                "Boekwaarde einde boekjaar"
+                "Boekwaarde einde boekjaar",
+                "Restwaarde"
             ]
 
         case .tangibleFixedAssets:

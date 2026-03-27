@@ -188,7 +188,7 @@ extension AssetViews {
             switch profile {
             case .intangibleFixedAssets:
                 lines.append(
-                    "\(name) | \(fmt(totals.acquisitionCost)) | \(fmt(totals.openingCarryingAmount)) | \(fmt(totals.closingCarryingAmount))"
+                    "\(name) | \(fmt(totals.acquisitionCost)) | \(fmt(totals.openingCarryingAmount)) | \(fmt(totals.closingCarryingAmount)) | \(fmt(totals.residualAmount))"
                 )
 
             case .tangibleFixedAssets:
@@ -224,7 +224,7 @@ extension AssetViews {
             switch profile {
             case .intangibleFixedAssets:
                 lines.append(
-                    "\(label) | \(fmt(row.acquisitionCost ?? 0)) | \(fmt(row.openingCarryingAmount)) | \(fmt(row.closingCarryingAmount))"
+                    "\(label) | \(fmt(row.acquisitionCost ?? 0)) | \(fmt(row.openingCarryingAmount)) | \(fmt(row.closingCarryingAmount)) | \(fmt(row.residualAmount ?? 0))"
                 )
 
             case .tangibleFixedAssets:
@@ -248,6 +248,76 @@ extension AssetViews {
                 )
             }
         }
+
+        // private static func appendLine(
+        //     name: String,
+        //     totals: AssetsOverviewAmounts,
+        //     profile: AssetsOverviewColumnProfile,
+        //     into lines: inout [String]
+        // ) {
+        //     switch profile {
+        //     case .intangibleFixedAssets:
+        //         lines.append(
+        //             "\(name) | \(fmt(totals.acquisitionCost)) | \(fmt(totals.openingCarryingAmount)) | \(fmt(totals.closingCarryingAmount))"
+        //         )
+
+        //     case .tangibleFixedAssets:
+        //         lines.append(
+        //             "\(name) | \(fmt(totals.acquisitionCost)) | \(fmt(totals.openingCarryingAmount)) | \(fmt(totals.closingCarryingAmount)) | \(fmt(totals.residualAmount))"
+        //         )
+
+        //     case .financialFixedAssets, .inventory, .securities, .liquidAssets:
+        //         lines.append(
+        //             "\(name) | \(fmt(totals.openingCarryingAmount)) | \(fmt(totals.closingCarryingAmount))"
+        //         )
+
+        //     case .receivables:
+        //         lines.append(
+        //             "\(name) | \(fmt(totals.acquisitionCost)) | \(fmt(totals.openingCarryingAmount)) | \(fmt(totals.closingCarryingAmount))"
+        //         )
+
+        //     case .unclassified:
+        //         lines.append(
+        //             "\(name) | \(fmt(totals.acquisitionCost)) | \(fmt(totals.openingCarryingAmount)) | \(fmt(totals.closingCarryingAmount)) | \(fmt(totals.residualAmount))"
+        //         )
+        //     }
+        // }
+
+        // private static func renderUnderlyingRow(
+        //     _ row: AssetsOverviewRow,
+        //     profile: AssetsOverviewColumnProfile,
+        //     into lines: inout [String]
+        // ) {
+        //     let marker = issueMarker(for: row)
+        //     let label = "    · \(row.displayName)\(marker.isEmpty ? "" : " \(marker)")"
+
+        //     switch profile {
+        //     case .intangibleFixedAssets:
+        //         lines.append(
+        //             "\(label) | \(fmt(row.acquisitionCost ?? 0)) | \(fmt(row.openingCarryingAmount)) | \(fmt(row.closingCarryingAmount))"
+        //         )
+
+        //     case .tangibleFixedAssets:
+        //         lines.append(
+        //             "\(label) | \(fmt(row.acquisitionCost ?? 0)) | \(fmt(row.openingCarryingAmount)) | \(fmt(row.closingCarryingAmount)) | \(fmt(row.residualAmount ?? 0))"
+        //         )
+
+        //     case .financialFixedAssets, .inventory, .securities, .liquidAssets:
+        //         lines.append(
+        //             "\(label) | \(fmt(row.openingCarryingAmount)) | \(fmt(row.closingCarryingAmount))"
+        //         )
+
+        //     case .receivables:
+        //         lines.append(
+        //             "\(label) | \(fmt(row.acquisitionCost ?? 0)) | \(fmt(row.openingCarryingAmount)) | \(fmt(row.closingCarryingAmount))"
+        //         )
+
+        //     case .unclassified:
+        //         lines.append(
+        //             "\(label) | \(fmt(row.acquisitionCost ?? 0)) | \(fmt(row.openingCarryingAmount)) | \(fmt(row.closingCarryingAmount)) | \(fmt(row.residualAmount ?? 0))"
+        //         )
+        //     }
+        // }
 
         private static func issueMarker(
             for row: AssetsOverviewRow
