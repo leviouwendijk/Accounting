@@ -456,30 +456,81 @@ public enum StatementStyleCSS {
                 ),
 
                 // ------------------------------------------------------------
+                // Assets overview + KIA PDF table tuning
+                // ------------------------------------------------------------
+                CSS.rule(
+                    "body.sr-assets, body.sr-kia",
+                    CSS.decl("margin", "0"),
+                    CSS.decl("font-size", "11px"),
+                    CSS.decl("line-height", "1.3")
+                ),
+                CSS.rule(
+                    "body.sr-assets h1, body.sr-kia h1",
+                    CSS.decl("font-size", "18px"),
+                    CSS.decl("margin", "0 0 4px")
+                ),
+                CSS.rule(
+                    "body.sr-assets h2, body.sr-kia h2",
+                    CSS.decl("font-size", "15px"),
+                    CSS.decl("margin", "12px 0 6px")
+                ),
+                CSS.rule(
+                    "body.sr-assets .subtitle, body.sr-kia .subtitle",
+                    CSS.decl("font-size", "11px"),
+                    CSS.decl("margin", "0 0 8px")
+                ),
+                CSS.rule(
+                    "body.sr-assets .summary, body.sr-kia .summary",
+                    CSS.decl("font-size", "11px"),
+                    CSS.decl("margin-top", "6px")
+                ),
+
+                // ------------------------------------------------------------
                 // Assets overview tables (scoped under body.sr-assets)
                 // ------------------------------------------------------------
                 CSS.rule(
                     "body.sr-assets table.tbl-assets-overview, body.sr-assets table.tbl-assets-summary",
                     CSS.decl("width", "100%"),
                     CSS.decl("table-layout", "fixed"),
-                    CSS.decl("border-collapse", "collapse")
+                    CSS.decl("border-collapse", "collapse"),
+                    CSS.decl("margin-top", "6px"),
+                    CSS.decl("font-size", "10.5px")
+                ),
+                CSS.rule(
+                    "body.sr-assets table.tbl-assets-overview thead th, body.sr-assets table.tbl-assets-summary thead th",
+                    CSS.decl("padding", "0 4px 6px 4px"),
+                    CSS.decl("font-size", "10px"),
+                    CSS.decl("line-height", "1.15"),
+                    CSS.decl("white-space", "normal"),
+                    CSS.decl("overflow-wrap", "break-word"),
+                    CSS.decl("word-break", "normal"),
+                    CSS.decl("hyphens", "auto"),
+                    CSS.decl("vertical-align", "bottom")
+                ),
+                CSS.rule(
+                    "body.sr-assets table.tbl-assets-overview td, body.sr-assets table.tbl-assets-summary td",
+                    CSS.decl("padding", "3px 4px"),
+                    CSS.decl("vertical-align", "top"),
+                    CSS.decl("line-height", "1.25")
                 ),
                 CSS.rule(
                     "body.sr-assets table.tbl-assets-overview th.col-label, body.sr-assets table.tbl-assets-overview td.col-label",
-                    CSS.decl("width", "56%"),
+                    CSS.decl("width", "52%"),
                     CSS.decl("min-width", "0")
                 ),
                 CSS.rule(
                     "body.sr-assets table.tbl-assets-summary th.col-label, body.sr-assets table.tbl-assets-summary td.col-label",
-                    CSS.decl("width", "72%"),
+                    CSS.decl("width", "74%"),
                     CSS.decl("min-width", "0")
                 ),
                 CSS.rule(
                     "body.sr-assets table.tbl-assets-overview th.col-money, body.sr-assets table.tbl-assets-overview td.col-money, body.sr-assets table.tbl-assets-summary th.col-money, body.sr-assets table.tbl-assets-summary td.col-money",
                     CSS.decl("text-align", "right"),
                     CSS.decl("white-space", "nowrap"),
+                    CSS.decl("font-size", "10.5px"),
                     CSS.decl("font-variant-numeric", "tabular-nums"),
-                    CSS.decl("font-feature-settings", "\"tnum\"")
+                    CSS.decl("font-feature-settings", "\"tnum\""),
+                    CSS.decl("padding-left", "8px")
                 ),
                 CSS.rule(
                     "body.sr-assets .cell-wrap",
@@ -489,8 +540,8 @@ public enum StatementStyleCSS {
                     "body.sr-assets .cell-main",
                     CSS.decl("display", "block"),
                     CSS.decl("min-width", "0"),
-                    CSS.decl("overflow-wrap", "anywhere"),
-                    CSS.decl("word-break", "break-word"),
+                    CSS.decl("overflow-wrap", "break-word"),
+                    CSS.decl("word-break", "normal"),
                     CSS.decl("hyphens", "auto")
                 ),
                 CSS.rule(
@@ -498,10 +549,11 @@ public enum StatementStyleCSS {
                     CSS.decl("display", "block"),
                     CSS.decl("min-width", "0"),
                     CSS.decl("margin-top", "2px"),
-                    CSS.decl("font-size", "11px"),
+                    CSS.decl("font-size", "10px"),
+                    CSS.decl("line-height", "1.2"),
                     CSS.decl("color", "#666"),
-                    CSS.decl("overflow-wrap", "anywhere"),
-                    CSS.decl("word-break", "break-word"),
+                    CSS.decl("overflow-wrap", "break-word"),
+                    CSS.decl("word-break", "normal"),
                     CSS.decl("hyphens", "auto")
                 ),
                 CSS.rule(
@@ -509,10 +561,11 @@ public enum StatementStyleCSS {
                     CSS.decl("display", "block"),
                     CSS.decl("min-width", "0"),
                     CSS.decl("margin-top", "2px"),
-                    CSS.decl("font-size", "11px"),
+                    CSS.decl("font-size", "10px"),
+                    CSS.decl("line-height", "1.2"),
                     CSS.decl("color", "#b45309"),
-                    CSS.decl("overflow-wrap", "anywhere"),
-                    CSS.decl("word-break", "break-word"),
+                    CSS.decl("overflow-wrap", "break-word"),
+                    CSS.decl("word-break", "normal"),
                     CSS.decl("hyphens", "auto")
                 ),
 
@@ -523,26 +576,45 @@ public enum StatementStyleCSS {
                     "body.sr-kia table.tbl-kia-owner, body.sr-kia table.tbl-kia-qualified",
                     CSS.decl("width", "100%"),
                     CSS.decl("table-layout", "fixed"),
-                    CSS.decl("border-collapse", "collapse")
+                    CSS.decl("border-collapse", "collapse"),
+                    CSS.decl("margin-top", "6px"),
+                    CSS.decl("font-size", "10.5px")
                 ),
-
+                CSS.rule(
+                    "body.sr-kia table.tbl-kia-owner thead th, body.sr-kia table.tbl-kia-qualified thead th",
+                    CSS.decl("padding", "0 4px 6px 4px"),
+                    CSS.decl("font-size", "10px"),
+                    CSS.decl("line-height", "1.15"),
+                    CSS.decl("white-space", "normal"),
+                    CSS.decl("overflow-wrap", "break-word"),
+                    CSS.decl("word-break", "normal"),
+                    CSS.decl("hyphens", "auto"),
+                    CSS.decl("vertical-align", "bottom")
+                ),
+                CSS.rule(
+                    "body.sr-kia table.tbl-kia-owner td, body.sr-kia table.tbl-kia-qualified td",
+                    CSS.decl("padding", "3px 4px"),
+                    CSS.decl("vertical-align", "top"),
+                    CSS.decl("line-height", "1.25")
+                ),
                 CSS.rule(
                     "body.sr-kia table.tbl-kia-owner th.col-owner, body.sr-kia table.tbl-kia-owner td.col-owner",
-                    CSS.decl("width", "48%"),
+                    CSS.decl("width", "44%"),
                     CSS.decl("min-width", "0")
                 ),
                 CSS.rule(
                     "body.sr-kia table.tbl-kia-owner th.col-money, body.sr-kia table.tbl-kia-owner td.col-money",
-                    CSS.decl("width", "26%"),
+                    CSS.decl("width", "28%"),
                     CSS.decl("text-align", "right"),
                     CSS.decl("white-space", "nowrap"),
+                    CSS.decl("font-size", "10.5px"),
                     CSS.decl("font-variant-numeric", "tabular-nums"),
-                    CSS.decl("font-feature-settings", "\"tnum\"")
+                    CSS.decl("font-feature-settings", "\"tnum\""),
+                    CSS.decl("padding-left", "8px")
                 ),
-
                 CSS.rule(
                     "body.sr-kia table.tbl-kia-qualified th.col-asset, body.sr-kia table.tbl-kia-qualified td.col-asset",
-                    CSS.decl("width", "42%"),
+                    CSS.decl("width", "32%"),
                     CSS.decl("min-width", "0")
                 ),
                 CSS.rule(
@@ -552,18 +624,19 @@ public enum StatementStyleCSS {
                 ),
                 CSS.rule(
                     "body.sr-kia table.tbl-kia-qualified th.col-money, body.sr-kia table.tbl-kia-qualified td.col-money",
-                    CSS.decl("width", "11%"),
+                    CSS.decl("width", "13%"),
                     CSS.decl("text-align", "right"),
                     CSS.decl("white-space", "nowrap"),
+                    CSS.decl("font-size", "10.5px"),
                     CSS.decl("font-variant-numeric", "tabular-nums"),
-                    CSS.decl("font-feature-settings", "\"tnum\"")
+                    CSS.decl("font-feature-settings", "\"tnum\""),
+                    CSS.decl("padding-left", "8px")
                 ),
                 CSS.rule(
                     "body.sr-kia table.tbl-kia-qualified th.col-shares, body.sr-kia table.tbl-kia-qualified td.col-shares",
-                    CSS.decl("width", "24%"),
+                    CSS.decl("width", "30%"),
                     CSS.decl("min-width", "0")
                 ),
-
                 CSS.rule(
                     "body.sr-kia .kia-cell-wrap",
                     CSS.decl("min-width", "0")
@@ -572,8 +645,8 @@ public enum StatementStyleCSS {
                     "body.sr-kia .kia-cell-main",
                     CSS.decl("display", "block"),
                     CSS.decl("min-width", "0"),
-                    CSS.decl("overflow-wrap", "anywhere"),
-                    CSS.decl("word-break", "break-word"),
+                    CSS.decl("overflow-wrap", "break-word"),
+                    CSS.decl("word-break", "normal"),
                     CSS.decl("hyphens", "auto")
                 ),
                 CSS.rule(
@@ -581,18 +654,20 @@ public enum StatementStyleCSS {
                     CSS.decl("display", "block"),
                     CSS.decl("min-width", "0"),
                     CSS.decl("margin-top", "2px"),
-                    CSS.decl("font-size", "11px"),
+                    CSS.decl("font-size", "10px"),
+                    CSS.decl("line-height", "1.2"),
                     CSS.decl("color", "#666"),
-                    CSS.decl("overflow-wrap", "anywhere"),
-                    CSS.decl("word-break", "break-word"),
+                    CSS.decl("overflow-wrap", "break-word"),
+                    CSS.decl("word-break", "normal"),
                     CSS.decl("hyphens", "auto")
                 ),
                 CSS.rule(
                     "body.sr-kia .kia-share-line",
                     CSS.decl("display", "block"),
                     CSS.decl("min-width", "0"),
-                    CSS.decl("overflow-wrap", "anywhere"),
-                    CSS.decl("word-break", "break-word"),
+                    CSS.decl("line-height", "1.2"),
+                    CSS.decl("overflow-wrap", "break-word"),
+                    CSS.decl("word-break", "normal"),
                     CSS.decl("hyphens", "auto")
                 ),
             ],
