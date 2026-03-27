@@ -321,58 +321,67 @@ public enum MetaAuditHTMLRenderer {
         return nodes
     }
 
+    @HTMLBuilder
     private static func makeAssetsOverviewNodes(
         report: MetaAuditReport,
         options: Options
     ) -> [any HTMLNode] {
-        StatementHTMLRenderer.renderAssetsOverviewBody(
-            overview: report.overview,
-            reconciliation: report.filingReconciliation,
-            options: .init(
-                title: "Assets filing overview",
-                subtitle: report.overview.period.string(),
-                currencySymbol: options.currencySymbol,
-                showDiagnostics: options.showAssetsDiagnostics,
-                showUnderlyingRows: options.showAssetsUnderlyingRows,
-                showOnlyFlaggedUnderlyingRows: options.showAssetsOnlyFlaggedUnderlyingRows,
-                showZeroUnderlyingRows: options.showAssetsZeroUnderlyingRows,
-                showReconciliation: options.showAssetsReconciliation,
-                omitZeroOnlySupplementarySections: options.omitZeroOnlySupplementarySections
+        HTML.div(["class": "sr-assets"]) {
+            StatementHTMLRenderer.renderAssetsOverviewBody(
+                overview: report.overview,
+                reconciliation: report.filingReconciliation,
+                options: .init(
+                    title: "Assets filing overview",
+                    subtitle: report.overview.period.string(),
+                    currencySymbol: options.currencySymbol,
+                    showDiagnostics: options.showAssetsDiagnostics,
+                    showUnderlyingRows: options.showAssetsUnderlyingRows,
+                    showOnlyFlaggedUnderlyingRows: options.showAssetsOnlyFlaggedUnderlyingRows,
+                    showZeroUnderlyingRows: options.showAssetsZeroUnderlyingRows,
+                    showReconciliation: options.showAssetsReconciliation,
+                    omitZeroOnlySupplementarySections: options.omitZeroOnlySupplementarySections
+                )
             )
-        )
+        }
     }
 
+    @HTMLBuilder
     private static func makeKIANodes(
         report: MetaAuditReport,
         options: Options
     ) -> [any HTMLNode] {
-        KIARenderer.renderBody(
-            report.kia,
-            title: "KIA \(report.kia.taxYear)",
-            subtitle: "Kleinschaligheidsinvesteringsaftrek",
-            verbose: options.verboseKIA,
-            diagnostics: options.showKIADiagnostics,
-            currencySymbol: options.currencySymbol
-        )
+        HTML.div(["class": "sr-kia"]) {
+            KIARenderer.renderBody(
+                report.kia,
+                title: "KIA \(report.kia.taxYear)",
+                subtitle: "Kleinschaligheidsinvesteringsaftrek",
+                verbose: options.verboseKIA,
+                diagnostics: options.showKIADiagnostics,
+                currencySymbol: options.currencySymbol
+            )
+        }
     }
 
+    @HTMLBuilder
     private static func makeEquityOverviewNodes(
         report: MetaAuditReport,
         subtitle: String,
         options: Options
     ) -> [any HTMLNode] {
-        StatementHTMLRenderer.renderEquityOverviewBody(
-            report: report.equity.report,
-            entities: report.entities,
-            options: .init(
-                title: report.equity.title,
-                subtitle: subtitle,
-                showAnchorMessages: options.showEquityAnchorMessages,
-                showDiagnostics: options.showEquityDiagnostics,
-                showAllocation: options.showEquityAllocation,
-                showDrawingsBreakdown: options.showEquityDrawingsBreakdown,
-                showUnassignedEquity: options.showEquityUnassigned
+        HTML.div(["class": "sr-eq"]) {
+            StatementHTMLRenderer.renderEquityOverviewBody(
+                report: report.equity.report,
+                entities: report.entities,
+                options: .init(
+                    title: report.equity.title,
+                    subtitle: subtitle,
+                    showAnchorMessages: options.showEquityAnchorMessages,
+                    showDiagnostics: options.showEquityDiagnostics,
+                    showAllocation: options.showEquityAllocation,
+                    showDrawingsBreakdown: options.showEquityDrawingsBreakdown,
+                    showUnassignedEquity: options.showEquityUnassigned
+                )
             )
-        )
+        }
     }
 }
