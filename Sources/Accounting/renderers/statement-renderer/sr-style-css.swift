@@ -246,70 +246,70 @@ public enum StatementStyleCSS {
                 // VAT overview (scoped under body.sr-vat)
                 // ------------------------------------------------------------
                 CSS.rule(
-                    "body.sr-vat",
+                    ".sr-vat",
                     CSS.decl("font-family", "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif"),
                     CSS.decl("margin", "48px"),
                     CSS.decl("font-size", "12px")
                 ),
                 CSS.rule(
-                    "body.sr-vat h1",
+                    ".sr-vat h1",
                     CSS.decl("font-size", "20px"),
                     CSS.decl("margin", "0 0 8px")
                 ),
                 CSS.rule(
-                    "body.sr-vat h2",
+                    ".sr-vat h2",
                     CSS.decl("font-size", "16px"),
                     CSS.decl("margin", "24px 0 8px")
                 ),
                 CSS.rule(
-                    "body.sr-vat .sr-vat-sub",
+                    ".sr-vat .sr-vat-sub",
                     CSS.decl("color", "#666"),
                     CSS.decl("margin", "0 0 24px")
                 ),
                 CSS.rule(
-                    "body.sr-vat table.sr-vat-table",
+                    ".sr-vat table.sr-vat-table",
                     CSS.decl("width", "100%"),
                     CSS.decl("border-collapse", "collapse"),
                     CSS.decl("margin", "8px 0 16px")
                 ),
                 CSS.rule(
-                    "body.sr-vat table.sr-vat-table th, body.sr-vat table.sr-vat-table td",
+                    ".sr-vat table.sr-vat-table th, .sr-vat table.sr-vat-table td",
                     CSS.decl("padding", "10px 12px"),
                     CSS.decl("border-bottom", "1px solid #eee")
                 ),
                 CSS.rule(
-                    "body.sr-vat table.sr-vat-table th",
+                    ".sr-vat table.sr-vat-table th",
                     CSS.decl("text-align", "left"),
                     CSS.decl("font-weight", "600")
                 ),
                 CSS.rule(
-                    "body.sr-vat th.sr-vat-amount, body.sr-vat td.sr-vat-amount",
+                    ".sr-vat th.sr-vat-amount, .sr-vat td.sr-vat-amount",
                     CSS.decl("text-align", "right"),
                     CSS.decl("white-space", "nowrap")
                 ),
                 CSS.rule(
-                    "body.sr-vat td.sr-vat-label",
+                    ".sr-vat td.sr-vat-label",
                     CSS.decl("width", "60%")
                 ),
                 CSS.rule(
-                    "body.sr-vat td.sr-vat-code",
+                    ".sr-vat td.sr-vat-code",
                     CSS.decl("width", "20%"),
                     CSS.decl("color", "#666")
                 ),
                 CSS.rule(
-                    "body.sr-vat .sr-vat-neg",
+                    ".sr-vat .sr-vat-neg",
                     CSS.decl("color", "#b00020")
                 ),
                 CSS.rule(
-                    "body.sr-vat .sr-vat-summary",
+                    ".sr-vat .sr-vat-summary",
                     CSS.decl("margin-top", "12px")
                 ),
                 CSS.rule(
-                    "body.sr-vat .sr-vat-summary table",
+                    ".sr-vat .sr-vat-summary table",
                     CSS.decl("margin-top", "4px")
                 ),
                 CSS.rule(
-                    "body.sr-vat .sr-vat-note",
+                    ".sr-vat .sr-vat-note",
                     CSS.decl("color", "#666"),
                     CSS.decl("font-size", "11px"),
                     CSS.decl("margin-top", "6px")
