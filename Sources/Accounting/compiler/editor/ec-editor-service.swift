@@ -198,7 +198,7 @@ internal extension ECEditorService {
 
             let subtitle: String? = resolved.displayName
             // let body = resolved.details ?? raw
-            let body = resolved.displayName ?? "<details>"
+            let body = resolved.displayName ?? "<displayName / details not implemented>"
 
             return ECHoverResult(
                 kind: .entity,
@@ -238,10 +238,12 @@ internal extension ECEditorService {
 
             let title = resolved.codes.code
             let subtitle = resolved.labels.short
+            let directionText = resolved.direction?.rawValue ?? "—"
+
             let body = [
                 "level: \(resolved.level)",
-                "direction: \(String(describing: resolved.direction))",
-                "side: \(String(describing: resolved.side))"
+                "direction: \(directionText)",
+                "side: \(String(describing: resolved.side))",
             ].joined(separator: "\n")
 
             return ECHoverResult(
