@@ -22,15 +22,49 @@ public struct EquityRollforwardReport: PresentableOutput {
 public struct EquityReportPeriod: Sendable {
     public let label: String
     public let rows: PeriodRollforward
+    public let drawings: EquityDrawingsBreakdownReport?
+    public let unassignedEquity: Decimal?
 
     public init(
         label: String,
-        rows: PeriodRollforward
+        rows: PeriodRollforward,
+        drawings: EquityDrawingsBreakdownReport? = nil,
+        unassignedEquity: Decimal? = nil
     ) {
         self.label = label
         self.rows = rows
+        self.drawings = drawings
+        self.unassignedEquity = unassignedEquity
     }
 }
+
+public struct EquityDrawingsBreakdownReport: Sendable {
+    public let owners: [Int]
+    public let rows: [EquityDrawingsBreakdownRow]
+    public let totalsByOwner: [Int: Decimal]
+    public let grandTotal: Decimal
+    public let uncapturedAudit: [String: Decimal]
+    public let reconcilesWithOnttrek: Bool
+}
+
+public struct EquityDrawingsBreakdownRow: Sendable {
+    public let label: String
+    public let amountsByOwner: [Int: Decimal]
+    public let total: Decimal
+}
+
+// public struct EquityReportPeriod: Sendable {
+//     public let label: String
+//     public let rows: PeriodRollforward
+
+//     public init(
+//         label: String,
+//         rows: PeriodRollforward
+//     ) {
+//         self.label = label
+//         self.rows = rows
+//     }
+// }
 
 public struct EquityDiagnostic: Sendable {
     public enum Kind: Sendable {

@@ -60,3 +60,57 @@ public func buildDrawingsBreakdown(
 
     return .init(perGroupPerOwner: rows, uncapturedAudit: uncaptured)
 }
+
+public func makeEquityDrawingsBreakdownReport(
+    breakdown: DrawingsBreakdown,
+    owners: [Int],
+    deltas: [Int: OwnerDelta],
+    digits: Int = 2
+) -> EquityDrawingsBreakdownReport? {
+    guard
+        !breakdown.perGroupPerOwner.isEmpty
+            || !breakdown.uncapturedAudit.isEmpty
+    else {
+        return nil
+    }
+
+    var rows: [EquityDrawingsBreakdownRow] = []
+    var totalsByOwner: [Int: Decimal] = [:]
+    var grandTotal: Decimal = 0
+
+    for (label, perOwner) in breakdown.perGroupPerOwner {
+        let rowTotal = owners.reduce(into: Decimal(0)) { partial, oid in
+            let value = perOwner[oid] ?? 0
+            partial += value
+            totalsByOwner[oid, default: 0] += value
+        }
+
+        grandTotal += rowTotal
+
+        rows.append(
+            .init(
+                label: label,
+                amountsByOwner: perOwner,
+                total: rowTotal
+            )
+        )
+    }
+
+    let reconcilesWithOnttrek = owners.allSatisfy { oid in
+        let onttrek = deltas[oid]?.onttrek ?? 0
+        let detailed = totalsByOwner[oid] ?? 0
+        return roundD(
+            onttrek - detailed,
+            digits: digits
+        ) == 0
+    }
+
+    return .init(
+        owners: owners,
+        rows: rows,
+        totalsByOwner: totalsByOwner,
+        grandTotal: grandTotal,
+        uncapturedAudit: breakdown.uncapturedAudit,
+        reconcilesWithOnttrek: reconcilesWithOnttrek
+    )
+}
