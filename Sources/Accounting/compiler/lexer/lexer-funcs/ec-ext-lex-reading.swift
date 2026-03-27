@@ -5,8 +5,8 @@ public enum LexerReadingSets {
 
     static let identAllowed: CharacterSet = {
         var s = CharacterSet.alphanumerics
-        // s.insert(charactersIn: "_/-")
-        s.insert(charactersIn: "_/")
+        // s.insert(charactersIn: "_/")
+        s.insert(charactersIn: "_/-")
         return s
     }()
 }
