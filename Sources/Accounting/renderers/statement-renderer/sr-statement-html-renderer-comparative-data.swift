@@ -19,19 +19,104 @@ extension StatementHTMLRenderer {
     struct ComparativeDocumentModel: Sendable {
         let income: ComparativeSection
         let balances: [ComparativeSection]
-        let summary: BalanceSummary?
-        let ratios: RatiosSection?
+        let summary: ComparativeBalanceSummary?
+        let ratios: ComparativeRatiosSection?
 
         init(
             income: ComparativeSection,
             balances: [ComparativeSection],
-            summary: BalanceSummary?,
-            ratios: RatiosSection?
+            summary: ComparativeBalanceSummary?,
+            ratios: ComparativeRatiosSection?
         ) {
             self.income = income
             self.balances = balances
             self.summary = summary
             self.ratios = ratios
+        }
+    }
+
+    struct ComparativeBalanceSummary: Sendable {
+        let currentTitle: String
+        let previousTitle: String
+
+        let currentAssets: Decimal
+        let previousAssets: Decimal?
+
+        let currentEquity: Decimal
+        let previousEquity: Decimal?
+
+        let currentLiabilities: Decimal
+        let previousLiabilities: Decimal?
+
+        var currentEquityPlusLiabilities: Decimal {
+            currentEquity + currentLiabilities
+        }
+
+        var previousEquityPlusLiabilities: Decimal? {
+            guard let previousEquity, let previousLiabilities else {
+                return nil
+            }
+
+            return previousEquity + previousLiabilities
+        }
+
+        var currentDiff: Decimal {
+            currentAssets - currentEquityPlusLiabilities
+        }
+
+        var previousDiff: Decimal? {
+            guard
+                let previousAssets,
+                let previousEquityPlusLiabilities
+            else {
+                return nil
+            }
+
+            return previousAssets - previousEquityPlusLiabilities
+        }
+    }
+
+    struct ComparativeRatiosSection: Sendable {
+        let title: String
+        let currentTitle: String
+        let previousTitle: String
+        let rows: [ComparativeRatioRow]
+
+        init(
+            title: String,
+            currentTitle: String,
+            previousTitle: String,
+            rows: [ComparativeRatioRow]
+        ) {
+            self.title = title
+            self.currentTitle = currentTitle
+            self.previousTitle = previousTitle
+            self.rows = rows
+        }
+    }
+
+    struct ComparativeRatioRow: Sendable {
+        let label: String
+        let description: String?
+        let formula: String?
+        let currentValue: Decimal?
+        let previousValue: Decimal?
+        let style: RatioValueStyle
+
+        init(
+            label: String,
+            description: String? = nil,
+            formula: String? = nil,
+            currentValue: Decimal?,
+            previousValue: Decimal?,
+            style: RatioValueStyle
+        ) {
+            self.label = label
+            self.description = description
+            self.formula = formula
+            self.currentValue = currentValue
+            self.previousValue = previousValue
+            self.style = style
         }
     }
 

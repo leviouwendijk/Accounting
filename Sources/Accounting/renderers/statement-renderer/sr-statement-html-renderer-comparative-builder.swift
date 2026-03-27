@@ -102,8 +102,76 @@ extension StatementHTMLRenderer {
         return ComparativeDocumentModel(
             income: mergedIncome,
             balances: mergedBalances,
-            summary: current.summary,
-            ratios: current.ratios
+            summary: buildComparativeSummary(
+                current: current.summary,
+                previous: previous.summary,
+                currentColumnTitle: currentColumnTitle,
+                previousColumnTitle: previousColumnTitle
+            ),
+            ratios: buildComparativeRatiosSection(
+                current: current.ratios,
+                previous: previous.ratios,
+                currentColumnTitle: currentColumnTitle,
+                previousColumnTitle: previousColumnTitle
+            )
+        )
+    }
+
+    static func buildComparativeSummary(
+        current: BalanceSummary?,
+        previous: BalanceSummary?,
+        currentColumnTitle: String,
+        previousColumnTitle: String
+    ) -> ComparativeBalanceSummary? {
+        guard let current else {
+            return nil
+        }
+
+        return ComparativeBalanceSummary(
+            currentTitle: currentColumnTitle,
+            previousTitle: previousColumnTitle,
+            currentAssets: current.assets,
+            previousAssets: previous?.assets,
+            currentEquity: current.equity,
+            previousEquity: previous?.equity,
+            currentLiabilities: current.liabilities,
+            previousLiabilities: previous?.liabilities
+        )
+    }
+
+    static func buildComparativeRatiosSection(
+        current: RatiosSection?,
+        previous: RatiosSection?,
+        currentColumnTitle: String,
+        previousColumnTitle: String
+    ) -> ComparativeRatiosSection? {
+        guard let current else {
+            return nil
+        }
+
+        var previousRowsByLabel: [String: RatioRow] = [:]
+        for row in previous?.rows ?? [] {
+            previousRowsByLabel[row.label] = row
+        }
+
+        let rows = current.rows.map { row in
+            let previousRow = previousRowsByLabel[row.label]
+
+            return ComparativeRatioRow(
+                label: row.label,
+                description: row.description,
+                formula: row.formula,
+                currentValue: row.value,
+                previousValue: previousRow?.value,
+                style: row.style
+            )
+        }
+
+        return ComparativeRatiosSection(
+            title: current.title,
+            currentTitle: currentColumnTitle,
+            previousTitle: previousColumnTitle,
+            rows: rows
         )
     }
 

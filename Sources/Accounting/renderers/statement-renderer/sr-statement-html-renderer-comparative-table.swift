@@ -32,8 +32,8 @@ extension StatementHTMLRenderer {
                         )
                     }
 
-                    renderSummary(model.summary)
-                    renderRatiosSection(model.ratios)
+                    renderComparativeSummary(model.summary)
+                    renderComparativeRatiosSection(model.ratios)
                 }
             }
         }
