@@ -37,33 +37,3 @@ extension StatementHTMLRenderer {
         case tree
     }
 }
-
-extension StatementHTMLRenderer {
-    public struct EquityOptions: Sendable {
-        public var title: String
-        public var subtitle: String?
-        public var showAnchorMessages: Bool = true
-        public var showDiagnostics: Bool = true
-        public var showAllocation: Bool = true
-        public var showDrawingsBreakdown: Bool = true
-        public var showUnassignedEquity: Bool = true
-
-        public init(
-            title: String = "IB equity rollforward",
-            subtitle: String? = nil,
-            showAnchorMessages: Bool = true,
-            showDiagnostics: Bool = true,
-            showAllocation: Bool = true,
-            showDrawingsBreakdown: Bool = true,
-            showUnassignedEquity: Bool = true
-        ) {
-            self.title = title
-            self.subtitle = subtitle
-            self.showAnchorMessages = showAnchorMessages
-            self.showDiagnostics = showDiagnostics
-            self.showAllocation = showAllocation
-            self.showDrawingsBreakdown = showDrawingsBreakdown
-            self.showUnassignedEquity = showUnassignedEquity
-        }
-    }
-}
