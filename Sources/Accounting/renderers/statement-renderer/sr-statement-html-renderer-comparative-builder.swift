@@ -99,17 +99,6 @@ extension StatementHTMLRenderer {
             )
         }
 
-        for leftover in previousBalanceByKey.values {
-            mergedBalances.append(
-                mergeComparativeSection(
-                    current: nil,
-                    previous: leftover,
-                    currentColumnTitle: currentColumnTitle,
-                    previousColumnTitle: previousColumnTitle
-                )
-            )
-        }
-
         return ComparativeDocumentModel(
             income: mergedIncome,
             balances: mergedBalances,
@@ -119,7 +108,7 @@ extension StatementHTMLRenderer {
     }
 
     static func mergeComparativeSection(
-        current: TableSection?,
+        current: TableSection,
         previous: TableSection?,
         currentColumnTitle: String,
         previousColumnTitle: String
@@ -129,89 +118,27 @@ extension StatementHTMLRenderer {
             ComparativeAmountColumn(title: previousColumnTitle),
         ]
 
-        guard let current else {
-            let rows = (previous?.rows ?? []).map { row in
-                ComparativeRow(
-                    id: row.id,
-                    parentId: row.parentId,
-                    depth: row.depth,
-                    prefix: row.prefix,
-                    label: row.label,
-                    cells: [
-                        .blank,
-                        .value(row.amount),
-                    ],
-                    direction: row.direction,
-                    orientation: row.orientation,
-                    isTotal: row.isTotal
-                )
-            }
-
-            return ComparativeSection(
-                kind: previous!.kind,
-                title: previous!.title,
-                columns: columns,
-                rows: rows,
-                subtotalCells: [
-                    .blank,
-                    comparativeAmountCell(previous!.subtotal),
-                ]
-            )
-        }
-
         var previousRowsByKey: [String: TableRow] = [:]
         for row in previous?.rows ?? [] {
             previousRowsByKey[comparativeRowKey(row)] = row
         }
 
-        var usedKeys = Set<String>()
-        var mergedRows: [ComparativeRow] = []
+        let mergedRows: [ComparativeRow] = current.rows.map { row in
+            let previousRow = previousRowsByKey[comparativeRowKey(row)]
 
-        for row in current.rows {
-            let key = comparativeRowKey(row)
-            let previousRow = previousRowsByKey[key]
-            usedKeys.insert(key)
-
-            mergedRows.append(
-                ComparativeRow(
-                    id: row.id,
-                    parentId: row.parentId,
-                    depth: row.depth,
-                    prefix: row.prefix,
-                    label: row.label,
-                    cells: [
-                        .value(row.amount),
-                        previousRow.map { .value($0.amount) } ?? .blank,
-                    ],
-                    direction: row.direction,
-                    orientation: row.orientation,
-                    isTotal: row.isTotal
-                )
-            )
-        }
-
-        for row in previous?.rows ?? [] {
-            let key = comparativeRowKey(row)
-
-            guard !usedKeys.contains(key) else {
-                continue
-            }
-
-            mergedRows.append(
-                ComparativeRow(
-                    id: row.id,
-                    parentId: row.parentId,
-                    depth: row.depth,
-                    prefix: row.prefix,
-                    label: row.label,
-                    cells: [
-                        .blank,
-                        .value(row.amount),
-                    ],
-                    direction: row.direction,
-                    orientation: row.orientation,
-                    isTotal: row.isTotal
-                )
+            return ComparativeRow(
+                id: row.id,
+                parentId: row.parentId,
+                depth: row.depth,
+                prefix: row.prefix,
+                label: row.label,
+                cells: [
+                    .value(row.amount),
+                    previousRow.map { .value($0.amount) } ?? .blank,
+                ],
+                direction: row.direction,
+                orientation: row.orientation,
+                isTotal: row.isTotal
             )
         }
 
