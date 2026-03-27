@@ -494,13 +494,13 @@ public enum StatementStyleCSS {
                     CSS.decl("table-layout", "fixed"),
                     CSS.decl("border-collapse", "collapse"),
                     CSS.decl("margin-top", "6px"),
-                    CSS.decl("font-size", "10.5px")
+                    CSS.decl("font-size", "10.25px")
                 ),
                 CSS.rule(
                     "body.sr-assets table.tbl-assets-overview thead th, body.sr-assets table.tbl-assets-summary thead th",
-                    CSS.decl("padding", "0 4px 6px 4px"),
-                    CSS.decl("font-size", "10px"),
-                    CSS.decl("line-height", "1.15"),
+                    CSS.decl("padding", "0 3px 6px 3px"),
+                    CSS.decl("font-size", "9.5px"),
+                    CSS.decl("line-height", "1.1"),
                     CSS.decl("white-space", "normal"),
                     CSS.decl("overflow-wrap", "break-word"),
                     CSS.decl("word-break", "normal"),
@@ -509,13 +509,13 @@ public enum StatementStyleCSS {
                 ),
                 CSS.rule(
                     "body.sr-assets table.tbl-assets-overview td, body.sr-assets table.tbl-assets-summary td",
-                    CSS.decl("padding", "3px 4px"),
+                    CSS.decl("padding", "3px 3px"),
                     CSS.decl("vertical-align", "top"),
-                    CSS.decl("line-height", "1.25")
+                    CSS.decl("line-height", "1.22")
                 ),
                 CSS.rule(
                     "body.sr-assets table.tbl-assets-overview th.col-label, body.sr-assets table.tbl-assets-overview td.col-label",
-                    CSS.decl("width", "52%"),
+                    CSS.decl("width", "49%"),
                     CSS.decl("min-width", "0")
                 ),
                 CSS.rule(
@@ -524,13 +524,26 @@ public enum StatementStyleCSS {
                     CSS.decl("min-width", "0")
                 ),
                 CSS.rule(
-                    "body.sr-assets table.tbl-assets-overview th.col-money, body.sr-assets table.tbl-assets-overview td.col-money, body.sr-assets table.tbl-assets-summary th.col-money, body.sr-assets table.tbl-assets-summary td.col-money",
+                    "body.sr-assets table.tbl-assets-overview td.col-money, body.sr-assets table.tbl-assets-summary td.col-money",
                     CSS.decl("text-align", "right"),
                     CSS.decl("white-space", "nowrap"),
-                    CSS.decl("font-size", "10.5px"),
+                    CSS.decl("font-size", "10.25px"),
                     CSS.decl("font-variant-numeric", "tabular-nums"),
                     CSS.decl("font-feature-settings", "\"tnum\""),
-                    CSS.decl("padding-left", "8px")
+                    CSS.decl("padding-left", "6px")
+                ),
+                CSS.rule(
+                    "body.sr-assets table.tbl-assets-overview th.col-money, body.sr-assets table.tbl-assets-summary th.col-money",
+                    CSS.decl("text-align", "left"),
+                    CSS.decl("white-space", "normal"),
+                    CSS.decl("font-size", "9.25px"),
+                    CSS.decl("line-height", "1.08"),
+                    CSS.decl("font-variant-numeric", "normal"),
+                    CSS.decl("font-feature-settings", "\"tnum\" 0"),
+                    CSS.decl("padding-left", "6px"),
+                    CSS.decl("overflow-wrap", "break-word"),
+                    CSS.decl("word-break", "normal"),
+                    CSS.decl("hyphens", "auto")
                 ),
                 CSS.rule(
                     "body.sr-assets .cell-wrap",
@@ -549,8 +562,8 @@ public enum StatementStyleCSS {
                     CSS.decl("display", "block"),
                     CSS.decl("min-width", "0"),
                     CSS.decl("margin-top", "2px"),
-                    CSS.decl("font-size", "10px"),
-                    CSS.decl("line-height", "1.2"),
+                    CSS.decl("font-size", "9.75px"),
+                    CSS.decl("line-height", "1.18"),
                     CSS.decl("color", "#666"),
                     CSS.decl("overflow-wrap", "break-word"),
                     CSS.decl("word-break", "normal"),
@@ -561,8 +574,8 @@ public enum StatementStyleCSS {
                     CSS.decl("display", "block"),
                     CSS.decl("min-width", "0"),
                     CSS.decl("margin-top", "2px"),
-                    CSS.decl("font-size", "10px"),
-                    CSS.decl("line-height", "1.2"),
+                    CSS.decl("font-size", "9.75px"),
+                    CSS.decl("line-height", "1.18"),
                     CSS.decl("color", "#b45309"),
                     CSS.decl("overflow-wrap", "break-word"),
                     CSS.decl("word-break", "normal"),
