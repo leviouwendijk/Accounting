@@ -12,9 +12,15 @@ public enum LexerReadingSets {
 }
 
 public extension EntryCompilerLexing {
+    // @inline(__always)
+    // func isWS(_ c: UnicodeScalar) -> Bool {
+    //     c == " " || c == "\n" || c == "\t" || c == "\r"
+    // }
     @inline(__always)
-    func isWS(_ c: UnicodeScalar) -> Bool {
-        c == " " || c == "\n" || c == "\t" || c == "\r"
+    func isWS(
+        _ c: UnicodeScalar
+    ) -> Bool {
+        CharacterSet.whitespacesAndNewlines.contains(c)
     }
 
     mutating func readUntilClosingBraceVerbatimResult() -> (text: String, terminated: Bool) {
