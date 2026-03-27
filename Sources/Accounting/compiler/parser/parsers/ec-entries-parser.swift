@@ -4,7 +4,11 @@ import plate
 public final class EntryCompilerEntriesParser: EntryCompilerParsing {
     public var core: EntryCompilerParserCore
     public let defaultTZ: TimeZone
-    public init(core: EntryCompilerParserCore, defaultTimeZone: TimeZone) {
+
+    public init(
+        core: EntryCompilerParserCore,
+        defaultTimeZone: TimeZone
+    ) {
         self.core = core
         self.defaultTZ = defaultTimeZone
     }
@@ -14,10 +18,17 @@ public final class EntryCompilerEntriesParser: EntryCompilerParsing {
         defaultTimeZone: TimeZone,
         fileURL: URL? = nil,
         lineMap: [Int]? = nil,
+        spanMap: [SourceSpan]? = nil,
         verbose: Bool = false
     ) {
         self.init(
-            core: .init(tokens: tokens, filePath: fileURL?.path, lineMap: lineMap, verbose: verbose),
+            core: .init(
+                tokens: tokens,
+                filePath: fileURL?.path,
+                lineMap: lineMap,
+                spanMap: spanMap,
+                verbose: verbose
+            ),
             defaultTimeZone: defaultTimeZone
         )
     }

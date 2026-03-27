@@ -18,10 +18,18 @@ public enum EntryCompilerReferenceState: Sendable {
 public protocol EntryCompilerLexing: Sendable {
     var scalars: [UnicodeScalar] { get }
     var index: Int { get set }
+
     var line: Int { get set }
     var column: Int { get set }
+
+    var lastConsumedLine: Int { get set }
+    var lastConsumedColumn: Int { get set }
+
     var detailsState: EntryCompilerDetailsState { get set }
     var referenceState: EntryCompilerReferenceState { get set }
+
+    var diagnostics: [EntryCompilerLexDiagnostic] { get set }
+    var lastTokenSpan: SourceSpan? { get set }
 
     mutating func nextToken() -> EntryCompilerToken
 }

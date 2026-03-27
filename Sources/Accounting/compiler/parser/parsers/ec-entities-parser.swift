@@ -20,6 +20,7 @@ public final class EntryCompilerEntitiesFileParser: EntryCompilerParsing {
         defaultTZ: TimeZone,
         fileURL: URL? = nil,
         lineMap: [Int]? = nil,
+        spanMap: [SourceSpan]? = nil,
         verbose: Bool = false
     ) {
         self.init(
@@ -27,6 +28,7 @@ public final class EntryCompilerEntitiesFileParser: EntryCompilerParsing {
                 tokens: tokens,
                 filePath: fileURL?.path,
                 lineMap: lineMap,        
+                spanMap: spanMap,
                 verbose: verbose
             ), 
             defaultTZ: defaultTZ,
