@@ -219,15 +219,46 @@ public extension KIARenderer {
                                         HTML.text("none")
                                     }
                                 } else {
-                                    for share in asset.shares {
-                                        HTML.div(["class": "kia-share-line"]) {
-                                            HTML.text(
-                                                "\(share.ownerLabel): \(kiaNumber(share.percentage))% → \(kiaFmt(share.amount, currencySymbol: currencySymbol))"
-                                            )
+                                    HTML.table(["class": "kia-share-table"]) {
+                                        HTML.tbody {
+                                            for share in asset.shares {
+                                                HTML.tr {
+                                                    HTML.td(["class": "kia-share-label"]) {
+                                                        HTML.text(
+                                                            "\(share.ownerLabel): \(kiaNumber(share.percentage))%"
+                                                        )
+                                                    }
+
+                                                    HTML.td(["class": "kia-share-amount"]) {
+                                                        HTML.text(
+                                                            kiaFmt(
+                                                                share.amount,
+                                                                currencySymbol: currencySymbol
+                                                            )
+                                                        )
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
+
+                            // HTML.td(["class": "col-shares kia-cell-wrap"]) {
+                            //     if asset.shares.isEmpty {
+                            //         HTML.span(["class": "kia-cell-main"]) {
+                            //             HTML.text("none")
+                            //         }
+                            //     } else {
+                            //         for share in asset.shares {
+                            //             HTML.div(["class": "kia-share-line"]) {
+                            //                 HTML.text(
+                            //                     "\(share.ownerLabel): \(kiaNumber(share.percentage))% → \(kiaFmt(share.amount, currencySymbol: currencySymbol))"
+                            //                 )
+                            //             }
+                            //         }
+                            //     }
+                            // }
                         }
                     }
                 }

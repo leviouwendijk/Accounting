@@ -706,15 +706,44 @@ public enum StatementStyleCSS {
                     CSS.decl("word-break", "normal"),
                     CSS.decl("hyphens", "auto")
                 ),
+                // CSS.rule(
+                //     ".sr-kia .kia-share-line",
+                //     CSS.decl("display", "block"),
+                //     CSS.decl("min-width", "0"),
+                //     CSS.decl("line-height", "1.18"),
+                //     CSS.decl("overflow-wrap", "break-word"),
+                //     CSS.decl("word-break", "normal"),
+                //     CSS.decl("hyphens", "auto")
+                // ),
                 CSS.rule(
-                    ".sr-kia .kia-share-line",
-                    CSS.decl("display", "block"),
+                    ".sr-kia .kia-share-table",
+                    CSS.decl("width", "100%"),
+                    CSS.decl("table-layout", "fixed"),
+                    CSS.decl("border-collapse", "collapse")
+                ),
+                CSS.rule(
+                    ".sr-kia .kia-share-table td",
+                    CSS.decl("padding", "0"),
+                    CSS.decl("border", "none"),
+                    CSS.decl("vertical-align", "top"),
+                    CSS.decl("line-height", "1.18")
+                ),
+                CSS.rule(
+                    ".sr-kia .kia-share-label",
                     CSS.decl("min-width", "0"),
-                    CSS.decl("line-height", "1.18"),
+                    CSS.decl("padding-right", "8px"),
                     CSS.decl("overflow-wrap", "break-word"),
                     CSS.decl("word-break", "normal"),
                     CSS.decl("hyphens", "auto")
                 ),
+                CSS.rule(
+                    ".sr-kia .kia-share-amount",
+                    CSS.decl("width", "1%"),
+                    CSS.decl("text-align", "right"),
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("font-variant-numeric", "tabular-nums"),
+                    CSS.decl("font-feature-settings", "\"tnum\"")
+                )
             ],
 
             // adding page breaking:
