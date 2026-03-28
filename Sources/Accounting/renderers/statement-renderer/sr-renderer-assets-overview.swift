@@ -407,7 +407,7 @@ extension StatementHTMLRenderer {
         }
 
         HTML.h2 {
-            HTML.text("Asset filing reconciliation")
+            HTML.text("Asset validation (expected balances)")
         }
 
         HTML.div(["class": "summary"]) {
