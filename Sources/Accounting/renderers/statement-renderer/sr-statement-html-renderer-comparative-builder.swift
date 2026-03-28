@@ -186,27 +186,54 @@ extension StatementHTMLRenderer {
             ComparativeAmountColumn(title: previousColumnTitle),
         ]
 
+        var currentRowsByKey: [String: TableRow] = [:]
+        for row in current.rows {
+            currentRowsByKey[comparativeRowKey(row)] = row
+        }
+
         var previousRowsByKey: [String: TableRow] = [:]
         for row in previous?.rows ?? [] {
             previousRowsByKey[comparativeRowKey(row)] = row
         }
 
-        let mergedRows: [ComparativeRow] = current.rows.map { row in
-            let previousRow = previousRowsByKey[comparativeRowKey(row)]
+        var orderedKeys: [String] = []
+        var seenKeys = Set<String>()
+
+        for row in current.rows {
+            let key = comparativeRowKey(row)
+            if seenKeys.insert(key).inserted {
+                orderedKeys.append(key)
+            }
+        }
+
+        for row in previous?.rows ?? [] {
+            let key = comparativeRowKey(row)
+            if seenKeys.insert(key).inserted {
+                orderedKeys.append(key)
+            }
+        }
+
+        let mergedRows: [ComparativeRow] = orderedKeys.compactMap { key in
+            let currentRow = currentRowsByKey[key]
+            let previousRow = previousRowsByKey[key]
+
+            guard let baseRow = currentRow ?? previousRow else {
+                return nil
+            }
 
             return ComparativeRow(
-                id: row.id,
-                parentId: row.parentId,
-                depth: row.depth,
-                prefix: row.prefix,
-                label: row.label,
+                id: baseRow.id,
+                parentId: baseRow.parentId,
+                depth: baseRow.depth,
+                prefix: baseRow.prefix,
+                label: baseRow.label,
                 cells: [
-                    .value(row.amount),
+                    currentRow.map { .value($0.amount) } ?? .blank,
                     previousRow.map { .value($0.amount) } ?? .blank,
                 ],
-                direction: row.direction,
-                orientation: row.orientation,
-                isTotal: row.isTotal
+                direction: baseRow.direction,
+                orientation: baseRow.orientation,
+                isTotal: baseRow.isTotal
             )
         }
 
@@ -221,6 +248,53 @@ extension StatementHTMLRenderer {
             ]
         )
     }
+
+    // static func mergeComparativeSection(
+    //     current: TableSection,
+    //     previous: TableSection?,
+    //     currentColumnTitle: String,
+    //     previousColumnTitle: String
+    // ) -> ComparativeSection {
+    //     let columns = [
+    //         ComparativeAmountColumn(title: currentColumnTitle),
+    //         ComparativeAmountColumn(title: previousColumnTitle),
+    //     ]
+
+    //     var previousRowsByKey: [String: TableRow] = [:]
+    //     for row in previous?.rows ?? [] {
+    //         previousRowsByKey[comparativeRowKey(row)] = row
+    //     }
+
+    //     let mergedRows: [ComparativeRow] = current.rows.map { row in
+    //         let previousRow = previousRowsByKey[comparativeRowKey(row)]
+
+    //         return ComparativeRow(
+    //             id: row.id,
+    //             parentId: row.parentId,
+    //             depth: row.depth,
+    //             prefix: row.prefix,
+    //             label: row.label,
+    //             cells: [
+    //                 .value(row.amount),
+    //                 previousRow.map { .value($0.amount) } ?? .blank,
+    //             ],
+    //             direction: row.direction,
+    //             orientation: row.orientation,
+    //             isTotal: row.isTotal
+    //         )
+    //     }
+
+    //     return ComparativeSection(
+    //         kind: current.kind,
+    //         title: current.title,
+    //         columns: columns,
+    //         rows: mergedRows,
+    //         subtotalCells: [
+    //             comparativeAmountCell(current.subtotal),
+    //             comparativeAmountCell(previous?.subtotal),
+    //         ]
+    //     )
+    // }
 
     @inline(__always)
     static func comparativeAmountCell(
