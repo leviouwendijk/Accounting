@@ -189,43 +189,47 @@ public enum StatementStyleCSS {
                 CSS.rule(
                     ".sr-eq",
                     CSS.decl("font-family", "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif"),
-                    CSS.decl("font-size", "12px"),
-                    CSS.decl("line-height", "1.4"),
+                    CSS.decl("font-size", "11.5px"),
+                    CSS.decl("line-height", "1.38"),
                     CSS.decl("margin", "24px")
                 ),
                 CSS.rule(
                     ".sr-eq h1",
-                    CSS.decl("font-size", "22px"),
+                    CSS.decl("font-size", "21px"),
                     CSS.decl("margin", "0 0 8px")
                 ),
                 CSS.rule(
                     ".sr-eq h2",
-                    CSS.decl("font-size", "16px"),
-                    CSS.decl("margin", "24px 0 8px")
+                    CSS.decl("font-size", "15px"),
+                    CSS.decl("margin", "22px 0 8px")
                 ),
                 CSS.rule(
                     ".sr-eq .sr-eq-sub",
                     CSS.decl("color", "#666"),
-                    CSS.decl("font-size", "12px"),
-                    CSS.decl("margin", "-6px 0 16px")
+                    CSS.decl("font-size", "11px"),
+                    CSS.decl("margin", "-6px 0 14px")
                 ),
                 CSS.rule(
                     ".sr-eq table.sr-eq-table",
                     CSS.decl("border-collapse", "collapse"),
                     CSS.decl("width", "100%"),
-                    CSS.decl("margin", "16px 0"),
-                    CSS.decl("font-size", "12px")
+                    CSS.decl("margin", "14px 0"),
+                    CSS.decl("font-size", "11px")
                 ),
                 CSS.rule(
                     ".sr-eq table.sr-eq-table th, .sr-eq table.sr-eq-table td",
                     CSS.decl("border-bottom", "1px solid #ddd"),
-                    CSS.decl("padding", "6px 8px"),
+                    CSS.decl("padding", "5px 6px"),
                     CSS.decl("text-align", "right"),
                     CSS.decl("white-space", "nowrap")
                 ),
                 CSS.rule(
                     ".sr-eq table.sr-eq-table th.sr-eq-left, .sr-eq table.sr-eq-table td.sr-eq-left",
-                    CSS.decl("text-align", "left")
+                    CSS.decl("text-align", "left"),
+                    CSS.decl("white-space", "normal"),
+                    CSS.decl("overflow-wrap", "break-word"),
+                    CSS.decl("word-break", "normal"),
+                    CSS.decl("hyphens", "auto")
                 ),
                 CSS.rule(
                     ".sr-eq td.sr-eq-amount.sr-eq-neg",
@@ -233,13 +237,13 @@ public enum StatementStyleCSS {
                 ),
                 CSS.rule(
                     ".sr-eq .sr-eq-period",
-                    CSS.decl("margin-top", "28px")
+                    CSS.decl("margin-top", "24px")
                 ),
                 CSS.rule(
                     ".sr-eq .sr-eq-summary",
-                    CSS.decl("margin", "8px 0"),
+                    CSS.decl("margin", "7px 0"),
                     CSS.decl("color", "#444"),
-                    CSS.decl("font-size", "12px")
+                    CSS.decl("font-size", "11px")
                 ),
 
                 // ------------------------------------------------------------
@@ -515,12 +519,12 @@ public enum StatementStyleCSS {
                 ),
                 CSS.rule(
                     ".sr-assets table.tbl-assets-overview th.col-label, .sr-assets table.tbl-assets-overview td.col-label",
-                    CSS.decl("width", "49%"),
+                    CSS.decl("width", "44%"),
                     CSS.decl("min-width", "0")
                 ),
                 CSS.rule(
                     ".sr-assets table.tbl-assets-summary th.col-label, .sr-assets table.tbl-assets-summary td.col-label",
-                    CSS.decl("width", "74%"),
+                    CSS.decl("width", "70%"),
                     CSS.decl("min-width", "0")
                 ),
                 CSS.rule(
