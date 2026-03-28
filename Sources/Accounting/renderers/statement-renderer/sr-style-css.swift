@@ -645,12 +645,12 @@ public enum StatementStyleCSS {
                 ),
                 CSS.rule(
                     ".sr-kia table.tbl-kia-qualified th.col-asset, .sr-kia table.tbl-kia-qualified td.col-asset",
-                    CSS.decl("width", "31%"),
+                    CSS.decl("width", "25%"),
                     CSS.decl("min-width", "0")
                 ),
                 CSS.rule(
                     ".sr-kia table.tbl-kia-qualified th.col-date, .sr-kia table.tbl-kia-qualified td.col-date",
-                    CSS.decl("width", "14%"),
+                    CSS.decl("width", "10%"),
                     CSS.decl("white-space", "nowrap")
                 ),
                 CSS.rule(
