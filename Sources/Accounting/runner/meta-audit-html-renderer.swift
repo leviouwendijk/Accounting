@@ -283,6 +283,10 @@ public enum MetaAuditHTMLRenderer {
             options: statementOptions
         )
 
+        let maps = try RGSAssembler.makeMaps(
+            from: report.period.chart
+        )
+
         let comparativeModel = StatementHTMLRenderer.buildComparativeDocumentModel(
             current: currentModel,
             previous: previousModel,
@@ -291,7 +295,9 @@ public enum MetaAuditHTMLRenderer {
             ),
             previousColumnTitle: StatementHTMLRenderer.comparativeColumnTitle(
                 for: previous
-            )
+            ),
+            maps: maps,
+            options: statementOptions
         )
 
         nodes.append(contentsOf: StatementHTMLRenderer.renderComparativeTableSection(
