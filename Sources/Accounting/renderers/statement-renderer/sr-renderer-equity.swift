@@ -12,7 +12,7 @@ extension StatementHTMLRenderer {
         public var showUnassignedEquity: Bool = true
 
         public init(
-            title: String = "IB equity rollforward",
+            title: String = "Equity rollforward (backsolved)",
             subtitle: String? = nil,
             showAnchorMessages: Bool = true,
             showDiagnostics: Bool = true,

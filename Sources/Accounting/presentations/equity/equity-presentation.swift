@@ -3,13 +3,13 @@ public struct EquityPresentation: Presentation {
     public typealias Output = EquityRollforwardReport
 
     public static let id = "equity"
-    public static let title = "IB equity rollforward"
+    public static let title = "Equity rollforward (backsolved)"
 
     public let reportTitle: String
     public let config: EquityRollforwardConfig
 
     public init(
-        reportTitle: String = "IB equity rollforward (owner split, backsolved)",
+        reportTitle: String = "Equity rollforward (backsolved)",
         config: EquityRollforwardConfig = .init()
     ) {
         self.reportTitle = reportTitle

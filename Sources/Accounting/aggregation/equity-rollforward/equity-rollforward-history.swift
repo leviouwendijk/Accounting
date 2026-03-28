@@ -3,7 +3,7 @@ import Foundation
 extension OwnerEquity.Rollforward {
     // public func runOwnerEquityRollforwardHistory(
     public static func history(
-        title: String = "IB equity rollforward (owner split, backsolved)",
+        title: String = "Equity rollforward (backsolved)",
         allPeriods: [EquityPeriod],
         chart: CompiledChart,
         entities: EntityStore,
@@ -62,7 +62,7 @@ extension OwnerEquity.Rollforward {
 
     // public func runOwnerEquityRollforwardHistoryAsync(
     public static func history_async(
-        title: String = "IB equity rollforward (owner split, backsolved)",
+        title: String = "Equity rollforward (backsolved)",
         allPeriods: [EquityPeriod],
         chart: CompiledChart,
         entities: EntityStore,

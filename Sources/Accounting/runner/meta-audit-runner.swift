@@ -312,7 +312,7 @@ public enum MetaAuditRunner {
             return lo...curIdx
         }()
 
-        let title = "IB equity rollforward (owner split, backsolved)"
+        let title = "Equity (backsolved)"
         let config = EquityRollforwardConfig()
 
         let report = try EquityPresentation(
