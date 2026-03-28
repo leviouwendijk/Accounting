@@ -269,34 +269,17 @@ public enum MetaAuditHTMLRenderer {
             return nodes
         }
 
-        let currentModel = try StatementHTMLRenderer.buildDocumentModel(
-            bundle: report.period.assembled.current.bundle,
+        let comparativeModel = try StatementHTMLRenderer.buildComparativeDocumentModel(
+            currentBundle: report.period.assembled.current.bundle,
+            previousBundle: previous.bundle,
             chart: report.period.chart,
             equityCode: "BEiv",
-            options: statementOptions
-        )
-
-        let previousModel = try StatementHTMLRenderer.buildDocumentModel(
-            bundle: previous.bundle,
-            chart: report.period.chart,
-            equityCode: "BEiv",
-            options: statementOptions
-        )
-
-        let maps = try RGSAssembler.makeMaps(
-            from: report.period.chart
-        )
-
-        let comparativeModel = StatementHTMLRenderer.buildComparativeDocumentModel(
-            current: currentModel,
-            previous: previousModel,
             currentColumnTitle: StatementHTMLRenderer.comparativeColumnTitle(
                 for: report.period.assembled.current
             ),
             previousColumnTitle: StatementHTMLRenderer.comparativeColumnTitle(
                 for: previous
             ),
-            maps: maps,
             options: statementOptions
         )
 
