@@ -716,9 +716,14 @@ public enum StatementStyleCSS {
                 //     CSS.decl("hyphens", "auto")
                 // ),
                 CSS.rule(
+                    ".sr-kia table.tbl-kia-qualified th.col-shares, .sr-kia table.tbl-kia-qualified td.col-shares",
+                    CSS.decl("width", "22%"),
+                    CSS.decl("min-width", "0")
+                ),
+                CSS.rule(
                     ".sr-kia .kia-share-table",
-                    CSS.decl("width", "100%"),
-                    CSS.decl("table-layout", "fixed"),
+                    CSS.decl("width", "auto"),
+                    CSS.decl("table-layout", "auto"),
                     CSS.decl("border-collapse", "collapse")
                 ),
                 CSS.rule(
@@ -731,14 +736,11 @@ public enum StatementStyleCSS {
                 CSS.rule(
                     ".sr-kia .kia-share-label",
                     CSS.decl("min-width", "0"),
-                    CSS.decl("padding-right", "8px"),
-                    CSS.decl("overflow-wrap", "break-word"),
-                    CSS.decl("word-break", "normal"),
-                    CSS.decl("hyphens", "auto")
+                    CSS.decl("padding-right", "4px"),
+                    CSS.decl("white-space", "nowrap")
                 ),
                 CSS.rule(
                     ".sr-kia .kia-share-amount",
-                    CSS.decl("width", "1%"),
                     CSS.decl("text-align", "right"),
                     CSS.decl("white-space", "nowrap"),
                     CSS.decl("font-variant-numeric", "tabular-nums"),
