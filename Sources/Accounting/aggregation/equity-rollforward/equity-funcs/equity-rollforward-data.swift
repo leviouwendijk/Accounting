@@ -43,9 +43,33 @@ extension OwnerEquity.Rollforward {
         }
 
         let periods = indices.map { i in
-            EquityReportPeriod(
-                label: allPeriods[i].label,
-                rows: solved[i]
+            let period = allPeriods[i]
+            let rows = solved[i]
+
+            let breakdown = buildDrawingsBreakdown(
+                bundle: period.bundle,
+                chart: chart,
+                groups: cfg.defaultDrawingGroups
+            )
+
+            let drawings = makeEquityDrawingsBreakdownReport(
+                breakdown: breakdown,
+                owners: rows.owners,
+                deltas: rows.deltas,
+                digits: cfg.fractionDigits
+            )
+
+            let unassignedEquity = unassignedEquityAmount(
+                period,
+                chart: chart,
+                cfg: cfg
+            )
+
+            return EquityReportPeriod(
+                label: period.label,
+                rows: rows,
+                drawings: drawings,
+                unassignedEquity: unassignedEquity
             )
         }
 
