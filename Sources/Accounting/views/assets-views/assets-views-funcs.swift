@@ -133,7 +133,7 @@ public struct AssetViews {
     public static func normalizedDetails(
         from entity: EntityDef
     ) -> String? {
-        guard let raw = cleaned(entity.metadata["details"]) else {
+        guard let raw = cleaned(entity.details) ?? cleaned(entity.metadata["details"]) else {
             return nil
         }
 

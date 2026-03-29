@@ -77,6 +77,7 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
         // "entity", // place as ident
         "domain",
         "content",
+        "display",
         "variant", "subvariant", "trait"
     ]
     

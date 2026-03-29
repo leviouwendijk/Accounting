@@ -118,8 +118,8 @@ public struct ECWorkspaceIndex: Sendable {
                 ECCompletionItem(
                     kind: .entity,
                     label: def.key.identifier(displaying: .fullchain),
-                    detail: def.displayName,
-                    documentation: def.metadata["details"] ?? def.displayName
+                    detail: def.effectiveDisplayName,
+                    documentation: def.effectiveDetails ?? def.effectiveDisplayName
                 )
             }
 
@@ -283,7 +283,7 @@ public struct ECWorkspaceIndex: Sendable {
 
         var values = sets.keywords.union(sets.idents)
         values.formUnion([
-            "display_name",
+            "display",
             "profile",
             "kia"
         ])

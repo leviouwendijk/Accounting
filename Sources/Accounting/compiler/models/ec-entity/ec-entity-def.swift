@@ -42,3 +42,39 @@ public struct EntityDef: Sendable, Codable {
         self.location = location
     }
 }
+
+extension EntityDef {
+    @inline(__always)
+    public var effectiveDisplayName: String? {
+        let trimmed = displayName?.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
+        guard let trimmed, !trimmed.isEmpty else {
+            return nil
+        }
+
+        return trimmed
+    }
+
+    @inline(__always)
+    public var effectiveDetails: String? {
+        let primary = details?.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
+        if let primary, !primary.isEmpty {
+            return primary
+        }
+
+        let legacy = metadata["details"]?.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
+        guard let legacy, !legacy.isEmpty else {
+            return nil
+        }
+
+        return legacy
+    }
+}

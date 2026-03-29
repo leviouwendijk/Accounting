@@ -196,9 +196,10 @@ internal extension ECEditorService {
                 displaying: .fullchain
             )
 
-            let subtitle: String? = resolved.displayName
-            // let body = resolved.details ?? raw
-            let body = resolved.displayName ?? "<displayName / details not implemented>"
+            let subtitle: String? = resolved.effectiveDisplayName
+            let body = resolved.effectiveDetails
+                ?? resolved.effectiveDisplayName
+                ?? ""
 
             return ECHoverResult(
                 kind: .entity,
