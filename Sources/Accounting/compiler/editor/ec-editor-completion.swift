@@ -18,6 +18,7 @@ private enum ECCompletionContext {
     case dateDayValue
     case historyEvent
     case inventoryMutation
+    case entryDefaults
     case keyword
     case selectKeyword
     case transactionsKeyword
@@ -106,6 +107,15 @@ public extension ECEditorService {
         case .inventoryMutation:
             return workspace.inventoryMutationCompletionItems
 
+        case .entryDefaults:
+            return makeEntryDefaultsCompletionItems(
+                workspace: workspace,
+                analysis: analysis,
+                line: line,
+                column: column,
+                documentFilePath: documentFilePath
+            )
+
         case .selectKeyword:
             return [
                 ECCompletionItem(
@@ -125,9 +135,26 @@ public extension ECEditorService {
             ]
 
         case .keyword:
-            return workspace.completionKeywordItems(
+            var items = workspace.completionKeywordItems(
                 for: analysis.flavor
             )
+
+            if analysis.flavor == .entries,
+               ecCanOfferTopLevelEntryTemplate(
+                   analysis: analysis,
+                   line: line,
+                   column: column
+               ) {
+                items.insert(
+                    contentsOf: makeTopLevelEntryTemplateCompletionItems(
+                        workspace: workspace,
+                        documentFilePath: documentFilePath
+                    ),
+                    at: 0
+                )
+            }
+
+            return items
         }
     }
 }
@@ -214,6 +241,17 @@ private extension ECEditorService {
 
         let previousWord = previousWords.first
         let secondPreviousWord = previousWords.dropFirst().first
+
+        if analysis.flavor == .entries,
+           topBlock == .entry,
+           previousWord == "entry",
+           ecLineBeforeCursorIsWhitespaceOnly(
+               source: analysis.source,
+               line: line,
+               column: column
+           ) {
+            return .entryDefaults
+        }
 
         if previousWord == "infer", secondPreviousWord == "date" {
             return .dateInferValue
@@ -503,6 +541,135 @@ private extension ECEditorService {
             )
         }
     }
+
+    static func makeTopLevelEntryTemplateCompletionItems(
+        workspace: ECWorkspaceIndex,
+        documentFilePath: String?
+    ) -> [ECCompletionItem] {
+        let nextID = workspace
+            .nextEntryIDCompletionItems(limit: 1)
+            .first?
+            .label
+            ?? "_"
+
+        let day = ecSuggestedDates(
+            documentFilePath: documentFilePath
+        )
+        .first
+        .map { "\($0.day)" }
+        ?? "_"
+
+        return [
+            ECCompletionItem(
+                kind: .keyword,
+                label: "entry defaults",
+                insertText:
+"""
+entry {
+    id = ${1:\(nextID)}
+
+    date infer ${2:\(day)}
+
+    sort ${3:regular}
+
+    details {
+        ${4:_}
+    }
+
+    for (${5:entity}) in (${6:account}) {
+        ${7:debit} = ${8:0.00}
+    }
+
+    for (${9:entity}) in (${10:account}) {
+        ${11:credit} = ${12:0.00}
+    }
+}$0
+""",
+                detail: "Entry scaffold",
+                documentation: "Full entry scaffold with suggested next id and inferred date.",
+                insertFormat: .snippet
+            )
+        ]
+    }
+
+    static func makeEntryDefaultsCompletionItems(
+        workspace: ECWorkspaceIndex,
+        analysis: ECDocumentAnalysis,
+        line: Int,
+        column: Int,
+        documentFilePath: String?
+    ) -> [ECCompletionItem] {
+        let indentUnit = "    "
+
+        let rawBodyIndent = ecLinePrefixBeforeCursor(
+            source: analysis.source,
+            line: line,
+            column: column
+        )
+
+        let bodyIndent = rawBodyIndent.isEmpty
+            ? indentUnit
+            : rawBodyIndent
+
+        let parentIndent: String
+        if bodyIndent.hasSuffix(indentUnit) {
+            parentIndent = String(
+                bodyIndent.dropLast(indentUnit.count)
+            )
+        } else if bodyIndent.hasSuffix("\t") {
+            parentIndent = String(
+                bodyIndent.dropLast()
+            )
+        } else {
+            parentIndent = ""
+        }
+
+        let nestedIndent = bodyIndent + indentUnit
+
+        let nextID = workspace
+            .nextEntryIDCompletionItems(limit: 1)
+            .first?
+            .label
+            ?? "_"
+
+        let day = ecSuggestedDates(
+            documentFilePath: documentFilePath
+        )
+        .first
+        .map { "\($0.day)" }
+        ?? "_"
+
+        return [
+            ECCompletionItem(
+                kind: .keyword,
+                label: "fill entry defaults",
+                insertText:
+"""
+id = ${1:\(nextID)}
+
+\(bodyIndent)date infer ${2:\(day)}
+
+\(bodyIndent)sort ${3:regular}
+
+\(bodyIndent)details {
+\(nestedIndent)${4:_}
+\(bodyIndent)}
+
+\(bodyIndent)for (${5:entity}) in (${6:account}) {
+\(nestedIndent)${7:debit} = ${8:0.00}
+\(bodyIndent)}
+
+\(bodyIndent)for (${9:entity}) in (${10:account}) {
+\(nestedIndent)${11:credit} = ${12:0.00}
+\(bodyIndent)}
+\(parentIndent)}$0
+""",
+                detail: "Populate current entry block",
+                documentation: "Fill a fresh entry block with id/date/sort/details and mirrored debit-credit legs.",
+                insertFormat: .snippet
+            )
+        ]
+    }
 }
 
 private enum ECDateComponent {
@@ -657,4 +824,68 @@ private func ecDedupeCompletionItemsByLabel(
     }
 
     return out
+}
+
+private func ecCanOfferTopLevelEntryTemplate(
+    analysis: ECDocumentAnalysis,
+    line: Int,
+    column: Int
+) -> Bool {
+    ecBlockStack(
+        analysis: analysis,
+        line: line,
+        column: column
+    ).isEmpty
+}
+
+private func ecTextBeforeCursorOnLine(
+    source: String,
+    line: Int,
+    column: Int
+) -> String {
+    let lines = source.components(separatedBy: "\n")
+    guard line >= 1, line <= lines.count else {
+        return ""
+    }
+
+    let currentLine = lines[line - 1]
+    let chars = Array(currentLine)
+    let clamped = min(
+        max(column - 1, 0),
+        chars.count
+    )
+
+    return String(chars[..<clamped])
+}
+
+private func ecLinePrefixBeforeCursor(
+    source: String,
+    line: Int,
+    column: Int
+) -> String {
+    let text = ecTextBeforeCursorOnLine(
+        source: source,
+        line: line,
+        column: column
+    )
+
+    return String(
+        text.prefix {
+            $0 == " " || $0 == "\t"
+        }
+    )
+}
+
+private func ecLineBeforeCursorIsWhitespaceOnly(
+    source: String,
+    line: Int,
+    column: Int
+) -> Bool {
+    ecTextBeforeCursorOnLine(
+        source: source,
+        line: line,
+        column: column
+    )
+    .trimmingCharacters(in: .whitespacesAndNewlines)
+    .isEmpty
 }

@@ -180,24 +180,32 @@ public enum ECCompletionKind: String, Sendable, Codable {
     case selectGroup
 }
 
+public enum ECCompletionInsertFormat: String, Sendable, Codable {
+    case plain
+    case snippet
+}
+
 public struct ECCompletionItem: Sendable, Codable, Hashable {
     public let kind: ECCompletionKind
     public let label: String
     public let insertText: String
     public let detail: String?
     public let documentation: String?
+    public let insertFormat: ECCompletionInsertFormat
 
     public init(
         kind: ECCompletionKind,
         label: String,
         insertText: String? = nil,
         detail: String? = nil,
-        documentation: String? = nil
+        documentation: String? = nil,
+        insertFormat: ECCompletionInsertFormat = .plain
     ) {
         self.kind = kind
         self.label = label
         self.insertText = insertText ?? label
         self.detail = detail
         self.documentation = documentation
+        self.insertFormat = insertFormat
     }
 }
