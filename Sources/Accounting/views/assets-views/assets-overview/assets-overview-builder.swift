@@ -304,9 +304,58 @@ extension AssetViews {
                 periodInvestment: rows.reduce(0) { $0 + $1.periodInvestment },
                 periodDepreciation: rows.reduce(0) { $0 + $1.periodDepreciation },
                 closingCarryingAmount: rows.reduce(0) { $0 + $1.closingCarryingAmount },
-                residualAmount: rows.reduce(0) { $0 + ($1.residualAmount ?? 0) }
+                residualAmount: rows.reduce(0) { $0 + ($1.residualAmount ?? 0) },
+                shareOpeningCarryingAmount: rows.reduce(0) {
+                    $0 + assignedShareAmount(
+                        for: $1,
+                        base: $1.openingCarryingAmount
+                    )
+                },
+                sharePeriodInvestment: rows.reduce(0) {
+                    $0 + assignedShareAmount(
+                        for: $1,
+                        base: $1.periodInvestment
+                    )
+                },
+                shareClosingCarryingAmount: rows.reduce(0) {
+                    $0 + assignedShareAmount(
+                        for: $1,
+                        base: $1.closingCarryingAmount
+                    )
+                }
             )
         }
+
+        @inline(__always)
+        private static func assignedShareAmount(
+            for row: AssetsOverviewRow,
+            base: Decimal
+        ) -> Decimal {
+            guard base != 0 else {
+                return 0
+            }
+
+            return row.ownerShares.reduce(into: Decimal(0)) { partial, share in
+                guard share.owner != nil else {
+                    return
+                }
+
+                partial += (base * share.percentage) / Decimal(100)
+            }
+        }
+
+        // private static func makeAmounts(
+        //     from rows: [AssetsOverviewRow]
+        // ) -> AssetsOverviewAmounts {
+        //     AssetsOverviewAmounts(
+        //         acquisitionCost: rows.reduce(0) { $0 + ($1.acquisitionCost ?? 0) },
+        //         openingCarryingAmount: rows.reduce(0) { $0 + $1.openingCarryingAmount },
+        //         periodInvestment: rows.reduce(0) { $0 + $1.periodInvestment },
+        //         periodDepreciation: rows.reduce(0) { $0 + $1.periodDepreciation },
+        //         closingCarryingAmount: rows.reduce(0) { $0 + $1.closingCarryingAmount },
+        //         residualAmount: rows.reduce(0) { $0 + ($1.residualAmount ?? 0) }
+        //     )
+        // }
 
         private static func schemaIssues(
             key: EntityKey,

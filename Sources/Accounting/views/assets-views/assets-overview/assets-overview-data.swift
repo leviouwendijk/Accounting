@@ -30,13 +30,20 @@ public struct AssetsOverviewAmounts: Sendable {
     public let closingCarryingAmount: Decimal
     public let residualAmount: Decimal
 
+    public let shareOpeningCarryingAmount: Decimal
+    public let sharePeriodInvestment: Decimal
+    public let shareClosingCarryingAmount: Decimal
+
     public init(
         acquisitionCost: Decimal,
         openingCarryingAmount: Decimal,
         periodInvestment: Decimal,
         periodDepreciation: Decimal,
         closingCarryingAmount: Decimal,
-        residualAmount: Decimal
+        residualAmount: Decimal,
+        shareOpeningCarryingAmount: Decimal = 0,
+        sharePeriodInvestment: Decimal = 0,
+        shareClosingCarryingAmount: Decimal = 0
     ) {
         self.acquisitionCost = acquisitionCost
         self.openingCarryingAmount = openingCarryingAmount
@@ -44,6 +51,9 @@ public struct AssetsOverviewAmounts: Sendable {
         self.periodDepreciation = periodDepreciation
         self.closingCarryingAmount = closingCarryingAmount
         self.residualAmount = residualAmount
+        self.shareOpeningCarryingAmount = shareOpeningCarryingAmount
+        self.sharePeriodInvestment = sharePeriodInvestment
+        self.shareClosingCarryingAmount = shareClosingCarryingAmount
     }
 }
 

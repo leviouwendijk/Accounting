@@ -168,6 +168,16 @@ public extension StatementHTMLRenderer {
         }
 
         if !overview.groups.isEmpty {
+            let visibleShareOpeningTotal = visibleGroups.reduce(Decimal(0)) {
+                $0 + $1.totals.shareOpeningCarryingAmount
+            }
+            let visibleSharePeriodInvestmentTotal = visibleGroups.reduce(Decimal(0)) {
+                $0 + $1.totals.sharePeriodInvestment
+            }
+            let visibleShareClosingTotal = visibleGroups.reduce(Decimal(0)) {
+                $0 + $1.totals.shareClosingCarryingAmount
+            }
+
             HTML.h2 {
                 HTML.text("Totaal activa")
             }
@@ -213,6 +223,78 @@ public extension StatementHTMLRenderer {
                                 HTML.text(
                                     fmtAssetsOverviewAmount(
                                         visibleClosingTotal,
+                                        currencySymbol: options.currencySymbol
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            HTML.h2 {
+                HTML.text("Aandelen in activa (vermogenschatting)")
+            }
+
+            HTML.table(["class": "tbl tbl-assets-summary"]) {
+                HTML.thead {
+                    HTML.tr {
+                        HTML.th(["class": "col-label"]) {
+                            HTML.text("Label")
+                        }
+                        HTML.th(["class": "col-money"]) {
+                            HTML.text("Bedrag")
+                        }
+                    }
+                }
+                HTML.tbody {
+                    HTML.tr {
+                        HTML.td(["class": "col-label cell-wrap"]) {
+                            HTML.span(["class": "cell-main"]) {
+                                HTML.text("Som activa-aandelen begin boekjaar")
+                            }
+                        }
+                        HTML.td(["class": "col-money"]) {
+                            HTML.strong {
+                                HTML.text(
+                                    fmtAssetsOverviewAmount(
+                                        visibleShareOpeningTotal,
+                                        currencySymbol: options.currencySymbol
+                                    )
+                                )
+                            }
+                        }
+                    }
+
+                    HTML.tr {
+                        HTML.td(["class": "col-label cell-wrap"]) {
+                            HTML.span(["class": "cell-main"]) {
+                                HTML.text("Som activa-aandelen investeringen in periode")
+                            }
+                        }
+                        HTML.td(["class": "col-money"]) {
+                            HTML.strong {
+                                HTML.text(
+                                    fmtAssetsOverviewAmount(
+                                        visibleSharePeriodInvestmentTotal,
+                                        currencySymbol: options.currencySymbol
+                                    )
+                                )
+                            }
+                        }
+                    }
+
+                    HTML.tr {
+                        HTML.td(["class": "col-label cell-wrap"]) {
+                            HTML.span(["class": "cell-main"]) {
+                                HTML.text("Som activa-aandelen einde boekjaar")
+                            }
+                        }
+                        HTML.td(["class": "col-money"]) {
+                            HTML.strong {
+                                HTML.text(
+                                    fmtAssetsOverviewAmount(
+                                        visibleShareClosingTotal,
                                         currencySymbol: options.currencySymbol
                                     )
                                 )

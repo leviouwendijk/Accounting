@@ -73,6 +73,37 @@ extension AssetViews {
                 lines.append("────────────")
                 lines.append("Boekwaarde begin boekjaar | \(fmt(totalOpeningAcrossVisibleSections(overview)))")
                 lines.append("Boekwaarde einde boekjaar | \(fmt(totalClosingAcrossVisibleSections(overview)))")
+
+                let shareOpeningTotal = overview.groups.reduce(Decimal(0)) { partial, group in
+                    if group.section == .unclassified {
+                        return partial
+                    }
+
+                    return partial + group.totals.shareOpeningCarryingAmount
+                }
+
+                let sharePeriodInvestmentTotal = overview.groups.reduce(Decimal(0)) { partial, group in
+                    if group.section == .unclassified {
+                        return partial
+                    }
+
+                    return partial + group.totals.sharePeriodInvestment
+                }
+
+                let shareClosingTotal = overview.groups.reduce(Decimal(0)) { partial, group in
+                    if group.section == .unclassified {
+                        return partial
+                    }
+
+                    return partial + group.totals.shareClosingCarryingAmount
+                }
+
+                lines.append("")
+                lines.append("Aandelen in activa (vermogenschatting)")
+                lines.append("────────────")
+                lines.append("Som activa-aandelen begin boekjaar | \(fmt(shareOpeningTotal))")
+                lines.append("Som activa-aandelen investeringen in periode | \(fmt(sharePeriodInvestmentTotal))")
+                lines.append("Som activa-aandelen einde boekjaar | \(fmt(shareClosingTotal))")
             }
 
             while lines.last == "" {

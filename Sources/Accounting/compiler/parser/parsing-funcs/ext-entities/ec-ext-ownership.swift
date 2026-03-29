@@ -95,8 +95,10 @@ public extension EntryCompilerParsing {
     }
 
     @inlinable
-    func parseOwnershipRollforward(into meta: inout [String:String],
-                                   tz: TimeZone = .current) throws -> Bool {
+    func parseOwnershipRollforward(
+        into meta: inout [String:String],
+        tz: TimeZone = .current
+    ) throws -> Bool {
         guard current == .keyword("rollforward") || current == .ident("rollforward") else { return false }
         advance(); try expect(.lBrace)
 
