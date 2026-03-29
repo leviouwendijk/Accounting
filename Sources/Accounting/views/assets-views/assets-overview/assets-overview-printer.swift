@@ -68,7 +68,9 @@ extension AssetViews {
             }
 
             if !overview.groups.isEmpty {
-                let shareBreakdown = visibleShareBreakdown(overview)
+                let shareSummary = AssetViews.AssetsOverviewSharesSummary.visible(
+                    from: overview
+                )
 
                 lines.append("")
                 lines.append("Totaal activa")
@@ -79,23 +81,23 @@ extension AssetViews {
                 lines.append("")
                 lines.append("Aandelen in activa (vermogenschatting)")
                 lines.append("────────────────────────────────────")
-                lines.append("Som activa-aandelen begin boekjaar | \(fmt(totalShareOpeningAcrossVisibleSections(overview)))")
+                lines.append("Som activa-aandelen begin boekjaar | \(fmt(shareSummary.openingCarryingAmount))")
                 appendShareBreakdown(
-                    shareBreakdown,
+                    shareSummary.breakdown,
                     value: \.openingCarryingAmount,
                     into: &lines
                 )
 
-                lines.append("Som activa-aandelen investeringen in periode | \(fmt(totalSharePeriodInvestmentAcrossVisibleSections(overview)))")
+                lines.append("Som activa-aandelen investeringen in periode | \(fmt(shareSummary.periodInvestment))")
                 appendShareBreakdown(
-                    shareBreakdown,
+                    shareSummary.breakdown,
                     value: \.periodInvestment,
                     into: &lines
                 )
 
-                lines.append("Som activa-aandelen einde boekjaar | \(fmt(totalShareClosingAcrossVisibleSections(overview)))")
+                lines.append("Som activa-aandelen einde boekjaar | \(fmt(shareSummary.closingCarryingAmount))")
                 appendShareBreakdown(
-                    shareBreakdown,
+                    shareSummary.breakdown,
                     value: \.closingCarryingAmount,
                     into: &lines
                 )
@@ -566,64 +568,64 @@ extension AssetViews {
             return formatter.string(from: date)
         }
 
-        private static func visibleShareBreakdown(
-            _ overview: AssetsOverview
-        ) -> [AssetsOverviewOwnerShareAmounts] {
-            var byOwner: [String: (
-                openingCarryingAmount: Decimal,
-                periodInvestment: Decimal,
-                closingCarryingAmount: Decimal
-            )] = [:]
+        // private static func visibleShareBreakdown(
+        //     _ overview: AssetsOverview
+        // ) -> [AssetsOverviewOwnerShareAmounts] {
+        //     var byOwner: [String: (
+        //         openingCarryingAmount: Decimal,
+        //         periodInvestment: Decimal,
+        //         closingCarryingAmount: Decimal
+        //     )] = [:]
 
-            for group in overview.groups {
-                if group.section == .unclassified {
-                    continue
-                }
+        //     for group in overview.groups {
+        //         if group.section == .unclassified {
+        //             continue
+        //         }
 
-                for item in group.totals.shareBreakdown {
-                    var bucket = byOwner[item.ownerLabel] ?? (0, 0, 0)
-                    bucket.openingCarryingAmount += item.openingCarryingAmount
-                    bucket.periodInvestment += item.periodInvestment
-                    bucket.closingCarryingAmount += item.closingCarryingAmount
-                    byOwner[item.ownerLabel] = bucket
-                }
-            }
+        //         for item in group.totals.shareBreakdown {
+        //             var bucket = byOwner[item.ownerLabel] ?? (0, 0, 0)
+        //             bucket.openingCarryingAmount += item.openingCarryingAmount
+        //             bucket.periodInvestment += item.periodInvestment
+        //             bucket.closingCarryingAmount += item.closingCarryingAmount
+        //             byOwner[item.ownerLabel] = bucket
+        //         }
+        //     }
 
-            return byOwner.keys.sorted().map { ownerLabel in
-                let bucket = byOwner[ownerLabel] ?? (0, 0, 0)
+        //     return byOwner.keys.sorted().map { ownerLabel in
+        //         let bucket = byOwner[ownerLabel] ?? (0, 0, 0)
 
-                return AssetsOverviewOwnerShareAmounts(
-                    ownerLabel: ownerLabel,
-                    openingCarryingAmount: bucket.openingCarryingAmount,
-                    periodInvestment: bucket.periodInvestment,
-                    closingCarryingAmount: bucket.closingCarryingAmount
-                )
-            }
-        }
+        //         return AssetsOverviewOwnerShareAmounts(
+        //             ownerLabel: ownerLabel,
+        //             openingCarryingAmount: bucket.openingCarryingAmount,
+        //             periodInvestment: bucket.periodInvestment,
+        //             closingCarryingAmount: bucket.closingCarryingAmount
+        //         )
+        //     }
+        // }
 
-        private static func totalShareOpeningAcrossVisibleSections(
-            _ overview: AssetsOverview
-        ) -> Decimal {
-            visibleShareBreakdown(overview).reduce(0) {
-                $0 + $1.openingCarryingAmount
-            }
-        }
+        // private static func totalShareOpeningAcrossVisibleSections(
+        //     _ overview: AssetsOverview
+        // ) -> Decimal {
+        //     visibleShareBreakdown(overview).reduce(0) {
+        //         $0 + $1.openingCarryingAmount
+        //     }
+        // }
 
-        private static func totalSharePeriodInvestmentAcrossVisibleSections(
-            _ overview: AssetsOverview
-        ) -> Decimal {
-            visibleShareBreakdown(overview).reduce(0) {
-                $0 + $1.periodInvestment
-            }
-        }
+        // private static func totalSharePeriodInvestmentAcrossVisibleSections(
+        //     _ overview: AssetsOverview
+        // ) -> Decimal {
+        //     visibleShareBreakdown(overview).reduce(0) {
+        //         $0 + $1.periodInvestment
+        //     }
+        // }
 
-        private static func totalShareClosingAcrossVisibleSections(
-            _ overview: AssetsOverview
-        ) -> Decimal {
-            visibleShareBreakdown(overview).reduce(0) {
-                $0 + $1.closingCarryingAmount
-            }
-        }
+        // private static func totalShareClosingAcrossVisibleSections(
+        //     _ overview: AssetsOverview
+        // ) -> Decimal {
+        //     visibleShareBreakdown(overview).reduce(0) {
+        //         $0 + $1.closingCarryingAmount
+        //     }
+        // }
 
         private static func appendShareBreakdown(
             _ breakdown: [AssetsOverviewOwnerShareAmounts],

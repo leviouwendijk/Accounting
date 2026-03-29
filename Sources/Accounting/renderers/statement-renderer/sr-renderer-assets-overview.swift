@@ -168,21 +168,9 @@ public extension StatementHTMLRenderer {
         }
 
         if !overview.groups.isEmpty {
-            let visibleShareBreakdown = mergeAssetsOverviewShareBreakdowns(
-                visibleGroups
-                    .filter { $0.section != .unclassified }
-                    .map { $0.totals.shareBreakdown }
+            let shareSummary = AssetViews.AssetsOverviewSharesSummary.visible(
+                from: overview
             )
-
-            let visibleShareOpeningTotal = visibleShareBreakdown.reduce(Decimal(0)) {
-                $0 + $1.openingCarryingAmount
-            }
-            let visibleSharePeriodInvestmentTotal = visibleShareBreakdown.reduce(Decimal(0)) {
-                $0 + $1.periodInvestment
-            }
-            let visibleShareClosingTotal = visibleShareBreakdown.reduce(Decimal(0)) {
-                $0 + $1.closingCarryingAmount
-            }
 
             HTML.h2 {
                 HTML.text("Totaal activa")
@@ -264,7 +252,7 @@ public extension StatementHTMLRenderer {
                             HTML.strong {
                                 HTML.text(
                                     fmtAssetsOverviewAmount(
-                                        visibleShareOpeningTotal,
+                                        shareSummary.openingCarryingAmount,
                                         currencySymbol: options.currencySymbol
                                     )
                                 )
@@ -278,7 +266,7 @@ public extension StatementHTMLRenderer {
                             "colspan": "2"
                         ]) {
                             renderAssetsOverviewShareBreakdownTable(
-                                visibleShareBreakdown,
+                                shareSummary.breakdown,
                                 value: \.openingCarryingAmount,
                                 currencySymbol: options.currencySymbol
                             )
@@ -295,7 +283,7 @@ public extension StatementHTMLRenderer {
                             HTML.strong {
                                 HTML.text(
                                     fmtAssetsOverviewAmount(
-                                        visibleSharePeriodInvestmentTotal,
+                                        shareSummary.periodInvestment,
                                         currencySymbol: options.currencySymbol
                                     )
                                 )
@@ -309,7 +297,7 @@ public extension StatementHTMLRenderer {
                             "colspan": "2"
                         ]) {
                             renderAssetsOverviewShareBreakdownTable(
-                                visibleShareBreakdown,
+                                shareSummary.breakdown,
                                 value: \.periodInvestment,
                                 currencySymbol: options.currencySymbol
                             )
@@ -326,7 +314,7 @@ public extension StatementHTMLRenderer {
                             HTML.strong {
                                 HTML.text(
                                     fmtAssetsOverviewAmount(
-                                        visibleShareClosingTotal,
+                                        shareSummary.closingCarryingAmount,
                                         currencySymbol: options.currencySymbol
                                     )
                                 )
@@ -340,7 +328,7 @@ public extension StatementHTMLRenderer {
                             "colspan": "2"
                         ]) {
                             renderAssetsOverviewShareBreakdownTable(
-                                visibleShareBreakdown,
+                                shareSummary.breakdown,
                                 value: \.closingCarryingAmount,
                                 currencySymbol: options.currencySymbol
                             )
@@ -675,36 +663,36 @@ extension StatementHTMLRenderer {
         }
     }
 
-    private static func mergeAssetsOverviewShareBreakdowns(
-        _ breakdowns: [[AssetsOverviewOwnerShareAmounts]]
-    ) -> [AssetsOverviewOwnerShareAmounts] {
-        var byOwner: [String: (
-            openingCarryingAmount: Decimal,
-            periodInvestment: Decimal,
-            closingCarryingAmount: Decimal
-        )] = [:]
+    // private static func mergeAssetsOverviewShareBreakdowns(
+    //     _ breakdowns: [[AssetsOverviewOwnerShareAmounts]]
+    // ) -> [AssetsOverviewOwnerShareAmounts] {
+    //     var byOwner: [String: (
+    //         openingCarryingAmount: Decimal,
+    //         periodInvestment: Decimal,
+    //         closingCarryingAmount: Decimal
+    //     )] = [:]
 
-        for breakdown in breakdowns {
-            for row in breakdown {
-                var bucket = byOwner[row.ownerLabel] ?? (0, 0, 0)
-                bucket.openingCarryingAmount += row.openingCarryingAmount
-                bucket.periodInvestment += row.periodInvestment
-                bucket.closingCarryingAmount += row.closingCarryingAmount
-                byOwner[row.ownerLabel] = bucket
-            }
-        }
+    //     for breakdown in breakdowns {
+    //         for row in breakdown {
+    //             var bucket = byOwner[row.ownerLabel] ?? (0, 0, 0)
+    //             bucket.openingCarryingAmount += row.openingCarryingAmount
+    //             bucket.periodInvestment += row.periodInvestment
+    //             bucket.closingCarryingAmount += row.closingCarryingAmount
+    //             byOwner[row.ownerLabel] = bucket
+    //         }
+    //     }
 
-        return byOwner.keys.sorted().map { ownerLabel in
-            let bucket = byOwner[ownerLabel] ?? (0, 0, 0)
+    //     return byOwner.keys.sorted().map { ownerLabel in
+    //         let bucket = byOwner[ownerLabel] ?? (0, 0, 0)
 
-            return AssetsOverviewOwnerShareAmounts(
-                ownerLabel: ownerLabel,
-                openingCarryingAmount: bucket.openingCarryingAmount,
-                periodInvestment: bucket.periodInvestment,
-                closingCarryingAmount: bucket.closingCarryingAmount
-            )
-        }
-    }
+    //         return AssetsOverviewOwnerShareAmounts(
+    //             ownerLabel: ownerLabel,
+    //             openingCarryingAmount: bucket.openingCarryingAmount,
+    //             periodInvestment: bucket.periodInvestment,
+    //             closingCarryingAmount: bucket.closingCarryingAmount
+    //         )
+    //     }
+    // }
 
     private static func renderAssetsOverviewShareBreakdownTable(
         _ breakdown: [AssetsOverviewOwnerShareAmounts],
