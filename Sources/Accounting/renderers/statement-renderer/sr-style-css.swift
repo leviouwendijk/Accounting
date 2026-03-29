@@ -838,3 +838,41 @@ extension StatementStyleCSS {
         )
     }
 }
+
+extension StatementStyleCSS {
+    static func costBreakdown() -> CSSStyleSheet {
+        CSSStyleSheet(
+            rules: [
+                rule(
+                    "body.sr-cost-breakdown table.tbl-cost-breakdown, " +
+                    "body.sr-cost-breakdown table.tbl-cost-breakdown-members, " +
+                    "body.sr-cost-breakdown table.tbl-cost-breakdown-reconciliation",
+                    decl("width", "100%"),
+                    decl("table-layout", "fixed")
+                ),
+
+                rule(
+                    "body.sr-cost-breakdown .tbl th.col-money, " +
+                    "body.sr-cost-breakdown .tbl td.col-money, " +
+                    "body.sr-cost-breakdown .tbl td.col-value",
+                    decl("width", "12ch"),
+                    decl("text-align", "right"),
+                    decl("white-space", "nowrap"),
+                    decl("font-variant-numeric", "tabular-nums"),
+                    decl("font-feature-settings", "\"tnum\"")
+                ),
+
+                rule(
+                    "body.sr-cost-breakdown .tbl th.col-label, " +
+                    "body.sr-cost-breakdown .tbl td.col-label",
+                    decl("overflow-wrap", "break-word")
+                ),
+
+                rule(
+                    "body.sr-cost-breakdown .tbl-cost-breakdown-reconciliation td.col-value",
+                    decl("text-align", "right")
+                )
+            ]
+        )
+    }
+}

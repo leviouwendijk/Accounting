@@ -1,5 +1,39 @@
 import Foundation
 
+// (feature): possible expansion, for unmapped / unresolved codes:
+// note: run ec with hierarchy diagnostics first
+
+// public struct RGSHierarchyOverrides: Sendable, Codable {
+//     public let parentCodeByChildCode: [String: String]
+
+//     public init(
+//         parentCodeByChildCode: [String: String] = [:]
+//     ) {
+//         self.parentCodeByChildCode = parentCodeByChildCode
+//     }
+
+//     public static let rgsDefault = RGSHierarchyOverrides(
+//         parentCodeByChildCode: [
+//             // child: parent
+//             "BLasOlsIlgBet": "BLasOlsIlg",
+//             "BLasOlsIlgSto": "BLasOlsIlg",
+//             "BLasSohSohBet": "BLasSohSoh",
+//             "BLasSohSohSto": "BLasSohSoh",
+//             "BMvaHuuCaeOvm": "BMvaHuuCae",
+//             "BMvaHuuCuhOvm": "BMvaHuuCuh",
+//             "BSchOdvKlo": "BSchOdv",
+//             "BVrdVioVic": "BVrdVio",
+//             "BVrzOihOrtTev": "BVrzOihOrt",
+//         ]
+//     )
+// }
+
+// public static func makeMaps(
+//     from ch: CompiledChart,
+//     overrides: RGSHierarchyOverrides = .rgsDefault
+// ) throws -> RGSAssemblerResult
+// ....
+
 public enum RGSIdentifierHierarchy {
     public struct Problem: Sendable, Codable, CustomStringConvertible {
         public enum Kind: Sendable, Codable { case noParent(level: UInt8), multipleParents(level: UInt8, candidates: [String]) }

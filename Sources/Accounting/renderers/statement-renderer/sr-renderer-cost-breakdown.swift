@@ -1,5 +1,6 @@
 import Foundation
 import HTML
+import CSS
 
 public extension StatementHTMLRenderer {
     struct CostBreakdownOptions: Sendable {
@@ -207,7 +208,12 @@ public extension StatementHTMLRenderer {
         report: CostBreakdownReport,
         options: CostBreakdownOptions = .init()
     ) -> String {
-        let css = StatementStyleCSS.base().render()
+        let css = CSSStyleSheet
+            .merged([
+                StatementStyleCSS.base(),
+                StatementStyleCSS.costBreakdown()
+            ])
+            .render()
 
         let doc: HTMLDocument = HTML.document {
             HTML.html(["lang": "nl"]) {
@@ -263,7 +269,7 @@ public extension StatementHTMLRenderer {
             HTML.td(["class": "col-label"]) {
                 HTML.text(label)
             }
-            HTML.td(["class": "col-label"]) {
+            HTML.td(["class": "col-value"]) {
                 HTML.text(value)
             }
         }
