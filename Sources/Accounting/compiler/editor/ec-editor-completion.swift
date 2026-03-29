@@ -19,6 +19,8 @@ private enum ECCompletionContext {
     case historyEvent
     case inventoryMutation
     case entryDefaults
+    case groupedForKeyword
+    case groupedInKeyword
     case keyword
     case selectKeyword
     case transactionsKeyword
@@ -134,6 +136,24 @@ public extension ECEditorService {
                 )
             ]
 
+        case .groupedForKeyword:
+            return [
+                ECCompletionItem(
+                    kind: .keyword,
+                    label: "in",
+                    detail: "Grouped account clause"
+                )
+            ]
+
+        case .groupedInKeyword:
+            return [
+                ECCompletionItem(
+                    kind: .keyword,
+                    label: "for",
+                    detail: "Grouped entity clause"
+                )
+            ]
+
         case .keyword:
             var items = workspace.completionKeywordItems(
                 for: analysis.flavor
@@ -199,19 +219,28 @@ private extension ECEditorService {
         }
 
         if analysis.flavor == .entries,
-           topBlock == .anonymous,
-           stack.contains(.entry),
            ecLineBeforeCursorIsWhitespaceOnly(
                source: analysis.source,
                line: line,
                column: column
-           ),
-           !ecMayWantGroupedForInKeywordHere(
-               analysis: analysis,
-               line: line,
-               column: column
            ) {
-            return .none
+            switch topBlock {
+            case .groupedFor:
+                return .groupedForKeyword
+
+            case .groupedIn:
+                return .groupedInKeyword
+
+            case .anonymous:
+                if stack.contains(.entry),
+                   !stack.contains(.groupedFor),
+                   !stack.contains(.groupedIn) {
+                    return .none
+                }
+
+            default:
+                break
+            }
         }
 
         let tokenIndexAtCursor = analysis.tokenIndex(
@@ -921,38 +950,4 @@ private func ecLineBeforeCursorIsWhitespaceOnly(
     )
     .trimmingCharacters(in: .whitespacesAndNewlines)
     .isEmpty
-}
-
-private func ecMayWantGroupedForInKeywordHere(
-    analysis: ECDocumentAnalysis,
-    line: Int,
-    column: Int
-) -> Bool {
-    let previousTokenIndex = ecPreviousTokenIndex(
-        analysis: analysis,
-        line: line,
-        column: column
-    )
-
-    guard let previousTokenIndex else {
-        return false
-    }
-
-    let previousWords = ecPreviousSignificantWords(
-        tokens: analysis.tokens,
-        before: previousTokenIndex + 1,
-        limit: 2
-    )
-
-    guard let previousWord = previousWords.first else {
-        return false
-    }
-
-    switch previousWord {
-    case "for", "in":
-        return true
-
-    default:
-        return false
-    }
 }

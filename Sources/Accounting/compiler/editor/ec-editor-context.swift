@@ -12,6 +12,8 @@ enum ECEditorBlockKind: String, Sendable {
     case select
     case transactions
     case inventory
+    case groupedFor
+    case groupedIn
     case line
     case posting
 }
@@ -129,10 +131,83 @@ func ecPreviousSignificantWord(
     }
 }
 
+func ecGroupedClauseBlockKindBeforeBrace(
+    tokens: [EntryCompilerToken],
+    before index: Int
+) -> ECEditorBlockKind? {
+    guard index > 0 else {
+        return nil
+    }
+
+    var parenDepth = 0
+    var clauseWords: [String] = []
+    var i = index - 1
+
+    while true {
+        switch tokens[i] {
+        case .rPar:
+            parenDepth += 1
+
+        case .lPar:
+            if parenDepth > 0 {
+                parenDepth -= 1
+            }
+
+        case .lBrace,
+             .rBrace:
+            if parenDepth == 0 {
+                switch clauseWords {
+                case ["for"]:
+                    return .groupedFor
+
+                case ["in"]:
+                    return .groupedIn
+
+                default:
+                    return nil
+                }
+            }
+
+        case .keyword(let s),
+             .ident(let s):
+            if parenDepth == 0, s == "for" || s == "in" {
+                clauseWords.append(s)
+            }
+
+        default:
+            break
+        }
+
+        if i == 0 {
+            break
+        }
+
+        i -= 1
+    }
+
+    switch clauseWords {
+    case ["for"]:
+        return .groupedFor
+
+    case ["in"]:
+        return .groupedIn
+
+    default:
+        return nil
+    }
+}
+
 func ecBlockKindIntroduced(
     tokens: [EntryCompilerToken],
     before index: Int
 ) -> ECEditorBlockKind? {
+    if let grouped = ecGroupedClauseBlockKindBeforeBrace(
+        tokens: tokens,
+        before: index
+    ) {
+        return grouped
+    }
+
     guard let word = ecPreviousSignificantWord(
         tokens: tokens,
         before: index
