@@ -190,7 +190,7 @@ public extension EntryCompilerParsing {
             switch current {
             case .keyword("use"), .ident("use"):
                 advance()
-                try expect(.keyword("alias"))
+                try expectKeywordOrIdent("alias")
                 alias = try readSingleAliasFlexible()
 
             case .keyword("section"), .ident("section"):

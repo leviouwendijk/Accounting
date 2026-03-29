@@ -27,6 +27,22 @@ public extension EntryCompilerParsing {
         return s
     }
 
+    @inlinable
+    func expectKeywordOrIdent(
+        _ value: String
+    ) throws {
+        switch current {
+        case .keyword(value), .ident(value):
+            advance()
+        default:
+            throw ParserError.unexpectedToken(
+                current,
+                expected: value,
+                at: loc()
+            )
+        }
+    }
+
     func expectFieldEquals(_ name: String) throws {
         switch current {
         case .ident(name), .keyword(name):
