@@ -269,7 +269,7 @@ public extension StatementHTMLRenderer {
             HTML.td(["class": "col-label"]) {
                 HTML.text(label)
             }
-            HTML.td(["class": "col-value"]) {
+            HTML.td(["class": "col-value-text"]) {
                 HTML.text(value)
             }
         }

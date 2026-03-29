@@ -852,9 +852,8 @@ extension StatementStyleCSS {
                 ),
 
                 rule(
-                    ".sr-cost-breakdown .tbl th.col-money, " +
-                    ".sr-cost-breakdown .tbl td.col-money, " +
-                    ".sr-cost-breakdown .tbl td.col-value",
+                    ".sr-cost-breakdown .tbl th.col-money, "
+                        + ".sr-cost-breakdown .tbl td.col-money",
                     decl("width", "12ch"),
                     decl("text-align", "right"),
                     decl("white-space", "nowrap"),
@@ -871,6 +870,20 @@ extension StatementStyleCSS {
                 rule(
                     ".sr-cost-breakdown .tbl-cost-breakdown-reconciliation td.col-value",
                     decl("text-align", "right")
+                ),
+
+                rule(
+                    ".sr-cost-breakdown .tbl td.col-value",
+                    decl("text-align", "left"),
+                    decl("white-space", "normal"),
+                    decl("overflow-wrap", "break-word")
+                ),
+
+                rule(
+                    ".sr-cost-breakdown .tbl td.col-value",
+                    decl("text-align", "left"),
+                    decl("white-space", "normal"),
+                    decl("overflow-wrap", "break-word")
                 )
             ]
         )
