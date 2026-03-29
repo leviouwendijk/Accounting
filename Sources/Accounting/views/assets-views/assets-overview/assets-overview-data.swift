@@ -22,6 +22,25 @@ public struct AssetsOverview: PresentableOutput {
     }
 }
 
+public struct AssetsOverviewOwnerShareAmounts: Sendable {
+    public let ownerLabel: String
+    public let openingCarryingAmount: Decimal
+    public let periodInvestment: Decimal
+    public let closingCarryingAmount: Decimal
+
+    public init(
+        ownerLabel: String,
+        openingCarryingAmount: Decimal,
+        periodInvestment: Decimal,
+        closingCarryingAmount: Decimal
+    ) {
+        self.ownerLabel = ownerLabel
+        self.openingCarryingAmount = openingCarryingAmount
+        self.periodInvestment = periodInvestment
+        self.closingCarryingAmount = closingCarryingAmount
+    }
+}
+
 public struct AssetsOverviewAmounts: Sendable {
     public let acquisitionCost: Decimal
     public let openingCarryingAmount: Decimal
@@ -30,9 +49,19 @@ public struct AssetsOverviewAmounts: Sendable {
     public let closingCarryingAmount: Decimal
     public let residualAmount: Decimal
 
-    public let shareOpeningCarryingAmount: Decimal
-    public let sharePeriodInvestment: Decimal
-    public let shareClosingCarryingAmount: Decimal
+    public let shareBreakdown: [AssetsOverviewOwnerShareAmounts]
+
+    public var shareOpeningCarryingAmount: Decimal {
+        shareBreakdown.reduce(0) { $0 + $1.openingCarryingAmount }
+    }
+
+    public var sharePeriodInvestment: Decimal {
+        shareBreakdown.reduce(0) { $0 + $1.periodInvestment }
+    }
+
+    public var shareClosingCarryingAmount: Decimal {
+        shareBreakdown.reduce(0) { $0 + $1.closingCarryingAmount }
+    }
 
     public init(
         acquisitionCost: Decimal,
@@ -41,9 +70,7 @@ public struct AssetsOverviewAmounts: Sendable {
         periodDepreciation: Decimal,
         closingCarryingAmount: Decimal,
         residualAmount: Decimal,
-        shareOpeningCarryingAmount: Decimal = 0,
-        sharePeriodInvestment: Decimal = 0,
-        shareClosingCarryingAmount: Decimal = 0
+        shareBreakdown: [AssetsOverviewOwnerShareAmounts] = []
     ) {
         self.acquisitionCost = acquisitionCost
         self.openingCarryingAmount = openingCarryingAmount
@@ -51,9 +78,7 @@ public struct AssetsOverviewAmounts: Sendable {
         self.periodDepreciation = periodDepreciation
         self.closingCarryingAmount = closingCarryingAmount
         self.residualAmount = residualAmount
-        self.shareOpeningCarryingAmount = shareOpeningCarryingAmount
-        self.sharePeriodInvestment = sharePeriodInvestment
-        self.shareClosingCarryingAmount = shareClosingCarryingAmount
+        self.shareBreakdown = shareBreakdown
     }
 }
 

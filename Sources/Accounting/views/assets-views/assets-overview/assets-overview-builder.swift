@@ -298,31 +298,45 @@ extension AssetViews {
         private static func makeAmounts(
             from rows: [AssetsOverviewRow]
         ) -> AssetsOverviewAmounts {
-            AssetsOverviewAmounts(
+            var byOwner: [String: (
+                openingCarryingAmount: Decimal,
+                periodInvestment: Decimal,
+                closingCarryingAmount: Decimal
+            )] = [:]
+
+            for row in rows {
+                for share in row.ownerShares where share.percentage != 0 {
+                    let fraction = share.percentage / Decimal(100)
+
+                    var bucket = byOwner[share.ownerLabel] ?? (0, 0, 0)
+                    bucket.openingCarryingAmount += row.openingCarryingAmount * fraction
+                    bucket.periodInvestment += row.periodInvestment * fraction
+                    bucket.closingCarryingAmount += row.closingCarryingAmount * fraction
+                    byOwner[share.ownerLabel] = bucket
+                }
+            }
+
+            let shareBreakdown: [AssetsOverviewOwnerShareAmounts] = byOwner.keys
+                .sorted()
+                .map { ownerLabel in
+                    let bucket = byOwner[ownerLabel] ?? (0, 0, 0)
+
+                    return AssetsOverviewOwnerShareAmounts(
+                        ownerLabel: ownerLabel,
+                        openingCarryingAmount: bucket.openingCarryingAmount,
+                        periodInvestment: bucket.periodInvestment,
+                        closingCarryingAmount: bucket.closingCarryingAmount
+                    )
+                }
+
+            return AssetsOverviewAmounts(
                 acquisitionCost: rows.reduce(0) { $0 + ($1.acquisitionCost ?? 0) },
                 openingCarryingAmount: rows.reduce(0) { $0 + $1.openingCarryingAmount },
                 periodInvestment: rows.reduce(0) { $0 + $1.periodInvestment },
                 periodDepreciation: rows.reduce(0) { $0 + $1.periodDepreciation },
                 closingCarryingAmount: rows.reduce(0) { $0 + $1.closingCarryingAmount },
                 residualAmount: rows.reduce(0) { $0 + ($1.residualAmount ?? 0) },
-                shareOpeningCarryingAmount: rows.reduce(0) {
-                    $0 + assignedShareAmount(
-                        for: $1,
-                        base: $1.openingCarryingAmount
-                    )
-                },
-                sharePeriodInvestment: rows.reduce(0) {
-                    $0 + assignedShareAmount(
-                        for: $1,
-                        base: $1.periodInvestment
-                    )
-                },
-                shareClosingCarryingAmount: rows.reduce(0) {
-                    $0 + assignedShareAmount(
-                        for: $1,
-                        base: $1.closingCarryingAmount
-                    )
-                }
+                shareBreakdown: shareBreakdown
             )
         }
 

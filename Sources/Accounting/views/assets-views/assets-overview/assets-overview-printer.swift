@@ -68,42 +68,37 @@ extension AssetViews {
             }
 
             if !overview.groups.isEmpty {
+                let shareBreakdown = visibleShareBreakdown(overview)
+
                 lines.append("")
                 lines.append("Totaal activa")
                 lines.append("────────────")
                 lines.append("Boekwaarde begin boekjaar | \(fmt(totalOpeningAcrossVisibleSections(overview)))")
                 lines.append("Boekwaarde einde boekjaar | \(fmt(totalClosingAcrossVisibleSections(overview)))")
 
-                let shareOpeningTotal = overview.groups.reduce(Decimal(0)) { partial, group in
-                    if group.section == .unclassified {
-                        return partial
-                    }
-
-                    return partial + group.totals.shareOpeningCarryingAmount
-                }
-
-                let sharePeriodInvestmentTotal = overview.groups.reduce(Decimal(0)) { partial, group in
-                    if group.section == .unclassified {
-                        return partial
-                    }
-
-                    return partial + group.totals.sharePeriodInvestment
-                }
-
-                let shareClosingTotal = overview.groups.reduce(Decimal(0)) { partial, group in
-                    if group.section == .unclassified {
-                        return partial
-                    }
-
-                    return partial + group.totals.shareClosingCarryingAmount
-                }
-
                 lines.append("")
                 lines.append("Aandelen in activa (vermogenschatting)")
-                lines.append("────────────")
-                lines.append("Som activa-aandelen begin boekjaar | \(fmt(shareOpeningTotal))")
-                lines.append("Som activa-aandelen investeringen in periode | \(fmt(sharePeriodInvestmentTotal))")
-                lines.append("Som activa-aandelen einde boekjaar | \(fmt(shareClosingTotal))")
+                lines.append("────────────────────────────────────")
+                lines.append("Som activa-aandelen begin boekjaar | \(fmt(totalShareOpeningAcrossVisibleSections(overview)))")
+                appendShareBreakdown(
+                    shareBreakdown,
+                    value: \.openingCarryingAmount,
+                    into: &lines
+                )
+
+                lines.append("Som activa-aandelen investeringen in periode | \(fmt(totalSharePeriodInvestmentAcrossVisibleSections(overview)))")
+                appendShareBreakdown(
+                    shareBreakdown,
+                    value: \.periodInvestment,
+                    into: &lines
+                )
+
+                lines.append("Som activa-aandelen einde boekjaar | \(fmt(totalShareClosingAcrossVisibleSections(overview)))")
+                appendShareBreakdown(
+                    shareBreakdown,
+                    value: \.closingCarryingAmount,
+                    into: &lines
+                )
             }
 
             while lines.last == "" {
@@ -569,6 +564,82 @@ extension AssetViews {
             formatter.locale = Locale(identifier: "en_US_POSIX")
             formatter.dateFormat = "yyyy-MM-dd"
             return formatter.string(from: date)
+        }
+
+        private static func visibleShareBreakdown(
+            _ overview: AssetsOverview
+        ) -> [AssetsOverviewOwnerShareAmounts] {
+            var byOwner: [String: (
+                openingCarryingAmount: Decimal,
+                periodInvestment: Decimal,
+                closingCarryingAmount: Decimal
+            )] = [:]
+
+            for group in overview.groups {
+                if group.section == .unclassified {
+                    continue
+                }
+
+                for item in group.totals.shareBreakdown {
+                    var bucket = byOwner[item.ownerLabel] ?? (0, 0, 0)
+                    bucket.openingCarryingAmount += item.openingCarryingAmount
+                    bucket.periodInvestment += item.periodInvestment
+                    bucket.closingCarryingAmount += item.closingCarryingAmount
+                    byOwner[item.ownerLabel] = bucket
+                }
+            }
+
+            return byOwner.keys.sorted().map { ownerLabel in
+                let bucket = byOwner[ownerLabel] ?? (0, 0, 0)
+
+                return AssetsOverviewOwnerShareAmounts(
+                    ownerLabel: ownerLabel,
+                    openingCarryingAmount: bucket.openingCarryingAmount,
+                    periodInvestment: bucket.periodInvestment,
+                    closingCarryingAmount: bucket.closingCarryingAmount
+                )
+            }
+        }
+
+        private static func totalShareOpeningAcrossVisibleSections(
+            _ overview: AssetsOverview
+        ) -> Decimal {
+            visibleShareBreakdown(overview).reduce(0) {
+                $0 + $1.openingCarryingAmount
+            }
+        }
+
+        private static func totalSharePeriodInvestmentAcrossVisibleSections(
+            _ overview: AssetsOverview
+        ) -> Decimal {
+            visibleShareBreakdown(overview).reduce(0) {
+                $0 + $1.periodInvestment
+            }
+        }
+
+        private static func totalShareClosingAcrossVisibleSections(
+            _ overview: AssetsOverview
+        ) -> Decimal {
+            visibleShareBreakdown(overview).reduce(0) {
+                $0 + $1.closingCarryingAmount
+            }
+        }
+
+        private static func appendShareBreakdown(
+            _ breakdown: [AssetsOverviewOwnerShareAmounts],
+            value: KeyPath<AssetsOverviewOwnerShareAmounts, Decimal>,
+            into lines: inout [String]
+        ) {
+            if breakdown.isEmpty {
+                lines.append("    · none")
+                return
+            }
+
+            for item in breakdown {
+                lines.append(
+                    "    · \(item.ownerLabel) | \(fmt(item[keyPath: value]))"
+                )
+            }
         }
     }
 }

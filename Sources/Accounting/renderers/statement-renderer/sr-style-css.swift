@@ -745,7 +745,43 @@ public enum StatementStyleCSS {
                     CSS.decl("white-space", "nowrap"),
                     CSS.decl("font-variant-numeric", "tabular-nums"),
                     CSS.decl("font-feature-settings", "\"tnum\"")
-                )
+                ),
+                // // for asset share details
+                CSS.rule(
+                    ".sr-assets tr.assets-share-detail-row > td",
+                    CSS.decl("padding-top", "0"),
+                    CSS.decl("padding-bottom", "4px")
+                ),
+                CSS.rule(
+                    ".sr-assets .assets-share-detail-cell",
+                    CSS.decl("padding-left", "0")
+                ),
+                CSS.rule(
+                    ".sr-assets .assets-share-table",
+                    CSS.decl("width", "auto"),
+                    CSS.decl("table-layout", "auto"),
+                    CSS.decl("border-collapse", "collapse")
+                ),
+                // CSS.rule(
+                //     ".sr-assets .assets-share-table td",
+                //     CSS.decl("padding", "0"),
+                //     CSS.decl("border", "none"),
+                //     CSS.decl("vertical-align", "top"),
+                //     CSS.decl("line-height", "1.18")
+                // ),
+                CSS.rule(
+                    ".sr-assets .assets-share-label",
+                    CSS.decl("min-width", "0"),
+                    CSS.decl("padding-right", "6px"),
+                    CSS.decl("white-space", "nowrap")
+                ),
+                CSS.rule(
+                    ".sr-assets .assets-share-amount",
+                    CSS.decl("text-align", "right"),
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("font-variant-numeric", "tabular-nums"),
+                    CSS.decl("font-feature-settings", "\"tnum\"")
+                ),
             ],
 
             // adding page breaking:

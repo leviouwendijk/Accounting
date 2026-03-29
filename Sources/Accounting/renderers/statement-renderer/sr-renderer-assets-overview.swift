@@ -168,14 +168,20 @@ public extension StatementHTMLRenderer {
         }
 
         if !overview.groups.isEmpty {
-            let visibleShareOpeningTotal = visibleGroups.reduce(Decimal(0)) {
-                $0 + $1.totals.shareOpeningCarryingAmount
+            let visibleShareBreakdown = mergeAssetsOverviewShareBreakdowns(
+                visibleGroups
+                    .filter { $0.section != .unclassified }
+                    .map { $0.totals.shareBreakdown }
+            )
+
+            let visibleShareOpeningTotal = visibleShareBreakdown.reduce(Decimal(0)) {
+                $0 + $1.openingCarryingAmount
             }
-            let visibleSharePeriodInvestmentTotal = visibleGroups.reduce(Decimal(0)) {
-                $0 + $1.totals.sharePeriodInvestment
+            let visibleSharePeriodInvestmentTotal = visibleShareBreakdown.reduce(Decimal(0)) {
+                $0 + $1.periodInvestment
             }
-            let visibleShareClosingTotal = visibleGroups.reduce(Decimal(0)) {
-                $0 + $1.totals.shareClosingCarryingAmount
+            let visibleShareClosingTotal = visibleShareBreakdown.reduce(Decimal(0)) {
+                $0 + $1.closingCarryingAmount
             }
 
             HTML.h2 {
@@ -266,6 +272,19 @@ public extension StatementHTMLRenderer {
                         }
                     }
 
+                    HTML.tr(["class": "assets-share-detail-row"]) {
+                        HTML.td([
+                            "class": "col-label cell-wrap assets-share-detail-cell",
+                            "colspan": "2"
+                        ]) {
+                            renderAssetsOverviewShareBreakdownTable(
+                                visibleShareBreakdown,
+                                value: \.openingCarryingAmount,
+                                currencySymbol: options.currencySymbol
+                            )
+                        }
+                    }
+
                     HTML.tr {
                         HTML.td(["class": "col-label cell-wrap"]) {
                             HTML.span(["class": "cell-main"]) {
@@ -284,6 +303,19 @@ public extension StatementHTMLRenderer {
                         }
                     }
 
+                    HTML.tr(["class": "assets-share-detail-row"]) {
+                        HTML.td([
+                            "class": "col-label cell-wrap assets-share-detail-cell",
+                            "colspan": "2"
+                        ]) {
+                            renderAssetsOverviewShareBreakdownTable(
+                                visibleShareBreakdown,
+                                value: \.periodInvestment,
+                                currencySymbol: options.currencySymbol
+                            )
+                        }
+                    }
+
                     HTML.tr {
                         HTML.td(["class": "col-label cell-wrap"]) {
                             HTML.span(["class": "cell-main"]) {
@@ -299,6 +331,19 @@ public extension StatementHTMLRenderer {
                                     )
                                 )
                             }
+                        }
+                    }
+
+                    HTML.tr(["class": "assets-share-detail-row"]) {
+                        HTML.td([
+                            "class": "col-label cell-wrap assets-share-detail-cell",
+                            "colspan": "2"
+                        ]) {
+                            renderAssetsOverviewShareBreakdownTable(
+                                visibleShareBreakdown,
+                                value: \.closingCarryingAmount,
+                                currencySymbol: options.currencySymbol
+                            )
                         }
                     }
                 }
@@ -627,6 +672,70 @@ extension StatementHTMLRenderer {
                 fmtAssetsOverviewAmount(amounts.closingCarryingAmount, currencySymbol: currencySymbol),
                 fmtAssetsOverviewAmount(amounts.residualAmount, currencySymbol: currencySymbol),
             ]
+        }
+    }
+
+    private static func mergeAssetsOverviewShareBreakdowns(
+        _ breakdowns: [[AssetsOverviewOwnerShareAmounts]]
+    ) -> [AssetsOverviewOwnerShareAmounts] {
+        var byOwner: [String: (
+            openingCarryingAmount: Decimal,
+            periodInvestment: Decimal,
+            closingCarryingAmount: Decimal
+        )] = [:]
+
+        for breakdown in breakdowns {
+            for row in breakdown {
+                var bucket = byOwner[row.ownerLabel] ?? (0, 0, 0)
+                bucket.openingCarryingAmount += row.openingCarryingAmount
+                bucket.periodInvestment += row.periodInvestment
+                bucket.closingCarryingAmount += row.closingCarryingAmount
+                byOwner[row.ownerLabel] = bucket
+            }
+        }
+
+        return byOwner.keys.sorted().map { ownerLabel in
+            let bucket = byOwner[ownerLabel] ?? (0, 0, 0)
+
+            return AssetsOverviewOwnerShareAmounts(
+                ownerLabel: ownerLabel,
+                openingCarryingAmount: bucket.openingCarryingAmount,
+                periodInvestment: bucket.periodInvestment,
+                closingCarryingAmount: bucket.closingCarryingAmount
+            )
+        }
+    }
+
+    private static func renderAssetsOverviewShareBreakdownTable(
+        _ breakdown: [AssetsOverviewOwnerShareAmounts],
+        value: KeyPath<AssetsOverviewOwnerShareAmounts, Decimal>,
+        currencySymbol: String
+    ) -> any HTMLNode {
+        if breakdown.isEmpty {
+            return HTML.span(["class": "cell-meta"]) {
+                HTML.text("none")
+            }
+        }
+
+        return HTML.table(["class": "assets-share-table"]) {
+            HTML.tbody {
+                for item in breakdown {
+                    HTML.tr {
+                        HTML.td(["class": "assets-share-label"]) {
+                            HTML.text(item.ownerLabel)
+                        }
+
+                        HTML.td(["class": "assets-share-amount"]) {
+                            HTML.text(
+                                fmtAssetsOverviewAmount(
+                                    item[keyPath: value],
+                                    currencySymbol: currencySymbol
+                                )
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
