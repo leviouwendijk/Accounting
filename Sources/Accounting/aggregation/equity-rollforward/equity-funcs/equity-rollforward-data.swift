@@ -75,7 +75,8 @@ extension OwnerEquity.Rollforward {
 
         var diagnostics: [EquityDiagnostic] = []
 
-        for i in indices {
+        // for i in indices {
+        for i in allPeriods.indices {
             let period = allPeriods[i]
             let rows = solved[i]
 
@@ -214,7 +215,8 @@ extension OwnerEquity.Rollforward {
 
         var diagnostics: [EquityDiagnostic] = []
 
-        for i in indices {
+        // for i in indices {
+        for i in allPeriods.indices {
             let period = allPeriods[i]
             let rows = solved[i]
 
