@@ -27,6 +27,12 @@ struct ECDocumentIDOccurrence: Sendable, Hashable {
     let span: SourceSpan
 }
 
+enum ECEditorParenContext: Sendable {
+    case generic
+    case forEntity
+    case forAccount
+}
+
 @inline(__always)
 func ecStartsBeforeOrAt(
     _ span: SourceSpan,
@@ -210,6 +216,56 @@ func ecBlockStack(
     }
 
     return stack
+}
+
+func ecParenContext(
+    analysis: ECDocumentAnalysis,
+    line: Int,
+    column: Int
+) -> ECEditorParenContext? {
+    var stack: [ECEditorParenContext] = []
+    var pending: ECEditorParenContext?
+
+    for (index, token) in analysis.tokens.enumerated() {
+        let span = analysis.spans[index]
+
+        guard ecStartsBeforeOrAt(span, line: line, column: column) else {
+            break
+        }
+
+        switch token {
+        case .keyword("for"),
+             .ident("for"):
+            pending = .forEntity
+
+        case .keyword("in"),
+             .ident("in"):
+            pending = .forAccount
+
+        case .keyword,
+             .ident:
+            pending = nil
+
+        case .lPar:
+            stack.append(
+                pending
+                ?? stack.last
+                ?? .generic
+            )
+            pending = nil
+
+        case .rPar:
+            if !stack.isEmpty {
+                stack.removeLast()
+            }
+            pending = nil
+
+        default:
+            break
+        }
+    }
+
+    return stack.last
 }
 
 func ecFieldNameBeforeCursor(

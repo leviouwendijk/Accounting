@@ -181,6 +181,23 @@ private extension ECEditorService {
 
         let topBlock = stack.last
 
+        if let parenContext = ecParenContext(
+            analysis: analysis,
+            line: line,
+            column: column
+        ) {
+            switch parenContext {
+            case .forEntity:
+                return .entityReference
+
+            case .forAccount:
+                return .accountReference
+
+            case .generic:
+                break
+            }
+        }
+
         let tokenIndexAtCursor = analysis.tokenIndex(
             atLine: line,
             column: column
