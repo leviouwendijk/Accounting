@@ -61,6 +61,7 @@ public struct EquityOwnerDisplayRow: Sendable {
     public let style: EquityOwnerDisplayStyle
     public let detail: String?
     public let startsNewSection: Bool
+    public let includeInSum: Bool
 
     public let begin: Decimal
     public let stort: Decimal
@@ -73,6 +74,7 @@ public struct EquityOwnerDisplayRow: Sendable {
         style: EquityOwnerDisplayStyle,
         detail: String?,
         startsNewSection: Bool,
+        includeInSum: Bool,
         begin: Decimal,
         stort: Decimal,
         onttrek: Decimal,
@@ -83,6 +85,7 @@ public struct EquityOwnerDisplayRow: Sendable {
         self.style = style
         self.detail = detail
         self.startsNewSection = startsNewSection
+        self.includeInSum = includeInSum
         self.begin = begin
         self.stort = stort
         self.onttrek = onttrek
@@ -106,11 +109,13 @@ private enum ResolvedEquityOwnerDisplaySpec: Sendable {
         ownerId: Int,
         ownerName: String,
         portion: Decimal,
-        label: String?
+        label: String?,
+        includeInSum: Bool
     )
     case subtotal(
         label: String,
-        members: [ResolvedEquityOwnerPortion]
+        members: [ResolvedEquityOwnerPortion],
+        includeInSum: Bool
     )
 }
 
@@ -224,7 +229,8 @@ private func makeEquityOwnerDisplaySectionTable(
     var totalWinst = Decimal(0)
     var totalEnd = Decimal(0)
 
-    for row in rows {
+    // for row in rows {
+    for row in rows where row.includeInSum {
         totalBegin += row.begin
         totalStort += row.stort
         totalOnttrek += row.onttrek
@@ -337,7 +343,8 @@ private func resolveSections(
                     ownerId: ownerId,
                     ownerName: ownerName,
                     portion: split.portion,
-                    label: split.label.map(normalizeInlineDisplayText)
+                    label: split.label.map(normalizeInlineDisplayText),
+                    includeInSum: split.includeInSum
                 )
 
             case .subtotal(let subtotal):
@@ -369,7 +376,8 @@ private func resolveSections(
 
                 return .subtotal(
                     label: normalizeInlineDisplayText(subtotal.label),
-                    members: members
+                    members: members,
+                    includeInSum: subtotal.includeInSum
                 )
             }
         }
@@ -396,6 +404,7 @@ private func makeEquityOwnerDisplayRow(
             style: .normal,
             detail: nil,
             startsNewSection: startsNewSection,
+            includeInSum: true,
             begin: begin,
             stort: delta.stort,
             onttrek: delta.onttrek,
@@ -403,7 +412,7 @@ private func makeEquityOwnerDisplayRow(
             end: end
         )
 
-    case .split(let ownerId, let ownerName, let portion, let label):
+    case .split(let ownerId, let ownerName, let portion, let label, let includeInSum):
         let begin = (rows.beginByOwner[ownerId] ?? 0) * portion
         let delta = rows.deltas[ownerId] ?? OwnerDelta(
             stort: 0,
@@ -421,6 +430,7 @@ private func makeEquityOwnerDisplayRow(
             style: .subtotal,
             detail: "\(fmtPct(portion, digits: 2)) of \(ownerName)",
             startsNewSection: startsNewSection,
+            includeInSum: includeInSum,
             begin: begin,
             stort: delta.stort * portion,
             onttrek: delta.onttrek * portion,
@@ -428,7 +438,7 @@ private func makeEquityOwnerDisplayRow(
             end: end
         )
 
-    case .subtotal(let label, let members):
+    case .subtotal(let label, let members, let includeInSum):
         var begin = Decimal(0)
         var stort = Decimal(0)
         var onttrek = Decimal(0)
@@ -464,6 +474,7 @@ private func makeEquityOwnerDisplayRow(
             style: .subtotal,
             detail: detailParts.joined(separator: " + "),
             startsNewSection: startsNewSection,
+            includeInSum: includeInSum,
             begin: begin,
             stort: stort,
             onttrek: onttrek,

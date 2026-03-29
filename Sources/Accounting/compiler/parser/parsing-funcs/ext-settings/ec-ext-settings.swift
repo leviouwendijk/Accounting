@@ -292,6 +292,7 @@ public extension EntryCompilerParsing {
             let owner = try parseStatementEntityPath()
             let percent = try expectDecimal()
             var label: String?
+            var includeInSum: Bool?
 
             if current == .lBrace {
                 try beginBlock()
@@ -303,10 +304,13 @@ public extension EntryCompilerParsing {
                             named: "label"
                         )
 
+                    case .keyword("include_in_sum"), .ident("include_in_sum"):
+                        includeInSum = try parseStatementEquityIncludeInSumValue()
+
                     default:
                         throw ParserError.unexpectedToken(
                             current,
-                            expected: "label",
+                            expected: "label or include_in_sum",
                             at: loc()
                         )
                     }
@@ -319,7 +323,8 @@ public extension EntryCompilerParsing {
                 kind: .split,
                 owner: owner,
                 percent: percent,
-                label: label
+                label: label,
+                includeInSum: includeInSum
             )
 
         case .keyword("subtotal"), .ident("subtotal"):
@@ -327,6 +332,7 @@ public extension EntryCompilerParsing {
             try beginBlock()
 
             var label: String?
+            var includeInSum: Bool?
             var members: [StatementEquityMemberSettings] = []
 
             while current != .rBrace && current != .eof {
@@ -336,6 +342,9 @@ public extension EntryCompilerParsing {
                         named: "label"
                     )
 
+                case .keyword("include_in_sum"), .ident("include_in_sum"):
+                    includeInSum = try parseStatementEquityIncludeInSumValue()
+
                 case .keyword("member"), .ident("member"):
                     members.append(
                         try parseStatementEquityMemberSettings()
@@ -344,7 +353,7 @@ public extension EntryCompilerParsing {
                 default:
                     throw ParserError.unexpectedToken(
                         current,
-                        expected: "label or member",
+                        expected: "label, include_in_sum, or member",
                         at: loc()
                     )
                 }
@@ -355,6 +364,7 @@ public extension EntryCompilerParsing {
             return StatementEquityRowSettings(
                 kind: .subtotal,
                 label: label,
+                includeInSum: includeInSum,
                 members: members
             )
 
@@ -392,6 +402,56 @@ public extension EntryCompilerParsing {
     func parseStatementEntityPath() throws -> StatementEntityPath {
         let ref = try parseEntityRefFlexible()
         return StatementEntityPath(ref: ref)
+    }
+
+    func parseStatementEquityIncludeInSumValue() throws -> Bool {
+        switch current {
+        case .keyword("include_in_sum"), .ident("include_in_sum"):
+            advance()
+        default:
+            throw ParserError.unexpectedToken(
+                current,
+                expected: "include_in_sum",
+                at: loc()
+            )
+        }
+
+        try expect(.equals)
+
+        switch current {
+        case .keyword("true"), .ident("true"):
+            advance()
+            return true
+
+        case .keyword("false"), .ident("false"):
+            advance()
+            return false
+
+        case .string(let s):
+            let lowered = s.lowercased()
+            advance()
+
+            if lowered == "true" || lowered == "yes" || lowered == "1" {
+                return true
+            }
+
+            if lowered == "false" || lowered == "no" || lowered == "0" {
+                return false
+            }
+
+            throw ParserError.unexpectedToken(
+                current,
+                expected: "boolean value",
+                at: loc()
+            )
+
+        default:
+            throw ParserError.unexpectedToken(
+                current,
+                expected: "boolean value",
+                at: loc()
+            )
+        }
     }
 
     func parseStatementCompanySettings() throws -> StatementCompanySettings {

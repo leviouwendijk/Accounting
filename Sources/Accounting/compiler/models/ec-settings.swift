@@ -188,6 +188,7 @@ public struct StatementEquityRowSettings: Codable, Sendable {
     public var owner: StatementEntityPath?
     public var percent: Decimal?
     public var label: String?
+    public var includeInSum: Bool?
     public var members: [StatementEquityMemberSettings]
 
     public init(
@@ -195,12 +196,14 @@ public struct StatementEquityRowSettings: Codable, Sendable {
         owner: StatementEntityPath? = nil,
         percent: Decimal? = nil,
         label: String? = nil,
+        includeInSum: Bool? = nil,
         members: [StatementEquityMemberSettings] = []
     ) {
         self.kind = kind
         self.owner = owner
         self.percent = percent
         self.label = label
+        self.includeInSum = includeInSum
         self.members = members
     }
 }

@@ -87,7 +87,8 @@ public extension StatementEquityViewSettings {
                             .init(
                                 owner: try owner.makeEntityRef(),
                                 portion: percent / 100,
-                                label: row.label
+                                label: row.label,
+                                includeInSum: row.includeInSum ?? true
                             )
                         )
 
@@ -104,7 +105,8 @@ public extension StatementEquityViewSettings {
                                         owner: try $0.owner.makeEntityRef(),
                                         portion: $0.percent / 100
                                     )
-                                }
+                                },
+                                includeInSum: row.includeInSum ?? true
                             )
                         )
                     }
