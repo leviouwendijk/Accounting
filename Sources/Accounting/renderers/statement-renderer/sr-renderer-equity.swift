@@ -329,7 +329,7 @@ extension StatementHTMLRenderer {
 
             HTML.div(["class": "sr-eq-summary"]) {
                 HTML.text(
-                    "Identity: Begin + Stort − Onttrek + Winst = \(fmtEquityAmount(period.identityTotal))"
+                    "Identity: Begin + Stort − Onttrekkingen + Winst = \(fmtEquityAmount(period.identityTotal))"
                 )
             }
 
@@ -379,7 +379,7 @@ extension StatementHTMLRenderer {
 
             if options.showDrawingsBreakdown, let drawings = period.drawings {
                 HTML.div(["class": "sr-eq-summary"]) {
-                    HTML.text("Onttrek – detail per post")
+                    HTML.text("Onttrekkingen – detail per post")
                 }
 
                 HTML.table(["class": "sr-eq-table"]) {
@@ -642,7 +642,7 @@ extension StatementHTMLRenderer {
             ownerTotals: ownerTotals,
             grandTotal: drawings.grandTotal,
             grandTotalClass: equityAmountClass(drawings.grandTotal),
-            reconcilesText: "Check: Σ(posts) per owner equals Onttrek column → \(drawings.reconcilesWithOnttrek ? "OK" : "DIFF")",
+            reconcilesText: "Check: Σ(posts) per owner equals Onttrekkingen column → \(drawings.reconcilesWithOnttrek ? "OK" : "DIFF")",
             auditLines: auditLines
         )
     }
