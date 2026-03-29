@@ -43,7 +43,7 @@ public extension StatementHTMLRenderer {
             }
         }
 
-        HTML.table(["class": "tbl"]) {
+        HTML.table(["class": "tbl tbl-cost-breakdown"]) {
             HTML.thead {
                 HTML.tr {
                     HTML.th(["class": "col-label"]) {
@@ -103,7 +103,7 @@ public extension StatementHTMLRenderer {
                         HTML.text("\(bucket.label) – opbouw")
                     }
 
-                    HTML.table(["class": "tbl"]) {
+                    HTML.table(["class": "tbl tbl-cost-breakdown-members"]) {
                         HTML.thead {
                             HTML.tr {
                                 HTML.th(["class": "col-label"]) {
@@ -144,7 +144,7 @@ public extension StatementHTMLRenderer {
                 HTML.text("Reconciliation")
             }
 
-            HTML.table(["class": "tbl"]) {
+            HTML.table(["class": "tbl tbl-cost-breakdown-reconciliation"]) {
                 HTML.tbody {
                     reconciliationRow(
                         "Bronpost",
