@@ -39,10 +39,17 @@ public func printPeriod(
         )
     }
 
-    func printDisplayRow(_ row: EquityOwnerDisplayRow) {
+    func printDisplayRow(
+        _ row: EquityOwnerDisplayRow,
+        digits d: Int
+    ) {
+        let exclusionSuffix = row.includeInSum
+            ? ""
+            : " [excluded]"
+
         let name = row.style == .subtotal
-            ? "[subtotal] \(row.label)"
-            : row.label
+            ? "[subtotal] \(row.label)\(exclusionSuffix)"
+            : "\(row.label)\(exclusionSuffix)"
 
         print(
             "\(pad(name, 28)) " +
@@ -53,8 +60,21 @@ public func printPeriod(
             "\(pad(fmtDec(roundD(row.end, digits: d), digits: d), 14, .right))"
         )
 
-        if let detail = row.detail, !detail.isEmpty {
-            print("    \(detail)")
+        let detailLine = [
+            row.detail,
+            row.includeInSum ? nil : "Excluded from section total"
+        ]
+        .compactMap { value -> String? in
+            guard let value, !value.isEmpty else {
+                return nil
+            }
+
+            return value
+        }
+        .joined(separator: " • ")
+
+        if !detailLine.isEmpty {
+            print("    \(detailLine)")
         }
     }
 
@@ -82,7 +102,10 @@ public func printPeriod(
         printTableHeader()
 
         for row in section.rows {
-            printDisplayRow(row)
+            printDisplayRow(
+                row,
+                digits: d
+            )
         }
 
         printSectionFooter(section)

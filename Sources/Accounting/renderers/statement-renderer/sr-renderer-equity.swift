@@ -40,6 +40,7 @@ struct EquityHTMLOwnerRowView: Sendable {
     let ownerName: String
     let detailText: String?
     let rowClass: String
+    let exclusionBadgeText: String?
 
     let begin: Decimal
     let beginClass: String
@@ -302,6 +303,12 @@ extension StatementHTMLRenderer {
                                 HTML.td(["class": "sr-eq-left"]) {
                                     HTML.div {
                                         HTML.text(row.ownerName)
+
+                                        if let badge = row.exclusionBadgeText {
+                                            HTML.span(["class": "sr-eq-row-badge"]) {
+                                                HTML.text(" \(badge)")
+                                            }
+                                        }
                                     }
 
                                     if let detail = row.detailText, !detail.isEmpty {
@@ -573,10 +580,31 @@ extension StatementHTMLRenderer {
 
             let ownerSections: [EquityHTMLSectionView] = (table?.sections ?? []).map { section in
                 let ownerRows: [EquityHTMLOwnerRowView] = section.rows.map { row in
-                    EquityHTMLOwnerRowView(
+                    let rowClass = [
+                        row.style == .subtotal ? "sr-eq-subtotal" : nil,
+                        row.includeInSum ? nil : "sr-eq-excluded"
+                    ]
+                    .compactMap { $0 }
+                    .joined(separator: " ")
+
+                    let detailText = [
+                        row.detail,
+                        row.includeInSum ? nil : "Excluded from section total"
+                    ]
+                    .compactMap { value -> String? in
+                        guard let value, !value.isEmpty else {
+                            return nil
+                        }
+
+                        return value
+                    }
+                    .joined(separator: " • ")
+
+                    return EquityHTMLOwnerRowView(
                         ownerName: row.label,
-                        detailText: row.detail,
-                        rowClass: row.style == .subtotal ? "sr-eq-subtotal" : "",
+                        detailText: detailText.isEmpty ? nil : detailText,
+                        rowClass: rowClass,
+                        exclusionBadgeText: row.includeInSum ? nil : "excluded",
                         begin: row.begin,
                         beginClass: equityAmountClass(row.begin),
                         stort: row.stort,

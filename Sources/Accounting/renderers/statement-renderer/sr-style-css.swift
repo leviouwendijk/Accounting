@@ -260,6 +260,22 @@ public enum StatementStyleCSS {
                     CSS.decl("font-weight", "400")
                 ),
 
+                CSS.rule(
+                    ".sr-eq-excluded",
+                    CSS.decl("opacity", "0.72"),
+                ),
+
+                CSS.rule(
+                    ".sr-eq-row-badge",
+                    CSS.decl("font-size", "0.85em"),
+                    CSS.decl("font-style", "italic"),
+                ),
+
+                CSS.rule(
+                    ".sr-eq-row-detail",
+                    CSS.decl("opacity", "0.82"),
+                ),
+
                 // ------------------------------------------------------------
                 // VAT overview (scoped under body.sr-vat)
                 // ------------------------------------------------------------
