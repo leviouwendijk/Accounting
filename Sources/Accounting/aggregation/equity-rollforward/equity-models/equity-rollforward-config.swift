@@ -20,12 +20,15 @@ public struct EquityRollforwardConfig: Sendable {
     public var drawingCode: String
     public var equityTotalFallback: String?
 
+    public var ownerDisplayPlan: EquityOwnerDisplayPlan?
+
     public init(
         entity: BusinessEntity = .vof,
         fractionDigits: Int = 2,
         contribCode: String? = nil,
         drawingCode: String? = nil,
-        equityTotalFallback: String? = nil
+        equityTotalFallback: String? = nil,
+        ownerDisplayPlan: EquityOwnerDisplayPlan? = nil
     ) {
         let roots = entity.capitalRoots
 
@@ -34,6 +37,7 @@ public struct EquityRollforwardConfig: Sendable {
         self.contribCode = contribCode ?? roots.contributionRootCode
         self.drawingCode = drawingCode ?? roots.drawingRootCode
         self.equityTotalFallback = equityTotalFallback ?? roots.equityTotalFallbackCode
+        self.ownerDisplayPlan = ownerDisplayPlan
     }
 
     public init() {

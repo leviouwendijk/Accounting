@@ -36,16 +36,23 @@ fileprivate struct EquityHTMLDiagnosticView {
     let payloadLines: [String]
 }
 
-fileprivate struct EquityHTMLOwnerRowView {
+struct EquityHTMLOwnerRowView: Sendable {
     let ownerName: String
+    let detailText: String?
+    let rowClass: String
+
     let begin: Decimal
     let beginClass: String
+
     let stort: Decimal
     let stortClass: String
+
     let onttrek: Decimal
     let onttrekClass: String
+
     let winst: Decimal
     let winstClass: String
+
     let end: Decimal
     let endClass: String
 }
@@ -104,10 +111,12 @@ public extension StatementHTMLRenderer {
         chart: CompiledChart,
         entities: EntityStore,
         view: ClosedRange<Int>? = nil,
+        config cfg: EquityRollforwardConfig = .init(),
         options: EquityOptions = .init()
     ) throws -> String {
         let report = try EquityPresentation(
-            reportTitle: title
+            reportTitle: title,
+            config: cfg
         ).build(
             from: .init(
                 chart: chart,
@@ -123,6 +132,7 @@ public extension StatementHTMLRenderer {
         return try renderEquityOverviewHTML(
             report: report,
             entities: entities,
+            config: cfg,
             options: resolvedOptions
         )
     }
@@ -131,9 +141,9 @@ public extension StatementHTMLRenderer {
     static func renderEquityOverviewBody(
         report: EquityRollforwardReport,
         entities: EntityStore,
+        config cfg: EquityRollforwardConfig = .init(),
         options: EquityOptions = .init()
     ) -> [any HTMLNode] {
-        let cfg = EquityRollforwardConfig()
         let names = ownerNameMap(entities)
         let title = options.title.isEmpty ? report.title : options.title
 
@@ -145,6 +155,7 @@ public extension StatementHTMLRenderer {
 
         let periodViews = buildEquityPeriodViews(
             report.periods,
+            entities: entities,
             names: names,
             cfg: cfg
         )
@@ -198,6 +209,7 @@ public extension StatementHTMLRenderer {
     static func renderEquityOverviewHTML(
         report: EquityRollforwardReport,
         entities: EntityStore,
+        config cfg: EquityRollforwardConfig = .init(),
         options: EquityOptions = .init()
     ) throws -> String {
         let title = options.title.isEmpty ? report.title : options.title
@@ -216,6 +228,7 @@ public extension StatementHTMLRenderer {
                     renderEquityOverviewBody(
                         report: report,
                         entities: entities,
+                        config: cfg,
                         options: options
                     )
                 }
@@ -274,9 +287,17 @@ extension StatementHTMLRenderer {
 
                 HTML.tbody {
                     for row in period.ownerRows {
-                        HTML.tr {
+                        HTML.tr(row.rowClass.isEmpty ? [:] : ["class": row.rowClass]) {
                             HTML.td(["class": "sr-eq-left"]) {
-                                HTML.text(row.ownerName)
+                                HTML.div {
+                                    HTML.text(row.ownerName)
+                                }
+
+                                if let detail = row.detailText, !detail.isEmpty {
+                                    HTML.div(["class": "sr-eq-row-detail"]) {
+                                        HTML.text(detail)
+                                    }
+                                }
                             }
                             HTML.td(["class": row.beginClass]) {
                                 HTML.text(fmtEquityAmount(row.begin))
@@ -508,51 +529,34 @@ extension StatementHTMLRenderer {
 
     private static func buildEquityPeriodViews(
         _ periods: [EquityReportPeriod],
+        entities: EntityStore,
         names: [Int?: String],
         cfg: EquityRollforwardConfig
     ) -> [EquityHTMLPeriodView] {
         periods.map { period in
             let rows = period.rows
 
-            var ownerRows: [EquityHTMLOwnerRowView] = []
-            ownerRows.reserveCapacity(rows.owners.count)
+            let table = try? makeEquityOwnerDisplayTable(
+                rows: rows,
+                entities: entities,
+                cfg: cfg
+            )
 
-            var totalBegin: Decimal = 0
-            var totalStort: Decimal = 0
-            var totalOnttrek: Decimal = 0
-            var totalWinst: Decimal = 0
-            var totalEnd: Decimal = 0
-
-            for oid in rows.owners {
-                let ownerName = names[Int?(oid)] ?? "owner#\(oid)"
-                let begin = rows.beginByOwner[oid] ?? 0
-                let delta = rows.deltas[oid] ?? OwnerDelta(
-                    stort: 0,
-                    onttrek: 0,
-                    winst: 0
-                )
-                let end = rows.endByOwner[oid] ?? (begin + delta.delta)
-
-                totalBegin += begin
-                totalStort += delta.stort
-                totalOnttrek += delta.onttrek
-                totalWinst += delta.winst
-                totalEnd += end
-
-                ownerRows.append(
-                    EquityHTMLOwnerRowView(
-                        ownerName: ownerName,
-                        begin: begin,
-                        beginClass: equityAmountClass(begin),
-                        stort: delta.stort,
-                        stortClass: equityAmountClass(delta.stort),
-                        onttrek: delta.onttrek,
-                        onttrekClass: equityAmountClass(delta.onttrek),
-                        winst: delta.winst,
-                        winstClass: equityAmountClass(delta.winst),
-                        end: end,
-                        endClass: equityAmountClass(end)
-                    )
+            let ownerRows: [EquityHTMLOwnerRowView] = (table?.rows ?? []).map { row in
+                EquityHTMLOwnerRowView(
+                    ownerName: row.label,
+                    detailText: row.detail,
+                    rowClass: row.style == .subtotal ? "sr-eq-subtotal" : "",
+                    begin: row.begin,
+                    beginClass: equityAmountClass(row.begin),
+                    stort: row.stort,
+                    stortClass: equityAmountClass(row.stort),
+                    onttrek: row.onttrek,
+                    onttrekClass: equityAmountClass(row.onttrek),
+                    winst: row.winst,
+                    winstClass: equityAmountClass(row.winst),
+                    end: row.end,
+                    endClass: equityAmountClass(row.end)
                 )
             }
 
@@ -565,7 +569,10 @@ extension StatementHTMLRenderer {
 
                 return EquityHTMLAllocationRowView(
                     ownerName: ownerName,
-                    percentText: fmtPct(note.percent, digits: cfg.fractionDigits),
+                    percentText: fmtPct(
+                        note.percent,
+                        digits: cfg.fractionDigits
+                    ),
                     amount: note.amount,
                     amountClass: equityAmountClass(note.amount)
                 )
@@ -575,6 +582,12 @@ extension StatementHTMLRenderer {
                 period.drawings,
                 names: names
             )
+
+            let totalBegin = table?.actualTotalBegin ?? 0
+            let totalStort = table?.actualTotalStort ?? 0
+            let totalOnttrek = table?.actualTotalOnttrek ?? 0
+            let totalWinst = table?.actualTotalWinst ?? 0
+            let totalEnd = table?.actualTotalEnd ?? 0
 
             return EquityHTMLPeriodView(
                 label: period.label,

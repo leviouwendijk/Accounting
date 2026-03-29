@@ -246,6 +246,20 @@ public enum StatementStyleCSS {
                     CSS.decl("font-size", "11px")
                 ),
 
+                // grayer:
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table tr.sr-eq-subtotal td, .sr-eq table.sr-eq-table tr.sr-eq-subtotal th",
+                    CSS.decl("background", "#f3f4f6"),
+                    CSS.decl("font-weight", "600")
+                ),
+                CSS.rule(
+                    ".sr-eq .sr-eq-row-detail",
+                    CSS.decl("margin-top", "2px"),
+                    CSS.decl("font-size", "10px"),
+                    CSS.decl("color", "#666"),
+                    CSS.decl("font-weight", "400")
+                ),
+
                 // ------------------------------------------------------------
                 // VAT overview (scoped under body.sr-vat)
                 // ------------------------------------------------------------
