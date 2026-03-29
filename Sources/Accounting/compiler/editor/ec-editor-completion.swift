@@ -198,6 +198,22 @@ private extension ECEditorService {
             }
         }
 
+        if analysis.flavor == .entries,
+           topBlock == .anonymous,
+           stack.contains(.entry),
+           ecLineBeforeCursorIsWhitespaceOnly(
+               source: analysis.source,
+               line: line,
+               column: column
+           ),
+           !ecMayWantGroupedForInKeywordHere(
+               analysis: analysis,
+               line: line,
+               column: column
+           ) {
+            return .none
+        }
+
         let tokenIndexAtCursor = analysis.tokenIndex(
             atLine: line,
             column: column
@@ -905,4 +921,38 @@ private func ecLineBeforeCursorIsWhitespaceOnly(
     )
     .trimmingCharacters(in: .whitespacesAndNewlines)
     .isEmpty
+}
+
+private func ecMayWantGroupedForInKeywordHere(
+    analysis: ECDocumentAnalysis,
+    line: Int,
+    column: Int
+) -> Bool {
+    let previousTokenIndex = ecPreviousTokenIndex(
+        analysis: analysis,
+        line: line,
+        column: column
+    )
+
+    guard let previousTokenIndex else {
+        return false
+    }
+
+    let previousWords = ecPreviousSignificantWords(
+        tokens: analysis.tokens,
+        before: previousTokenIndex + 1,
+        limit: 2
+    )
+
+    guard let previousWord = previousWords.first else {
+        return false
+    }
+
+    switch previousWord {
+    case "for", "in":
+        return true
+
+    default:
+        return false
+    }
 }

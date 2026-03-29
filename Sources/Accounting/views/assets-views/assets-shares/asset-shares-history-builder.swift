@@ -9,7 +9,6 @@ public extension AssetViews {
             customFrom: Date?,
             customTo: Date?,
             includeHistory: Bool,
-            rangeToDate: Bool,
             tz: TimeZone,
             calendar base: Calendar
         ) throws -> AssetSharesHistoryReport {
@@ -20,7 +19,6 @@ public extension AssetViews {
                 let periods = try buildHistoricalYearPeriods(
                     result: result,
                     anchor: anchor,
-                    rangeToDate: rangeToDate,
                     calendar: calendar
                 )
 
@@ -33,7 +31,7 @@ public extension AssetViews {
             let windows = PeriodSlicer.resolve(
                 shape: .init(
                     kind: kind,
-                    rangeToDate: rangeToDate
+                    rangeToDate: false
                 ),
                 anchor: anchor,
                 customFrom: customFrom,
@@ -57,7 +55,6 @@ public extension AssetViews {
         private static func buildHistoricalYearPeriods(
             result: EntryCompileDriver.Result,
             anchor: Date,
-            rangeToDate: Bool,
             calendar: Calendar
         ) throws -> [AssetSharesPeriodReport] {
             let resolvedDates = result.resolved.compactMap { resolved in
@@ -72,8 +69,7 @@ public extension AssetViews {
                         result: result,
                         period: yearWindow(
                             year: anchorYear,
-                            anchor: anchor,
-                            rangeToDate: rangeToDate,
+                            // anchor: anchor,
                             calendar: calendar
                         ),
                         calendar: calendar
@@ -89,8 +85,7 @@ public extension AssetViews {
                     result: result,
                     period: yearWindow(
                         year: year,
-                        anchor: anchor,
-                        rangeToDate: rangeToDate && year == anchorYear,
+                        // anchor: anchor,
                         calendar: calendar
                     ),
                     calendar: calendar
@@ -124,8 +119,6 @@ public extension AssetViews {
 
         private static func yearWindow(
             year: Int,
-            anchor: Date,
-            rangeToDate: Bool,
             calendar: Calendar
         ) -> PeriodWindow {
             let from = calendar.date(
@@ -136,23 +129,22 @@ public extension AssetViews {
                 )
             )
 
-            let to: Date? = {
-                if rangeToDate {
-                    return dayEnd(anchor, calendar: calendar)
-                }
-
-                let endOfYear = calendar.date(
-                    from: DateComponents(
-                        year: year,
-                        month: 12,
-                        day: 31
-                    )
+            let to = calendar.date(
+                from: DateComponents(
+                    year: year,
+                    month: 12,
+                    day: 31
                 )
-
-                return endOfYear.map {
-                    dayEnd($0, calendar: calendar)
-                }
-            }()
+            ).map { date in
+                var comps = calendar.dateComponents(
+                    [.year, .month, .day],
+                    from: date
+                )
+                comps.hour = 23
+                comps.minute = 59
+                comps.second = 59
+                return calendar.date(from: comps) ?? date
+            }
 
             return PeriodWindow(
                 from: from,
