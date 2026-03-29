@@ -803,3 +803,38 @@ public enum StatementStyleCSS {
         )
     }
 }
+
+extension StatementStyleCSS {
+    static func assetsShares() -> CSSStyleSheet {
+        CSSStyleSheet(
+            rules: [
+                rule(
+                    "body.sr-assets.sr-assets-shares .sr-assets-shares-period",
+                    decl("margin-top", "18px")
+                ),
+
+                rule(
+                    "body.sr-assets.sr-assets-shares .sr-assets-shares-period:first-of-type",
+                    decl("margin-top", "0")
+                ),
+
+                rule(
+                    "body.sr-assets.sr-assets-shares .sr-assets-shares-period h2",
+                    decl("margin-top", "0")
+                )
+            ],
+            media: [
+                media(
+                    "print",
+                    rule(
+                        "body.sr-assets.sr-assets-shares .sr-assets-shares-period",
+                        decl("break-before", "auto"),
+                        decl("page-break-before", "auto"),
+                        decl("break-inside", "auto"),
+                        decl("page-break-inside", "auto")
+                    )
+                )
+            ]
+        )
+    }
+}

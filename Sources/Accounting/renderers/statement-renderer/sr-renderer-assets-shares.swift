@@ -1,5 +1,6 @@
 import Foundation
 import HTML
+import CSS
 
 public extension StatementHTMLRenderer {
     struct AssetsSharesOptions: Sendable {
@@ -38,118 +39,116 @@ public extension StatementHTMLRenderer {
                 HTML.text("(no periods)")
             }
         } else {
-            for (index, period) in report.periods.enumerated() {
-                if index > 0 {
-                    HTML.div(["class": "sr-print-page-break-before"]) {}
-                }
-
-                HTML.h2 {
-                    HTML.text(period.period.string())
-                }
-
-                HTML.table(["class": "tbl tbl-assets-summary"]) {
-                    HTML.thead {
-                        HTML.tr {
-                            HTML.th(["class": "col-label"]) {
-                                HTML.text("Label")
-                            }
-                            HTML.th(["class": "col-money"]) {
-                                HTML.text("Bedrag")
-                            }
-                        }
+            for period in report.periods {
+                HTML.section(["class": "sr-assets-shares-period"]) {
+                    HTML.h2 {
+                        HTML.text(period.period.string())
                     }
 
-                    HTML.tbody {
-                        HTML.tr {
-                            HTML.td(["class": "col-label cell-wrap"]) {
-                                HTML.span(["class": "cell-main"]) {
-                                    HTML.text("Som activa-aandelen begin boekjaar")
+                    HTML.table(["class": "tbl tbl-assets-summary"]) {
+                        HTML.thead {
+                            HTML.tr {
+                                HTML.th(["class": "col-label"]) {
+                                    HTML.text("Label")
+                                }
+                                HTML.th(["class": "col-money"]) {
+                                    HTML.text("Bedrag")
                                 }
                             }
-                            HTML.td(["class": "col-money"]) {
-                                HTML.strong {
-                                    HTML.text(
-                                        fmtAssetsSharesAmount(
-                                            period.openingCarryingAmount,
-                                            currencySymbol: options.currencySymbol
+                        }
+
+                        HTML.tbody {
+                            HTML.tr {
+                                HTML.td(["class": "col-label cell-wrap"]) {
+                                    HTML.span(["class": "cell-main"]) {
+                                        HTML.text("Som activa-aandelen begin boekjaar")
+                                    }
+                                }
+                                HTML.td(["class": "col-money"]) {
+                                    HTML.strong {
+                                        HTML.text(
+                                            fmtAssetsSharesAmount(
+                                                period.openingCarryingAmount,
+                                                currencySymbol: options.currencySymbol
+                                            )
                                         )
+                                    }
+                                }
+                            }
+
+                            HTML.tr(["class": "assets-share-detail-row"]) {
+                                HTML.td([
+                                    "class": "col-label cell-wrap assets-share-detail-cell",
+                                    "colspan": "2"
+                                ]) {
+                                    renderAssetsSharesBreakdownTable(
+                                        period.breakdown,
+                                        value: \.openingCarryingAmount,
+                                        currencySymbol: options.currencySymbol
                                     )
                                 }
                             }
-                        }
 
-                        HTML.tr(["class": "assets-share-detail-row"]) {
-                            HTML.td([
-                                "class": "col-label cell-wrap assets-share-detail-cell",
-                                "colspan": "2"
-                            ]) {
-                                renderAssetsSharesBreakdownTable(
-                                    period.breakdown,
-                                    value: \.openingCarryingAmount,
-                                    currencySymbol: options.currencySymbol
-                                )
-                            }
-                        }
-
-                        HTML.tr {
-                            HTML.td(["class": "col-label cell-wrap"]) {
-                                HTML.span(["class": "cell-main"]) {
-                                    HTML.text("Som activa-aandelen investeringen in periode")
+                            HTML.tr {
+                                HTML.td(["class": "col-label cell-wrap"]) {
+                                    HTML.span(["class": "cell-main"]) {
+                                        HTML.text("Som activa-aandelen investeringen in periode")
+                                    }
+                                }
+                                HTML.td(["class": "col-money"]) {
+                                    HTML.strong {
+                                        HTML.text(
+                                            fmtAssetsSharesAmount(
+                                                period.periodInvestment,
+                                                currencySymbol: options.currencySymbol
+                                            )
+                                        )
+                                    }
                                 }
                             }
-                            HTML.td(["class": "col-money"]) {
-                                HTML.strong {
-                                    HTML.text(
-                                        fmtAssetsSharesAmount(
-                                            period.periodInvestment,
-                                            currencySymbol: options.currencySymbol
-                                        )
+
+                            HTML.tr(["class": "assets-share-detail-row"]) {
+                                HTML.td([
+                                    "class": "col-label cell-wrap assets-share-detail-cell",
+                                    "colspan": "2"
+                                ]) {
+                                    renderAssetsSharesBreakdownTable(
+                                        period.breakdown,
+                                        value: \.periodInvestment,
+                                        currencySymbol: options.currencySymbol
                                     )
                                 }
                             }
-                        }
 
-                        HTML.tr(["class": "assets-share-detail-row"]) {
-                            HTML.td([
-                                "class": "col-label cell-wrap assets-share-detail-cell",
-                                "colspan": "2"
-                            ]) {
-                                renderAssetsSharesBreakdownTable(
-                                    period.breakdown,
-                                    value: \.periodInvestment,
-                                    currencySymbol: options.currencySymbol
-                                )
-                            }
-                        }
-
-                        HTML.tr {
-                            HTML.td(["class": "col-label cell-wrap"]) {
-                                HTML.span(["class": "cell-main"]) {
-                                    HTML.text("Som activa-aandelen einde boekjaar")
+                            HTML.tr {
+                                HTML.td(["class": "col-label cell-wrap"]) {
+                                    HTML.span(["class": "cell-main"]) {
+                                        HTML.text("Som activa-aandelen einde boekjaar")
+                                    }
+                                }
+                                HTML.td(["class": "col-money"]) {
+                                    HTML.strong {
+                                        HTML.text(
+                                            fmtAssetsSharesAmount(
+                                                period.closingCarryingAmount,
+                                                currencySymbol: options.currencySymbol
+                                            )
+                                        )
+                                    }
                                 }
                             }
-                            HTML.td(["class": "col-money"]) {
-                                HTML.strong {
-                                    HTML.text(
-                                        fmtAssetsSharesAmount(
-                                            period.closingCarryingAmount,
-                                            currencySymbol: options.currencySymbol
-                                        )
+
+                            HTML.tr(["class": "assets-share-detail-row"]) {
+                                HTML.td([
+                                    "class": "col-label cell-wrap assets-share-detail-cell",
+                                    "colspan": "2"
+                                ]) {
+                                    renderAssetsSharesBreakdownTable(
+                                        period.breakdown,
+                                        value: \.closingCarryingAmount,
+                                        currencySymbol: options.currencySymbol
                                     )
                                 }
-                            }
-                        }
-
-                        HTML.tr(["class": "assets-share-detail-row"]) {
-                            HTML.td([
-                                "class": "col-label cell-wrap assets-share-detail-cell",
-                                "colspan": "2"
-                            ]) {
-                                renderAssetsSharesBreakdownTable(
-                                    period.breakdown,
-                                    value: \.closingCarryingAmount,
-                                    currencySymbol: options.currencySymbol
-                                )
                             }
                         }
                     }
@@ -162,7 +161,12 @@ public extension StatementHTMLRenderer {
         report: AssetSharesHistoryReport,
         options: AssetsSharesOptions = .init()
     ) -> String {
-        let css = StatementStyleCSS.base().render()
+        let css = CSSStyleSheet
+            .merged([
+                StatementStyleCSS.base(),
+                StatementStyleCSS.assetsShares()
+            ])
+            .render()
 
         let doc: HTMLDocument = HTML.document {
             HTML.html(["lang": "nl"]) {
@@ -173,7 +177,7 @@ public extension StatementHTMLRenderer {
                     HTML.style(css)
                 }
 
-                HTML.body(["class": "sr-assets"]) {
+                HTML.body(["class": "sr-assets sr-assets-shares"]) {
                     renderAssetsSharesBody(
                         report: report,
                         options: options
