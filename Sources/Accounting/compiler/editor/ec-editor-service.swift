@@ -43,9 +43,36 @@ public enum ECEditorService {
 
         switch token {
         case .entity(let raw):
+            if let reference = entityReference(
+                analysis: analysis,
+                at: index
+            ) {
+                return hoverEntity(
+                    reference.ref,
+                    raw: reference.raw,
+                    at: reference.start,
+                    workspace: workspace
+                )
+            }
+
             return hoverEntity(
                 raw,
                 at: span.start,
+                workspace: workspace
+            )
+
+        case .dot, .hash:
+            guard let reference = entityReference(
+                analysis: analysis,
+                at: index
+            ) else {
+                return nil
+            }
+
+            return hoverEntity(
+                reference.ref,
+                raw: reference.raw,
+                at: reference.start,
                 workspace: workspace
             )
 
@@ -126,9 +153,34 @@ public enum ECEditorService {
 
         switch token {
         case .entity(let raw):
+            if let reference = entityReference(
+                analysis: analysis,
+                at: index
+            ) {
+                return definitionEntity(
+                    reference.ref,
+                    at: reference.start,
+                    workspace: workspace
+                )
+            }
+
             return definitionEntity(
                 raw,
                 at: span.start,
+                workspace: workspace
+            )
+
+        case .dot, .hash:
+            guard let reference = entityReference(
+                analysis: analysis,
+                at: index
+            ) else {
+                return nil
+            }
+
+            return definitionEntity(
+                reference.ref,
+                at: reference.start,
                 workspace: workspace
             )
 
@@ -175,18 +227,153 @@ internal extension ECEditorService {
         }
     }
 
+    @inline(__always)
+    static func isEntityReferenceToken(
+        _ token: EntryCompilerToken
+    ) -> Bool {
+        switch token {
+        case .entity,
+             .dot,
+             .hash:
+            return true
+
+        default:
+            return false
+        }
+    }
+
+    static func entityReference(
+        analysis: ECDocumentAnalysis,
+        at index: Int
+    ) -> (
+        raw: String,
+        ref: EntityRef,
+        start: SourceLocation
+    )? {
+        guard analysis.tokens.indices.contains(index) else {
+            return nil
+        }
+
+        guard isEntityReferenceToken(analysis.tokens[index]) else {
+            return nil
+        }
+
+        var lower = index
+        while lower > 0,
+              isEntityReferenceToken(analysis.tokens[lower - 1]) {
+            lower -= 1
+        }
+
+        var upper = index
+        while upper + 1 < analysis.tokens.count,
+              isEntityReferenceToken(analysis.tokens[upper + 1]) {
+            upper += 1
+        }
+
+        var raw = ""
+        var sawEntitySegment = false
+
+        for i in lower...upper {
+            switch analysis.tokens[i] {
+            case .entity(let s):
+                raw += s
+                sawEntitySegment = true
+
+            case .dot:
+                raw += "."
+
+            case .hash:
+                raw += "#"
+
+            default:
+                break
+            }
+        }
+
+        guard sawEntitySegment else {
+            return nil
+        }
+
+        guard let ref = parseFlexibleEntityRef(raw) else {
+            return nil
+        }
+
+        return (
+            raw: raw,
+            ref: ref,
+            start: analysis.spans[lower].start
+        )
+    }
+
+    static func parseFlexibleEntityRef(
+        _ raw: String
+    ) -> EntityRef? {
+        let segments = raw
+            .split(separator: ".", omittingEmptySubsequences: false)
+            .map(String.init)
+
+        guard !segments.isEmpty else {
+            return nil
+        }
+
+        guard !segments.contains(where: \.isEmpty) else {
+            return nil
+        }
+
+        switch segments.count {
+        case 1:
+            return EntityRef(
+                class: nil,
+                family: nil,
+                alias: EntityAlias.parse(segments[0])
+            )
+
+        case 2:
+            return EntityRef(
+                class: segments[0],
+                family: nil,
+                alias: EntityAlias.parse(segments[1])
+            )
+
+        case 3:
+            return EntityRef(
+                class: segments[0],
+                family: segments[1],
+                alias: EntityAlias.parse(segments[2])
+            )
+
+        default:
+            return nil
+        }
+    }
+
     static func hoverEntity(
         _ raw: String,
         at loc: SourceLocation,
         workspace: ECWorkspaceIndex
     ) -> ECHoverResult {
-        do {
-            let ref = EntityRef(
+        let ref = parseFlexibleEntityRef(raw)
+            ?? EntityRef(
                 class: nil,
                 family: nil,
                 alias: EntityAlias.parse(raw)
             )
 
+        return hoverEntity(
+            ref,
+            raw: raw,
+            at: loc,
+            workspace: workspace
+        )
+    }
+
+    static func hoverEntity(
+        _ ref: EntityRef,
+        raw: String,
+        at loc: SourceLocation,
+        workspace: ECWorkspaceIndex
+    ) -> ECHoverResult {
+        do {
             let resolved = try workspace.entities.resolve(
                 ref,
                 at: loc
@@ -303,13 +490,26 @@ extension ECEditorService {
         at loc: SourceLocation,
         workspace: ECWorkspaceIndex
     ) -> ECDefinitionResult? {
-        do {
-            let ref = EntityRef(
+        let ref = parseFlexibleEntityRef(raw)
+            ?? EntityRef(
                 class: nil,
                 family: nil,
                 alias: EntityAlias.parse(raw)
             )
 
+        return definitionEntity(
+            ref,
+            at: loc,
+            workspace: workspace
+        )
+    }
+
+    static func definitionEntity(
+        _ ref: EntityRef,
+        at loc: SourceLocation,
+        workspace: ECWorkspaceIndex
+    ) -> ECDefinitionResult? {
+        do {
             let resolved = try workspace.entities.resolve(
                 ref,
                 at: loc

@@ -118,10 +118,29 @@ public struct ECWorkspaceIndex: Sendable {
                 ECCompletionItem(
                     kind: .entity,
                     label: def.key.identifier(displaying: .fullchain),
+                    insertText: Self.shortestEntityInsertText(
+                        for: def.key,
+                        in: result.entities
+                    ),
                     detail: def.effectiveDisplayName,
                     documentation: def.effectiveDetails ?? def.effectiveDisplayName
                 )
             }
+
+        // self.entityCompletionItems = result.entities.byFull
+        //     .values
+        //     .sorted {
+        //         $0.key.identifier(displaying: .fullchain)
+        //             < $1.key.identifier(displaying: .fullchain)
+        //     }
+        //     .map { def in
+        //         ECCompletionItem(
+        //             kind: .entity,
+        //             label: def.key.identifier(displaying: .fullchain),
+        //             detail: def.effectiveDisplayName,
+        //             documentation: def.effectiveDetails ?? def.effectiveDisplayName
+        //         )
+        //     }
 
         var accountItems: [ECCompletionItem] = []
         accountItems.reserveCapacity(
@@ -296,6 +315,68 @@ public struct ECWorkspaceIndex: Sendable {
                     label: value
                 )
             }
+    }
+
+    private static func shortestEntityInsertText(
+        for key: EntityKey,
+        in entities: EntityStore
+    ) -> String {
+        let aliasOnly = key.alias.string
+        let familyPlusAlias = "\(key.family).\(key.alias.string)"
+        let full = key.identifier(displaying: .fullchain)
+
+        let candidates = [
+            (
+                text: aliasOnly,
+                ref: EntityRef(
+                    class: nil,
+                    family: nil,
+                    alias: key.alias
+                )
+            ),
+            (
+                text: familyPlusAlias,
+                ref: EntityRef(
+                    class: nil,
+                    family: key.family,
+                    alias: key.alias
+                )
+            ),
+            (
+                text: full,
+                ref: EntityRef(
+                    class: key.class,
+                    family: key.family,
+                    alias: key.alias
+                )
+            )
+        ]
+
+        for candidate in candidates {
+            guard resolvesExactly(
+                candidate.ref,
+                to: key,
+                in: entities
+            ) else {
+                continue
+            }
+
+            return candidate.text
+        }
+
+        return full
+    }
+
+    private static func resolvesExactly(
+        _ ref: EntityRef,
+        to expected: EntityKey,
+        in entities: EntityStore
+    ) -> Bool {
+        guard let resolved = try? entities.resolve(ref, at: nil) else {
+            return false
+        }
+
+        return resolved.key == expected
     }
 
     public static func build(
