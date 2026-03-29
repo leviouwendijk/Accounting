@@ -82,11 +82,7 @@ fileprivate struct EquityHTMLDrawingsView {
     let auditLines: [String]
 }
 
-fileprivate struct EquityHTMLPeriodView {
-    let label: String
-    let winstSourceDescription: String
-    let niTotal: Decimal
-
+fileprivate struct EquityHTMLSectionView {
     let ownerRows: [EquityHTMLOwnerRowView]
 
     let totalBegin: Decimal
@@ -94,6 +90,20 @@ fileprivate struct EquityHTMLPeriodView {
     let totalOnttrek: Decimal
     let totalWinst: Decimal
     let totalEnd: Decimal
+}
+
+fileprivate struct EquityHTMLPeriodView {
+    let label: String
+    let winstSourceDescription: String
+    let niTotal: Decimal
+
+    let ownerSections: [EquityHTMLSectionView]
+
+    let actualTotalBegin: Decimal
+    let actualTotalStort: Decimal
+    let actualTotalOnttrek: Decimal
+    let actualTotalWinst: Decimal
+    let actualTotalEnd: Decimal
 
     let openingTotal: Decimal
     let closingTotal: Decimal
@@ -261,82 +271,94 @@ extension StatementHTMLRenderer {
                 HTML.text("• Nettowinst (totaal, geïnjecteerd): \(fmtEquityAmount(period.niTotal))")
             }
 
-            HTML.table(["class": "sr-eq-table"]) {
-                HTML.thead {
-                    HTML.tr {
-                        HTML.th(["class": "sr-eq-left"]) {
-                            HTML.text("Eigenaar")
-                        }
-                        HTML.th {
-                            HTML.text("Beginvermogen")
-                        }
-                        HTML.th {
-                            HTML.text("Stortingen")
-                        }
-                        HTML.th {
-                            HTML.text("Onttrekkingen")
-                        }
-                        HTML.th {
-                            HTML.text("Winstaandeel")
-                        }
-                        HTML.th {
-                            HTML.text("Eindvermogen")
+            for section in period.ownerSections {
+                HTML.table(["class": "sr-eq-table"]) {
+                    HTML.thead {
+                        HTML.tr {
+                            HTML.th(["class": "sr-eq-left"]) {
+                                HTML.text("Eigenaar")
+                            }
+                            HTML.th {
+                                HTML.text("Beginvermogen")
+                            }
+                            HTML.th {
+                                HTML.text("Stortingen")
+                            }
+                            HTML.th {
+                                HTML.text("Onttrekkingen")
+                            }
+                            HTML.th {
+                                HTML.text("Winstaandeel")
+                            }
+                            HTML.th {
+                                HTML.text("Eindvermogen")
+                            }
                         }
                     }
-                }
 
-                HTML.tbody {
-                    for row in period.ownerRows {
-                        HTML.tr(row.rowClass.isEmpty ? [:] : ["class": row.rowClass]) {
-                            HTML.td(["class": "sr-eq-left"]) {
-                                HTML.div {
-                                    HTML.text(row.ownerName)
-                                }
+                    HTML.tbody {
+                        for row in section.ownerRows {
+                            HTML.tr(row.rowClass.isEmpty ? [:] : ["class": row.rowClass]) {
+                                HTML.td(["class": "sr-eq-left"]) {
+                                    HTML.div {
+                                        HTML.text(row.ownerName)
+                                    }
 
-                                if let detail = row.detailText, !detail.isEmpty {
-                                    HTML.div(["class": "sr-eq-row-detail"]) {
-                                        HTML.text(detail)
+                                    if let detail = row.detailText, !detail.isEmpty {
+                                        HTML.div(["class": "sr-eq-row-detail"]) {
+                                            HTML.text(detail)
+                                        }
                                     }
                                 }
-                            }
-                            HTML.td(["class": row.beginClass]) {
-                                HTML.text(fmtEquityAmount(row.begin))
-                            }
-                            HTML.td(["class": row.stortClass]) {
-                                HTML.text(fmtEquityAmount(row.stort))
-                            }
-                            HTML.td(["class": row.onttrekClass]) {
-                                HTML.text(fmtEquityAmount(row.onttrek))
-                            }
-                            HTML.td(["class": row.winstClass]) {
-                                HTML.text(fmtEquityAmount(row.winst))
-                            }
-                            HTML.td(["class": row.endClass]) {
-                                HTML.text(fmtEquityAmount(row.end))
+
+                                HTML.td(["class": row.beginClass]) {
+                                    HTML.text(fmtEquityAmount(row.begin))
+                                }
+
+                                HTML.td(["class": row.stortClass]) {
+                                    HTML.text(fmtEquityAmount(row.stort))
+                                }
+
+                                HTML.td(["class": row.onttrekClass]) {
+                                    HTML.text(fmtEquityAmount(row.onttrek))
+                                }
+
+                                HTML.td(["class": row.winstClass]) {
+                                    HTML.text(fmtEquityAmount(row.winst))
+                                }
+
+                                HTML.td(["class": row.endClass]) {
+                                    HTML.text(fmtEquityAmount(row.end))
+                                }
                             }
                         }
                     }
-                }
 
-                HTML.tfoot {
-                    HTML.tr {
-                        HTML.th(["class": "sr-eq-left"]) {
-                            HTML.text("TOTAAL")
-                        }
-                        HTML.th {
-                            HTML.text(fmtEquityAmount(period.totalBegin))
-                        }
-                        HTML.th {
-                            HTML.text(fmtEquityAmount(period.totalStort))
-                        }
-                        HTML.th {
-                            HTML.text(fmtEquityAmount(period.totalOnttrek))
-                        }
-                        HTML.th {
-                            HTML.text(fmtEquityAmount(period.totalWinst))
-                        }
-                        HTML.th {
-                            HTML.text(fmtEquityAmount(period.totalEnd))
+                    HTML.tfoot {
+                        HTML.tr {
+                            HTML.th(["class": "sr-eq-left"]) {
+                                HTML.text("TOTAAL")
+                            }
+
+                            HTML.th {
+                                HTML.text(fmtEquityAmount(section.totalBegin))
+                            }
+
+                            HTML.th {
+                                HTML.text(fmtEquityAmount(section.totalStort))
+                            }
+
+                            HTML.th {
+                                HTML.text(fmtEquityAmount(section.totalOnttrek))
+                            }
+
+                            HTML.th {
+                                HTML.text(fmtEquityAmount(section.totalWinst))
+                            }
+
+                            HTML.th {
+                                HTML.text(fmtEquityAmount(section.totalEnd))
+                            }
                         }
                     }
                 }
@@ -344,14 +366,21 @@ extension StatementHTMLRenderer {
 
             HTML.div(["class": "sr-eq-summary"]) {
                 HTML.text(
-                    "Check totals → Opening: \(fmtEquityAmount(period.openingTotal)) | Closing: \(fmtEquityAmount(period.closingTotal))"
+                    "Werkelijk totaal (ruw) → " +
+                    "Begin: \(fmtEquityAmount(period.actualTotalBegin)) | " +
+                    "Stort: \(fmtEquityAmount(period.actualTotalStort)) | " +
+                    "Onttrek: \(fmtEquityAmount(period.actualTotalOnttrek)) | " +
+                    "Winst: \(fmtEquityAmount(period.actualTotalWinst)) | " +
+                    "Eind: \(fmtEquityAmount(period.actualTotalEnd))"
                 )
             }
 
             HTML.div(["class": "sr-eq-summary"]) {
-                HTML.text(
-                    "Identity: Begin + Stort − Onttrekkingen + Winst = \(fmtEquityAmount(period.identityTotal))"
-                )
+                HTML.text("Check totals → Opening: \(fmtEquityAmount(period.openingTotal)) | Closing: \(fmtEquityAmount(period.closingTotal))")
+            }
+
+            HTML.div(["class": "sr-eq-summary"]) {
+                HTML.text("Identity: Begin + Stort − Onttrekkingen + Winst = \(fmtEquityAmount(period.identityTotal))")
             }
 
             if options.showAllocation, !period.allocationRows.isEmpty {
@@ -366,7 +395,7 @@ extension StatementHTMLRenderer {
                                 HTML.text("Eigenaar")
                             }
                             HTML.th {
-                                HTML.text("%")
+                                HTML.text("Percentage")
                             }
                             HTML.th {
                                 HTML.text("Bedrag")
@@ -392,15 +421,15 @@ extension StatementHTMLRenderer {
                 }
             }
 
-            if options.showUnassignedEquity, let unassigned = period.unassignedEquity {
+            if let unassigned = period.unassignedEquity, options.showUnassignedEquity {
                 HTML.div(["class": "sr-eq-summary"]) {
-                    HTML.text("· [debug] unassigned equity movements in \(period.label): \(fmtEquityAmount(unassigned))")
+                    HTML.text("Niet-toegewezen eigen vermogen mutaties: \(fmtEquityAmount(unassigned))")
                 }
             }
 
             if options.showDrawingsBreakdown, let drawings = period.drawings {
-                HTML.div(["class": "sr-eq-summary"]) {
-                    HTML.text("Onttrekkingen – detail per post")
+                HTML.h3 {
+                    HTML.text("Onttrekkingen uitsplitsing")
                 }
 
                 HTML.table(["class": "sr-eq-table"]) {
@@ -542,21 +571,32 @@ extension StatementHTMLRenderer {
                 cfg: cfg
             )
 
-            let ownerRows: [EquityHTMLOwnerRowView] = (table?.rows ?? []).map { row in
-                EquityHTMLOwnerRowView(
-                    ownerName: row.label,
-                    detailText: row.detail,
-                    rowClass: row.style == .subtotal ? "sr-eq-subtotal" : "",
-                    begin: row.begin,
-                    beginClass: equityAmountClass(row.begin),
-                    stort: row.stort,
-                    stortClass: equityAmountClass(row.stort),
-                    onttrek: row.onttrek,
-                    onttrekClass: equityAmountClass(row.onttrek),
-                    winst: row.winst,
-                    winstClass: equityAmountClass(row.winst),
-                    end: row.end,
-                    endClass: equityAmountClass(row.end)
+            let ownerSections: [EquityHTMLSectionView] = (table?.sections ?? []).map { section in
+                let ownerRows: [EquityHTMLOwnerRowView] = section.rows.map { row in
+                    EquityHTMLOwnerRowView(
+                        ownerName: row.label,
+                        detailText: row.detail,
+                        rowClass: row.style == .subtotal ? "sr-eq-subtotal" : "",
+                        begin: row.begin,
+                        beginClass: equityAmountClass(row.begin),
+                        stort: row.stort,
+                        stortClass: equityAmountClass(row.stort),
+                        onttrek: row.onttrek,
+                        onttrekClass: equityAmountClass(row.onttrek),
+                        winst: row.winst,
+                        winstClass: equityAmountClass(row.winst),
+                        end: row.end,
+                        endClass: equityAmountClass(row.end)
+                    )
+                }
+
+                return EquityHTMLSectionView(
+                    ownerRows: ownerRows,
+                    totalBegin: section.totalBegin,
+                    totalStort: section.totalStort,
+                    totalOnttrek: section.totalOnttrek,
+                    totalWinst: section.totalWinst,
+                    totalEnd: section.totalEnd
                 )
             }
 
@@ -583,25 +623,25 @@ extension StatementHTMLRenderer {
                 names: names
             )
 
-            let totalBegin = table?.actualTotalBegin ?? 0
-            let totalStort = table?.actualTotalStort ?? 0
-            let totalOnttrek = table?.actualTotalOnttrek ?? 0
-            let totalWinst = table?.actualTotalWinst ?? 0
-            let totalEnd = table?.actualTotalEnd ?? 0
+            let actualTotalBegin = table?.actualTotalBegin ?? 0
+            let actualTotalStort = table?.actualTotalStort ?? 0
+            let actualTotalOnttrek = table?.actualTotalOnttrek ?? 0
+            let actualTotalWinst = table?.actualTotalWinst ?? 0
+            let actualTotalEnd = table?.actualTotalEnd ?? 0
 
             return EquityHTMLPeriodView(
                 label: period.label,
                 winstSourceDescription: rows.winstSource.description,
                 niTotal: rows.niTotal,
-                ownerRows: ownerRows,
-                totalBegin: totalBegin,
-                totalStort: totalStort,
-                totalOnttrek: totalOnttrek,
-                totalWinst: totalWinst,
-                totalEnd: totalEnd,
+                ownerSections: ownerSections,
+                actualTotalBegin: actualTotalBegin,
+                actualTotalStort: actualTotalStort,
+                actualTotalOnttrek: actualTotalOnttrek,
+                actualTotalWinst: actualTotalWinst,
+                actualTotalEnd: actualTotalEnd,
                 openingTotal: rows.openingTotal,
                 closingTotal: rows.closingTotal,
-                identityTotal: totalBegin + totalStort - totalOnttrek + totalWinst,
+                identityTotal: actualTotalBegin + actualTotalStort - actualTotalOnttrek + actualTotalWinst,
                 allocationRows: allocationRows,
                 unassignedEquity: period.unassignedEquity,
                 drawings: drawings

@@ -28,23 +28,18 @@ public func printPeriod(
         return
     }
 
-    print("\n\(label)")
-    print("Winst source: \(rows.winstSource)")
-    print("• Net income (total, injected): \(fmtDec(roundD(rows.niTotal, digits: d), digits: d))")
-    print(
-        "\(pad("Owner", 28)) " +
-        "\(pad("Begin", 14, .right)) " +
-        "\(pad("Stort", 14, .right)) " +
-        "\(pad("Onttrek", 14, .right)) " +
-        "\(pad("Winst", 14, .right)) " +
-        "\(pad("Eind", 14, .right))"
-    )
+    func printTableHeader() {
+        print(
+            "\(pad("Owner", 28)) " +
+            "\(pad("Begin", 14, .right)) " +
+            "\(pad("Stort", 14, .right)) " +
+            "\(pad("Onttrek", 14, .right)) " +
+            "\(pad("Winst", 14, .right)) " +
+            "\(pad("Eind", 14, .right))"
+        )
+    }
 
-    for (idx, row) in table.rows.enumerated() {
-        if idx > 0 && row.startsNewSection {
-            print("")
-        }
-
+    func printDisplayRow(_ row: EquityOwnerDisplayRow) {
         let name = row.style == .subtotal
             ? "[subtotal] \(row.label)"
             : row.label
@@ -63,23 +58,60 @@ public func printPeriod(
         }
     }
 
-    print(String(repeating: "-", count: 103))
-    print(
-        "\(pad("TOTAAL", 28)) " +
-        "\(pad(fmtDec(roundD(table.actualTotalBegin, digits: d), digits: d), 14, .right)) " +
-        "\(pad(fmtDec(roundD(table.actualTotalStort, digits: d), digits: d), 14, .right)) " +
-        "\(pad(fmtDec(roundD(table.actualTotalOnttrek, digits: d), digits: d), 14, .right)) " +
-        "\(pad(fmtDec(roundD(table.actualTotalWinst, digits: d), digits: d), 14, .right)) " +
-        "\(pad(fmtDec(roundD(table.actualTotalEnd, digits: d), digits: d), 14, .right))"
-    )
+    func printSectionFooter(_ section: EquityOwnerDisplaySectionTable) {
+        print(String(repeating: "-", count: 103))
+        print(
+            "\(pad("TOTAAL", 28)) " +
+            "\(pad(fmtDec(roundD(section.totalBegin, digits: d), digits: d), 14, .right)) " +
+            "\(pad(fmtDec(roundD(section.totalStort, digits: d), digits: d), 14, .right)) " +
+            "\(pad(fmtDec(roundD(section.totalOnttrek, digits: d), digits: d), 14, .right)) " +
+            "\(pad(fmtDec(roundD(section.totalWinst, digits: d), digits: d), 14, .right)) " +
+            "\(pad(fmtDec(roundD(section.totalEnd, digits: d), digits: d), 14, .right))"
+        )
+    }
+
+    print("\n\(label)")
+    print("Winst source: \(rows.winstSource)")
+    print("• Net income (total, injected): \(fmtDec(roundD(rows.niTotal, digits: d), digits: d))")
+
+    for (sectionIndex, section) in table.sections.enumerated() {
+        if sectionIndex > 0 {
+            print("")
+        }
+
+        printTableHeader()
+
+        for row in section.rows {
+            printDisplayRow(row)
+        }
+
+        printSectionFooter(section)
+    }
 
     let identity = table.actualTotalBegin
         + table.actualTotalStort
         - table.actualTotalOnttrek
         + table.actualTotalWinst
 
-    print("Check totals → Opening: \(fmtDec(roundD(rows.openingTotal, digits: d), digits: d)) | Closing: \(fmtDec(roundD(rows.closingTotal, digits: d), digits: d))")
-    print("Identity: Begin + Stort − Onttrekkingen + Winst = \(fmtDec(roundD(identity, digits: d), digits: d))")
+    print("")
+    print(
+        "Werkelijk totaal (ruw) → " +
+        "Begin: \(fmtDec(roundD(table.actualTotalBegin, digits: d), digits: d)) | " +
+        "Stort: \(fmtDec(roundD(table.actualTotalStort, digits: d), digits: d)) | " +
+        "Onttrek: \(fmtDec(roundD(table.actualTotalOnttrek, digits: d), digits: d)) | " +
+        "Winst: \(fmtDec(roundD(table.actualTotalWinst, digits: d), digits: d)) | " +
+        "Eind: \(fmtDec(roundD(table.actualTotalEnd, digits: d), digits: d))"
+    )
+
+    print(
+        "Check totals → Opening: \(fmtDec(roundD(rows.openingTotal, digits: d), digits: d)) | " +
+        "Closing: \(fmtDec(roundD(rows.closingTotal, digits: d), digits: d))"
+    )
+
+    print(
+        "Identity: Begin + Stort − Onttrekkingen + Winst = " +
+        "\(fmtDec(roundD(identity, digits: d), digits: d))"
+    )
 }
 
 // public func printHeader(_ title: String) {

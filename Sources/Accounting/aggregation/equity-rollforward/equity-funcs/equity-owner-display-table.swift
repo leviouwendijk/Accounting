@@ -1,7 +1,33 @@
 import Foundation
 
-public struct EquityOwnerDisplayTable: Sendable {
+public struct EquityOwnerDisplaySectionTable: Sendable {
     public let rows: [EquityOwnerDisplayRow]
+
+    public let totalBegin: Decimal
+    public let totalStort: Decimal
+    public let totalOnttrek: Decimal
+    public let totalWinst: Decimal
+    public let totalEnd: Decimal
+
+    public init(
+        rows: [EquityOwnerDisplayRow],
+        totalBegin: Decimal,
+        totalStort: Decimal,
+        totalOnttrek: Decimal,
+        totalWinst: Decimal,
+        totalEnd: Decimal
+    ) {
+        self.rows = rows
+        self.totalBegin = totalBegin
+        self.totalStort = totalStort
+        self.totalOnttrek = totalOnttrek
+        self.totalWinst = totalWinst
+        self.totalEnd = totalEnd
+    }
+}
+
+public struct EquityOwnerDisplayTable: Sendable {
+    public let sections: [EquityOwnerDisplaySectionTable]
 
     public let actualTotalBegin: Decimal
     public let actualTotalStort: Decimal
@@ -10,19 +36,23 @@ public struct EquityOwnerDisplayTable: Sendable {
     public let actualTotalEnd: Decimal
 
     public init(
-        rows: [EquityOwnerDisplayRow],
+        sections: [EquityOwnerDisplaySectionTable],
         actualTotalBegin: Decimal,
         actualTotalStort: Decimal,
         actualTotalOnttrek: Decimal,
         actualTotalWinst: Decimal,
         actualTotalEnd: Decimal
     ) {
-        self.rows = rows
+        self.sections = sections
         self.actualTotalBegin = actualTotalBegin
         self.actualTotalStort = actualTotalStort
         self.actualTotalOnttrek = actualTotalOnttrek
         self.actualTotalWinst = actualTotalWinst
         self.actualTotalEnd = actualTotalEnd
+    }
+
+    public var rows: [EquityOwnerDisplayRow] {
+        sections.flatMap(\.rows)
     }
 }
 
@@ -100,15 +130,15 @@ public enum EquityOwnerDisplayPlanError: LocalizedError, Sendable {
 }
 
 public func makeEquityOwnerDisplayTable(
-    rows: PeriodRollforward,
+    rows periodRows: PeriodRollforward,
     entities: EntityStore,
     cfg: EquityRollforwardConfig
 ) throws -> EquityOwnerDisplayTable {
     let names = ownerNameMap(entities)
 
-    let displayRows = try makeDisplayRows(
+    let displaySections = try makeDisplaySections(
         plan: cfg.ownerDisplayPlan,
-        rows: rows,
+        rows: periodRows,
         entities: entities,
         names: names
     )
@@ -119,14 +149,14 @@ public func makeEquityOwnerDisplayTable(
     var actualTotalWinst = Decimal(0)
     var actualTotalEnd = Decimal(0)
 
-    for ownerId in rows.owners {
-        let begin = rows.beginByOwner[ownerId] ?? 0
-        let delta = rows.deltas[ownerId] ?? OwnerDelta(
+    for ownerId in periodRows.owners {
+        let begin = periodRows.beginByOwner[ownerId] ?? 0
+        let delta = periodRows.deltas[ownerId] ?? OwnerDelta(
             stort: 0,
             onttrek: 0,
             winst: 0
         )
-        let end = rows.endByOwner[ownerId] ?? (begin + delta.delta)
+        let end = periodRows.endByOwner[ownerId] ?? (begin + delta.delta)
 
         actualTotalBegin += begin
         actualTotalStort += delta.stort
@@ -136,12 +166,79 @@ public func makeEquityOwnerDisplayTable(
     }
 
     return EquityOwnerDisplayTable(
-        rows: displayRows,
+        sections: displaySections,
         actualTotalBegin: actualTotalBegin,
         actualTotalStort: actualTotalStort,
         actualTotalOnttrek: actualTotalOnttrek,
         actualTotalWinst: actualTotalWinst,
         actualTotalEnd: actualTotalEnd
+    )
+}
+
+private func makeDisplaySections(
+    plan: EquityOwnerDisplayPlan?,
+    rows periodRows: PeriodRollforward,
+    entities: EntityStore,
+    names: [Int?: String]
+) throws -> [EquityOwnerDisplaySectionTable] {
+    let resolvedSections: [[ResolvedEquityOwnerDisplaySpec]]
+
+    if let plan {
+        resolvedSections = try resolveSections(
+            plan.sections,
+            entities: entities,
+            names: names
+        )
+    } else {
+        resolvedSections = [[
+            periodRows.owners.map { ownerId in
+                .owner(
+                    ownerId: ownerId,
+                    ownerName: names[Int?(ownerId)] ?? "owner#\(ownerId)"
+                )
+            }
+        ].flatMap { $0 }]
+    }
+
+    return resolvedSections.enumerated().map { sectionIndex, section in
+        let renderedRows = section.enumerated().map { rowIndex, spec in
+            makeEquityOwnerDisplayRow(
+                spec,
+                startsNewSection: sectionIndex > 0 && rowIndex == 0,
+                rows: periodRows
+            )
+        }
+
+        return makeEquityOwnerDisplaySectionTable(
+            rows: renderedRows
+        )
+    }
+}
+
+private func makeEquityOwnerDisplaySectionTable(
+    rows: [EquityOwnerDisplayRow]
+) -> EquityOwnerDisplaySectionTable {
+    var totalBegin = Decimal(0)
+    var totalStort = Decimal(0)
+    var totalOnttrek = Decimal(0)
+    var totalWinst = Decimal(0)
+    var totalEnd = Decimal(0)
+
+    for row in rows {
+        totalBegin += row.begin
+        totalStort += row.stort
+        totalOnttrek += row.onttrek
+        totalWinst += row.winst
+        totalEnd += row.end
+    }
+
+    return EquityOwnerDisplaySectionTable(
+        rows: rows,
+        totalBegin: totalBegin,
+        totalStort: totalStort,
+        totalOnttrek: totalOnttrek,
+        totalWinst: totalWinst,
+        totalEnd: totalEnd
     )
 }
 
