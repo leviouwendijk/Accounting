@@ -4,6 +4,7 @@ enum ECEditorBlockKind: String, Sendable {
     case anonymous
     case entry
     case transaction
+    case display
     case details
     case metadata
     case history
@@ -138,6 +139,9 @@ func ecBlockKindIntroduced(
 
     case "transaction":
         return .transaction
+
+    case "display":
+        return .display
 
     case "details":
         return .details

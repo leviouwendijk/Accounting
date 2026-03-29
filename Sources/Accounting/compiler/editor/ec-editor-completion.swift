@@ -98,7 +98,7 @@ private extension ECEditorService {
             column: column
         )
 
-        if stack.contains(.details) {
+        if stack.contains(.details) || stack.contains(.display) {
             return .none
         }
 
