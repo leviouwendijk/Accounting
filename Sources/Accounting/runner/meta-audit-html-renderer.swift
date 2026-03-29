@@ -375,6 +375,7 @@ public enum MetaAuditHTMLRenderer {
             StatementHTMLRenderer.renderEquityOverviewBody(
                 report: report.equity.report,
                 entities: report.entities,
+                config: report.equity.config,
                 options: .init(
                     title: report.equity.title,
                     subtitle: subtitle,
