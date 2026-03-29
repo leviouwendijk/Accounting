@@ -30,6 +30,7 @@ public struct MetaAuditReport: Sendable {
     public let filingReconciliation: AssetFilingReconciliationReport
     public let acquired: AcquiredAssetsReport
     public let period: NativePeriodCompileOutput
+    public let costBreakdown: CostBreakdownReport
     public let kia: KIAProjectionResult
     public let equity: MetaAuditEquitySection
     public let depreciation: DepreciationAuditReport
@@ -42,6 +43,7 @@ public struct MetaAuditReport: Sendable {
         filingReconciliation: AssetFilingReconciliationReport,
         acquired: AcquiredAssetsReport,
         period: NativePeriodCompileOutput,
+        costBreakdown: CostBreakdownReport,
         kia: KIAProjectionResult,
         equity: MetaAuditEquitySection,
         depreciation: DepreciationAuditReport
@@ -53,6 +55,7 @@ public struct MetaAuditReport: Sendable {
         self.filingReconciliation = filingReconciliation
         self.acquired = acquired
         self.period = period
+        self.costBreakdown = costBreakdown
         self.kia = kia
         self.equity = equity
         self.depreciation = depreciation
@@ -125,6 +128,14 @@ public enum MetaAuditRunner {
             tolerance: reconciliationTolerance
         )
 
+        let costBreakdown = try CostViews.CostBreakdownBuilder.build(
+            period: period.assembled.current.range,
+            chart: period.chart,
+            bundle: period.assembled.current.bundle,
+            omslag: omslag,
+            tolerance: reconciliationTolerance
+        )
+
         var kiaCalendar = Calendar(identifier: .gregorian)
         kiaCalendar.timeZone = settings.entry.defaultTimezone
 
@@ -187,6 +198,7 @@ public enum MetaAuditRunner {
             filingReconciliation: filingReconciliation,
             acquired: acquired,
             period: period,
+            costBreakdown: costBreakdown,
             kia: kia,
             equity: equity,
             depreciation: depreciation

@@ -87,6 +87,11 @@ public enum MetaAuditHTMLRenderer {
             options: options
         )
 
+        let costBreakdownNodes = makeCostBreakdownNodes(
+            report: report,
+            options: options
+        )
+
         let assetsNodes = makeAssetsOverviewNodes(
             report: report,
             options: options
@@ -122,6 +127,13 @@ public enum MetaAuditHTMLRenderer {
                         title: "Financiëel verslag"
                     ) {
                         statementNodes
+                    }
+
+                    renderMetaAuditSection(
+                        title: report.costBreakdown.title,
+                        pageBreak: true
+                    ) {
+                        costBreakdownNodes
                     }
 
                     renderMetaAuditSection(
@@ -369,6 +381,26 @@ public enum MetaAuditHTMLRenderer {
                     showAllocation: options.showEquityAllocation,
                     showDrawingsBreakdown: options.showEquityDrawingsBreakdown,
                     showUnassignedEquity: options.showEquityUnassigned
+                )
+            )
+        }
+    }
+
+    @HTMLBuilder
+    private static func makeCostBreakdownNodes(
+        report: MetaAuditReport,
+        options: Options
+    ) -> [any HTMLNode] {
+        HTML.div(["class": "sr-cost-breakdown"]) {
+            StatementHTMLRenderer.renderCostBreakdownBody(
+                report: report.costBreakdown,
+                options: .init(
+                    title: report.costBreakdown.title,
+                    subtitle: report.costBreakdown.period.string(),
+                    currencySymbol: options.currencySymbol,
+                    showMembers: true,
+                    omitZeroMembers: true,
+                    showReconciliation: true
                 )
             )
         }
