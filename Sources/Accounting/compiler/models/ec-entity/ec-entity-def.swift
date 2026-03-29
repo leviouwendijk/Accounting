@@ -3,6 +3,7 @@ import Foundation
 public struct EntityDef: Sendable, Codable {
     public let key: EntityKey
     public var displayName: String?
+    public var details: String?
     public var metadata: [String: String]
     public var profile: EntityUnitProfile?
     public var depreciation: DepreciationConfig?
@@ -17,6 +18,7 @@ public struct EntityDef: Sendable, Codable {
     public init(
         key: EntityKey,
         displayName: String? = nil,
+        details: String? = nil,
         metadata: [String: String] = [:],
         profile: EntityUnitProfile? = nil,
         depreciation: DepreciationConfig? = nil,
@@ -29,6 +31,7 @@ public struct EntityDef: Sendable, Codable {
     ) {
         self.key = key
         self.displayName = displayName
+        self.details = details
         self.metadata = metadata
         self.profile = profile
         self.depreciation = depreciation

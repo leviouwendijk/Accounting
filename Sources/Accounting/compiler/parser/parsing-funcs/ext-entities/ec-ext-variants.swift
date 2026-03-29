@@ -24,6 +24,7 @@ public extension EntryCompilerParsing {
             }
 
             try expect(.lBrace)
+            var vDisplayName: String?
             var vMeta: [String:String] = [:]
             var vDetails: String?
 
@@ -39,15 +40,21 @@ public extension EntryCompilerParsing {
                 case .keyword("metadata"):
                     vMeta = try parseStringMapBlock(named: "metadata")
 
-                case .ident("details"):
+                case .ident("display"), .keyword("display"):
+                    vDisplayName = try parseFreeTextBlock(named: "display")
+
+                case .ident("details"), .keyword("details"):
                     vDetails = try parseFreeTextBlock(named: "details")
 
                 case .keyword("subvariant"), .ident("subvariant"):
                     guard let v = vName else {
                         throw ParserError.unexpectedToken(current, expected: "variant alias before subvariant", at: loc())
                     }
-                    let parent = EntityKey(class: baseKey.class, family: baseKey.family,
-                                           alias: baseKey.alias.appendingVariant(v))
+                    let parent = EntityKey(
+                        class: baseKey.class,
+                        family: baseKey.family,
+                        alias: baseKey.alias.appendingVariant(v)
+                    )
                     defs.append(contentsOf: try parseSubvariantBlocks(parentKey: parent))
 
                 default:
@@ -57,9 +64,20 @@ public extension EntryCompilerParsing {
             try expect(.rBrace)
 
             if let v = vName {
-                let k = EntityKey(class: baseKey.class, family: baseKey.family,
-                                  alias: baseKey.alias.appendingVariant(v))
-                defs.append(EntityDef(key: k, displayName: vDetails, metadata: vMeta, depreciation: nil))
+                let k = EntityKey(
+                    class: baseKey.class,
+                    family: baseKey.family,
+                    alias: baseKey.alias.appendingVariant(v)
+                )
+                defs.append(
+                    EntityDef(
+                        key: k,
+                        displayName: vDisplayName,
+                        details: vDetails,
+                        metadata: vMeta,
+                        depreciation: nil
+                    )
+                )
             }
         }
         return defs

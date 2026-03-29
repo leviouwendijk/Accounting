@@ -22,6 +22,7 @@ public extension EntryCompilerParsing {
 
         var key: EntityKey?
         var displayName: String?
+        var details: String?
         var metadata: [String:String] = [:]
         var dep: DepreciationConfigDraft?
         var extraDefs: [EntityDef] = []              // collect unit/variant outputs
@@ -91,18 +92,24 @@ public extension EntryCompilerParsing {
                 key = EntityKey(class: c!, family: f!, alias: ref.alias)
                 core.trace("  use alias \(ref.alias.string) → \(key!.identifier(displaying: .fullchain))")
 
+            case .ident("display"), .keyword("display"):
+                let txt = try parseFreeTextBlock(named: "display")
+                displayName = txt
+                core.trace("  display { … }")
+
             case .ident("details"), .keyword("details"):
                 let txt = try parseFreeTextBlock(named: "details")
+                details = txt
                 metadata["details"] = txt
                 core.trace("  details { … }")
 
-            case .ident("display_name"):
-                advance(); try expect(.equals)
-                guard case let .string(s) = current else {
-                    throw ParserError.unexpectedToken(current, expected: "string", at: loc())
-                }
-                displayName = s; advance()
-                core.trace("  display_name = \(s)")
+            // case .ident("display_name"):
+            //     advance(); try expect(.equals)
+            //     guard case let .string(s) = current else {
+            //         throw ParserError.unexpectedToken(current, expected: "string", at: loc())
+            //     }
+            //     displayName = s; advance()
+            //     core.trace("  display_name = \(s)")
 
             case .ident("metadata"), .keyword("metadata"):
                 metadata = try parseStringMapBlock(named: "metadata")
@@ -132,7 +139,7 @@ public extension EntryCompilerParsing {
             default:
                 throw ParserError.unexpectedToken(
                     current,
-                    expected: "use alias / display_name / metadata / depreciation / type / domain / content / ownership / rollforward / variant / unit",
+                    expected: "use alias / display / details / metadata / depreciation / type / domain / content / ownership / rollforward / variant / unit",
                     at: loc()
                 )
             }
@@ -148,6 +155,7 @@ public extension EntryCompilerParsing {
         let base = EntityDef(
             key: k,
             displayName: displayName,
+            details: details,
             metadata: metadata,
             depreciation: nil,
             depreciationDraft: dep,

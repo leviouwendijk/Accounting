@@ -27,12 +27,37 @@ public struct ECSymbolOccurrence: Sendable, Codable, Hashable {
     }
 }
 
+public enum ECDocumentDiagnosticSeverity: String, Sendable, Codable, Hashable {
+    case error
+    case warning
+    case information
+}
+
+public struct ECDocumentDiagnostic: Sendable, Codable, Hashable {
+    public let severity: ECDocumentDiagnosticSeverity
+    public let code: String
+    public let message: String
+    public let span: SourceSpan
+
+    public init(
+        severity: ECDocumentDiagnosticSeverity,
+        code: String,
+        message: String,
+        span: SourceSpan
+    ) {
+        self.severity = severity
+        self.code = code
+        self.message = message
+        self.span = span
+    }
+}
+
 public struct ECDocumentAnalysis: Sendable {
     public let source: String
     public let flavor: EntryCompilerLexingFlavor
     public let tokens: [EntryCompilerToken]
     public let spans: [SourceSpan]
-    public let diagnostics: [EntryCompilerLexDiagnostic]
+    public let diagnostics: [ECDocumentDiagnostic]
     public let occurrences: [ECSymbolOccurrence]
 
     public init(
@@ -40,7 +65,7 @@ public struct ECDocumentAnalysis: Sendable {
         flavor: EntryCompilerLexingFlavor,
         tokens: [EntryCompilerToken],
         spans: [SourceSpan],
-        diagnostics: [EntryCompilerLexDiagnostic],
+        diagnostics: [ECDocumentDiagnostic],
         occurrences: [ECSymbolOccurrence]
     ) {
         self.source = source
@@ -150,6 +175,9 @@ public enum ECCompletionKind: String, Sendable, Codable {
     case entity
     case account
     case transaction
+    case value
+    case id
+    case selectGroup
 }
 
 public struct ECCompletionItem: Sendable, Codable, Hashable {

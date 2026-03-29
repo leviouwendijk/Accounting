@@ -13,10 +13,18 @@ public struct ECWorkspaceIndex: Sendable {
     public let transactionDefinitionByID: [Int: ECDefinitionResult]
     public let entryDefinitionByID: [Int: ECDefinitionResult]
 
+    public let usedEntryIDs: [Int]
+    public let usedTransactionIDs: [Int]
+
     public let entityCompletionItems: [ECCompletionItem]
     public let accountCompletionItems: [ECCompletionItem]
     public let transactionCompletionItems: [ECCompletionItem]
     public let keywordCompletionItems: [ECCompletionItem]
+
+    public let selectGroupCompletionItems: [ECCompletionItem]
+    public let entrySortCompletionItems: [ECCompletionItem]
+    public let historyEventCompletionItems: [ECCompletionItem]
+    public let inventoryMutationCompletionItems: [ECCompletionItem]
 
     public init(
         result: EntryCompileDriver.Result,
@@ -92,6 +100,14 @@ public struct ECWorkspaceIndex: Sendable {
         self.transactionDefinitionByID = transactionDefs
         self.entryDefinitionByID = entryDefs
 
+        self.usedEntryIDs = Array(
+            Set(result.resolved.compactMap(\.id))
+        ).sorted()
+
+        self.usedTransactionIDs = Array(
+            Set(result.transactions.byID.keys.map(\.id))
+        ).sorted()
+
         self.entityCompletionItems = result.entities.byFull
             .values
             .sorted {
@@ -148,30 +164,138 @@ public struct ECWorkspaceIndex: Sendable {
                 )
             }
 
-        self.keywordCompletionItems = [
-            "entry",
-            "for",
-            "in",
-            "ref",
-            "details",
-            "metadata",
-            "display_name",
-            "entity",
-            "use",
-            "alias",
-            "variant",
-            "subvariant",
-            "unit",
-            "trait",
-            "profile",
-            "depreciation",
-            "kia"
-        ].map {
+        let selectGroups = EntrySelect.normalizedUniqueGroups(
+            result.resolved.flatMap { $0.select?.groups ?? [] }
+        )
+
+        self.selectGroupCompletionItems = selectGroups.map { group in
             ECCompletionItem(
-                kind: .keyword,
-                label: $0
+                kind: .selectGroup,
+                label: group,
+                detail: "Existing select group"
             )
         }
+
+        self.entrySortCompletionItems = [
+            ECCompletionItem(
+                kind: .value,
+                label: "regular",
+                detail: "Entry sort"
+            ),
+            ECCompletionItem(
+                kind: .value,
+                label: "adjusting",
+                detail: "Entry sort"
+            )
+        ]
+
+        self.historyEventCompletionItems = [
+            ECCompletionItem(
+                kind: .keyword,
+                label: "recorded",
+                detail: "History event"
+            ),
+            ECCompletionItem(
+                kind: .keyword,
+                label: "corrected",
+                detail: "History event"
+            ),
+            ECCompletionItem(
+                kind: .keyword,
+                label: "adjusted",
+                detail: "History event"
+            )
+        ]
+
+        self.inventoryMutationCompletionItems = [
+            "add",
+            "remove",
+            "addition",
+            "reduction",
+            "adding",
+            "removing",
+            "rm"
+        ].map { value in
+            ECCompletionItem(
+                kind: .value,
+                label: value,
+                detail: "Inventory mutation"
+            )
+        }
+
+        self.keywordCompletionItems = Self.makeCompletionKeywordItems(
+            for: .entries
+        )
+    }
+
+    public func nextEntryIDCompletionItems(
+        limit: Int = 3
+    ) -> [ECCompletionItem] {
+        let start = (usedEntryIDs.last ?? 0) + 1
+
+        return (0..<max(limit, 1)).map { offset in
+            let value = start + offset
+            return ECCompletionItem(
+                kind: .id,
+                label: "\(value)",
+                detail: offset == 0
+                    ? "Suggested next entry id"
+                    : "Nearby entry id"
+            )
+        }
+    }
+
+    public func nextTransactionIDCompletionItems(
+        limit: Int = 3
+    ) -> [ECCompletionItem] {
+        let start = (usedTransactionIDs.last ?? 0) + 1
+
+        return (0..<max(limit, 1)).map { offset in
+            let value = start + offset
+            return ECCompletionItem(
+                kind: .id,
+                label: "\(value)",
+                detail: offset == 0
+                    ? "Suggested next transaction id"
+                    : "Nearby transaction id"
+            )
+        }
+    }
+
+    public func completionKeywordItems(
+        for flavor: EntryCompilerLexingFlavor
+    ) -> [ECCompletionItem] {
+        switch flavor {
+        case .entries:
+            return keywordCompletionItems
+
+        default:
+            return Self.makeCompletionKeywordItems(
+                for: flavor
+            )
+        }
+    }
+
+    private static func makeCompletionKeywordItems(
+        for flavor: EntryCompilerLexingFlavor
+    ) -> [ECCompletionItem] {
+        let sets = aggregateLexingSets(flavor: flavor)
+
+        var values = sets.keywords.union(sets.idents)
+        values.formUnion([
+            "display_name",
+            "profile",
+            "kia"
+        ])
+
+        return values
+            .sorted()
+            .map { value in
+                ECCompletionItem(
+                    kind: .keyword,
+                    label: value
+                )
+            }
     }
 
     public static func build(

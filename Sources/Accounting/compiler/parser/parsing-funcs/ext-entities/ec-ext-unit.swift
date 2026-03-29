@@ -57,12 +57,15 @@ public extension EntryCompilerParsing {
                     advance()
                     owner = try readSingleAliasFlexible()
 
-                case .ident("display_name"):
-                    advance(); try expect(.equals)
-                    guard case let .string(s) = current else {
-                        throw ParserError.unexpectedToken(current, expected: "string", at: loc())
-                    }
-                    displayName = s; advance()
+                case .ident("display"), .keyword("display"):
+                    displayName = try parseFreeTextBlock(named: "display")
+
+                // case .ident("display_name"):
+                //     advance(); try expect(.equals)
+                //     guard case let .string(s) = current else {
+                //         throw ParserError.unexpectedToken(current, expected: "string", at: loc())
+                //     }
+                //     displayName = s; advance()
 
                 case .ident("metadata"), .keyword("metadata"):
                     metadata = try parseStringMapBlock(named: "metadata")
@@ -101,7 +104,11 @@ public extension EntryCompilerParsing {
             // - If no owner: preserve old behavior (just the unit alias – back-compat)
             func merged(_ base: EntityAlias, with child: EntityAlias) -> EntityAlias {
                 var out = base.appendingVariant(child.name)
-                if let vs = child.variant { for v in vs { out = out.appendingVariant(v) } }
+                if let vs = child.variant { 
+                    for v in vs { 
+                        out = out.appendingVariant(v) 
+                    } 
+                }
                 return out
             }
 

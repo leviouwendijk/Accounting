@@ -42,12 +42,29 @@ public enum ECDocumentAnalyzer {
             )
         }
 
+        let lexDiagnostics = lexer.diagnostics.map { diagnostic in
+            ECDocumentDiagnostic(
+                severity: mapSeverity(diagnostic.severity),
+                code: diagnostic.kind.rawValue,
+                message: diagnostic.message,
+                span: diagnostic.span
+            )
+        }
+
+        let editorDiagnostics = makeEditorDiagnostics(
+            flavor: flavor,
+            tokens: tokens,
+            spans: spans
+        )
+
         return ECDocumentAnalysis(
             source: source,
             flavor: flavor,
             tokens: tokens,
             spans: spans,
-            diagnostics: lexer.diagnostics,
+            diagnostics: ecDedupeDiagnostics(
+                lexDiagnostics + editorDiagnostics
+            ),
             occurrences: occurrences
         )
     }
@@ -80,6 +97,83 @@ public enum ECDocumentAnalyzer {
 }
 
 private extension ECDocumentAnalyzer {
+    @inline(__always)
+    static func mapSeverity(
+        _ severity: EntryCompilerLexDiagnosticSeverity
+    ) -> ECDocumentDiagnosticSeverity {
+        switch severity {
+        case .error:
+            return .error
+
+        case .warning:
+            return .warning
+        }
+    }
+
+    static func makeEditorDiagnostics(
+        flavor: EntryCompilerLexingFlavor,
+        tokens: [EntryCompilerToken],
+        spans: [SourceSpan]
+    ) -> [ECDocumentDiagnostic] {
+        switch flavor {
+        case .entries,
+             .transactions:
+            return duplicateIDDiagnostics(
+                tokens: tokens,
+                spans: spans
+            )
+
+        default:
+            return []
+        }
+    }
+
+    static func duplicateIDDiagnostics(
+        tokens: [EntryCompilerToken],
+        spans: [SourceSpan]
+    ) -> [ECDocumentDiagnostic] {
+        let occurrences = ecDocumentIDOccurrences(
+            tokens: tokens,
+            spans: spans
+        )
+
+        var buckets: [String: [ECDocumentIDOccurrence]] = [:]
+        for occurrence in occurrences {
+            let key = "\(occurrence.namespace.rawValue)|\(occurrence.id)"
+            buckets[key, default: []].append(occurrence)
+        }
+
+        var out: [ECDocumentDiagnostic] = []
+
+        for group in buckets.values where group.count > 1 {
+            for occurrence in group {
+                let code: String
+                let message: String
+
+                switch occurrence.namespace {
+                case .entry:
+                    code = "duplicateEntryIDInDocument"
+                    message = "Duplicate entry id \(occurrence.id) in current document."
+
+                case .transaction:
+                    code = "duplicateTransactionIDInDocument"
+                    message = "Duplicate transaction id \(occurrence.id) in current document."
+                }
+
+                out.append(
+                    ECDocumentDiagnostic(
+                        severity: .warning,
+                        code: code,
+                        message: message,
+                        span: occurrence.span
+                    )
+                )
+            }
+        }
+
+        return out
+    }
+
     @inline(__always)
     static func occurrence(
         for token: EntryCompilerToken,

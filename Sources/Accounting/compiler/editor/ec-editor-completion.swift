@@ -1,10 +1,19 @@
 import Foundation
 
 private enum ECCompletionContext {
+    case none
     case entityReference
     case accountReference
     case transactionReference
+    case entryID
+    case transactionID
+    case selectGroup
+    case sortValue
+    case historyEvent
+    case inventoryMutation
     case keyword
+    case selectKeyword
+    case transactionsKeyword
 }
 
 public extension ECEditorService {
@@ -21,6 +30,9 @@ public extension ECEditorService {
         )
 
         switch context {
+        case .none:
+            return []
+
         case .entityReference:
             return workspace.entityCompletionItems
 
@@ -30,8 +42,46 @@ public extension ECEditorService {
         case .transactionReference:
             return workspace.transactionCompletionItems
 
+        case .entryID:
+            return workspace.nextEntryIDCompletionItems()
+
+        case .transactionID:
+            return workspace.nextTransactionIDCompletionItems()
+
+        case .selectGroup:
+            return workspace.selectGroupCompletionItems
+
+        case .sortValue:
+            return workspace.entrySortCompletionItems
+
+        case .historyEvent:
+            return workspace.historyEventCompletionItems
+
+        case .inventoryMutation:
+            return workspace.inventoryMutationCompletionItems
+
+        case .selectKeyword:
+            return [
+                ECCompletionItem(
+                    kind: .keyword,
+                    label: "group",
+                    detail: "Select group"
+                )
+            ]
+
+        case .transactionsKeyword:
+            return [
+                ECCompletionItem(
+                    kind: .keyword,
+                    label: "ref",
+                    detail: "Transaction reference"
+                )
+            ]
+
         case .keyword:
-            return workspace.keywordCompletionItems
+            return workspace.completionKeywordItems(
+                for: analysis.flavor
+            )
         }
     }
 }
@@ -42,7 +92,69 @@ private extension ECEditorService {
         line: Int,
         column: Int
     ) -> ECCompletionContext {
-        if let index = analysis.tokenIndex(atLine: line, column: column) {
+        let stack = ecBlockStack(
+            analysis: analysis,
+            line: line,
+            column: column
+        )
+
+        if stack.contains(.details) {
+            return .none
+        }
+
+        if stack.contains(.metadata) {
+            return .none
+        }
+
+        let topBlock = stack.last
+        let fieldName = ecFieldNameBeforeCursor(
+            analysis: analysis,
+            line: line,
+            column: column
+        )
+
+        if let fieldName {
+            switch fieldName {
+            case "id":
+                switch topBlock {
+                case .entry:
+                    return .entryID
+
+                case .transaction:
+                    return .transactionID
+
+                default:
+                    break
+                }
+
+            case "account":
+                return .accountReference
+
+            case "entity":
+                return .entityReference
+
+            case "group":
+                if topBlock == .select {
+                    return .selectGroup
+                }
+
+            case "sort":
+                return .sortValue
+
+            case "mutation":
+                if stack.contains(.inventory) {
+                    return .inventoryMutation
+                }
+
+            default:
+                break
+            }
+        }
+
+        if let index = analysis.tokenIndex(
+            atLine: line,
+            column: column
+        ) {
             let token = analysis.tokens[index]
 
             switch token {
@@ -53,7 +165,10 @@ private extension ECEditorService {
                 return .accountReference
 
             case .number:
-                if isTransactionReference(tokens: analysis.tokens, at: index) {
+                if isTransactionReference(
+                    tokens: analysis.tokens,
+                    at: index
+                ) {
                     return .transactionReference
                 }
 
@@ -62,104 +177,61 @@ private extension ECEditorService {
             }
         }
 
-        guard let index = previousTokenIndex(
+        let anchor = ecPreviousTokenIndex(
             analysis: analysis,
             line: line,
             column: column
-        ) else {
-            return .keyword
+        )
+
+        let previousWord = anchor.flatMap {
+            ecPreviousSignificantWord(
+                tokens: analysis.tokens,
+                before: $0 + 1
+            )
         }
 
-        if let previousKeyword = previousSignificantKeyword(
-            tokens: analysis.tokens,
-            before: index + 1
-        ) {
-            switch previousKeyword {
-            case "for":
-                return .entityReference
+        if topBlock == .history {
+            return .historyEvent
+        }
 
-            case "in":
-                return .accountReference
-
-            case "ref":
-                return .transactionReference
-
-            default:
-                break
+        if topBlock == .select {
+            if previousWord == "group" {
+                return .selectGroup
             }
+
+            return .selectKeyword
+        }
+
+        if topBlock == .transactions {
+            if previousWord == "ref" {
+                return .transactionReference
+            }
+
+            return .transactionsKeyword
+        }
+
+        switch previousWord {
+        case "for":
+            return .entityReference
+
+        case "in":
+            return .accountReference
+
+        case "ref":
+            return .transactionReference
+
+        case "group":
+            if topBlock == .select {
+                return .selectGroup
+            }
+
+        case "sort":
+            return .sortValue
+
+        default:
+            break
         }
 
         return .keyword
-    }
-
-    static func previousTokenIndex(
-        analysis: ECDocumentAnalysis,
-        line: Int,
-        column: Int
-    ) -> Int? {
-        var best: Int?
-        var bestLine = Int.min
-        var bestColumn = Int.min
-
-        for (index, span) in analysis.spans.enumerated() {
-            let startsBeforeCursor =
-                span.start.line < line
-                || (span.start.line == line && span.start.column <= column)
-
-            guard startsBeforeCursor else {
-                continue
-            }
-
-            if span.start.line > bestLine
-                || (span.start.line == bestLine && span.start.column > bestColumn) {
-                best = index
-                bestLine = span.start.line
-                bestColumn = span.start.column
-            }
-        }
-
-        return best
-    }
-
-    static func previousSignificantKeyword(
-        tokens: [EntryCompilerToken],
-        before index: Int
-    ) -> String? {
-        guard index > 0 else {
-            return nil
-        }
-
-        var i = index - 1
-        while i >= 0 {
-            switch tokens[i] {
-            case .lPar,
-                 .rPar,
-                 .lBrace,
-                 .rBrace,
-                 .comma,
-                 .dot,
-                 .equals,
-                 .arrow,
-                 .hash:
-                break
-
-            case .keyword(let s):
-                return s
-
-            case .ident(let s):
-                return s
-
-            default:
-                return nil
-            }
-
-            if i == 0 {
-                break
-            }
-
-            i -= 1
-        }
-
-        return nil
     }
 }
