@@ -190,8 +190,19 @@ public extension EntryCompilerParsing {
             switch current {
             case .keyword("use"), .ident("use"):
                 advance()
-                try expectKeywordOrIdent("alias")
-                alias = try readSingleAliasFlexible()
+
+                switch current {
+                case .keyword("alias"), .ident("alias"):
+                    advance()
+                default:
+                    throw ParserError.unexpectedToken(
+                        current,
+                        expected: "alias",
+                        at: loc()
+                    )
+                }
+
+                alias = try expectNameOrNumberValue()
 
             case .keyword("section"), .ident("section"):
                 sections.append(
