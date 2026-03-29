@@ -148,23 +148,45 @@ public struct ECWorkspaceIndex: Sendable {
         )
 
         for (_, node) in result.accounts.byCode.sorted(by: { $0.key < $1.key }) {
+            let documentation = [
+                node.labels.long == node.labels.short
+                    ? nil
+                    : node.labels.long,
+                node.xlsx?.reference.map { "ref: \($0)" }
+            ]
+            .compactMap { $0 }
+            .joined(separator: "\n")
+
             accountItems.append(
                 ECCompletionItem(
                     kind: .account,
                     label: node.codes.code,
                     detail: node.labels.short,
-                    documentation: node.xlsx?.reference
+                    documentation: documentation.isEmpty
+                        ? nil
+                        : documentation
                 )
             )
         }
 
         for (identifier, node) in result.accounts.byIdentifier.sorted(by: { $0.key < $1.key }) {
+            let documentation = [
+                node.labels.long == node.labels.short
+                    ? nil
+                    : node.labels.long,
+                node.xlsx?.reference.map { "ref: \($0)" }
+            ]
+            .compactMap { $0 }
+            .joined(separator: "\n")
+
             accountItems.append(
                 ECCompletionItem(
                     kind: .account,
                     label: identifier,
                     detail: "\(node.codes.code) — \(node.labels.short)",
-                    documentation: node.xlsx?.reference
+                    documentation: documentation.isEmpty
+                        ? nil
+                        : documentation
                 )
             )
         }
