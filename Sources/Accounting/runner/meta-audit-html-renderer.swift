@@ -191,6 +191,8 @@ public enum MetaAuditHTMLRenderer {
 
         return CSSStyleSheet.merged([
             StatementStyleCSS.base(),
+            StatementStyleCSS.assetsShares(),
+            StatementStyleCSS.costBreakdown(),
             local
         ])
     }
