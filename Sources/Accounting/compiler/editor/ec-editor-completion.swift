@@ -153,6 +153,80 @@ private extension ECEditorService {
         }
 
         let topBlock = stack.last
+
+        let tokenIndexAtCursor = analysis.tokenIndex(
+            atLine: line,
+            column: column
+        )
+
+        let previousTokenIndex = ecPreviousTokenIndex(
+            analysis: analysis,
+            line: line,
+            column: column
+        )
+
+        let previousWords: [String] = {
+            if let tokenIndexAtCursor {
+                return ecPreviousSignificantWords(
+                    tokens: analysis.tokens,
+                    before: tokenIndexAtCursor,
+                    limit: 2
+                )
+            }
+
+            guard let previousTokenIndex else {
+                return []
+            }
+
+            switch analysis.tokens[previousTokenIndex] {
+            case .keyword(let s),
+                 .ident(let s):
+                switch s {
+                case "date",
+                     "infer",
+                     "sort",
+                     "group",
+                     "ref",
+                     "for",
+                     "in":
+                    return ecPreviousSignificantWords(
+                        tokens: analysis.tokens,
+                        before: previousTokenIndex + 1,
+                        limit: 2
+                    )
+
+                default:
+                    return ecPreviousSignificantWords(
+                        tokens: analysis.tokens,
+                        before: previousTokenIndex,
+                        limit: 2
+                    )
+                }
+
+            default:
+                return ecPreviousSignificantWords(
+                    tokens: analysis.tokens,
+                    before: previousTokenIndex,
+                    limit: 2
+                )
+            }
+        }()
+
+        let previousWord = previousWords.first
+        let secondPreviousWord = previousWords.dropFirst().first
+
+        if previousWord == "infer", secondPreviousWord == "date" {
+            return .dateInferValue
+        }
+
+        if previousWord == "date" {
+            return .dateExpression
+        }
+
+        if previousWord == "sort" {
+            return .sortValue
+        }
+
         let fieldName = ecFieldNameBeforeCursor(
             analysis: analysis,
             line: line,
@@ -220,10 +294,7 @@ private extension ECEditorService {
             }
         }
 
-        if let index = analysis.tokenIndex(
-            atLine: line,
-            column: column
-        ) {
+        if let index = tokenIndexAtCursor {
             let token = analysis.tokens[index]
 
             switch token {
@@ -244,31 +315,6 @@ private extension ECEditorService {
             default:
                 break
             }
-        }
-
-        let anchor = ecPreviousTokenIndex(
-            analysis: analysis,
-            line: line,
-            column: column
-        )
-
-        let previousWords = anchor.map {
-            ecPreviousSignificantWords(
-                tokens: analysis.tokens,
-                before: $0 + 1,
-                limit: 2
-            )
-        } ?? []
-
-        let previousWord = previousWords.first
-        let secondPreviousWord = previousWords.dropFirst().first
-
-        if previousWord == "infer", secondPreviousWord == "date" {
-            return .dateInferValue
-        }
-
-        if previousWord == "date" {
-            return .dateExpression
         }
 
         if topBlock == .history {
