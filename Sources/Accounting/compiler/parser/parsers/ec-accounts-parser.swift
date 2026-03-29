@@ -111,16 +111,21 @@ public extension EntryCompilerParsing {
                 code = String((n as NSDecimalNumber).intValue); advance()
 
             case .keyword("label"):
-                advance()
-                if current == .lBrace {
-                    label = try parseFreeTextBlock(named: "label")
-                } else {
-                    try expect(.equals)
-                    guard case let .string(s) = current else {
-                        throw ParserError.unexpectedToken(current, expected: "string", at: loc())
-                    }
-                    label = s; advance()
-                }
+                label = try parseScalarOrFreeTextField(
+                    named: "label"
+                )
+
+            // case .keyword("label"):
+            //     advance()
+            //     if current == .lBrace {
+            //         label = try parseFreeTextBlock(named: "label")
+            //     } else {
+            //         try expect(.equals)
+            //         guard case let .string(s) = current else {
+            //             throw ParserError.unexpectedToken(current, expected: "string", at: loc())
+            //         }
+            //         label = s; advance()
+            //     }
 
             case .keyword("direction"):
                 advance(); try expect(.equals)

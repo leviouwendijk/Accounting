@@ -101,6 +101,51 @@ public extension EntryCompilerParsing {
         return out
     }
 
+    /// Field that supports either:
+    /// - `label = "..."` (strict scalar string)
+    /// - `label { free text ... }` (lenient block text)
+    @inlinable
+    func parseScalarOrFreeTextField(
+        named kw: String
+    ) throws -> String {
+        if case .ident(let s) = current, s == kw {
+            advance()
+        } else if case .keyword(let s) = current, s == kw {
+            advance()
+        } else {
+            throw ParserError.unexpectedToken(
+                current,
+                expected: kw,
+                at: loc()
+            )
+        }
+
+        if current == .lBrace {
+            try beginBlock()
+
+            let out = try collectFreeText(
+                until: { current == .rBrace || current == .eof },
+                mode: .lenient
+            )
+
+            try endBlock()
+            return out
+        }
+
+        try expect(.equals)
+
+        guard case let .string(s) = current else {
+            throw ParserError.unexpectedToken(
+                current,
+                expected: "string or { ... }",
+                at: loc()
+            )
+        }
+
+        advance()
+        return s
+    }
+
     /// Free text block `{ ... }` (lenient).
     @inlinable
     func parseFreeTextBlock(named kw: String = "details") throws -> String {

@@ -40,7 +40,11 @@ public func printPeriod(
         "\(pad("Eind", 14, .right))"
     )
 
-    for row in table.rows {
+    for (idx, row) in table.rows.enumerated() {
+        if idx > 0 && row.startsNewSection {
+            print("")
+        }
+
         let name = row.style == .subtotal
             ? "[subtotal] \(row.label)"
             : row.label

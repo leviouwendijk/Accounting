@@ -96,16 +96,20 @@ public extension EntryCompilerParsing {
         try beginBlock()
 
         var company: StatementCompanySettings?
+        var equity: StatementEquitySettings?
 
         while current != .rBrace && current != .eof {
             switch current {
             case .keyword("company"), .ident("company"):
                 company = try parseStatementCompanySettings()
 
+            case .keyword("equity"), .ident("equity"):
+                equity = try parseStatementEquitySettings()
+
             default:
                 throw ParserError.unexpectedToken(
                     current,
-                    expected: "company",
+                    expected: "company or equity",
                     at: loc()
                 )
             }
@@ -113,7 +117,270 @@ public extension EntryCompilerParsing {
 
         try endBlock()
 
-        return StatementDataSettings(company: company)
+        return StatementDataSettings(
+            company: company,
+            equity: equity
+        )
+    }
+
+    func parseStatementEquitySettings() throws -> StatementEquitySettings {
+        switch current {
+        case .keyword("equity"), .ident("equity"):
+            advance()
+        default:
+            throw ParserError.unexpectedToken(
+                current,
+                expected: "equity",
+                at: loc()
+            )
+        }
+
+        try beginBlock()
+
+        var preset: String?
+        var views: [StatementEquityViewSettings] = []
+
+        while current != .rBrace && current != .eof {
+            switch current {
+            case .keyword("preset"), .ident("preset"):
+                advance()
+                try expect(.equals)
+                preset = try expectNameOrNumberValue()
+
+            case .keyword("view"), .ident("view"):
+                views.append(
+                    try parseStatementEquityViewSettings()
+                )
+
+            default:
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "preset or view",
+                    at: loc()
+                )
+            }
+        }
+
+        try endBlock()
+
+        return StatementEquitySettings(
+            preset: preset,
+            views: views
+        )
+    }
+
+    func parseStatementEquityViewSettings() throws -> StatementEquityViewSettings {
+        switch current {
+        case .keyword("view"), .ident("view"):
+            advance()
+        default:
+            throw ParserError.unexpectedToken(
+                current,
+                expected: "view",
+                at: loc()
+            )
+        }
+
+        try beginBlock()
+
+        var alias: String?
+        var sections: [StatementEquitySectionSettings] = []
+
+        while current != .rBrace && current != .eof {
+            switch current {
+            case .keyword("use"), .ident("use"):
+                advance()
+                try expect(.keyword("alias"))
+                alias = try readSingleAliasFlexible()
+
+            case .keyword("section"), .ident("section"):
+                sections.append(
+                    try parseStatementEquitySectionSettings()
+                )
+
+            default:
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "use alias or section",
+                    at: loc()
+                )
+            }
+        }
+
+        try endBlock()
+
+        guard let alias else {
+            throw ParserError.unexpectedToken(
+                current,
+                expected: "view { use alias <preset> ... }",
+                at: loc()
+            )
+        }
+
+        return StatementEquityViewSettings(
+            alias: alias,
+            sections: sections
+        )
+    }
+
+    func parseStatementEquitySectionSettings() throws -> StatementEquitySectionSettings {
+        switch current {
+        case .keyword("section"), .ident("section"):
+            advance()
+        default:
+            throw ParserError.unexpectedToken(
+                current,
+                expected: "section",
+                at: loc()
+            )
+        }
+
+        try beginBlock()
+
+        var rows: [StatementEquityRowSettings] = []
+
+        while current != .rBrace && current != .eof {
+            switch current {
+            case .keyword("row"), .ident("row"):
+                rows.append(
+                    try parseStatementEquityRowSettings()
+                )
+
+            default:
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "row",
+                    at: loc()
+                )
+            }
+        }
+
+        try endBlock()
+
+        return StatementEquitySectionSettings(
+            rows: rows
+        )
+    }
+
+    func parseStatementEquityRowSettings() throws -> StatementEquityRowSettings {
+        switch current {
+        case .keyword("row"), .ident("row"):
+            advance()
+        default:
+            throw ParserError.unexpectedToken(
+                current,
+                expected: "row",
+                at: loc()
+            )
+        }
+
+        switch current {
+        case .keyword("split"), .ident("split"):
+            advance()
+
+            let owner = try parseStatementEntityPath()
+            let percent = try expectDecimal()
+            var label: String?
+
+            if current == .lBrace {
+                try beginBlock()
+
+                while current != .rBrace && current != .eof {
+                    switch current {
+                    case .keyword("label"), .ident("label"):
+                        label = try parseScalarOrFreeTextField(
+                            named: "label"
+                        )
+
+                    default:
+                        throw ParserError.unexpectedToken(
+                            current,
+                            expected: "label",
+                            at: loc()
+                        )
+                    }
+                }
+
+                try endBlock()
+            }
+
+            return StatementEquityRowSettings(
+                kind: .split,
+                owner: owner,
+                percent: percent,
+                label: label
+            )
+
+        case .keyword("subtotal"), .ident("subtotal"):
+            advance()
+            try beginBlock()
+
+            var label: String?
+            var members: [StatementEquityMemberSettings] = []
+
+            while current != .rBrace && current != .eof {
+                switch current {
+                case .keyword("label"), .ident("label"):
+                    label = try parseScalarOrFreeTextField(
+                        named: "label"
+                    )
+
+                case .keyword("member"), .ident("member"):
+                    members.append(
+                        try parseStatementEquityMemberSettings()
+                    )
+
+                default:
+                    throw ParserError.unexpectedToken(
+                        current,
+                        expected: "label or member",
+                        at: loc()
+                    )
+                }
+            }
+
+            try endBlock()
+
+            return StatementEquityRowSettings(
+                kind: .subtotal,
+                label: label,
+                members: members
+            )
+
+        default:
+            let owner = try parseStatementEntityPath()
+
+            return StatementEquityRowSettings(
+                kind: .owner,
+                owner: owner
+            )
+        }
+    }
+
+    func parseStatementEquityMemberSettings() throws -> StatementEquityMemberSettings {
+        switch current {
+        case .keyword("member"), .ident("member"):
+            advance()
+        default:
+            throw ParserError.unexpectedToken(
+                current,
+                expected: "member",
+                at: loc()
+            )
+        }
+
+        let owner = try parseStatementEntityPath()
+        let percent = try expectDecimal()
+
+        return StatementEquityMemberSettings(
+            owner: owner,
+            percent: percent
+        )
+    }
+
+    func parseStatementEntityPath() throws -> StatementEntityPath {
+        let ref = try parseEntityRefFlexible()
+        return StatementEntityPath(ref: ref)
     }
 
     func parseStatementCompanySettings() throws -> StatementCompanySettings {

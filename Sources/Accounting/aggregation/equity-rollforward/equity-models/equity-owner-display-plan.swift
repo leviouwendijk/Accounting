@@ -1,6 +1,16 @@
 import Foundation
 
 public struct EquityOwnerDisplayPlan: Sendable {
+    public let sections: [EquityOwnerDisplaySection]
+
+    public init(
+        sections: [EquityOwnerDisplaySection]
+    ) {
+        self.sections = sections
+    }
+}
+
+public struct EquityOwnerDisplaySection: Sendable {
     public let rows: [EquityOwnerDisplayRowSpec]
 
     public init(
@@ -12,22 +22,36 @@ public struct EquityOwnerDisplayPlan: Sendable {
 
 public enum EquityOwnerDisplayRowSpec: Sendable {
     case owner(EntityRef)
-    case composed(EquityOwnerComposedRow)
+    case split(EquityOwnerSplitRow)
+    case subtotal(EquityOwnerSubtotalRow)
 }
 
-public struct EquityOwnerComposedRow: Sendable {
+public struct EquityOwnerSplitRow: Sendable {
+    public let owner: EntityRef
+    public let portion: Decimal
+    public let label: String?
+
+    public init(
+        owner: EntityRef,
+        portion: Decimal,
+        label: String? = nil
+    ) {
+        self.owner = owner
+        self.portion = portion
+        self.label = label
+    }
+}
+
+public struct EquityOwnerSubtotalRow: Sendable {
     public let label: String
     public let members: [EquityOwnerPortion]
-    public let style: EquityOwnerDisplayStyle
 
     public init(
         label: String,
-        members: [EquityOwnerPortion],
-        style: EquityOwnerDisplayStyle = .subtotal
+        members: [EquityOwnerPortion]
     ) {
         self.label = label
         self.members = members
-        self.style = style
     }
 }
 
@@ -56,54 +80,28 @@ public extension EquityOwnerDisplayRowSpec {
         .owner(owner)
     }
 
-    static func subtotal(
-        label: String,
-        owners: [EntityRef]
-    ) -> Self {
-        .composed(
-            .init(
-                label: label,
-                members: owners.map {
-                    EquityOwnerPortion(
-                        owner: $0,
-                        portion: 1
-                    )
-                },
-                style: .subtotal
-            )
-        )
-    }
-
     static func split(
-        label: String,
         owner: EntityRef,
         percent: Decimal,
-        style: EquityOwnerDisplayStyle = .subtotal
+        label: String? = nil
     ) -> Self {
-        .composed(
+        .split(
             .init(
-                label: label,
-                members: [
-                    .init(
-                        owner: owner,
-                        portion: percent
-                    )
-                ],
-                style: style
+                owner: owner,
+                portion: percent,
+                label: label
             )
         )
     }
 
-    static func composed(
+    static func subtotal(
         label: String,
-        members: [EquityOwnerPortion],
-        style: EquityOwnerDisplayStyle = .subtotal
+        members: [EquityOwnerPortion]
     ) -> Self {
-        .composed(
+        .subtotal(
             .init(
                 label: label,
-                members: members,
-                style: style
+                members: members
             )
         )
     }

@@ -325,7 +325,8 @@ public enum MetaAuditRunner {
         }()
 
         let title = "Equity (backsolved)"
-        let config = EquityRollforwardConfig()
+        // let config = EquityRollforwardConfig()
+        let config = try settings.makeEquityRollforwardConfig(entity: entity)
 
         let report = try EquityPresentation(
             reportTitle: title,
