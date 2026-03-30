@@ -257,7 +257,7 @@ public extension EntryCompilerParsing {
             return (owner: owner, percent: percent)
 
         default:
-            let owner = try parseEntityRefFlexible()
+            let owner = try parseOwnershipDivideTargetRef()
 
             try expect(.lPar)
             let percent = try expectDecimal()
@@ -265,6 +265,43 @@ public extension EntryCompilerParsing {
 
             return (owner: owner, percent: percent)
         }
+    }
+
+    @inlinable
+    func parseOwnershipDivideTargetRef() throws -> EntityRef {
+        var segs: [String] = []
+
+        while true {
+            let segment: String
+
+            switch current {
+            case let .ident(s), let .entity(s), let .account(s):
+                segment = s
+                advance()
+
+            case let .keyword(s):
+                segment = s
+                advance()
+
+            default:
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "entity path",
+                    at: loc()
+                )
+            }
+
+            segs.append(segment)
+
+            if current == .dot || current == .arrow {
+                advance()
+                continue
+            }
+
+            break
+        }
+
+        return try makeEntityRef(from: segs)
     }
 
     // @inlinable
