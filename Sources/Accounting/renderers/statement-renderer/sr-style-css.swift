@@ -233,7 +233,8 @@ public enum StatementStyleCSS {
                 ),
                 CSS.rule(
                     ".sr-eq td.sr-eq-amount.sr-eq-neg",
-                    CSS.decl("color", "#b00")
+                    CSS.decl("color", "#b91c1c"),
+                    CSS.decl("font-weight", "600")
                 ),
                 CSS.rule(
                     ".sr-eq .sr-eq-period",
@@ -246,12 +247,49 @@ public enum StatementStyleCSS {
                     CSS.decl("font-size", "11px")
                 ),
 
-                // grayer:
                 CSS.rule(
                     ".sr-eq table.sr-eq-table tr.sr-eq-subtotal td, .sr-eq table.sr-eq-table tr.sr-eq-subtotal th",
                     CSS.decl("background", "#f3f4f6"),
                     CSS.decl("font-weight", "600")
                 ),
+
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table tr.sr-eq-row-child td, .sr-eq table.sr-eq-table tr.sr-eq-row-child th",
+                    CSS.decl("background", "#fafafa")
+                ),
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table tr.sr-eq-row-child td.sr-eq-left",
+                    CSS.decl("padding-left", "18px"),
+                    CSS.decl("border-left", "2px solid #e5e7eb")
+                ),
+
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table tr.sr-eq-row-direct td, .sr-eq table.sr-eq-table tr.sr-eq-row-direct th",
+                    CSS.decl("background", "#f8fafc")
+                ),
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table tr.sr-eq-row-direct td.sr-eq-left",
+                    CSS.decl("border-left-color", "#cbd5e1")
+                ),
+
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table tr.sr-eq-row-incoming td, .sr-eq table.sr-eq-table tr.sr-eq-row-incoming th",
+                    CSS.decl("background", "#f0fdf4")
+                ),
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table tr.sr-eq-row-incoming td.sr-eq-left",
+                    CSS.decl("border-left-color", "#86efac")
+                ),
+
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table tr.sr-eq-row-outgoing td, .sr-eq table.sr-eq-table tr.sr-eq-row-outgoing th",
+                    CSS.decl("background", "#fff7ed")
+                ),
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table tr.sr-eq-row-outgoing td.sr-eq-left",
+                    CSS.decl("border-left-color", "#fdba74")
+                ),
+
                 CSS.rule(
                     ".sr-eq .sr-eq-row-detail",
                     CSS.decl("margin-top", "2px"),
@@ -259,21 +297,18 @@ public enum StatementStyleCSS {
                     CSS.decl("color", "#666"),
                     CSS.decl("font-weight", "400")
                 ),
-
                 CSS.rule(
                     ".sr-eq-excluded",
-                    CSS.decl("opacity", "0.72"),
+                    CSS.decl("opacity", "0.72")
                 ),
-
                 CSS.rule(
                     ".sr-eq-row-badge",
                     CSS.decl("font-size", "0.85em"),
-                    CSS.decl("font-style", "italic"),
+                    CSS.decl("font-style", "italic")
                 ),
-
                 CSS.rule(
                     ".sr-eq-row-detail",
-                    CSS.decl("opacity", "0.82"),
+                    CSS.decl("opacity", "0.82")
                 ),
 
                 // ------------------------------------------------------------

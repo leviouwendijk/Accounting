@@ -14,6 +14,8 @@ public func printPeriod(
     cfg: EquityRollforwardConfig
 ) {
     let d = cfg.fractionDigits
+    let ownerWidth = 34
+
     let table: EquityOwnerDisplayTable
 
     do {
@@ -28,9 +30,31 @@ public func printPeriod(
         return
     }
 
+    func printableRowLabel(
+        _ row: EquityOwnerDisplayRow
+    ) -> String {
+        let baseLabel: String
+
+        if row.label.hasPrefix("  ") {
+            baseLabel = "↳ " + String(row.label.dropFirst(2))
+        } else {
+            baseLabel = row.label
+        }
+
+        let exclusionSuffix = row.includeInSum
+            ? ""
+            : " [excluded]"
+
+        if row.style == .subtotal {
+            return "[subtotal] \(baseLabel)\(exclusionSuffix)"
+        }
+
+        return "\(baseLabel)\(exclusionSuffix)"
+    }
+
     func printTableHeader() {
         print(
-            "\(pad("Owner", 28)) " +
+            "\(pad("Owner", ownerWidth)) " +
             "\(pad("Begin", 14, .right)) " +
             "\(pad("Stort", 14, .right)) " +
             "\(pad("Onttrek", 14, .right)) " +
@@ -43,21 +67,15 @@ public func printPeriod(
         _ row: EquityOwnerDisplayRow,
         digits d: Int
     ) {
-        let exclusionSuffix = row.includeInSum
-            ? ""
-            : " [excluded]"
-
-        let name = row.style == .subtotal
-            ? "[subtotal] \(row.label)\(exclusionSuffix)"
-            : "\(row.label)\(exclusionSuffix)"
+        let name = printableRowLabel(row)
 
         print(
-            "\(pad(name, 28)) " +
-            "\(pad(fmtDec(roundD(row.begin, digits: d), digits: d), 14, .right)) " +
-            "\(pad(fmtDec(roundD(row.stort, digits: d), digits: d), 14, .right)) " +
-            "\(pad(fmtDec(roundD(row.onttrek, digits: d), digits: d), 14, .right)) " +
-            "\(pad(fmtDec(roundD(row.winst, digits: d), digits: d), 14, .right)) " +
-            "\(pad(fmtDec(roundD(row.end, digits: d), digits: d), 14, .right))"
+            "\(pad(name, ownerWidth)) " +
+            "\(pad(fmtDec(row.begin, digits: d), 14, .right)) " +
+            "\(pad(fmtDec(row.stort, digits: d), 14, .right)) " +
+            "\(pad(fmtDec(row.onttrek, digits: d), 14, .right)) " +
+            "\(pad(fmtDec(row.winst, digits: d), 14, .right)) " +
+            "\(pad(fmtDec(row.end, digits: d), 14, .right))"
         )
 
         let detailLine = [
@@ -78,21 +96,23 @@ public func printPeriod(
         }
     }
 
-    func printSectionFooter(_ section: EquityOwnerDisplaySectionTable) {
-        print(String(repeating: "-", count: 103))
+    func printSectionFooter(
+        _ section: EquityOwnerDisplaySectionTable
+    ) {
+        print(String(repeating: "-", count: ownerWidth + 1 + 14 * 5))
         print(
-            "\(pad("TOTAAL", 28)) " +
-            "\(pad(fmtDec(roundD(section.totalBegin, digits: d), digits: d), 14, .right)) " +
-            "\(pad(fmtDec(roundD(section.totalStort, digits: d), digits: d), 14, .right)) " +
-            "\(pad(fmtDec(roundD(section.totalOnttrek, digits: d), digits: d), 14, .right)) " +
-            "\(pad(fmtDec(roundD(section.totalWinst, digits: d), digits: d), 14, .right)) " +
-            "\(pad(fmtDec(roundD(section.totalEnd, digits: d), digits: d), 14, .right))"
+            "\(pad("TOTAAL", ownerWidth)) " +
+            "\(pad(fmtDec(section.totalBegin, digits: d), 14, .right)) " +
+            "\(pad(fmtDec(section.totalStort, digits: d), 14, .right)) " +
+            "\(pad(fmtDec(section.totalOnttrek, digits: d), 14, .right)) " +
+            "\(pad(fmtDec(section.totalWinst, digits: d), 14, .right)) " +
+            "\(pad(fmtDec(section.totalEnd, digits: d), 14, .right))"
         )
     }
 
     print("\n\(label)")
     print("Winst source: \(rows.winstSource)")
-    print("• Net income (total, injected): \(fmtDec(roundD(rows.niTotal, digits: d), digits: d))")
+    print("• Net income (total, injected): \(fmtDec(rows.niTotal, digits: d))")
 
     for (sectionIndex, section) in table.sections.enumerated() {
         if sectionIndex > 0 {
@@ -119,21 +139,21 @@ public func printPeriod(
     print("")
     print(
         "Werkelijk totaal (ruw) → " +
-        "Begin: \(fmtDec(roundD(table.actualTotalBegin, digits: d), digits: d)) | " +
-        "Stort: \(fmtDec(roundD(table.actualTotalStort, digits: d), digits: d)) | " +
-        "Onttrek: \(fmtDec(roundD(table.actualTotalOnttrek, digits: d), digits: d)) | " +
-        "Winst: \(fmtDec(roundD(table.actualTotalWinst, digits: d), digits: d)) | " +
-        "Eind: \(fmtDec(roundD(table.actualTotalEnd, digits: d), digits: d))"
+        "Begin: \(fmtDec(table.actualTotalBegin, digits: d)) | " +
+        "Stort: \(fmtDec(table.actualTotalStort, digits: d)) | " +
+        "Onttrek: \(fmtDec(table.actualTotalOnttrek, digits: d)) | " +
+        "Winst: \(fmtDec(table.actualTotalWinst, digits: d)) | " +
+        "Eind: \(fmtDec(table.actualTotalEnd, digits: d))"
     )
 
     print(
-        "Check totals → Opening: \(fmtDec(roundD(rows.openingTotal, digits: d), digits: d)) | " +
-        "Closing: \(fmtDec(roundD(rows.closingTotal, digits: d), digits: d))"
+        "Check totals → Opening: \(fmtDec(rows.openingTotal, digits: d)) | " +
+        "Closing: \(fmtDec(rows.closingTotal, digits: d))"
     )
 
     print(
         "Identity: Begin + Stort − Onttrekkingen + Winst = " +
-        "\(fmtDec(roundD(identity, digits: d), digits: d))"
+        "\(fmtDec(identity, digits: d))"
     )
 }
 

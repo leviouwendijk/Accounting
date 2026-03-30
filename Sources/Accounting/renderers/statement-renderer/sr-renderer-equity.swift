@@ -569,7 +569,45 @@ extension StatementHTMLRenderer {
         names: [Int?: String],
         cfg: EquityRollforwardConfig
     ) -> [EquityHTMLPeriodView] {
-        periods.map { period in
+        func equityOwnerLabel(
+            _ raw: String
+        ) -> String {
+            if raw.hasPrefix("  ") {
+                return "↳ " + String(raw.dropFirst(2))
+            }
+
+            return raw
+        }
+
+        func equityOwnerRowClasses(
+            _ row: EquityOwnerDisplayRow
+        ) -> String {
+            var classes: [String] = []
+
+            if row.style == .subtotal {
+                classes.append("sr-eq-subtotal")
+            }
+
+            if !row.includeInSum {
+                classes.append("sr-eq-excluded")
+            }
+
+            if row.label.hasPrefix("  ") {
+                classes.append("sr-eq-row-child")
+            }
+
+            if row.label.hasSuffix(" (direct)") {
+                classes.append("sr-eq-row-direct")
+            } else if row.label.hasPrefix("  from ") {
+                classes.append("sr-eq-row-incoming")
+            } else if row.label.hasPrefix("  to ") {
+                classes.append("sr-eq-row-outgoing")
+            }
+
+            return classes.joined(separator: " ")
+        }
+
+        return periods.map { period in
             let rows = period.rows
 
             let table = try? makeEquityOwnerDisplayTable(
@@ -580,13 +618,6 @@ extension StatementHTMLRenderer {
 
             let ownerSections: [EquityHTMLSectionView] = (table?.sections ?? []).map { section in
                 let ownerRows: [EquityHTMLOwnerRowView] = section.rows.map { row in
-                    let rowClass = [
-                        row.style == .subtotal ? "sr-eq-subtotal" : nil,
-                        row.includeInSum ? nil : "sr-eq-excluded"
-                    ]
-                    .compactMap { $0 }
-                    .joined(separator: " ")
-
                     let detailText = [
                         row.detail,
                         row.includeInSum ? nil : "Excluded from section total"
@@ -601,9 +632,9 @@ extension StatementHTMLRenderer {
                     .joined(separator: " • ")
 
                     return EquityHTMLOwnerRowView(
-                        ownerName: row.label,
+                        ownerName: equityOwnerLabel(row.label),
                         detailText: detailText.isEmpty ? nil : detailText,
-                        rowClass: rowClass,
+                        rowClass: equityOwnerRowClasses(row),
                         exclusionBadgeText: row.includeInSum ? nil : "excluded",
                         begin: row.begin,
                         beginClass: equityAmountClass(row.begin),
@@ -752,8 +783,18 @@ extension StatementHTMLRenderer {
         digits: Int = 2
     ) -> String {
         fmtDec(
-            roundD(value, digits: digits),
+            value,
             digits: digits
         )
     }
+
+    // private static func fmtEquityAmount(
+    //     _ value: Decimal,
+    //     digits: Int = 2
+    // ) -> String {
+    //     fmtDec(
+    //         roundD(value, digits: digits),
+    //         digits: digits
+    //     )
+    // }
 }

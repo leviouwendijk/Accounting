@@ -171,39 +171,151 @@ public extension EntryCompilerParsing {
     func _ownerEquityFromMeta(_ meta: [String:String]) -> OwnerEquity? {
         let iso = ISO8601DateFormatter()
 
-        // initial
         guard
-            let d0s = meta["ownership.initial.date"], let d0 = iso.date(from: d0s),
-            let p0s = meta["ownership.initial.pct"],  let p0 = Decimal(string: p0s)
+            let d0s = meta["ownership.initial.date"],
+            let d0 = iso.date(from: d0s),
+            let p0s = meta["ownership.initial.pct"],
+            let p0 = Decimal(string: p0s)
         else {
-            return nil // require both initial date & percentage to consider it present
+            return nil
         }
 
-        let initial = OwnershipPercentage(date: d0, percentage: p0, details: meta["ownership.initial.details"])
+        let initial = OwnershipState(
+            date: d0,
+            percentage: p0,
+            details: meta["ownership.initial.details"]
+        )
 
-        // changes: scan ownership.<idx>.(date|pct|reason)
-        var changes: [OwnershipPercentage] = []
-
-        // collect unique indices present
         var idxs = Set<Int>()
-        for k in meta.keys where k.hasPrefix("ownership.") {
-            let rest = k.dropFirst("ownership.".count) // e.g. "3.date"
-            if let i = rest.split(separator: ".", maxSplits: 1).first, let n = Int(i) {
-                idxs.insert(n)
+        for key in meta.keys where key.hasPrefix("ownership.") {
+            let rest = key.dropFirst("ownership.".count)
+            if let first = rest.split(separator: ".", maxSplits: 1).first,
+               let idx = Int(first) {
+                idxs.insert(idx)
             }
         }
 
-        for i in idxs.sorted() {
+        var changes: [OwnershipChange] = []
+
+        for idx in idxs.sorted() {
             guard
-                let ds = meta["ownership.\(i).date"], let d = iso.date(from: ds),
-                let ps = meta["ownership.\(i).pct"],  let p = Decimal(string: ps)
-            else { continue }
-            let details = meta["ownership.\(i).reason"] ?? meta["ownership.\(i).details"]
-            changes.append(OwnershipPercentage(date: d, percentage: p, details: details))
+                let ds = meta["ownership.\(idx).date"],
+                let date = iso.date(from: ds),
+                let ps = meta["ownership.\(idx).pct"],
+                let pct = Decimal(string: ps)
+            else {
+                continue
+            }
+
+            let details =
+                meta["ownership.\(idx).reason"]
+                ?? meta["ownership.\(idx).details"]
+
+            var divideIdxs = Set<Int>()
+            let dividePrefix = "ownership.\(idx).divide."
+
+            for key in meta.keys where key.hasPrefix(dividePrefix) {
+                let rest = key.dropFirst(dividePrefix.count)
+                if let first = rest.split(separator: ".", maxSplits: 1).first,
+                   let divideIdx = Int(first) {
+                    divideIdxs.insert(divideIdx)
+                }
+            }
+
+            var divide: [OwnershipDivideEntry] = []
+
+            for divideIdx in divideIdxs.sorted() {
+                guard
+                    let ownerRaw = meta["ownership.\(idx).divide.\(divideIdx).owner"],
+                    let pctRaw = meta["ownership.\(idx).divide.\(divideIdx).pct"],
+                    let dividePct = Decimal(string: pctRaw)
+                else {
+                    continue
+                }
+
+                let owner = try? _entityRefFromPrintable(ownerRaw)
+                guard let owner else {
+                    continue
+                }
+
+                divide.append(
+                    OwnershipDivideEntry(
+                        owner: owner,
+                        percent: dividePct
+                    )
+                )
+            }
+
+            changes.append(
+                OwnershipChange(
+                    state: OwnershipState(
+                        date: date,
+                        percentage: pct,
+                        details: details
+                    ),
+                    divide: divide
+                )
+            )
         }
 
-        // sort just to be safe
-        changes.sort { $0.date < $1.date }
-        return OwnerEquity(initial: initial, changes: changes)
+        return OwnerEquity(
+            initial: initial,
+            changes: changes
+        )
     }
+
+    @inlinable
+    func _entityRefFromPrintable(
+        _ raw: String
+    ) throws -> EntityRef {
+        let trimmed = raw.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
+        let segs = trimmed
+            .split(separator: ".", omittingEmptySubsequences: true)
+            .map(String.init)
+
+        return try makeEntityRef(from: segs)
+    }
+
+    // @inlinable
+    // func _ownerEquityFromMeta(_ meta: [String:String]) -> OwnerEquity? {
+    //     let iso = ISO8601DateFormatter()
+
+    //     // initial
+    //     guard
+    //         let d0s = meta["ownership.initial.date"], let d0 = iso.date(from: d0s),
+    //         let p0s = meta["ownership.initial.pct"],  let p0 = Decimal(string: p0s)
+    //     else {
+    //         return nil // require both initial date & percentage to consider it present
+    //     }
+
+    //     let initial = OwnershipPercentage(date: d0, percentage: p0, details: meta["ownership.initial.details"])
+
+    //     // changes: scan ownership.<idx>.(date|pct|reason)
+    //     var changes: [OwnershipPercentage] = []
+
+    //     // collect unique indices present
+    //     var idxs = Set<Int>()
+    //     for k in meta.keys where k.hasPrefix("ownership.") {
+    //         let rest = k.dropFirst("ownership.".count) // e.g. "3.date"
+    //         if let i = rest.split(separator: ".", maxSplits: 1).first, let n = Int(i) {
+    //             idxs.insert(n)
+    //         }
+    //     }
+
+    //     for i in idxs.sorted() {
+    //         guard
+    //             let ds = meta["ownership.\(i).date"], let d = iso.date(from: ds),
+    //             let ps = meta["ownership.\(i).pct"],  let p = Decimal(string: ps)
+    //         else { continue }
+    //         let details = meta["ownership.\(i).reason"] ?? meta["ownership.\(i).details"]
+    //         changes.append(OwnershipPercentage(date: d, percentage: p, details: details))
+    //     }
+
+    //     // sort just to be safe
+    //     changes.sort { $0.date < $1.date }
+    //     return OwnerEquity(initial: initial, changes: changes)
+    // }
 }

@@ -3,28 +3,113 @@ import Foundation
 // ─────────────────────────────────────────────────────────────────────────────
 // Small utils & formatting
 
-public enum PadAlign { case left, right }
-public func pad(_ s: String, _ w: Int, _ a: PadAlign = .left) -> String {
-    let len = s.count
-    if len >= w { return s }
-    let spaces = String(repeating: " ", count: w - len)
-    return a == .left ? (s + spaces) : (spaces + s)
+public enum PadAlign {
+    case left
+    case right
 }
-public func absD(_ x: Decimal) -> Decimal { x < 0 ? -x : x }
-public func roundD(_ x: Decimal, digits: Int = 2) -> Decimal {
-    var v = x, out = Decimal()
-    NSDecimalRound(&out, &v, digits, .plain)
+
+public func pad(
+    _ s: String,
+    _ w: Int,
+    _ a: PadAlign = .left
+) -> String {
+    let len = s.count
+    if len >= w {
+        return s
+    }
+
+    let spaces = String(
+        repeating: " ",
+        count: w - len
+    )
+
+    return a == .left
+        ? (s + spaces)
+        : (spaces + s)
+}
+
+public func absD(
+    _ x: Decimal
+) -> Decimal {
+    x < 0 ? -x : x
+}
+
+public func roundD(
+    _ x: Decimal,
+    digits: Int = 2
+) -> Decimal {
+    var v = x
+    var out = Decimal()
+
+    NSDecimalRound(
+        &out,
+        &v,
+        digits,
+        .plain
+    )
+
     return out
 }
-public func fmtDec(_ x: Decimal, digits: Int = 2) -> String {
+
+public func fmtDec(
+    _ x: Decimal,
+    digits: Int = 2
+) -> String {
+    let rounded = roundD(
+        x,
+        digits: digits
+    )
+
     let nf = NumberFormatter()
     nf.locale = Locale(identifier: "nl_NL")
     nf.numberStyle = .decimal
     nf.minimumFractionDigits = digits
     nf.maximumFractionDigits = digits
-    return nf.string(from: x as NSDecimalNumber) ?? x.description
-}
-public func fmtPct(_ p: Decimal, digits: Int = 2) -> String {
-    "\(fmtDec(roundD(p * 100, digits: digits), digits: digits))%"
+
+    let magnitude = absD(rounded)
+    let rendered = nf.string(
+        from: magnitude as NSDecimalNumber
+    ) ?? magnitude.description
+
+    if rounded < 0 {
+        return "(\(rendered))"
+    }
+
+    return rendered
 }
 
+public func fmtPct(
+    _ p: Decimal,
+    digits: Int = 2
+) -> String {
+    "\(fmtDec(p * 100, digits: digits))%"
+}
+
+// public enum PadAlign { case left, right }
+
+// public func pad(_ s: String, _ w: Int, _ a: PadAlign = .left) -> String {
+//     let len = s.count
+//     if len >= w { return s }
+//     let spaces = String(repeating: " ", count: w - len)
+//     return a == .left ? (s + spaces) : (spaces + s)
+// }
+// public func absD(_ x: Decimal) -> Decimal { x < 0 ? -x : x }
+
+// public func roundD(_ x: Decimal, digits: Int = 2) -> Decimal {
+//     var v = x, out = Decimal()
+//     NSDecimalRound(&out, &v, digits, .plain)
+//     return out
+// }
+
+// public func fmtDec(_ x: Decimal, digits: Int = 2) -> String {
+//     let nf = NumberFormatter()
+//     nf.locale = Locale(identifier: "nl_NL")
+//     nf.numberStyle = .decimal
+//     nf.minimumFractionDigits = digits
+//     nf.maximumFractionDigits = digits
+//     return nf.string(from: x as NSDecimalNumber) ?? x.description
+// }
+
+// public func fmtPct(_ p: Decimal, digits: Int = 2) -> String {
+//     "\(fmtDec(roundD(p * 100, digits: digits), digits: digits))%"
+// }

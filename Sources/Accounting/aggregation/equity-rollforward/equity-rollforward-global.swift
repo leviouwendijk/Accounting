@@ -88,6 +88,7 @@ extension OwnerEquity.Rollforward {
 
             // Pack a row
             let row = PeriodRollforward(
+                asOf: p.asOf,
                 owners: owners,
                 beginByOwner: beginByOwner,
                 deltas: deltas,
@@ -257,6 +258,7 @@ extension OwnerEquity.Rollforward {
             }
 
             let row = PeriodRollforward(
+                asOf: history[i].asOf,
                 owners: owners,
                 beginByOwner: beginByOwner,
                 deltas: deltas,
