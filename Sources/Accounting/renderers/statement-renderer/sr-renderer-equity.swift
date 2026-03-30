@@ -65,34 +65,16 @@ fileprivate struct EquityHTMLAllocationRowView {
     let amountClass: String
 }
 
-// fileprivate struct EquityHTMLDrawingsRowView {
-//     let label: String
-//     let ownerAmounts: [Decimal]
-//     let ownerClasses: [String]
-//     let total: Decimal
-//     let totalClass: String
-// }
-
-// fileprivate struct EquityHTMLDrawingsView {
-//     let ownerNames: [String]
-//     let rows: [EquityHTMLDrawingsRowView]
-//     let ownerTotals: [Decimal]
-//     let grandTotal: Decimal
-//     let grandTotalClass: String
-//     let reconcilesText: String
-//     let auditLines: [String]
-// }
-
-fileprivate struct EquityHTMLDrawingsDetailLineView {
-    let kindClass: String
-    let text: String
-    let amount: Decimal
+fileprivate struct EquityHTMLDrawingsDetailCellView {
+    let text: String?
+    let amount: Decimal?
     let amountClass: String
 }
 
-fileprivate struct EquityHTMLDrawingsDetailOwnerView {
-    let ownerName: String
-    let lines: [EquityHTMLDrawingsDetailLineView]
+fileprivate struct EquityHTMLDrawingsDetailRowView {
+    let label: String
+    let rowClass: String
+    let ownerCells: [EquityHTMLDrawingsDetailCellView]
 }
 
 fileprivate struct EquityHTMLDrawingsRowView {
@@ -101,7 +83,7 @@ fileprivate struct EquityHTMLDrawingsRowView {
     let ownerClasses: [String]
     let total: Decimal
     let totalClass: String
-    let detailOwners: [EquityHTMLDrawingsDetailOwnerView]
+    let detailRows: [EquityHTMLDrawingsDetailRowView]
 }
 
 fileprivate struct EquityHTMLDrawingsView {
@@ -517,55 +499,34 @@ extension StatementHTMLRenderer {
                                 }
                             }
 
-                            if !row.detailOwners.isEmpty {
-                                HTML.tr(["class": "sr-eq-row-child sr-eq-drawings-detail-row"]) {
+                            for detailRow in row.detailRows {
+                                HTML.tr(
+                                    detailRow.rowClass.isEmpty
+                                        ? ["class": "sr-eq-row-child"]
+                                        : ["class": "sr-eq-row-child \(detailRow.rowClass)"]
+                                ) {
                                     HTML.td(["class": "sr-eq-left"]) {
-                                        HTML.text("↳ opbouw")
+                                        HTML.text(detailRow.label)
                                     }
 
-                                    HTML.td([
-                                        "class": "sr-eq-drawings-detail-wrap",
-                                        "colspan": "\(drawings.ownerNames.count + 1)"
-                                    ]) {
-                                        HTML.table(["class": "sr-eq-drawings-detail-table"]) {
-                                            HTML.thead {
-                                                HTML.tr {
-                                                    HTML.th(["class": "sr-eq-left"]) {
-                                                        HTML.text("Eigenaar")
-                                                    }
-                                                    HTML.th(["class": "sr-eq-left"]) {
-                                                        HTML.text("Mutatie")
-                                                    }
-                                                    HTML.th {
-                                                        HTML.text("Bedrag")
-                                                    }
-                                                }
-                                            }
+                                    for cell in detailRow.ownerCells {
+                                        let attrs: HTMLAttribute = cell.amountClass.isEmpty
+                                            ? HTMLAttribute()
+                                            : ["class": cell.amountClass]
 
-                                            HTML.tbody {
-                                                for owner in row.detailOwners {
-                                                    for line in owner.lines {
-                                                        HTML.tr(
-                                                            line.kindClass.isEmpty
-                                                                ? [:]
-                                                                : ["class": line.kindClass]
-                                                        ) {
-                                                            HTML.td(["class": "sr-eq-left"]) {
-                                                                HTML.text(owner.ownerName)
-                                                            }
-
-                                                            HTML.td(["class": "sr-eq-left"]) {
-                                                                HTML.text(line.text)
-                                                            }
-
-                                                            HTML.td(["class": line.amountClass]) {
-                                                                HTML.text(fmtEquityAmount(line.amount))
-                                                            }
-                                                        }
-                                                    }
-                                                }
+                                        HTML.td(attrs) {
+                                            if let text = cell.text {
+                                                HTML.text(text)
+                                            } else if let amount = cell.amount {
+                                                HTML.text(fmtEquityAmount(amount))
+                                            } else {
+                                                HTML.text("")
                                             }
                                         }
+                                    }
+
+                                    HTML.td {
+                                        HTML.text("")
                                     }
                                 }
                             }
@@ -810,6 +771,12 @@ extension StatementHTMLRenderer {
             return nil
         }
 
+        struct OwnerDetailBuckets {
+            var direct: Decimal?
+            var incoming: [(text: String, amount: Decimal)] = []
+            var outgoing: [(text: String, amount: Decimal)] = []
+        }
+
         let ownerNames = drawings.owners.map { oid in
             names[Int?(oid)] ?? "owner#\(oid)"
         }
@@ -823,67 +790,144 @@ extension StatementHTMLRenderer {
 
             let primaryOwnerClasses = primaryOwnerAmounts.map(equityAmountClass)
 
-            let detailOwners: [EquityHTMLDrawingsDetailOwnerView] = drawings.owners.compactMap { oid in
-                let ownerName = names[Int?(oid)] ?? "owner#\(oid)"
+            var bucketsByOwner: [Int: OwnerDetailBuckets] = [:]
+
+            for oid in drawings.owners {
                 let direct = row.directAmountsByOwner[oid] ?? 0
                 let branches = row.branchRowsByOwner[oid] ?? []
 
-                var lines: [EquityHTMLDrawingsDetailLineView] = []
+                var buckets = OwnerDetailBuckets()
 
                 if direct != 0 {
-                    lines.append(
-                        EquityHTMLDrawingsDetailLineView(
-                            kindClass: "sr-eq-row-direct",
-                            text: "direct",
-                            amount: direct,
-                            amountClass: equityAmountClass(direct)
-                        )
-                    )
+                    buckets.direct = direct
                 }
 
                 for branch in branches {
-                    let text: String = {
-                        switch branch.kind {
-                        case .direct:
-                            return branch.detail.map { "direct • \($0)" } ?? "direct"
+                    let text = branch.detail ?? branch.label
 
-                        case .incoming:
-                            return branch.detail.map { "\(branch.label) • \($0)" } ?? branch.label
-
-                        case .outgoing:
-                            return branch.detail.map { "\(branch.label) • \($0)" } ?? branch.label
+                    switch branch.kind {
+                    case .direct:
+                        if buckets.direct == nil {
+                            buckets.direct = branch.amount
                         }
-                    }()
 
-                    let kindClass: String = {
-                        switch branch.kind {
-                        case .direct:
-                            return "sr-eq-row-direct"
-                        case .incoming:
-                            return "sr-eq-row-incoming"
-                        case .outgoing:
-                            return "sr-eq-row-outgoing"
-                        }
-                    }()
-
-                    lines.append(
-                        EquityHTMLDrawingsDetailLineView(
-                            kindClass: kindClass,
-                            text: text,
-                            amount: branch.amount,
-                            amountClass: equityAmountClass(branch.amount)
+                    case .incoming:
+                        buckets.incoming.append(
+                            (text: text, amount: branch.amount)
                         )
+
+                    case .outgoing:
+                        buckets.outgoing.append(
+                            (text: text, amount: branch.amount)
+                        )
+                    }
+                }
+
+                bucketsByOwner[oid] = buckets
+            }
+
+            let maxIncoming = drawings.owners.reduce(0) { partial, oid in
+                max(partial, bucketsByOwner[oid]?.incoming.count ?? 0)
+            }
+
+            let maxOutgoing = drawings.owners.reduce(0) { partial, oid in
+                max(partial, bucketsByOwner[oid]?.outgoing.count ?? 0)
+            }
+
+            var detailRows: [EquityHTMLDrawingsDetailRowView] = []
+
+            let hasDirect = drawings.owners.contains {
+                (bucketsByOwner[$0]?.direct) != nil
+            }
+
+            if hasDirect {
+                let ownerCells = drawings.owners.map { oid in
+                    if let amount = bucketsByOwner[oid]?.direct {
+                        return EquityHTMLDrawingsDetailCellView(
+                            text: nil,
+                            amount: amount,
+                            amountClass: equityAmountClass(amount)
+                        )
+                    }
+
+                    return EquityHTMLDrawingsDetailCellView(
+                        text: nil,
+                        amount: nil,
+                        amountClass: ""
                     )
                 }
 
-                guard !lines.isEmpty else {
-                    return nil
-                }
-
-                return EquityHTMLDrawingsDetailOwnerView(
-                    ownerName: ownerName,
-                    lines: lines
+                detailRows.append(
+                    EquityHTMLDrawingsDetailRowView(
+                        label: "↳ direct",
+                        rowClass: "sr-eq-row-direct",
+                        ownerCells: ownerCells
+                    )
                 )
+            }
+
+            if maxIncoming > 0 {
+                for index in 0..<maxIncoming {
+                    let ownerCells = drawings.owners.map { oid in
+                        let incoming = bucketsByOwner[oid]?.incoming ?? []
+
+                        guard index < incoming.count else {
+                            return EquityHTMLDrawingsDetailCellView(
+                                text: nil,
+                                amount: nil,
+                                amountClass: ""
+                            )
+                        }
+
+                        let item = incoming[index]
+
+                        return EquityHTMLDrawingsDetailCellView(
+                            text: "\(item.text): \(fmtEquityAmount(item.amount))",
+                            amount: nil,
+                            amountClass: equityAmountClass(item.amount)
+                        )
+                    }
+
+                    detailRows.append(
+                        EquityHTMLDrawingsDetailRowView(
+                            label: index == 0 ? "↳ branch" : "↳ branch",
+                            rowClass: "sr-eq-row-incoming",
+                            ownerCells: ownerCells
+                        )
+                    )
+                }
+            }
+
+            if maxOutgoing > 0 {
+                for index in 0..<maxOutgoing {
+                    let ownerCells = drawings.owners.map { oid in
+                        let outgoing = bucketsByOwner[oid]?.outgoing ?? []
+
+                        guard index < outgoing.count else {
+                            return EquityHTMLDrawingsDetailCellView(
+                                text: nil,
+                                amount: nil,
+                                amountClass: ""
+                            )
+                        }
+
+                        let item = outgoing[index]
+
+                        return EquityHTMLDrawingsDetailCellView(
+                            text: "\(item.text): \(fmtEquityAmount(item.amount))",
+                            amount: nil,
+                            amountClass: equityAmountClass(item.amount)
+                        )
+                    }
+
+                    detailRows.append(
+                        EquityHTMLDrawingsDetailRowView(
+                            label: "↳ branch",
+                            rowClass: "sr-eq-row-outgoing",
+                            ownerCells: ownerCells
+                        )
+                    )
+                }
             }
 
             rowViews.append(
@@ -893,7 +937,7 @@ extension StatementHTMLRenderer {
                     ownerClasses: primaryOwnerClasses,
                     total: row.total,
                     totalClass: equityAmountClass(row.total),
-                    detailOwners: detailOwners
+                    detailRows: detailRows
                 )
             )
         }
