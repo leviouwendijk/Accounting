@@ -253,6 +253,24 @@ public enum StatementStyleCSS {
                     CSS.decl("font-weight", "600")
                 ),
 
+                // slight emphasis of parent element
+                // ------------------------------------
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table tr:not(.sr-eq-subtotal):not(.sr-eq-row-child) td, .sr-eq table.sr-eq-table tr:not(.sr-eq-subtotal):not(.sr-eq-row-child) th",
+                    CSS.decl("background", "#fcfcfd"),
+                    CSS.decl("border-top", "1px solid #d1d5db"),
+                    CSS.decl("border-bottom", "1px solid #d1d5db")
+                ),
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table tr:not(.sr-eq-subtotal):not(.sr-eq-row-child) td:first-child, .sr-eq table.sr-eq-table tr:not(.sr-eq-subtotal):not(.sr-eq-row-child) th:first-child",
+                    CSS.decl("border-left", "1px solid #d1d5db")
+                ),
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table tr:not(.sr-eq-subtotal):not(.sr-eq-row-child) td:last-child, .sr-eq table.sr-eq-table tr:not(.sr-eq-subtotal):not(.sr-eq-row-child) th:last-child",
+                    CSS.decl("border-right", "1px solid #d1d5db")
+                ),
+                // ------------------------------------
+
                 CSS.rule(
                     ".sr-eq table.sr-eq-table tr.sr-eq-row-child td, .sr-eq table.sr-eq-table tr.sr-eq-row-child th",
                     CSS.decl("background", "#fafafa")
