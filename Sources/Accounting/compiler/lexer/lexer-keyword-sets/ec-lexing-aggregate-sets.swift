@@ -78,7 +78,8 @@ public func aggregateLexingSets(flavor: EntryCompilerLexingFlavor) -> EntryCompi
         "domain",
         "content",
         // "display",
-        "variant", "subvariant", "trait"
+        "variant", "subvariant", "trait",
+        "collapses",
     ]
     
     let ownership: Set<String> = [

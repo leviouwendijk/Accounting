@@ -9,9 +9,10 @@ public struct EntityDef: Sendable, Codable {
     public var depreciation: DepreciationConfig?
     public var depreciationDraft: DepreciationConfigDraft?
     public var ownerEquity: OwnerEquity?
-
     public var kia: KIAConfigAssetAllocation?
     public var kiaDraft: KIADraft?
+
+    public var collapses: Bool?
 
     public var location: SourceLocation?
 
@@ -26,6 +27,7 @@ public struct EntityDef: Sendable, Codable {
         ownerEquity: OwnerEquity? = nil,
         kia: KIAConfigAssetAllocation? = nil,
         kiaDraft: KIADraft? = nil,
+        collapses: Bool? = nil,
 
         location: SourceLocation? = nil
     ) {

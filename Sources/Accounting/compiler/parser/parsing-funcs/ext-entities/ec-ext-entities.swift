@@ -26,6 +26,7 @@ public extension EntryCompilerParsing {
         var metadata: [String:String] = [:]
         var dep: DepreciationConfigDraft?
         var extraDefs: [EntityDef] = []              // collect unit/variant outputs
+        var collapses: Bool = false
 
         let hint = _entityPathHint(fileURL: nil, inferredClass: inferredClass, inferredFamily: inferredFamily)
 
@@ -92,6 +93,12 @@ public extension EntryCompilerParsing {
                 key = EntityKey(class: c!, family: f!, alias: ref.alias)
                 core.trace("  use alias \(ref.alias.string) → \(key!.identifier(displaying: .fullchain))")
 
+            case .ident("collapses"), .keyword("collapses"):
+                collapses = true
+                metadata["entity.collapses"] = "true"
+                advance()
+                core.trace("  collapses")
+
             case .ident("display"), .keyword("display"):
                 let txt = try parseFreeTextBlock(named: "display")
                 displayName = txt
@@ -151,7 +158,15 @@ public extension EntryCompilerParsing {
         }
 
         var defs: [EntityDef] = []
+
         let oe = _ownerEquityFromMeta(metadata)
+
+        try validateCollapsingOwnership(
+            collapses: collapses == true,
+            ownerEquity: oe,
+            at: loc()
+        )
+
         let base = EntityDef(
             key: k,
             displayName: displayName,
@@ -159,7 +174,8 @@ public extension EntryCompilerParsing {
             metadata: metadata,
             depreciation: nil,
             depreciationDraft: dep,
-            ownerEquity: oe
+            ownerEquity: oe,
+            collapses: collapses
         )
         defs.append(base)
         defs.append(contentsOf: extraDefs)
@@ -277,6 +293,39 @@ public extension EntryCompilerParsing {
             .map(String.init)
 
         return try makeEntityRef(from: segs)
+    }
+
+    @inlinable
+    func validateCollapsingOwnership(
+        collapses: Bool,
+        ownerEquity: OwnerEquity?,
+        at location: SourceLocation
+    ) throws {
+        guard collapses, let ownerEquity else {
+            return
+        }
+
+        for change in ownerEquity.changes {
+            guard !change.divide.isEmpty else {
+                throw ParserError.unexpectedToken(
+                    .keyword("collapses"),
+                    expected: "divide block totaling 100.00 for collapsing entity ownership change on \(change.date)",
+                    at: location
+                )
+            }
+
+            let total = change.divide.reduce(Decimal(0)) { partial, entry in
+                partial + entry.percent
+            }
+
+            if total != 100 {
+                throw ParserError.unexpectedToken(
+                    .keyword("collapses"),
+                    expected: "divide total of 100.00 for collapsing entity ownership change on \(change.date), got \(total)",
+                    at: location
+                )
+            }
+        }
     }
 
     // @inlinable
