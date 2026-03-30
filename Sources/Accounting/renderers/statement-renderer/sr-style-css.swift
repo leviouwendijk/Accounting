@@ -329,6 +329,70 @@ public enum StatementStyleCSS {
                     CSS.decl("opacity", "0.82")
                 ),
 
+                // drawings breakdown view additions
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table tr.sr-eq-drawings-detail-row td.sr-eq-drawings-detail-wrap",
+                    CSS.decl("padding", "0"),
+                    CSS.decl("border-left", "none"),
+                    CSS.decl("border-right", "none")
+                ),
+                CSS.rule(
+                    ".sr-eq .sr-eq-drawings-detail-table",
+                    CSS.decl("width", "100%"),
+                    CSS.decl("border-collapse", "collapse"),
+                    CSS.decl("table-layout", "fixed")
+                ),
+                CSS.rule(
+                    ".sr-eq .sr-eq-drawings-detail-table th",
+                    CSS.decl("text-align", "left"),
+                    CSS.decl("font-size", "10px"),
+                    CSS.decl("font-weight", "600"),
+                    CSS.decl("color", "#666"),
+                    CSS.decl("padding", "6px 10px"),
+                    CSS.decl("border-bottom", "1px solid #e5e7eb"),
+                    CSS.decl("background", "#f8fafc")
+                ),
+                CSS.rule(
+                    ".sr-eq .sr-eq-drawings-detail-table td",
+                    CSS.decl("padding", "6px 10px"),
+                    CSS.decl("vertical-align", "top"),
+                    CSS.decl("border-bottom", "1px solid #eef2f7")
+                ),
+                CSS.rule(
+                    ".sr-eq .sr-eq-drawings-detail-table tr:last-child td",
+                    CSS.decl("border-bottom", "none")
+                ),
+                CSS.rule(
+                    ".sr-eq .sr-eq-drawings-detail-table td:nth-child(1)",
+                    CSS.decl("width", "20%"),
+                    CSS.decl("font-weight", "600")
+                ),
+                CSS.rule(
+                    ".sr-eq .sr-eq-drawings-detail-table td:nth-child(2)",
+                    CSS.decl("width", "60%"),
+                    CSS.decl("color", "#374151")
+                ),
+                CSS.rule(
+                    ".sr-eq .sr-eq-drawings-detail-table td:nth-child(3)",
+                    CSS.decl("width", "20%"),
+                    CSS.decl("text-align", "right"),
+                    CSS.decl("white-space", "nowrap"),
+                    CSS.decl("font-variant-numeric", "tabular-nums"),
+                    CSS.decl("font-feature-settings", "\"tnum\"")
+                ),
+                CSS.rule(
+                    ".sr-eq .sr-eq-drawings-detail-table tr.sr-eq-row-direct td",
+                    CSS.decl("background", "#f8fafc")
+                ),
+                CSS.rule(
+                    ".sr-eq .sr-eq-drawings-detail-table tr.sr-eq-row-incoming td",
+                    CSS.decl("background", "#f0fdf4")
+                ),
+                CSS.rule(
+                    ".sr-eq .sr-eq-drawings-detail-table tr.sr-eq-row-outgoing td",
+                    CSS.decl("background", "#fff7ed")
+                ),
+
                 // ------------------------------------------------------------
                 // VAT overview (scoped under body.sr-vat)
                 // ------------------------------------------------------------
