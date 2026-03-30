@@ -22,7 +22,7 @@ extension OwnerEquity.Rollforward {
         if hasPostedBegin {
             return ["Earliest anchor: owner-tagged opening found — using posted per-owner BEGIN."]
         } else if hasPerOwnerClosing {
-            return ["Earliest anchor: backsolved from per-owner closing − movements (no % guessing)."]
+            return ["Earliest anchor: backsolved from per-owner closing − owner rollforward movements."]
         } else {
             return ["Earliest anchor: none posted and no per-owner closing — BEGIN = 0 per owner."]
         }
