@@ -220,9 +220,20 @@ public extension EntryCompilerParsing {
         var out: [(owner: EntityRef, percent: Decimal)] = []
 
         while current != .rBrace && current != .eof {
-            out.append(
-                try parseOwnershipDivideEntry()
-            )
+            switch current {
+            case .keyword("to"), .ident("to"),
+                 .keyword("owner"), .ident("owner"):
+                out.append(
+                    try parseOwnershipDivideEntry()
+                )
+
+            default:
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "to(...) = <number> or owner.path(<number>)",
+                    at: loc()
+                )
+            }
         }
 
         try expect(.rBrace)
@@ -234,15 +245,20 @@ public extension EntryCompilerParsing {
         switch current {
         case .keyword("to"), .ident("to"):
             advance()
+            try expect(.lPar)
 
             let owner = try parseEntityRefFlexible()
+
+            try expect(.rPar)
             try expect(.equals)
+
             let percent = try expectDecimal()
 
             return (owner: owner, percent: percent)
 
         default:
             let owner = try parseEntityRefFlexible()
+
             try expect(.lPar)
             let percent = try expectDecimal()
             try expect(.rPar)
