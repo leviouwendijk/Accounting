@@ -2,36 +2,13 @@ import Foundation
 
 public func printDrawingsBreakdown(
     title: String,
-    owners: [Int],
-    deltas: [Int: OwnerDelta],
     entities: EntityStore,
     cfg: EquityRollforwardConfig,
-    breakdown: DrawingsBreakdown
+    report: EquityDrawingsBreakdownReport
 ) {
     let names = ownerNameMap(entities)
     let d = cfg.fractionDigits
-
-    let report: EquityDrawingsBreakdownReport?
-
-    do {
-        report = try makeEquityDrawingsBreakdownReport(
-            breakdown: breakdown,
-            owners: owners,
-            deltas: deltas,
-            asOf: Date(),
-            entities: entities,
-            digits: d
-        )
-    } catch {
-        print("\n\(title)")
-        print(String(repeating: "—", count: title.count))
-        print("error: \(error)")
-        return
-    }
-
-    guard let report else {
-        return
-    }
+    let owners = report.owners
 
     print("\n\(title)")
     print(String(repeating: "—", count: title.count))
