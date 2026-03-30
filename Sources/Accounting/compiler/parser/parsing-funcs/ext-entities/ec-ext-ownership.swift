@@ -36,7 +36,8 @@ public extension EntryCompilerParsing {
                     names: ["effective_date","date"], tz: tz, allowInfer: false
                 ) {
                     if let d = try? spec.asAbsolute(loc: loc()) {
-                        initialDateStr = ISO8601DateFormatter().string(from: d)
+                        // initialDateStr = ISO8601DateFormatter().string(from: d)
+                        initialDateStr = localDateString(d, timeZone: tz)
                     }
                 }
 
@@ -141,7 +142,8 @@ public extension EntryCompilerParsing {
                         allowInfer: false
                     )
                     let d = try spec.asAbsolute(loc: loc())
-                    dateISO = ISO8601DateFormatter().string(from: d)
+                    // dateISO = ISO8601DateFormatter().string(from: d)
+                    dateISO = localDateString(d, timeZone: tz)
 
                 case .keyword("percentage"), .ident("percentage"):
                     advance()

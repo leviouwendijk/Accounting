@@ -159,11 +159,12 @@ public extension EntryCompilerParsing {
 
         var defs: [EntityDef] = []
 
-        let oe = _ownerEquityFromMeta(metadata)
+        let oe = _ownerEquityFromMeta(metadata, timeZone: defaultTZ)
 
         try validateCollapsingOwnership(
             collapses: collapses == true,
             ownerEquity: oe,
+            timeZone: defaultTZ,
             at: loc()
         )
 
@@ -184,17 +185,29 @@ public extension EntryCompilerParsing {
     }
 
     @inlinable
-    func _ownerEquityFromMeta(_ meta: [String:String]) -> OwnerEquity? {
-        let iso = ISO8601DateFormatter()
+    func _ownerEquityFromMeta(
+        _ meta: [String:String],
+        timeZone: TimeZone
+    ) -> OwnerEquity? {
+        // let iso = ISO8601DateFormatter()
 
         guard
             let d0s = meta["ownership.initial.date"],
-            let d0 = iso.date(from: d0s),
+            let d0 = parseLocalDateString(d0s, timeZone: timeZone),
             let p0s = meta["ownership.initial.pct"],
             let p0 = Decimal(string: p0s)
         else {
             return nil
         }
+
+        // guard
+        //     let d0s = meta["ownership.initial.date"],
+        //     let d0 = iso.date(from: d0s),
+        //     let p0s = meta["ownership.initial.pct"],
+        //     let p0 = Decimal(string: p0s)
+        // else {
+        //     return nil
+        // }
 
         let initial = OwnershipState(
             date: d0,
@@ -216,12 +229,20 @@ public extension EntryCompilerParsing {
         for idx in idxs.sorted() {
             guard
                 let ds = meta["ownership.\(idx).date"],
-                let date = iso.date(from: ds),
+                let date = parseLocalDateString(ds, timeZone: timeZone),
                 let ps = meta["ownership.\(idx).pct"],
                 let pct = Decimal(string: ps)
             else {
                 continue
             }
+            // guard
+            //     let ds = meta["ownership.\(idx).date"],
+            //     let date = iso.date(from: ds),
+            //     let ps = meta["ownership.\(idx).pct"],
+            //     let pct = Decimal(string: ps)
+            // else {
+            //     continue
+            // }
 
             let details =
                 meta["ownership.\(idx).reason"]
@@ -299,17 +320,20 @@ public extension EntryCompilerParsing {
     func validateCollapsingOwnership(
         collapses: Bool,
         ownerEquity: OwnerEquity?,
-        at location: SourceLocation
+        timeZone: TimeZone,
+        at location: SourceLocation,
     ) throws {
         guard collapses, let ownerEquity else {
             return
         }
 
+
         for change in ownerEquity.changes {
+            let shownDate = localDateString(change.date, timeZone: timeZone)
             guard !change.divide.isEmpty else {
                 throw ParserError.unexpectedToken(
                     .keyword("collapses"),
-                    expected: "divide block totaling 100.00 for collapsing entity ownership change on \(change.date)",
+                    expected: "divide block totaling 100.00 for collapsing entity ownership change on \(shownDate)",
                     at: location
                 )
             }
@@ -321,7 +345,7 @@ public extension EntryCompilerParsing {
             if total != 100 {
                 throw ParserError.unexpectedToken(
                     .keyword("collapses"),
-                    expected: "divide total of 100.00 for collapsing entity ownership change on \(change.date), got \(total)",
+                    expected: "divide total of 100.00 for collapsing entity ownership change on \(shownDate), got \(total)",
                     at: location
                 )
             }
