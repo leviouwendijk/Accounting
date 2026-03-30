@@ -248,11 +248,40 @@ public extension EntryCompilerParsing {
 
         try beginBlock()
 
+        var kind: StatementEquitySectionSettings.Kind = .rows
         var rows: [StatementEquityRowSettings] = []
 
         while current != .rBrace && current != .eof {
             switch current {
+            case .keyword("standard"), .ident("standard"):
+                guard rows.isEmpty else {
+                    throw ParserError.unexpectedToken(
+                        current,
+                        expected: "section { standard } must not be mixed with row declarations",
+                        at: loc()
+                    )
+                }
+
+                guard kind != .standard else {
+                    throw ParserError.unexpectedToken(
+                        current,
+                        expected: "only one standard marker per section",
+                        at: loc()
+                    )
+                }
+
+                advance()
+                kind = .standard
+
             case .keyword("row"), .ident("row"):
+                guard kind == .rows else {
+                    throw ParserError.unexpectedToken(
+                        current,
+                        expected: "row declarations cannot be mixed with section { standard }",
+                        at: loc()
+                    )
+                }
+
                 rows.append(
                     try parseStatementEquityRowSettings()
                 )
@@ -260,7 +289,7 @@ public extension EntryCompilerParsing {
             default:
                 throw ParserError.unexpectedToken(
                     current,
-                    expected: "row",
+                    expected: "standard or row",
                     at: loc()
                 )
             }
@@ -269,6 +298,7 @@ public extension EntryCompilerParsing {
         try endBlock()
 
         return StatementEquitySectionSettings(
+            kind: kind,
             rows: rows
         )
     }

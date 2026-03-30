@@ -168,11 +168,19 @@ public struct StatementEquityViewSettings: Codable, Sendable {
 }
 
 public struct StatementEquitySectionSettings: Codable, Sendable {
+    public enum Kind: String, Codable, Sendable {
+        case rows
+        case standard
+    }
+
+    public var kind: Kind
     public var rows: [StatementEquityRowSettings]
 
     public init(
-        rows: [StatementEquityRowSettings]
+        kind: Kind = .rows,
+        rows: [StatementEquityRowSettings] = []
     ) {
+        self.kind = kind
         self.rows = rows
     }
 }

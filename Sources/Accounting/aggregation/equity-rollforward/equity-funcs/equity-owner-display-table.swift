@@ -191,6 +191,7 @@ private func makeDisplaySections(
     if let plan {
         resolvedSections = try resolveSections(
             plan.sections,
+            defaultOwnerIds: periodRows.owners,
             entities: entities,
             names: names
         )
@@ -219,6 +220,152 @@ private func makeDisplaySections(
         )
     }
 }
+
+private func resolveSections(
+    _ sections: [EquityOwnerDisplaySection],
+    defaultOwnerIds: [Int],
+    entities: EntityStore,
+    names: [Int?: String]
+) throws -> [[ResolvedEquityOwnerDisplaySpec]] {
+    let idIndex = entities.idIndex
+
+    return try sections.map { section in
+        switch section.kind {
+        case .standard:
+            return defaultOwnerIds.map { ownerId in
+                .owner(
+                    ownerId: ownerId,
+                    ownerName: names[Int?(ownerId)] ?? "owner#\(ownerId)"
+                )
+            }
+
+        case .manual:
+            return try section.rows.map { row in
+                switch row {
+                case .owner(let ref):
+                    let resolved = try entities.resolve(ref, at: nil)
+
+                    guard let ownerId = idIndex[resolved.key] else {
+                        throw EquityOwnerDisplayPlanError.missingOwnerID(
+                            resolved.key.identifier(displaying: .fullchain)
+                        )
+                    }
+
+                    let ownerName = normalizeInlineDisplayText(
+                        names[Int?(ownerId)]
+                            ?? entities.byFull[resolved.key]?.displayName
+                            ?? resolved.key.identifier(displaying: .fullchain)
+                    )
+
+                    return .owner(
+                        ownerId: ownerId,
+                        ownerName: ownerName
+                    )
+
+                case .split(let split):
+                    guard split.portion >= 0, split.portion <= 1 else {
+                        throw EquityOwnerDisplayPlanError.invalidPortion(split.portion)
+                    }
+
+                    let resolved = try entities.resolve(split.owner, at: nil)
+
+                    guard let ownerId = idIndex[resolved.key] else {
+                        throw EquityOwnerDisplayPlanError.missingOwnerID(
+                            resolved.key.identifier(displaying: .fullchain)
+                        )
+                    }
+
+                    let ownerName = normalizeInlineDisplayText(
+                        names[Int?(ownerId)]
+                            ?? entities.byFull[resolved.key]?.displayName
+                            ?? resolved.key.identifier(displaying: .fullchain)
+                    )
+
+                    return .split(
+                        ownerId: ownerId,
+                        ownerName: ownerName,
+                        portion: split.portion,
+                        label: split.label.map(normalizeInlineDisplayText),
+                        includeInSum: split.includeInSum
+                    )
+
+                case .subtotal(let subtotal):
+                    let members = try subtotal.members.map { member in
+                        guard member.portion >= 0, member.portion <= 1 else {
+                            throw EquityOwnerDisplayPlanError.invalidPortion(member.portion)
+                        }
+
+                        let resolved = try entities.resolve(member.owner, at: nil)
+
+                        guard let ownerId = idIndex[resolved.key] else {
+                            throw EquityOwnerDisplayPlanError.missingOwnerID(
+                                resolved.key.identifier(displaying: .fullchain)
+                            )
+                        }
+
+                        let ownerName = normalizeInlineDisplayText(
+                            names[Int?(ownerId)]
+                                ?? entities.byFull[resolved.key]?.displayName
+                                ?? resolved.key.identifier(displaying: .fullchain)
+                        )
+
+                        return ResolvedEquityOwnerPortion(
+                            ownerId: ownerId,
+                            portion: member.portion,
+                            ownerName: ownerName
+                        )
+                    }
+
+                    return .subtotal(
+                        label: normalizeInlineDisplayText(subtotal.label),
+                        members: members,
+                        includeInSum: subtotal.includeInSum
+                    )
+                }
+            }
+        }
+    }
+}
+
+// private func makeDisplaySections(
+//     plan: EquityOwnerDisplayPlan?,
+//     rows periodRows: PeriodRollforward,
+//     entities: EntityStore,
+//     names: [Int?: String]
+// ) throws -> [EquityOwnerDisplaySectionTable] {
+//     let resolvedSections: [[ResolvedEquityOwnerDisplaySpec]]
+
+//     if let plan {
+//         resolvedSections = try resolveSections(
+//             plan.sections,
+//             entities: entities,
+//             names: names
+//         )
+//     } else {
+//         resolvedSections = [[
+//             periodRows.owners.map { ownerId in
+//                 .owner(
+//                     ownerId: ownerId,
+//                     ownerName: names[Int?(ownerId)] ?? "owner#\(ownerId)"
+//                 )
+//             }
+//         ].flatMap { $0 }]
+//     }
+
+//     return resolvedSections.enumerated().map { sectionIndex, section in
+//         let renderedRows = section.enumerated().map { rowIndex, spec in
+//             makeEquityOwnerDisplayRow(
+//                 spec,
+//                 startsNewSection: sectionIndex > 0 && rowIndex == 0,
+//                 rows: periodRows
+//             )
+//         }
+
+//         return makeEquityOwnerDisplaySectionTable(
+//             rows: renderedRows
+//         )
+//     }
+// }
 
 private func makeEquityOwnerDisplaySectionTable(
     rows: [EquityOwnerDisplayRow]
@@ -259,6 +406,7 @@ private func makeDisplayRows(
     if let plan {
         resolvedSections = try resolveSections(
             plan.sections,
+            defaultOwnerIds: rows.owners,
             entities: entities,
             names: names
         )
@@ -290,99 +438,99 @@ private func makeDisplayRows(
     return out
 }
 
-private func resolveSections(
-    _ sections: [EquityOwnerDisplaySection],
-    entities: EntityStore,
-    names: [Int?: String]
-) throws -> [[ResolvedEquityOwnerDisplaySpec]] {
-    let idIndex = entities.idIndex
+// private func resolveSections(
+//     _ sections: [EquityOwnerDisplaySection],
+//     entities: EntityStore,
+//     names: [Int?: String]
+// ) throws -> [[ResolvedEquityOwnerDisplaySpec]] {
+//     let idIndex = entities.idIndex
 
-    return try sections.map { section in
-        try section.rows.map { row in
-            switch row {
-            case .owner(let ref):
-                let resolved = try entities.resolve(ref, at: nil)
+//     return try sections.map { section in
+//         try section.rows.map { row in
+//             switch row {
+//             case .owner(let ref):
+//                 let resolved = try entities.resolve(ref, at: nil)
 
-                guard let ownerId = idIndex[resolved.key] else {
-                    throw EquityOwnerDisplayPlanError.missingOwnerID(
-                        resolved.key.identifier(displaying: .fullchain)
-                    )
-                }
+//                 guard let ownerId = idIndex[resolved.key] else {
+//                     throw EquityOwnerDisplayPlanError.missingOwnerID(
+//                         resolved.key.identifier(displaying: .fullchain)
+//                     )
+//                 }
 
-                let ownerName = normalizeInlineDisplayText(
-                    names[Int?(ownerId)]
-                        ?? entities.byFull[resolved.key]?.displayName
-                        ?? resolved.key.identifier(displaying: .fullchain)
-                )
+//                 let ownerName = normalizeInlineDisplayText(
+//                     names[Int?(ownerId)]
+//                         ?? entities.byFull[resolved.key]?.displayName
+//                         ?? resolved.key.identifier(displaying: .fullchain)
+//                 )
 
-                return .owner(
-                    ownerId: ownerId,
-                    ownerName: ownerName
-                )
+//                 return .owner(
+//                     ownerId: ownerId,
+//                     ownerName: ownerName
+//                 )
 
-            case .split(let split):
-                guard split.portion >= 0, split.portion <= 1 else {
-                    throw EquityOwnerDisplayPlanError.invalidPortion(split.portion)
-                }
+//             case .split(let split):
+//                 guard split.portion >= 0, split.portion <= 1 else {
+//                     throw EquityOwnerDisplayPlanError.invalidPortion(split.portion)
+//                 }
 
-                let resolved = try entities.resolve(split.owner, at: nil)
+//                 let resolved = try entities.resolve(split.owner, at: nil)
 
-                guard let ownerId = idIndex[resolved.key] else {
-                    throw EquityOwnerDisplayPlanError.missingOwnerID(
-                        resolved.key.identifier(displaying: .fullchain)
-                    )
-                }
+//                 guard let ownerId = idIndex[resolved.key] else {
+//                     throw EquityOwnerDisplayPlanError.missingOwnerID(
+//                         resolved.key.identifier(displaying: .fullchain)
+//                     )
+//                 }
 
-                let ownerName = normalizeInlineDisplayText(
-                    names[Int?(ownerId)]
-                        ?? entities.byFull[resolved.key]?.displayName
-                        ?? resolved.key.identifier(displaying: .fullchain)
-                )
+//                 let ownerName = normalizeInlineDisplayText(
+//                     names[Int?(ownerId)]
+//                         ?? entities.byFull[resolved.key]?.displayName
+//                         ?? resolved.key.identifier(displaying: .fullchain)
+//                 )
 
-                return .split(
-                    ownerId: ownerId,
-                    ownerName: ownerName,
-                    portion: split.portion,
-                    label: split.label.map(normalizeInlineDisplayText),
-                    includeInSum: split.includeInSum
-                )
+//                 return .split(
+//                     ownerId: ownerId,
+//                     ownerName: ownerName,
+//                     portion: split.portion,
+//                     label: split.label.map(normalizeInlineDisplayText),
+//                     includeInSum: split.includeInSum
+//                 )
 
-            case .subtotal(let subtotal):
-                let members = try subtotal.members.map { member in
-                    guard member.portion >= 0, member.portion <= 1 else {
-                        throw EquityOwnerDisplayPlanError.invalidPortion(member.portion)
-                    }
+//             case .subtotal(let subtotal):
+//                 let members = try subtotal.members.map { member in
+//                     guard member.portion >= 0, member.portion <= 1 else {
+//                         throw EquityOwnerDisplayPlanError.invalidPortion(member.portion)
+//                     }
 
-                    let resolved = try entities.resolve(member.owner, at: nil)
+//                     let resolved = try entities.resolve(member.owner, at: nil)
 
-                    guard let ownerId = idIndex[resolved.key] else {
-                        throw EquityOwnerDisplayPlanError.missingOwnerID(
-                            resolved.key.identifier(displaying: .fullchain)
-                        )
-                    }
+//                     guard let ownerId = idIndex[resolved.key] else {
+//                         throw EquityOwnerDisplayPlanError.missingOwnerID(
+//                             resolved.key.identifier(displaying: .fullchain)
+//                         )
+//                     }
 
-                    let ownerName = normalizeInlineDisplayText(
-                        names[Int?(ownerId)]
-                            ?? entities.byFull[resolved.key]?.displayName
-                            ?? resolved.key.identifier(displaying: .fullchain)
-                    )
+//                     let ownerName = normalizeInlineDisplayText(
+//                         names[Int?(ownerId)]
+//                             ?? entities.byFull[resolved.key]?.displayName
+//                             ?? resolved.key.identifier(displaying: .fullchain)
+//                     )
 
-                    return ResolvedEquityOwnerPortion(
-                        ownerId: ownerId,
-                        portion: member.portion,
-                        ownerName: ownerName
-                    )
-                }
+//                     return ResolvedEquityOwnerPortion(
+//                         ownerId: ownerId,
+//                         portion: member.portion,
+//                         ownerName: ownerName
+//                     )
+//                 }
 
-                return .subtotal(
-                    label: normalizeInlineDisplayText(subtotal.label),
-                    members: members,
-                    includeInSum: subtotal.includeInSum
-                )
-            }
-        }
-    }
-}
+//                 return .subtotal(
+//                     label: normalizeInlineDisplayText(subtotal.label),
+//                     members: members,
+//                     includeInSum: subtotal.includeInSum
+//                 )
+//             }
+//         }
+//     }
+// }
 
 private func makeEquityOwnerDisplayRow(
     _ spec: ResolvedEquityOwnerDisplaySpec,

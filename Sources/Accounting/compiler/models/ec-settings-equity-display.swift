@@ -66,52 +66,62 @@ public extension StatementEntityPath {
 public extension StatementEquityViewSettings {
     func makeDisplayPlan() throws -> EquityOwnerDisplayPlan {
         let resolvedSections = try sections.map { section in
-            try EquityOwnerDisplaySection(
-                rows: section.rows.map { row in
-                    switch row.kind {
-                    case .owner:
-                        guard let owner = row.owner else {
-                            throw StatementEquitySettingsError.invalidEntityPath([])
-                        }
+            switch section.kind {
+            case .standard:
+                return EquityOwnerDisplaySection(
+                    kind: .standard,
+                    rows: []
+                )
 
-                        return .owner(
-                            try owner.makeEntityRef()
-                        )
+            case .rows:
+                return try EquityOwnerDisplaySection(
+                    kind: .manual,
+                    rows: section.rows.map { row in
+                        switch row.kind {
+                        case .owner:
+                            guard let owner = row.owner else {
+                                throw StatementEquitySettingsError.invalidEntityPath([])
+                            }
 
-                    case .split:
-                        guard let owner = row.owner, let percent = row.percent else {
-                            throw StatementEquitySettingsError.invalidEntityPath([])
-                        }
-
-                        return .split(
-                            .init(
-                                owner: try owner.makeEntityRef(),
-                                portion: percent / 100,
-                                label: row.label,
-                                includeInSum: row.includeInSum ?? true
+                            return .owner(
+                                try owner.makeEntityRef()
                             )
-                        )
 
-                    case .subtotal:
-                        guard let label = row.label else {
-                            throw StatementEquitySettingsError.invalidEntityPath([])
-                        }
+                        case .split:
+                            guard let owner = row.owner, let percent = row.percent else {
+                                throw StatementEquitySettingsError.invalidEntityPath([])
+                            }
 
-                        return .subtotal(
-                            .init(
-                                label: label,
-                                members: try row.members.map {
-                                    EquityOwnerPortion(
-                                        owner: try $0.owner.makeEntityRef(),
-                                        portion: $0.percent / 100
-                                    )
-                                },
-                                includeInSum: row.includeInSum ?? true
+                            return .split(
+                                .init(
+                                    owner: try owner.makeEntityRef(),
+                                    portion: percent / 100,
+                                    label: row.label,
+                                    includeInSum: row.includeInSum ?? true
+                                )
                             )
-                        )
+
+                        case .subtotal:
+                            guard let label = row.label else {
+                                throw StatementEquitySettingsError.invalidEntityPath([])
+                            }
+
+                            return .subtotal(
+                                .init(
+                                    label: label,
+                                    members: try row.members.map {
+                                        EquityOwnerPortion(
+                                            owner: try $0.owner.makeEntityRef(),
+                                            portion: $0.percent / 100
+                                        )
+                                    },
+                                    includeInSum: row.includeInSum ?? true
+                                )
+                            )
+                        }
                     }
-                }
-            )
+                )
+            }
         }
 
         return EquityOwnerDisplayPlan(

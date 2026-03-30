@@ -106,45 +106,71 @@ public extension EntryCompilerParsing {
         into meta: inout [String:String],
         tz: TimeZone = .current
     ) throws -> Bool {
-        guard current == .keyword("rollforward") || current == .ident("rollforward") else { return false }
-        advance(); try expect(.lBrace)
+        guard current == .keyword("rollforward") || current == .ident("rollforward") else {
+            return false
+        }
+
+        advance()
+        try expect(.lBrace)
 
         var idx = 0
         while current != .rBrace && current != .eof {
             guard current == .keyword("change") || current == .ident("change") else {
-                throw ParserError.unexpectedToken(current, expected: "change", at: loc())
+                throw ParserError.unexpectedToken(
+                    current,
+                    expected: "change",
+                    at: loc()
+                )
             }
-            advance(); try expect(.lBrace)
+
+            advance()
+            try expect(.lBrace)
 
             var dateISO: String?
-            var pctStr:  String?
-            var reason:  String?
+            var pctStr: String?
+            var reason: String?
+            var divideEntries: [(owner: EntityRef, percent: Decimal)] = []
 
             while current != .rBrace && current != .eof {
                 switch current {
                 case .keyword("effective_date"), .ident("effective_date"),
-                     .keyword("date"),           .ident("date"):
+                     .keyword("date"), .ident("date"):
                     let (_, spec) = try parseNamedDateOrInferExpecting(
-                        names: ["effective_date","date"], tz: tz, allowInfer: false
+                        names: ["effective_date", "date"],
+                        tz: tz,
+                        allowInfer: false
                     )
                     let d = try spec.asAbsolute(loc: loc())
                     dateISO = ISO8601DateFormatter().string(from: d)
 
                 case .keyword("percentage"), .ident("percentage"):
-                    advance(); if current == .equals { advance() }
-                    guard case let .number(n) = current else {
-                        throw ParserError.unexpectedToken(current, expected: "number", at: loc())
+                    advance()
+                    if current == .equals {
+                        advance()
                     }
-                    pctStr = "\(n)"; advance()
+
+                    guard case let .number(n) = current else {
+                        throw ParserError.unexpectedToken(
+                            current,
+                            expected: "number",
+                            at: loc()
+                        )
+                    }
+
+                    pctStr = "\(n)"
+                    advance()
 
                 case .keyword("details"), .ident("details"),
-                     .keyword("reason"),  .ident("reason"):
+                     .keyword("reason"), .ident("reason"):
                     reason = try parseFreeTextBlock(named: "details")
+
+                case .keyword("divide"), .ident("divide"):
+                    divideEntries = try parseOwnershipDivideBlock()
 
                 default:
                     throw ParserError.unexpectedToken(
                         current,
-                        expected: "effective_date/date/percentage/details or '}'",
+                        expected: "effective_date/date/percentage/details/reason/divide or '}'",
                         at: loc()
                     )
                 }
@@ -152,13 +178,138 @@ public extension EntryCompilerParsing {
 
             try expect(.rBrace)
 
-            if let d = dateISO { meta["ownership.\(idx).date"]   = d }
-            if let p = pctStr  { meta["ownership.\(idx).pct"]    = p }
-            if let r = reason  { meta["ownership.\(idx).reason"] = r }
+            if let d = dateISO {
+                meta["ownership.\(idx).date"] = d
+            }
+
+            if let p = pctStr {
+                meta["ownership.\(idx).pct"] = p
+            }
+
+            if let r = reason {
+                meta["ownership.\(idx).reason"] = r
+            }
+
+            for (divideIndex, entry) in divideEntries.enumerated() {
+                meta["ownership.\(idx).divide.\(divideIndex).owner"] = entry.owner.printable
+                meta["ownership.\(idx).divide.\(divideIndex).pct"] = "\(entry.percent)"
+            }
+
             idx += 1
         }
 
         try expect(.rBrace)
         return true
     }
+
+    @inlinable
+    func parseOwnershipDivideBlock() throws -> [(owner: EntityRef, percent: Decimal)] {
+        switch current {
+        case .keyword("divide"), .ident("divide"):
+            advance()
+        default:
+            throw ParserError.unexpectedToken(
+                current,
+                expected: "divide",
+                at: loc()
+            )
+        }
+
+        try expect(.lBrace)
+
+        var out: [(owner: EntityRef, percent: Decimal)] = []
+
+        while current != .rBrace && current != .eof {
+            out.append(
+                try parseOwnershipDivideEntry()
+            )
+        }
+
+        try expect(.rBrace)
+        return out
+    }
+
+    @inlinable
+    func parseOwnershipDivideEntry() throws -> (owner: EntityRef, percent: Decimal) {
+        switch current {
+        case .keyword("to"), .ident("to"):
+            advance()
+
+            let owner = try parseEntityRefFlexible()
+            try expect(.equals)
+            let percent = try expectDecimal()
+
+            return (owner: owner, percent: percent)
+
+        default:
+            let owner = try parseEntityRefFlexible()
+            try expect(.lPar)
+            let percent = try expectDecimal()
+            try expect(.rPar)
+
+            return (owner: owner, percent: percent)
+        }
+    }
+
+    // @inlinable
+    // func parseOwnershipRollforward(
+    //     into meta: inout [String:String],
+    //     tz: TimeZone = .current
+    // ) throws -> Bool {
+    //     guard current == .keyword("rollforward") || current == .ident("rollforward") else { return false }
+    //     advance(); try expect(.lBrace)
+
+    //     var idx = 0
+    //     while current != .rBrace && current != .eof {
+    //         guard current == .keyword("change") || current == .ident("change") else {
+    //             throw ParserError.unexpectedToken(current, expected: "change", at: loc())
+    //         }
+    //         advance(); try expect(.lBrace)
+
+    //         var dateISO: String?
+    //         var pctStr:  String?
+    //         var reason:  String?
+
+    //         while current != .rBrace && current != .eof {
+    //             switch current {
+    //             case .keyword("effective_date"), .ident("effective_date"),
+    //                  .keyword("date"),           .ident("date"):
+    //                 let (_, spec) = try parseNamedDateOrInferExpecting(
+    //                     names: ["effective_date","date"], tz: tz, allowInfer: false
+    //                 )
+    //                 let d = try spec.asAbsolute(loc: loc())
+    //                 dateISO = ISO8601DateFormatter().string(from: d)
+
+    //             case .keyword("percentage"), .ident("percentage"):
+    //                 advance(); if current == .equals { advance() }
+    //                 guard case let .number(n) = current else {
+    //                     throw ParserError.unexpectedToken(current, expected: "number", at: loc())
+    //                 }
+    //                 pctStr = "\(n)"; advance()
+
+    //             case .keyword("details"), .ident("details"),
+    //                  .keyword("reason"),  .ident("reason"):
+    //                 reason = try parseFreeTextBlock(named: "details")
+
+    //             default:
+    //                 throw ParserError.unexpectedToken(
+    //                     current,
+    //                     expected: "effective_date/date/percentage/details or '}'",
+    //                     at: loc()
+    //                 )
+    //             }
+    //         }
+
+    //         try expect(.rBrace)
+
+    //         if let d = dateISO { meta["ownership.\(idx).date"]   = d }
+    //         if let p = pctStr  { meta["ownership.\(idx).pct"]    = p }
+    //         if let r = reason  { meta["ownership.\(idx).reason"] = r }
+    //         idx += 1
+    //     }
+
+    //     try expect(.rBrace)
+    //     return true
+    // }
 }
+

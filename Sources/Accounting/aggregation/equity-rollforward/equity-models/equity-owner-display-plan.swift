@@ -11,11 +11,19 @@ public struct EquityOwnerDisplayPlan: Sendable {
 }
 
 public struct EquityOwnerDisplaySection: Sendable {
+    public enum Kind: Sendable {
+        case manual
+        case standard
+    }
+
+    public let kind: Kind
     public let rows: [EquityOwnerDisplayRowSpec]
 
     public init(
-        rows: [EquityOwnerDisplayRowSpec]
+        kind: Kind = .manual,
+        rows: [EquityOwnerDisplayRowSpec] = []
     ) {
+        self.kind = kind
         self.rows = rows
     }
 }
