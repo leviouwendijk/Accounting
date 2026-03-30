@@ -69,6 +69,16 @@ fileprivate struct EquityHTMLDrawingsDetailCellView {
     let text: String?
     let amount: Decimal?
     let amountClass: String
+
+    var tdClass: String {
+        if let text, !text.isEmpty {
+            return amountClass.isEmpty
+                ? "sr-eq-cell-wrap"
+                : "\(amountClass) sr-eq-cell-wrap"
+        }
+
+        return amountClass
+    }
 }
 
 fileprivate struct EquityHTMLDrawingsDetailRowView {
@@ -510,9 +520,10 @@ extension StatementHTMLRenderer {
                                     }
 
                                     for cell in detailRow.ownerCells {
-                                        let attrs: HTMLAttribute = cell.amountClass.isEmpty
-                                            ? HTMLAttribute()
-                                            : ["class": cell.amountClass]
+                                        let attrs: HTMLAttribute =
+                                            cell.tdClass.isEmpty
+                                            ? [:]
+                                            : ["class": cell.tdClass]
 
                                         HTML.td(attrs) {
                                             if let text = cell.text {

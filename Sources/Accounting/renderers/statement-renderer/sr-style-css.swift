@@ -329,7 +329,20 @@ public enum StatementStyleCSS {
                     CSS.decl("opacity", "0.82")
                 ),
 
-                // // drawings breakdown view additions
+                // drawings breakdown view additions
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table td.sr-eq-cell-wrap",
+                    CSS.decl("text-align", "left"),
+                    CSS.decl("white-space", "normal"),
+                    CSS.decl("overflow-wrap", "anywhere"),
+                    CSS.decl("word-break", "break-word"),
+                    CSS.decl("hyphens", "auto"),
+                    CSS.decl("vertical-align", "top")
+                ),
+                CSS.rule(
+                    ".sr-eq table.sr-eq-table tr.sr-eq-row-incoming td.sr-eq-cell-wrap, .sr-eq table.sr-eq-table tr.sr-eq-row-outgoing td.sr-eq-cell-wrap",
+                    CSS.decl("min-width", "0")
+                ),
                 // CSS.rule(
                 //     ".sr-eq table.sr-eq-table tr.sr-eq-drawings-detail-row td.sr-eq-drawings-detail-wrap",
                 //     CSS.decl("padding", "0"),
