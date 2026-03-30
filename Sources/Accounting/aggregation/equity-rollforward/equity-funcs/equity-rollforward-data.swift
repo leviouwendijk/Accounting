@@ -42,7 +42,7 @@ extension OwnerEquity.Rollforward {
             indices = Array(allPeriods.indices)
         }
 
-        let periods = indices.map { i in
+        let periods = try indices.map { i in
             let period = allPeriods[i]
             let rows = solved[i]
 
@@ -52,10 +52,19 @@ extension OwnerEquity.Rollforward {
                 groups: cfg.defaultDrawingGroups
             )
 
-            let drawings = makeEquityDrawingsBreakdownReport(
+            // let drawings = makeEquityDrawingsBreakdownReport(
+            //     breakdown: breakdown,
+            //     owners: rows.owners,
+            //     deltas: rows.deltas,
+            //     digits: cfg.fractionDigits
+            // )
+
+            let drawings = try makeEquityDrawingsBreakdownReport(
                 breakdown: breakdown,
                 owners: rows.owners,
                 deltas: rows.deltas,
+                asOf: period.asOf,
+                entities: entities,
                 digits: cfg.fractionDigits
             )
 
@@ -175,7 +184,7 @@ extension OwnerEquity.Rollforward {
             indices = Array(allPeriods.indices)
         }
 
-        let periods = indices.map { i in
+        let periods = try indices.map { i in
             let period = allPeriods[i]
             let rows = solved[i]
 
@@ -185,10 +194,19 @@ extension OwnerEquity.Rollforward {
                 groups: cfg.defaultDrawingGroups
             )
 
-            let drawings = makeEquityDrawingsBreakdownReport(
+            // let drawings = makeEquityDrawingsBreakdownReport(
+            //     breakdown: breakdown,
+            //     owners: rows.owners,
+            //     deltas: rows.deltas,
+            //     digits: cfg.fractionDigits
+            // )
+
+            let drawings = try makeEquityDrawingsBreakdownReport(
                 breakdown: breakdown,
                 owners: rows.owners,
                 deltas: rows.deltas,
+                asOf: period.asOf,
+                entities: entities,
                 digits: cfg.fractionDigits
             )
 

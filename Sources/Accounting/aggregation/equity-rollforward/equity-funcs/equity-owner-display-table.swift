@@ -119,66 +119,66 @@ private enum ResolvedEquityOwnerDisplaySpec: Sendable {
     )
 }
 
-private struct OwnerDisplayAmounts: Sendable {
-    let begin: Decimal
-    let stort: Decimal
-    let onttrek: Decimal
-    let winst: Decimal
-    let end: Decimal
+// private struct OwnerDisplayAmounts: Sendable {
+//     let begin: Decimal
+//     let stort: Decimal
+//     let onttrek: Decimal
+//     let winst: Decimal
+//     let end: Decimal
 
-    static let zero = OwnerDisplayAmounts(
-        begin: 0,
-        stort: 0,
-        onttrek: 0,
-        winst: 0,
-        end: 0
-    )
+//     static let zero = OwnerDisplayAmounts(
+//         begin: 0,
+//         stort: 0,
+//         onttrek: 0,
+//         winst: 0,
+//         end: 0
+//     )
 
-    static func + (
-        lhs: OwnerDisplayAmounts,
-        rhs: OwnerDisplayAmounts
-    ) -> OwnerDisplayAmounts {
-        .init(
-            begin: lhs.begin + rhs.begin,
-            stort: lhs.stort + rhs.stort,
-            onttrek: lhs.onttrek + rhs.onttrek,
-            winst: lhs.winst + rhs.winst,
-            end: lhs.end + rhs.end
-        )
-    }
+//     static func + (
+//         lhs: OwnerDisplayAmounts,
+//         rhs: OwnerDisplayAmounts
+//     ) -> OwnerDisplayAmounts {
+//         .init(
+//             begin: lhs.begin + rhs.begin,
+//             stort: lhs.stort + rhs.stort,
+//             onttrek: lhs.onttrek + rhs.onttrek,
+//             winst: lhs.winst + rhs.winst,
+//             end: lhs.end + rhs.end
+//         )
+//     }
 
-    static func - (
-        lhs: OwnerDisplayAmounts,
-        rhs: OwnerDisplayAmounts
-    ) -> OwnerDisplayAmounts {
-        .init(
-            begin: lhs.begin - rhs.begin,
-            stort: lhs.stort - rhs.stort,
-            onttrek: lhs.onttrek - rhs.onttrek,
-            winst: lhs.winst - rhs.winst,
-            end: lhs.end - rhs.end
-        )
-    }
+//     static func - (
+//         lhs: OwnerDisplayAmounts,
+//         rhs: OwnerDisplayAmounts
+//     ) -> OwnerDisplayAmounts {
+//         .init(
+//             begin: lhs.begin - rhs.begin,
+//             stort: lhs.stort - rhs.stort,
+//             onttrek: lhs.onttrek - rhs.onttrek,
+//             winst: lhs.winst - rhs.winst,
+//             end: lhs.end - rhs.end
+//         )
+//     }
 
-    static func * (
-        lhs: OwnerDisplayAmounts,
-        rhs: Decimal
-    ) -> OwnerDisplayAmounts {
-        .init(
-            begin: lhs.begin * rhs,
-            stort: lhs.stort * rhs,
-            onttrek: lhs.onttrek * rhs,
-            winst: lhs.winst * rhs,
-            end: lhs.end * rhs
-        )
-    }
-}
+//     static func * (
+//         lhs: OwnerDisplayAmounts,
+//         rhs: Decimal
+//     ) -> OwnerDisplayAmounts {
+//         .init(
+//             begin: lhs.begin * rhs,
+//             stort: lhs.stort * rhs,
+//             onttrek: lhs.onttrek * rhs,
+//             winst: lhs.winst * rhs,
+//             end: lhs.end * rhs
+//         )
+//     }
+// }
 
-private struct StandardDisplayBranch: Sendable {
-    let label: String
-    let detail: String?
-    let amounts: OwnerDisplayAmounts
-}
+// private struct StandardDisplayBranch: Sendable {
+//     let label: String
+//     let detail: String?
+//     let amounts: OwnerDisplayAmounts
+// }
 
 public enum EquityOwnerDisplayPlanError: LocalizedError, Sendable {
     case invalidPortion(Decimal)
@@ -421,144 +421,29 @@ private func makeStandardDisplayRows(
     names: [Int?: String],
     startsNewSectionOnFirstRow: Bool
 ) throws -> [EquityOwnerDisplayRow] {
-    var ownerIdSet = Set(defaultOwnerIds)
-    var displayOwnerIds = defaultOwnerIds
-
-    func appendOwnerIfMissing(
-        _ ownerId: Int
-    ) {
-        if ownerIdSet.insert(ownerId).inserted {
-            displayOwnerIds.append(ownerId)
-        }
-    }
-
-    var incomingByOwner: [Int: OwnerDisplayAmounts] = [:]
-    var outgoingByOwner: [Int: OwnerDisplayAmounts] = [:]
-
-    var incomingBranches: [Int: [StandardDisplayBranch]] = [:]
-    var outgoingBranches: [Int: [StandardDisplayBranch]] = [:]
-
-    let idIndex = entities.idIndex
-
-    let sortedKeys = entities.byFull.keys.sorted {
-        $0.identifier(displaying: .fullchain)
-            < $1.identifier(displaying: .fullchain)
-    }
-
-    for key in sortedKeys {
-        guard let def = entities.byFull[key] else {
-            continue
-        }
-
-        guard let oe = def.ownerEquity else {
-            continue
-        }
-
-        let divideEntries = oe.divideEntries(on: rows.asOf)
-        guard !divideEntries.isEmpty else {
-            continue
-        }
-
-        guard let sourceOwnerId = idIndex[key] else {
-            continue
-        }
-
-        appendOwnerIfMissing(sourceOwnerId)
-
-        let sourceOwnerName = normalizeInlineDisplayText(
-            names[Int?(sourceOwnerId)]
-                ?? def.displayName
-                ?? key.identifier(displaying: .fullchain)
-        )
-
-        let sourceBase = amountsForOwner(
-            sourceOwnerId,
-            rows: rows
-        )
-
-        for entry in divideEntries {
-            let fraction = entry.fraction
-            guard fraction != 0 else {
-                continue
-            }
-
-            let resolved = try entities.resolve(entry.owner, at: nil)
-
-            guard let targetOwnerId = idIndex[resolved.key] else {
-                throw EquityOwnerDisplayPlanError.missingOwnerID(
-                    resolved.key.identifier(displaying: .fullchain)
-                )
-            }
-
-            guard targetOwnerId != sourceOwnerId else {
-                continue
-            }
-
-            appendOwnerIfMissing(targetOwnerId)
-
-            let targetOwnerName = normalizeInlineDisplayText(
-                names[Int?(targetOwnerId)]
-                    ?? entities.byFull[resolved.key]?.displayName
-                    ?? resolved.key.identifier(displaying: .fullchain)
-            )
-
-            let allocated = sourceBase * fraction
-            let pctText = fmtPct(fraction, digits: 2)
-
-            outgoingByOwner[sourceOwnerId, default: .zero] =
-                outgoingByOwner[sourceOwnerId, default: .zero] + allocated
-
-            incomingByOwner[targetOwnerId, default: .zero] =
-                incomingByOwner[targetOwnerId, default: .zero] + allocated
-
-            incomingBranches[targetOwnerId, default: []].append(
-                .init(
-                    label: "  from \(sourceOwnerName)",
-                    detail: "\(pctText) of \(sourceOwnerName)",
-                    amounts: allocated
-                )
-            )
-
-            outgoingBranches[sourceOwnerId, default: []].append(
-                .init(
-                    label: "  to \(targetOwnerName)",
-                    detail: "\(pctText) allocated to \(targetOwnerName)",
-                    amounts: allocated * Decimal(-1)
-                )
-            )
-        }
-    }
+    let allocation = try buildEffectiveEquityAllocation(
+        rows: rows,
+        entities: entities,
+        names: names
+    )
 
     var rendered: [EquityOwnerDisplayRow] = []
 
-    for (index, ownerId) in displayOwnerIds.enumerated() {
-        let ownerName = normalizeInlineDisplayText(
-            names[Int?(ownerId)] ?? "owner#\(ownerId)"
-        )
-
-        let direct = amountsForOwner(
-            ownerId,
-            rows: rows
-        )
-
-        let incoming = incomingByOwner[ownerId] ?? .zero
-        let outgoing = outgoingByOwner[ownerId] ?? .zero
-        let primary = direct - outgoing + incoming
-
+    for (index, node) in allocation.nodes.enumerated() {
         rendered.append(
             makeDisplayRow(
-                label: ownerName,
+                label: node.ownerName,
                 style: .normal,
                 detail: nil,
                 startsNewSection: startsNewSectionOnFirstRow && index == 0,
                 includeInSum: true,
-                amounts: primary
+                amounts: node.primary
             )
         )
 
         let hasBranches =
-            !(incomingBranches[ownerId] ?? []).isEmpty
-            || !(outgoingBranches[ownerId] ?? []).isEmpty
+            !node.incoming.isEmpty
+            || !node.outgoing.isEmpty
 
         guard hasBranches else {
             continue
@@ -566,20 +451,16 @@ private func makeStandardDisplayRows(
 
         rendered.append(
             makeDisplayRow(
-                label: "  \(ownerName) (direct)",
+                label: "  \(node.ownerName) (direct)",
                 style: .normal,
                 detail: "Direct balance",
                 startsNewSection: false,
                 includeInSum: false,
-                amounts: direct
+                amounts: node.direct
             )
         )
 
-        let incomingSorted = (incomingBranches[ownerId] ?? []).sorted {
-            $0.label < $1.label
-        }
-
-        for branch in incomingSorted {
+        for branch in node.incoming {
             rendered.append(
                 makeDisplayRow(
                     label: branch.label,
@@ -592,11 +473,7 @@ private func makeStandardDisplayRows(
             )
         }
 
-        let outgoingSorted = (outgoingBranches[ownerId] ?? []).sorted {
-            $0.label < $1.label
-        }
-
-        for branch in outgoingSorted {
+        for branch in node.outgoing {
             rendered.append(
                 makeDisplayRow(
                     label: branch.label,
@@ -726,7 +603,7 @@ private func makeEquityOwnerDisplayRow(
         )
 
     case .subtotal(let label, let members, let includeInSum):
-        var total = OwnerDisplayAmounts.zero
+        var total = EquityOwnerAmounts.zero
         var detailParts: [String] = []
 
         for member in members {
@@ -760,23 +637,33 @@ private func makeEquityOwnerDisplayRow(
 private func amountsForOwner(
     _ ownerId: Int,
     rows: PeriodRollforward
-) -> OwnerDisplayAmounts {
-    let begin = rows.beginByOwner[ownerId] ?? 0
-    let delta = rows.deltas[ownerId] ?? OwnerDelta(
-        stort: 0,
-        onttrek: 0,
-        winst: 0
-    )
-    let end = rows.endByOwner[ownerId] ?? (begin + delta.delta)
-
-    return .init(
-        begin: begin,
-        stort: delta.stort,
-        onttrek: delta.onttrek,
-        winst: delta.winst,
-        end: end
+) -> EquityOwnerAmounts {
+    equityOwnerAmounts(
+        for: ownerId,
+        rows: rows
     )
 }
+
+// private func amountsForOwner(
+//     _ ownerId: Int,
+//     rows: PeriodRollforward
+// ) -> OwnerDisplayAmounts {
+//     let begin = rows.beginByOwner[ownerId] ?? 0
+//     let delta = rows.deltas[ownerId] ?? OwnerDelta(
+//         stort: 0,
+//         onttrek: 0,
+//         winst: 0
+//     )
+//     let end = rows.endByOwner[ownerId] ?? (begin + delta.delta)
+
+//     return .init(
+//         begin: begin,
+//         stort: delta.stort,
+//         onttrek: delta.onttrek,
+//         winst: delta.winst,
+//         end: end
+//     )
+// }
 
 private func makeDisplayRow(
     label: String,
@@ -784,7 +671,8 @@ private func makeDisplayRow(
     detail: String?,
     startsNewSection: Bool,
     includeInSum: Bool,
-    amounts: OwnerDisplayAmounts
+    // amounts: OwnerDisplayAmounts
+    amounts: EquityOwnerAmounts
 ) -> EquityOwnerDisplayRow {
     EquityOwnerDisplayRow(
         label: label,

@@ -47,11 +47,11 @@ public struct EquityDrawingsBreakdownReport: Sendable {
     public let reconcilesWithOnttrek: Bool
 }
 
-public struct EquityDrawingsBreakdownRow: Sendable {
-    public let label: String
-    public let amountsByOwner: [Int: Decimal]
-    public let total: Decimal
-}
+// public struct EquityDrawingsBreakdownRow: Sendable {
+//     public let label: String
+//     public let amountsByOwner: [Int: Decimal]
+//     public let total: Decimal
+// }
 
 // public struct EquityReportPeriod: Sendable {
 //     public let label: String
