@@ -219,7 +219,20 @@ public enum MetaAuditHTMLRenderer {
                 CSS.rule(
                     ".sr-meta-audit-fragment-title",
                     CSS.decl("display", "none")
-                )
+                ),
+
+                CSS.rule(
+                    ".sr-meta-audit-note",
+                    CSS.decl("padding", "12px 14px"),
+                    CSS.decl("border-radius", "8px"),
+                    CSS.decl("margin", "8px 0 0 0")
+                ),
+                CSS.rule(
+                    ".sr-meta-audit-note-warning",
+                    CSS.decl("border", "1px solid #d6c27a"),
+                    CSS.decl("background", "#fff8e1"),
+                    CSS.decl("color", "#5c4b00")
+                ),
             ]
         )
 
@@ -383,20 +396,52 @@ public enum MetaAuditHTMLRenderer {
         }
     }
 
+    // @HTMLBuilder
+    // private static func makeKIANodes(
+    //     report: MetaAuditReport,
+    //     options: Options
+    // ) -> [any HTMLNode] {
+    //     HTML.div(["class": "sr-kia"]) {
+    //         KIARenderer.renderBody(
+    //             report.kia,
+    //             title: "KIA \(report.kia.taxYear)",
+    //             subtitle: "Kleinschaligheidsinvesteringsaftrek",
+    //             verbose: options.verboseKIA,
+    //             diagnostics: options.showKIADiagnostics,
+    //             currencySymbol: options.currencySymbol
+    //         )
+    //     }
+    // }
+
     @HTMLBuilder
     private static func makeKIANodes(
         report: MetaAuditReport,
         options: Options
     ) -> [any HTMLNode] {
         HTML.div(["class": "sr-kia"]) {
-            KIARenderer.renderBody(
-                report.kia,
-                title: "KIA \(report.kia.taxYear)",
-                subtitle: "Kleinschaligheidsinvesteringsaftrek",
-                verbose: options.verboseKIA,
-                diagnostics: options.showKIADiagnostics,
-                currencySymbol: options.currencySymbol
-            )
+            if let kia = report.kia.result {
+                KIARenderer.renderBody(
+                    kia,
+                    title: "KIA \(report.kia.taxYear)",
+                    subtitle: "Kleinschaligheidsinvesteringsaftrek",
+                    verbose: options.verboseKIA,
+                    diagnostics: options.showKIADiagnostics,
+                    currencySymbol: options.currencySymbol
+                )
+            } else {
+                HTML.div(["class": "sr-meta-audit-note sr-meta-audit-note-warning"]) {
+                    HTML.h3 {
+                        HTML.text("KIA \(report.kia.taxYear)")
+                    }
+
+                    HTML.p {
+                        HTML.text(
+                            report.kia.warning
+                            ?? "KIA section unavailable."
+                        )
+                    }
+                }
+            }
         }
     }
 

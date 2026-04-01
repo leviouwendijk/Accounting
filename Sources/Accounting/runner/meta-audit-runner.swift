@@ -22,6 +22,22 @@ public struct MetaAuditEquitySection: Sendable {
     }
 }
 
+public struct MetaAuditKIASection: Sendable {
+    public let taxYear: Int
+    public let result: KIAProjectionResult?
+    public let warning: String?
+
+    public init(
+        taxYear: Int,
+        result: KIAProjectionResult?,
+        warning: String? = nil
+    ) {
+        self.taxYear = taxYear
+        self.result = result
+        self.warning = warning
+    }
+}
+
 public struct MetaAuditReport: Sendable {
     public let shape: PeriodShape
     public let anchor: Date
@@ -31,7 +47,8 @@ public struct MetaAuditReport: Sendable {
     public let acquired: AcquiredAssetsReport
     public let period: NativePeriodCompileOutput
     public let costBreakdown: CostBreakdownReport
-    public let kia: KIAProjectionResult
+    // public let kia: KIAProjectionResult
+    public let kia: MetaAuditKIASection
     public let equity: MetaAuditEquitySection
     public let depreciation: DepreciationAuditReport
 
@@ -44,7 +61,8 @@ public struct MetaAuditReport: Sendable {
         acquired: AcquiredAssetsReport,
         period: NativePeriodCompileOutput,
         costBreakdown: CostBreakdownReport,
-        kia: KIAProjectionResult,
+        // kia: KIAProjectionResult,
+        kia: MetaAuditKIASection,
         equity: MetaAuditEquitySection,
         depreciation: DepreciationAuditReport
     ) {
@@ -144,25 +162,53 @@ public enum MetaAuditRunner {
             from: anchor
         )
 
-        guard let kiaConfig = KIAConfigs.netherlands(year: taxYear) else {
-            throw NSError(
-                domain: "MetaAuditRunner",
-                code: 1,
-                userInfo: [
-                    NSLocalizedDescriptionKey:
-                        "No KIA config available for year \(taxYear)."
-                ]
-            )
-        }
+        // guard let kiaConfig = KIAConfigs.netherlands(year: taxYear) else {
+        //     throw NSError(
+        //         domain: "MetaAuditRunner",
+        //         code: 1,
+        //         userInfo: [
+        //             NSLocalizedDescriptionKey:
+        //                 "No KIA config available for year \(taxYear)."
+        //         ]
+        //     )
+        // }
 
-        let kia = KIAProjection.run(
-            entities: result.entities,
-            request: .init(
-                period: .init(taxYear: taxYear),
-                config: kiaConfig
-            ),
-            calendar: kiaCalendar
-        )
+        // let kia = KIAProjection.run(
+        //     entities: result.entities,
+        //     request: .init(
+        //         period: .init(taxYear: taxYear),
+        //         config: kiaConfig
+        //     ),
+        //     calendar: kiaCalendar
+        // )
+
+        let kia: MetaAuditKIASection = {
+            guard let kiaConfig = KIAConfigs.netherlands(year: taxYear) else {
+                let message = "No KIA config available for year \(taxYear). KIA section omitted."
+                fputs("warning: \(message)\n", stderr)
+
+                return .init(
+                    taxYear: taxYear,
+                    result: nil,
+                    warning: message
+                )
+            }
+
+            let result = KIAProjection.run(
+                entities: result.entities,
+                request: .init(
+                    period: .init(taxYear: taxYear),
+                    config: kiaConfig
+                ),
+                calendar: kiaCalendar
+            )
+
+            return .init(
+                taxYear: taxYear,
+                result: result,
+                warning: nil
+            )
+        }()
 
         let equity = try buildEquitySection(
             result: result,
