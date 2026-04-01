@@ -1,52 +1,9 @@
 import Foundation
 
 public enum KIAConfigs {
-    // // 2022:
+    // // 2022: none found
     // // I could not find the archived Belastingdienst year page directly anymore.
     // // These figures were corroborated from multiple Dutch secondary sources.
-    // public static let nl_2022 = KIAConfig(
-    //     countryCode: "NL",
-    //     taxYear: 2022,
-    //     minimumInvestmentTotal: 2_401,
-    //     minimumAssetAmount: 450,
-    //     brackets: [
-    //         KIABracket(
-    //             lowerInclusive: 0,
-    //             upperInclusive: 2_400,
-    //             fixedDeduction: 0,
-    //             rate: nil,
-    //             baseAmount: nil
-    //         ),
-    //         KIABracket(
-    //             lowerInclusive: 2_401,
-    //             upperInclusive: 59_939,
-    //             fixedDeduction: nil,
-    //             rate: 0.28,
-    //             baseAmount: nil
-    //         ),
-    //         KIABracket(
-    //             lowerInclusive: 59_940,
-    //             upperInclusive: 110_998,
-    //             fixedDeduction: 16_784,
-    //             rate: nil,
-    //             baseAmount: nil
-    //         ),
-    //         KIABracket(
-    //             lowerInclusive: 110_999,
-    //             upperInclusive: 332_994,
-    //             fixedDeduction: 16_784,
-    //             rate: -0.0756,
-    //             baseAmount: 110_998
-    //         ),
-    //         KIABracket(
-    //             lowerInclusive: 332_995,
-    //             upperInclusive: nil,
-    //             fixedDeduction: 0,
-    //             rate: nil,
-    //             baseAmount: nil
-    //         )
-    //     ]
-    // )
 
     public static let nl_2023 = KIAConfig(
         countryCode: "NL",

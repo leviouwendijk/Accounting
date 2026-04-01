@@ -66,63 +66,6 @@ public enum PeriodSlicer {
             dayEnd(cal.date(byAdding: .day, value: 6, to: s)!)
         }
 
-        // func previousWindow(sameLengthAs cur: PeriodWindow) -> PeriodWindow? {
-        //     guard let f = cur.from, let t = cur.to else { return nil }
-        //     let len = (cal.dateComponents([.day], from: dayStart(f), to: dayStart(t)).day ?? 0) + 1
-        //     let pTo = dayEnd(cal.date(byAdding: .day, value: -1, to: f)!)
-        //     let pFrom = dayStart(cal.date(byAdding: .day, value: -(len-1), to: pTo)!)
-        //     return .init(from: pFrom, to: pTo)
-        // }
-
-        // let a = anchor
-
-        // // compute the main window
-        // let window: PeriodWindow = {
-        //     switch shape.kind {
-        //     case .lifetime:
-        //         return .init(from: nil, to: nil)
-
-        //     case .custom:
-        //         // toDate flag is ignored for custom
-        //         let f = customFrom.map(dayStart)
-        //         let t = customTo.map(dayEnd)
-        //         return .init(from: f, to: t)
-
-        //     case .year:
-        //         let f = startOfYear(a)
-        //         let t = shape.rangeToDate ? dayEnd(a) : endOfYear(a)
-        //         return .init(from: f, to: t)
-
-        //     case .half: // NEW
-        //         let f = startOfHalf(a)
-        //         let t = shape.rangeToDate ? dayEnd(a) : endOfHalf(fromStart: f)
-        //         return .init(from: f, to: t)
-
-        //     case .quarter:
-        //         let f = startOfQuarter(a)
-        //         let t = shape.rangeToDate ? dayEnd(a) : endOfQuarter(fromStart: f)
-        //         return .init(from: f, to: t)
-
-        //     case .month:
-        //         let f = startOfMonth(a)
-        //         let t = shape.rangeToDate ? dayEnd(a) : endOfMonth(fromStart: f)
-        //         return .init(from: f, to: t)
-
-        //     case .week:
-        //         let f = startOfISOWeek(a)
-        //         let t = shape.rangeToDate ? dayEnd(a) : endOfISOWeek(fromStart: f)
-        //         return .init(from: f, to: t)
-
-        //     }
-        // }()
-
-        // let historical = PeriodWindow(
-        //     from: nil,
-        //     to: window.from.map { dayEnd(cal.date(byAdding: .day, value: -1, to: $0)!) }
-        // )
-        // let ytd = PeriodWindow(from: nil, to: window.to)
-        // let prev = previousWindow(sameLengthAs: window)
-
         func previousWindow(sameLengthAs cur: PeriodWindow) -> PeriodWindow? {
             guard let f = cur.from, let t = cur.to else { return nil }
             let len = (cal.dateComponents([.day], from: dayStart(f), to: dayStart(t)).day ?? 0) + 1

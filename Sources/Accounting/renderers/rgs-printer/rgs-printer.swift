@@ -210,72 +210,6 @@ public enum RGSPrinter {
             }
         }
 
-        // for r in bundle.balance {
-        //     guard let anc = l2AncestorId(of: r.id) else {
-        //         if includeOtherBucket {
-        //             otherLines.append(
-        //                 .init(
-        //                     id: r.id,
-        //                     code: codeById[r.id] ?? "",
-        //                     label: r.label,
-        //                     amount: r.amount,
-        //                     level: Int(r.level),
-        //                     relativeIndent: max(0, Int((levelById[r.id] ?? 1)) - 1)
-        //                 )
-        //             )
-        //         }
-        //         continue
-        //     }
-
-        //     if let eq = equityAnchor, anc == eq {
-        //         equityLines.append(
-        //             .init(
-        //                 id: r.id,
-        //                 code: codeById[r.id] ?? "",
-        //                 label: r.label,
-        //                 amount: r.amount,
-        //                 level: Int(r.level),
-        //                 relativeIndent: relativeIndent(of: r.id, anchorId: eq)
-        //             )
-        //         )
-        //     } else if assetsAnchorSet.contains(anc) {
-        //         let anchor = assetsAnchorSet.first
-        //         assetsLines.append(
-        //             .init(
-        //                 id: r.id,
-        //                 code: codeById[r.id] ?? "",
-        //                 label: r.label,
-        //                 amount: r.amount,
-        //                 level: Int(r.level),
-        //                 relativeIndent: relativeIndent(of: r.id, anchorId: anchor)
-        //             )
-        //         )
-        //     } else if liabilitiesAnchorSet.contains(anc) {
-        //         let anchor = liabilitiesAnchorSet.first
-        //         liabilitiesLines.append(
-        //             .init(
-        //                 id: r.id,
-        //                 code: codeById[r.id] ?? "",
-        //                 label: r.label,
-        //                 amount: r.amount,
-        //                 level: Int(r.level),
-        //                 relativeIndent: relativeIndent(of: r.id, anchorId: anchor)
-        //             )
-        //         )
-        //     } else if includeOtherBucket {
-        //         otherLines.append(
-        //             .init(
-        //                 id: r.id,
-        //                 code: codeById[r.id] ?? "",
-        //                 label: r.label,
-        //                 amount: r.amount,
-        //                 level: Int(r.level),
-        //                 relativeIndent: max(0, Int((levelById[r.id] ?? 1)) - 1)
-        //             )
-        //         )
-        //     }
-        // }
-
         func sortByKey(_ a: RGSBalanceBucketsOutput.Line, _ b: RGSBalanceBucketsOutput.Line) -> Bool {
             let ka = maps.sortKeyById[a.id] ?? ""
             let kb = maps.sortKeyById[b.id] ?? ""
@@ -368,36 +302,6 @@ public enum RGSPrinter {
             print("\nCheck: ( Assets ==  Equity + Liabilities )? → ( \(sum.assets) == \(ajk) )")
         }
     }
-
-    // public static func printLines(
-    //     _ title: String,
-    //     lines: [StatementLine],
-    //     chart: CompiledChart,
-    //     options: PresentationPrintOptions = .init()
-    // ) throws {
-    //     let maps = try RGSAssembler.makeMaps(from: chart)
-    //     let codeById: [Int: String] = Dictionary(
-    //         uniqueKeysWithValues: chart.nodes.map { ($0.id, $0.codes.code) }
-    //     )
-
-    //     print("\n\(title)")
-    //     print(String(repeating: "—", count: title.count))
-
-    //     for r in lines {
-    //         let indent = String(
-    //             repeating: "  ",
-    //             count: max(0, graphDepth(of: r.id, parentById: maps.parentById) - 1)
-    //         )
-
-    //         let text = caption(
-    //             label: r.label,
-    //             code: codeById[r.id] ?? "",
-    //             style: options.caption
-    //         )
-
-    //         print("\(indent)• \(text)  \(r.amount)")
-    //     }
-    // }
 
     public static func printLines(
         _ title: String,

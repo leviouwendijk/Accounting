@@ -243,22 +243,6 @@ public extension KIARenderer {
                                     }
                                 }
                             }
-
-                            // HTML.td(["class": "col-shares kia-cell-wrap"]) {
-                            //     if asset.shares.isEmpty {
-                            //         HTML.span(["class": "kia-cell-main"]) {
-                            //             HTML.text("none")
-                            //         }
-                            //     } else {
-                            //         for share in asset.shares {
-                            //             HTML.div(["class": "kia-share-line"]) {
-                            //                 HTML.text(
-                            //                     "\(share.ownerLabel): \(kiaNumber(share.percentage))% → \(kiaFmt(share.amount, currencySymbol: currencySymbol))"
-                            //                 )
-                            //             }
-                            //         }
-                            //     }
-                            // }
                         }
                     }
                 }

@@ -7,14 +7,6 @@ public enum NativePeriodRenderer {
     ) throws {
         let presentation = options.presentationOptions()
 
-        // try renderPeriod(
-        //     titleBalance: "Balance Sheet (current)",
-        //     titleIncome: "Income Statement (current)",
-        //     period: output.assembled.current,
-        //     chart: output.chart,
-        //     options: options,
-        //     presentation: presentation
-        // )
         try renderPeriod(
             titleBalance: "Balance Sheet (current)",
             titleIncome: "Income Statement (current)",
@@ -33,14 +25,6 @@ public enum NativePeriodRenderer {
 
         print("")
 
-        // try renderPeriod(
-        //     titleBalance: "Balance Sheet (previous)",
-        //     titleIncome: "Income Statement (previous)",
-        //     period: previous,
-        //     chart: output.chart,
-        //     options: options,
-        //     presentation: presentation
-        // )
         try renderPeriod(
             titleBalance: "Balance Sheet (previous)",
             titleIncome: "Income Statement (previous)",
@@ -52,14 +36,6 @@ public enum NativePeriodRenderer {
         )
     }
 
-    // private static func renderPeriod(
-    //     titleBalance: String,
-    //     titleIncome: String,
-    //     period: PeriodAssembleResultPeriod,
-    //     chart: CompiledChart,
-    //     options: NativeRenderOptions,
-    //     presentation: PresentationPrintOptions
-    // ) throws {
     private static func renderPeriod(
         titleBalance: String,
         titleIncome: String,
@@ -83,24 +59,6 @@ public enum NativePeriodRenderer {
             fputs("warning: \(error.localizedDescription)\n", stderr)
         }
 
-        // try RGSPrinter.printBalanceByL2Buckets(
-        //     titleBalance,
-        //     bundle: period.bundle,
-        //     chart: chart,
-        //     equityCode: options.equityCode,
-        //     includeOtherBucket: options.includeOtherBucket,
-        //     options: presentation
-        // )
-        // try RGSPrinter.printBalanceByL2Buckets(
-        //     titleBalance,
-        //     bundle: period.bundle,
-        //     chart: chart,
-        //     equityCode: options.equityCode,
-        //     includeOtherBucket: options.includeOtherBucket,
-        //     showEntityBreakdown: options.showEntityBreakdown,
-        //     entities: output.result.entities,
-        //     options: presentation
-        // )
         try RGSPrinter.printBalanceByL2Buckets(
             titleBalance,
             bundle: period.bundle,
@@ -111,13 +69,6 @@ public enum NativePeriodRenderer {
             entities: entities,
             options: presentation
         )
-
-        // try RGSPrinter.printLines(
-        //     titleIncome,
-        //     lines: period.bundle.income,
-        //     chart: chart,
-        //     options: presentation
-        // )
 
         try RGSPrinter.printLines(
             titleIncome,

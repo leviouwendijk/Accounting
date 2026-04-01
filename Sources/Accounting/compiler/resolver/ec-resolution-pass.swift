@@ -44,17 +44,6 @@ public enum EntryResolutionPass {
                 let txKeys = try transactions.resolveAll(ids: e.transactionReferences, at: e.location)
                 let resolvedDate = try e.date.resolved(for: e, using: settings)
 
-                // out.append(
-                //     ResolvedEntry(
-                //         id: e.id,
-                //         date: resolvedDate,
-                //         lines: lines,
-                //         details: e.details,
-                //         timezone: e.timezone,
-                //         metadata: e.metadata,
-                //         transactionReferences: txKeys
-                //     )
-                // )
                 out.append(
                     ResolvedEntry(
                         id: e.id,

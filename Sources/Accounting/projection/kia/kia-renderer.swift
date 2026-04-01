@@ -57,10 +57,6 @@ public enum KIARenderer {
             }
         }
 
-        // guard verbose || diagnostics else {
-        //     return lines.joined(separator: "\n")
-        // }
-
         if !result.qualifiedAssets.isEmpty {
             lines.append("")
             lines.append("Qualified assets")

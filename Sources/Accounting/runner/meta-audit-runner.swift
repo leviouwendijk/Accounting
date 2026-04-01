@@ -162,26 +162,6 @@ public enum MetaAuditRunner {
             from: anchor
         )
 
-        // guard let kiaConfig = KIAConfigs.netherlands(year: taxYear) else {
-        //     throw NSError(
-        //         domain: "MetaAuditRunner",
-        //         code: 1,
-        //         userInfo: [
-        //             NSLocalizedDescriptionKey:
-        //                 "No KIA config available for year \(taxYear)."
-        //         ]
-        //     )
-        // }
-
-        // let kia = KIAProjection.run(
-        //     entities: result.entities,
-        //     request: .init(
-        //         period: .init(taxYear: taxYear),
-        //         config: kiaConfig
-        //     ),
-        //     calendar: kiaCalendar
-        // )
-
         let kia: MetaAuditKIASection = {
             guard let kiaConfig = KIAConfigs.netherlands(year: taxYear) else {
                 let message = "No KIA config available for year \(taxYear). KIA section omitted."

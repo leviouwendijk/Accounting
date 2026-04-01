@@ -399,23 +399,6 @@ public enum MetaAuditHTMLRenderer {
         }
     }
 
-    // @HTMLBuilder
-    // private static func makeKIANodes(
-    //     report: MetaAuditReport,
-    //     options: Options
-    // ) -> [any HTMLNode] {
-    //     HTML.div(["class": "sr-kia"]) {
-    //         KIARenderer.renderBody(
-    //             report.kia,
-    //             title: "KIA \(report.kia.taxYear)",
-    //             subtitle: "Kleinschaligheidsinvesteringsaftrek",
-    //             verbose: options.verboseKIA,
-    //             diagnostics: options.showKIADiagnostics,
-    //             currencySymbol: options.currencySymbol
-    //         )
-    //     }
-    // }
-
     @HTMLBuilder
     private static func makeKIANodes(
         report: MetaAuditReport,
