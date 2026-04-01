@@ -1,10 +1,11 @@
 import Foundation
+import Primitives
 
 public struct EntryCompilerProject: Sendable {
     public let root: URL
     public init(root: URL) { self.root = root }
 
-    public enum Base: String, Sendable {
+    public enum Base: String, Sendable, StringParsableEnum {
         case config
         case entries
         case statements
@@ -32,7 +33,7 @@ public struct EntryCompilerProject: Sendable {
         // }
     }
 
-    public enum Sub: String, Specification {
+    public enum Sub: String, Specification, StringParsableEnum {
         case accounts
         case entities
         case resources
@@ -96,3 +97,96 @@ public struct EntryCompilerProject: Sendable {
 
 // include subpaths?
 // config/resources/rgs/v3_8.json -> source of RGSNode objects array
+
+extension EntryCompilerProject {
+    public enum Scope: String, Sendable, CaseIterable, StringParsableEnum {
+        case entries
+        case config
+        case transactions
+        case documents
+        case all
+
+        public var bases: [Base] {
+            switch self {
+            case .entries:
+                return [.entries]
+            case .config:
+                return [.config]
+            case .transactions:
+                return [.transactions]
+            case .documents:
+                return [.documents]
+            case .all:
+                return [
+                    .entries,
+                    .config,
+                    .transactions,
+                    .documents
+                ]
+            }
+        }
+    }
+
+    public func urls(_ scope: Scope) -> [URL] {
+        scope.bases.map(url)
+    }
+
+    public func containsBase(
+        _ base: Base,
+        fileManager: FileManager = .default
+    ) -> Bool {
+        var isDirectory: ObjCBool = false
+
+        let path = url(base).path
+        return fileManager.fileExists(
+            atPath: path,
+            isDirectory: &isDirectory
+        ) && isDirectory.boolValue
+    }
+
+    public var hasRecognizedRootShape: Bool {
+        containsBase(.entries) || containsBase(.config)
+    }
+
+    public static func findRoot(
+        startingAt start: URL,
+        hops: Int = 4,
+        fileManager: FileManager = .default
+    ) -> URL? {
+        var current = start.standardizedFileURL
+
+        for _ in 0...hops {
+            let candidate = EntryCompilerProject(root: current)
+
+            if candidate.hasRecognizedRootShape {
+                return candidate.root
+            }
+
+            let parent = current.deletingLastPathComponent()
+
+            if parent.path == current.path {
+                break
+            }
+
+            current = parent
+        }
+
+        return nil
+    }
+
+    public static func resolveRoot(
+        from explicitOrWorkingDirectory: String?,
+        defaultingTo workingDirectory: String = FileManager.default.currentDirectoryPath,
+        hops: Int = 4
+    ) -> URL {
+        let start = URL(
+            fileURLWithPath: explicitOrWorkingDirectory ?? workingDirectory,
+            isDirectory: true
+        )
+
+        return findRoot(
+            startingAt: start,
+            hops: hops
+        ) ?? start.standardizedFileURL
+    }
+}

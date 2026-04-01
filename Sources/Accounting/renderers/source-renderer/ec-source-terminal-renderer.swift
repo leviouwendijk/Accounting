@@ -25,60 +25,17 @@ extension ECSourceTerminalRenderer {
         document: ECSourceDocument,
         options: Options = .init()
     ) -> String {
-        var out: [String] = []
-        let lineNumberWidth = maxLineNumberWidth(in: document)
-
-        out.append(styledTitle(document.title))
-
-        if let subtitle = document.subtitle, !subtitle.isEmpty {
-            out.append(styledSubtitle(subtitle))
-        }
-
-        if !document.files.isEmpty {
-            out.append("")
-        }
-
-        for fileIndex in document.files.indices {
-            let file = document.files[fileIndex]
-
-            if fileIndex > 0 {
-                out.append("")
-            }
-
-            out.append(styledFilePath(file.relativePath))
-
-            if options.includeFileBlockCounts {
-                out.append(styledFileMeta(fileBlockCountLabel(file.blockCount)))
-            }
-
-            out.append(styledRule(length: max(24, file.relativePath.count)))
-
-            for blockIndex in file.blocks.indices {
-                let block = file.blocks[blockIndex]
-
-                if blockIndex > 0 {
-                    out.append("")
-
-                    if !options.compact {
-                        out.append("")
-                    }
-                }
-
-                out.append(styledBlockCaption(block.caption))
-
-                for line in block.lines {
-                    out.append(
-                        renderedLine(
-                            line,
-                            showLineNumbers: options.showLineNumbers,
-                            lineNumberWidth: lineNumberWidth
-                        )
-                    )
-                }
-            }
-        }
-
-        return out.joined(separator: "\n")
+        ECSourceRendererShared.makeOutput(
+            document: document,
+            options: options,
+            renderTitle: styledTitle,
+            renderSubtitle: styledSubtitle,
+            renderFilePath: styledFilePath,
+            renderFileMeta: styledFileMeta,
+            renderRule: styledRule,
+            renderBlockCaption: styledBlockCaption,
+            renderLine: renderedLine
+        )
     }
 
     private static func renderedLine(
@@ -179,30 +136,12 @@ extension ECSourceTerminalRenderer {
     }
 
     private static func styledRule(
-        length: Int
+        _ length: Int
     ) -> String {
         String(
             repeating: "─",
             count: max(1, length)
         )
         .ansi(.brightBlack)
-    }
-
-    private static func maxLineNumberWidth(
-        in document: ECSourceDocument
-    ) -> Int {
-        let maxNumber = document.files
-            .flatMap(\.blocks)
-            .flatMap(\.lines)
-            .map(\.number)
-            .max() ?? 0
-
-        return max(1, String(maxNumber).count)
-    }
-
-    private static func fileBlockCountLabel(
-        _ count: Int
-    ) -> String {
-        count == 1 ? "1 block" : "\(count) blocks"
     }
 }
