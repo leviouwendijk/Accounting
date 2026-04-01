@@ -1,6 +1,6 @@
 import Foundation
 
-public enum EntryCompilerResolverError: Error, LocalizedError {
+public enum EntryCompilerResolverError: Error, LocalizedError, CustomStringConvertible {
     case notImplemented
 
     case incompatibleEntityAccount(
@@ -21,14 +21,25 @@ public enum EntryCompilerResolverError: Error, LocalizedError {
             let reason,
             let at
         ):
-            var s = "Invalid entity/account intersection: entity '\(entity)' cannot be used with account '\(account)'"
+            var lines: [String] = [
+                "Incompatible entity/account intersection",
+                "    entity: \(entity)",
+                "    account: \(account)"
+            ]
+
             if !reason.isEmpty {
-                s += " (\(reason))"
+                lines.append("    reason: \(reason)")
             }
+
             if let at {
-                s += " @ \(at)"
+                lines.append("    at: \(at)")
             }
-            return s
+
+            return lines.joined(separator: "\n")
         }
+    }
+
+    public var description: String {
+        errorDescription ?? String(reflecting: self)
     }
 }

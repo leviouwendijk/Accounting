@@ -16,7 +16,6 @@ public extension PeriodAssembler {
         ownershipSlices: [OwnershipSlice] = [],
         entityIdOnRow: (TrialBalanceRow) -> Int? = { _ in nil }
     ) throws -> StatementBundle {
-
         // maps + index
         let ch  = try chart.ensuringIndex(enrichNodes: true, strict: false)
         guard let index = ch.index else { throw RGSAssemblerError.missingIndex }
@@ -196,58 +195,83 @@ public extension PeriodAssembler {
 
         // Force NI + Equity visible
         var localCut = cut
-        localCut.includeCodes.append(contentsOf: [targets.netIncomeCode, targets.retainedEarningsCode])
-
-        // Presentation lines
-        let forcedIds = Set(localCut.includeCodes.compactMap { index.byIdentifier[$0] })
-        let forcedChain: Set<Int> = localCut.includeIntermediates
-            ? Set(forcedIds.flatMap { chainToRoot($0, parentById: maps.parentById) })
-            : forcedIds
-        let labels = index.labelByGroupKey
-
-        let bs = linesFor(
-            .balance,
-            roll: maps,
-            totals: totalsBalance,
-            labels: labels,
-            cut: localCut,
-            forcedIds: forcedIds,
-            forcedChain: forcedChain,
-            omslag: omslag
+        localCut.includeCodes.append(
+            contentsOf: [
+                targets.netIncomeCode,
+                targets.retainedEarningsCode
+            ]
         )
 
-        let is_ = linesFor(
-            .income,
-            roll: maps,
-            totals: totalsIncome,
-            labels: labels,
-            cut: localCut,
-            forcedIds: forcedIds,
-            forcedChain: forcedChain,
-            omslag: omslag
+        let rolled = AssemblerKernelSeedResult(
+            totalsIncome: totalsIncome,
+            totalsBalance: totalsBalance,
+            breakdown: breakdown,
+            netIncome: niWindow,
+            effectiveCut: localCut
         )
 
-        // include analytics:
-        let bundle = StatementBundle(
-            balance: bs,
-            income: is_,
-            totalsById: totalsBalance,
-            entity: breakdown
-        )
-
-        let analytics = try RGSAssembler.makeAnalytics(
+        return try AssemblerKernel.makeBundle(
             chart: chart,
-            bundle: bundle,
+            index: index,
+            maps: maps,
+            cut: cut,
             omslag: omslag,
-            netIncome: niWindow
+            businessEntity: entity,
+            rolled: rolled
         )
 
-        return StatementBundle(
-            balance: bs,
-            income: is_,
-            totalsById: totalsBalance,
-            entity: breakdown,
-            analytics: analytics
-        )
+        // ROLLBACK ON REGRESSION:
+
+        // // Presentation lines
+        // let forcedIds = Set(localCut.includeCodes.compactMap { index.byIdentifier[$0] })
+        // let forcedChain: Set<Int> = localCut.includeIntermediates
+        //     ? Set(forcedIds.flatMap { chainToRoot($0, parentById: maps.parentById) })
+        //     : forcedIds
+        // let labels = index.labelByGroupKey
+
+        // let bs = linesFor(
+        //     .balance,
+        //     roll: maps,
+        //     totals: totalsBalance,
+        //     labels: labels,
+        //     cut: localCut,
+        //     forcedIds: forcedIds,
+        //     forcedChain: forcedChain,
+        //     omslag: omslag
+        // )
+
+        // let is_ = linesFor(
+        //     .income,
+        //     roll: maps,
+        //     totals: totalsIncome,
+        //     labels: labels,
+        //     cut: localCut,
+        //     forcedIds: forcedIds,
+        //     forcedChain: forcedChain,
+        //     omslag: omslag
+        // )
+
+        // // include analytics:
+        // let bundle = StatementBundle(
+        //     balance: bs,
+        //     income: is_,
+        //     totalsById: totalsBalance,
+        //     entity: breakdown
+        // )
+
+        // let analytics = try RGSAssembler.makeAnalytics(
+        //     chart: chart,
+        //     bundle: bundle,
+        //     omslag: omslag,
+        //     netIncome: niWindow
+        // )
+
+        // return StatementBundle(
+        //     balance: bs,
+        //     income: is_,
+        //     totalsById: totalsBalance,
+        //     entity: breakdown,
+        //     analytics: analytics
+        // )
     }
 }

@@ -7,7 +7,7 @@ extension NativeRenderOptions {
             caption: presentationCaptionStyle(),
             detail: presentationDetailStyle(),
             showMatchedCodes: false,
-            showEntityBreakdown: false
+            showEntityBreakdown: showEntityBreakdown
         )
     }
 

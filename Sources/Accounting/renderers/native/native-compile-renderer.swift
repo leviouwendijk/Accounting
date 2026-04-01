@@ -17,12 +17,23 @@ public enum NativeCompileRenderer {
 
         let presentation = options.presentationOptions()
 
+        // try RGSPrinter.printBalanceByL2Buckets(
+        //     "Balance Sheet (assembled)",
+        //     bundle: output.bundle,
+        //     chart: output.chart,
+        //     equityCode: options.equityCode,
+        //     includeOtherBucket: options.includeOtherBucket,
+        //     options: presentation
+        // )
+
         try RGSPrinter.printBalanceByL2Buckets(
             "Balance Sheet (assembled)",
             bundle: output.bundle,
             chart: output.chart,
             equityCode: options.equityCode,
             includeOtherBucket: options.includeOtherBucket,
+            showEntityBreakdown: options.showEntityBreakdown,
+            entities: output.result.entities,
             options: presentation
         )
 
