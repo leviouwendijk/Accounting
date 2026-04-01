@@ -3,6 +3,22 @@ import HTML
 import CSS
 
 public enum MetaAuditHTMLRenderer {
+    public struct SourceAppendix: Sendable {
+        public let title: String
+        public let document: ECSourceDocument
+        public let presentationOptions: ECSourcePresentationOptions
+
+        public init(
+            title: String,
+            document: ECSourceDocument,
+            presentationOptions: ECSourcePresentationOptions = .init()
+        ) {
+            self.title = title
+            self.document = document
+            self.presentationOptions = presentationOptions
+        }
+    }
+
     public struct Options: Sendable {
         public var title: String
         public var subtitle: String?
@@ -28,6 +44,8 @@ public enum MetaAuditHTMLRenderer {
         public var showEquityDrawingsBreakdown: Bool
         public var showEquityUnassigned: Bool
 
+        public var sourceAppendices: [SourceAppendix]
+
         public init(
             title: String = "Meta audit",
             subtitle: String? = nil,
@@ -47,7 +65,8 @@ public enum MetaAuditHTMLRenderer {
             showEquityDiagnostics: Bool = true,
             showEquityAllocation: Bool = true,
             showEquityDrawingsBreakdown: Bool = true,
-            showEquityUnassigned: Bool = true
+            showEquityUnassigned: Bool = true,
+            sourceAppendices: [SourceAppendix] = []
         ) {
             self.title = title
             self.subtitle = subtitle
@@ -72,6 +91,8 @@ public enum MetaAuditHTMLRenderer {
             self.showEquityAllocation = showEquityAllocation
             self.showEquityDrawingsBreakdown = showEquityDrawingsBreakdown
             self.showEquityUnassigned = showEquityUnassigned
+
+            self.sourceAppendices = sourceAppendices
         }
     }
 
@@ -107,6 +128,8 @@ public enum MetaAuditHTMLRenderer {
             subtitle: subtitle,
             options: options
         )
+
+        let sourceAppendices = options.sourceAppendices
 
         let doc = HTML.document {
             HTML.html(["lang": "nl"]) {
@@ -156,6 +179,17 @@ public enum MetaAuditHTMLRenderer {
                     ) {
                         equityNodes
                     }
+
+                    for appendix in sourceAppendices {
+                        renderMetaAuditSection(
+                            title: appendix.title,
+                            pageBreak: true
+                        ) {
+                            makeSourceAppendixNodes(
+                                appendix
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -193,6 +227,7 @@ public enum MetaAuditHTMLRenderer {
             StatementStyleCSS.base(),
             StatementStyleCSS.assetsShares(),
             StatementStyleCSS.costBreakdown(),
+            ECSourceHTMLRendererCSS.base(compact: true),
             local
         ])
     }
@@ -406,6 +441,31 @@ public enum MetaAuditHTMLRenderer {
                     showReconciliation: true
                 )
             )
+        }
+    }
+
+    @HTMLBuilder
+    private static func makeSourceAppendixNodes(
+        _ appendix: SourceAppendix
+    ) -> [any HTMLNode] {
+        HTML.div(["class": "sr-meta-audit-source"]) {
+            HTML.h2(["class": "sr-meta-audit-source-title"]) {
+                HTML.text(appendix.document.title)
+            }
+
+            if let subtitle = appendix.document.subtitle,
+               !subtitle.isEmpty {
+                HTML.div(["class": "subtitle"]) {
+                    HTML.text(subtitle)
+                }
+            }
+
+            for file in appendix.document.files {
+                ECSourceHTMLRenderer.renderFile(
+                    file,
+                    options: appendix.presentationOptions
+                )
+            }
         }
     }
 }
