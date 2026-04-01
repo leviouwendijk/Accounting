@@ -194,7 +194,10 @@ public enum MetaAuditHTMLRenderer {
             }
         }
 
-        return doc.render(default: .pretty, doctype: true)
+        // return doc.render(default: .pretty, doctype: true)
+
+        // '.minified' fixes appendices rendering:
+        return doc.render(default: .minified, doctype: true)
     }
 
     private static func buildStyleSheet() -> CSSStyleSheet {
