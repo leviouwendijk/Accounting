@@ -219,59 +219,5 @@ public extension PeriodAssembler {
             businessEntity: entity,
             rolled: rolled
         )
-
-        // ROLLBACK ON REGRESSION:
-
-        // // Presentation lines
-        // let forcedIds = Set(localCut.includeCodes.compactMap { index.byIdentifier[$0] })
-        // let forcedChain: Set<Int> = localCut.includeIntermediates
-        //     ? Set(forcedIds.flatMap { chainToRoot($0, parentById: maps.parentById) })
-        //     : forcedIds
-        // let labels = index.labelByGroupKey
-
-        // let bs = linesFor(
-        //     .balance,
-        //     roll: maps,
-        //     totals: totalsBalance,
-        //     labels: labels,
-        //     cut: localCut,
-        //     forcedIds: forcedIds,
-        //     forcedChain: forcedChain,
-        //     omslag: omslag
-        // )
-
-        // let is_ = linesFor(
-        //     .income,
-        //     roll: maps,
-        //     totals: totalsIncome,
-        //     labels: labels,
-        //     cut: localCut,
-        //     forcedIds: forcedIds,
-        //     forcedChain: forcedChain,
-        //     omslag: omslag
-        // )
-
-        // // include analytics:
-        // let bundle = StatementBundle(
-        //     balance: bs,
-        //     income: is_,
-        //     totalsById: totalsBalance,
-        //     entity: breakdown
-        // )
-
-        // let analytics = try RGSAssembler.makeAnalytics(
-        //     chart: chart,
-        //     bundle: bundle,
-        //     omslag: omslag,
-        //     netIncome: niWindow
-        // )
-
-        // return StatementBundle(
-        //     balance: bs,
-        //     income: is_,
-        //     totalsById: totalsBalance,
-        //     entity: breakdown,
-        //     analytics: analytics
-        // )
     }
 }
