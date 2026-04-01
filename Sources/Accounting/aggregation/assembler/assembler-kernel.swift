@@ -1,8 +1,6 @@
 import Foundation
 import Methods
 
-// NEW ABSTRACTED SEED KERNEL
-
 public enum AssemblerKernel {}
 
 extension AssemblerKernel {
@@ -83,11 +81,12 @@ extension AssemblerKernel {
                 rolledAE
             )
 
-            warnIfEntityRollupMismatchesBalanceRollup(
+            entity_account_balance_mismatch(
                 rolledBalance: rolledBalance,
                 collapsedEntityBalance: collapsedAE,
                 namesById: maps.nameById
             )
+            .warn()
 
             var byAccount: [Int: [Int?: Decimal]] = [:]
             for (k, v) in rolledAE where v != 0 {
@@ -171,15 +170,17 @@ extension AssemblerKernel {
     }
 
     @inline(__always)
-    private static func warnIfEntityRollupMismatchesBalanceRollup(
+    private static func entity_account_balance_mismatch(
         rolledBalance: [Int: Decimal],
         collapsedEntityBalance: [Int: Decimal],
         namesById: [Int: String],
         tolerance: Decimal = 0.01
-    ) {
+    ) -> EntityMismatchDiagnostic {
         let ids = Set(rolledBalance.keys).union(
             collapsedEntityBalance.keys
         )
+
+        var items: [EntityMismatchDiagnostic.Item] = []
 
         for id in ids.sorted() {
             let balance = rolledBalance[id] ?? 0
@@ -196,11 +197,19 @@ extension AssemblerKernel {
 
             let name = namesById[id] ?? "node#\(id)"
 
-            fputs(
-                "warning: entity breakdown mismatch at \(name) [id=\(id)]: "
-                    + "balance=\(balance), entities=\(entityTotal), diff=\(diff)\n",
-                stderr
+            items.append(
+                .init(
+                    id: id,
+                    name: name,
+                    balance: balance,
+                    entityTotal: entityTotal,
+                    diff: diff
+                )
             )
         }
+
+        return .init(
+            items: items
+        )
     }
 }
