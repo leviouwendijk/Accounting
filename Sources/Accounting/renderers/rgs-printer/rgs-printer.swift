@@ -369,6 +369,36 @@ public enum RGSPrinter {
         }
     }
 
+    // public static func printLines(
+    //     _ title: String,
+    //     lines: [StatementLine],
+    //     chart: CompiledChart,
+    //     options: PresentationPrintOptions = .init()
+    // ) throws {
+    //     let maps = try RGSAssembler.makeMaps(from: chart)
+    //     let codeById: [Int: String] = Dictionary(
+    //         uniqueKeysWithValues: chart.nodes.map { ($0.id, $0.codes.code) }
+    //     )
+
+    //     print("\n\(title)")
+    //     print(String(repeating: "—", count: title.count))
+
+    //     for r in lines {
+    //         let indent = String(
+    //             repeating: "  ",
+    //             count: max(0, graphDepth(of: r.id, parentById: maps.parentById) - 1)
+    //         )
+
+    //         let text = caption(
+    //             label: r.label,
+    //             code: codeById[r.id] ?? "",
+    //             style: options.caption
+    //         )
+
+    //         print("\(indent)• \(text)  \(r.amount)")
+    //     }
+    // }
+
     public static func printLines(
         _ title: String,
         lines: [StatementLine],
@@ -396,6 +426,87 @@ public enum RGSPrinter {
             )
 
             print("\(indent)• \(text)  \(r.amount)")
+        }
+    }
+
+    public static func printLines(
+        _ title: String,
+        lines: [StatementLine],
+        bundle: StatementBundle,
+        chart: CompiledChart,
+        showEntityBreakdown: Bool,
+        entities: EntityStore,
+        minAbs: Decimal = 0,
+        options: PresentationPrintOptions = .init()
+    ) throws {
+        var resolvedOptions = options
+        if showEntityBreakdown {
+            resolvedOptions.showEntityBreakdown = true
+        }
+
+        try RGSPrinter.printLines(
+            title,
+            lines: lines,
+            chart: chart,
+            options: resolvedOptions
+        )
+
+        guard resolvedOptions.showEntityBreakdown,
+              let eb = bundle.entity?.byAccount
+        else {
+            return
+        }
+
+        let idx = entities.idIndex
+
+        var idToName: [Int?: String] = [nil: "(unassigned)"]
+        for (key, id) in idx {
+            let fallback = key.identifier(displaying: .fullchain)
+            let raw = entities.byFull[key]?.displayName ?? fallback
+            let normalized = normalizeInlineDisplayText(raw)
+
+            idToName[id] = normalized.isEmpty
+                ? fallback
+                : normalized
+        }
+
+        let codeById: [Int: String] = Dictionary(
+            uniqueKeysWithValues: chart.nodes.map { ($0.id, $0.codes.code) }
+        )
+
+        print("\nEntity breakdown (inline)")
+        print("———————————————————————")
+
+        for line in lines {
+            let accId = line.id
+            guard let byEnt = eb[accId], !byEnt.isEmpty else {
+                continue
+            }
+
+            let total = byEnt.values.reduce(Decimal(0), +)
+            let absTotal = (total < 0 ? -total : total)
+            if minAbs > 0, absTotal < minAbs {
+                continue
+            }
+
+            let code = codeById[accId] ?? ""
+            let text = caption(
+                label: line.label,
+                code: code,
+                style: resolvedOptions.caption
+            )
+
+            print("• \(text)  \(total)")
+
+            for (eid, amt) in byEnt.sorted(by: { ($0.key ?? 0) < ($1.key ?? 0) }) where amt != 0 {
+                let absAmt = (amt < 0 ? -amt : amt)
+                if minAbs > 0, absAmt < minAbs {
+                    continue
+                }
+
+                let nm = idToName[eid] ?? "(entity \(eid ?? -1))"
+                print("   ↳ \(nm): \(amt)")
+            }
         }
     }
 

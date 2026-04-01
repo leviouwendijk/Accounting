@@ -112,10 +112,20 @@ public enum NativePeriodRenderer {
             options: presentation
         )
 
+        // try RGSPrinter.printLines(
+        //     titleIncome,
+        //     lines: period.bundle.income,
+        //     chart: chart,
+        //     options: presentation
+        // )
+
         try RGSPrinter.printLines(
             titleIncome,
             lines: period.bundle.income,
+            bundle: period.bundle,
             chart: chart,
+            showEntityBreakdown: options.showEntityBreakdown,
+            entities: entities,
             options: presentation
         )
     }

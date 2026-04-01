@@ -37,10 +37,20 @@ public enum NativeCompileRenderer {
             options: presentation
         )
 
+        // try RGSPrinter.printLines(
+        //     "Income Statement (assembled)",
+        //     lines: output.bundle.income,
+        //     chart: output.chart,
+        //     options: presentation
+        // )
+
         try RGSPrinter.printLines(
             "Income Statement (assembled)",
             lines: output.bundle.income,
+            bundle: output.bundle,
             chart: output.chart,
+            showEntityBreakdown: options.showEntityBreakdown,
+            entities: output.result.entities,
             options: presentation
         )
     }
