@@ -1,4 +1,5 @@
 import Foundation
+import Accounting
 import plate
 
 public extension LegacyJournalEntry {

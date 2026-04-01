@@ -1,4 +1,5 @@
 import Foundation
+import Accounting
 
 public struct IdentifiableByYQM: Hashable, Sendable {
     public let id: Int
