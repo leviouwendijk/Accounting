@@ -12,48 +12,61 @@ let package = Package(
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "Accounting",
-            targets: ["Accounting"]),
+            targets: ["Accounting"]
+        ),
+        .library(
+            name: "AccountingLegacy",
+            targets: ["AccountingLegacy"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/leviouwendijk/plate.git", branch: "master"),
-        // .package(url: "https://github.com/leviouwendijk/Extensions.git", branch: "master"),
-        // .package(url: "https://github.com/leviouwendijk/Constructors.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Primitives.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Methods.git", branch: "master"),
-
         .package(url: "https://github.com/leviouwendijk/HTML.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/CSS.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Writers.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Terminal.git", branch: "master"),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "Accounting",
             dependencies: [
                 .product(name: "plate", package: "plate"),
-                // .product(name: "Extensions", package: "Extensions"),
-                // .product(name: "Constructors", package: "Constructors"),
                 .product(name: "Primitives", package: "Primitives"),
                 .product(name: "Methods", package: "Methods"),
-
                 .product(name: "HTML", package: "HTML"),
                 .product(name: "CSS", package: "CSS"),
                 .product(name: "Writers", package: "Writers"),
+                .product(name: "Terminal", package: "Terminal"),
             ],
         ),
+
+        .target(
+            name: "AccountingLegacy",
+            dependencies: [
+                .product(name: "plate", package: "plate"),
+                .product(name: "Primitives", package: "Primitives"),
+                .product(name: "Methods", package: "Methods"),
+                .product(name: "HTML", package: "HTML"),
+                .product(name: "CSS", package: "CSS"),
+                .product(name: "Writers", package: "Writers"),
+                .product(name: "Terminal", package: "Terminal"),
+            ],
+        ),
+
         .testTarget(
             name: "AccountingTests",
             dependencies: [
                 "Accounting",
                 .product(name: "plate", package: "plate"),
-                // .product(name: "Extensions", package: "Extensions"),
-                // .product(name: "Constructors", package: "Constructors"),
-
                 .product(name: "HTML", package: "HTML"),
                 .product(name: "CSS", package: "CSS"),
                 .product(name: "Writers", package: "Writers"),
+                .product(name: "Terminal", package: "Terminal"),
             ]
         ),
     ]
 )
+
+
