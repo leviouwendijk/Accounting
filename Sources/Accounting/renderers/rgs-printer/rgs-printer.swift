@@ -33,9 +33,18 @@ public enum RGSPrinter {
         let idx = entities.idIndex
 
         var idToName: [Int?: String] = [nil: "(unassigned)"]
+        // for (key, id) in idx {
+        //     let name = entities.byFull[key]?.displayName ?? key.alias.string
+        //     idToName[id] = name
+        // }
         for (key, id) in idx {
-            let name = entities.byFull[key]?.displayName ?? key.alias.string
-            idToName[id] = name
+            let fallback = key.identifier(displaying: .fullchain)
+            let raw = entities.byFull[key]?.displayName ?? fallback
+            let normalized = normalizeInlineDisplayText(raw)
+
+            idToName[id] = normalized.isEmpty
+                ? fallback
+                : normalized
         }
 
         let codeById: [Int: String] = Dictionary(
