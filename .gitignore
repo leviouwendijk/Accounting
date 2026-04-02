@@ -10,6 +10,7 @@ DerivedData/
 libAccounting.dylib.dSYM/
 libAccounting.dylib*
 
+/.index-build
 .index-build/
 .build/
 
