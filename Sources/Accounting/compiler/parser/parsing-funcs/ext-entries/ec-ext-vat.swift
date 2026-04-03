@@ -6,13 +6,14 @@ public extension EntryCompilerParsing {
         try expectKeywordOrIdent("vat")
         try beginBlock()
 
-        var kind: VATKind?
+        var kind: VATKind = .settlement
+        var sawKind = false
         var period: VATPeriod?
 
         while current != .rBrace && current != .eof {
             switch current {
             case .keyword("kind"), .ident("kind"):
-                guard kind == nil else {
+                guard !sawKind else {
                     throw ParserError.unexpectedToken(
                         current,
                         expected: "single kind field",
@@ -20,6 +21,7 @@ public extension EntryCompilerParsing {
                     )
                 }
 
+                sawKind = true
                 try expectFieldEquals("kind")
                 kind = try parseVATKindValue()
 
@@ -44,14 +46,6 @@ public extension EntryCompilerParsing {
         }
 
         try endBlock()
-
-        guard let kind else {
-            throw ParserError.unexpectedToken(
-                current,
-                expected: "kind",
-                at: loc()
-            )
-        }
 
         guard let period else {
             throw ParserError.unexpectedToken(
@@ -146,20 +140,17 @@ public extension EntryCompilerParsing {
         default:
             throw ParserError.unexpectedToken(
                 current,
-                expected: "filing|payment|refund|correction",
+                expected: "settlement|filing|correction",
                 at: loc()
             )
         }
 
         switch raw.lowercased() {
+        case "settlement":
+            return .settlement
+
         case "filing":
             return .filing
-
-        case "payment":
-            return .payment
-
-        case "refund":
-            return .refund
 
         case "correction":
             return .correction
@@ -167,7 +158,7 @@ public extension EntryCompilerParsing {
         default:
             throw ParserError.unexpectedToken(
                 .ident(raw),
-                expected: "filing|payment|refund|correction",
+                expected: "settlement|filing|correction",
                 at: loc()
             )
         }

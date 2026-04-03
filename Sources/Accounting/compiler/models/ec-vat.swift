@@ -1,8 +1,12 @@
 public enum VATKind: String, Codable, Sendable, Hashable {
+    case settlement
     case filing
-    case payment
-    case refund
     case correction
+}
+
+public enum VATSettlementFlow: String, Codable, Sendable, Hashable {
+    case paid
+    case received
 }
 
 public enum VATQuarter: UInt8, Codable, Sendable, Hashable {
@@ -30,7 +34,7 @@ public struct VATAnnotation: Codable, Sendable, Hashable {
     public let period: VATPeriod
 
     public init(
-        kind: VATKind,
+        kind: VATKind = .settlement,
         period: VATPeriod
     ) {
         self.kind = kind

@@ -90,7 +90,7 @@ public extension VATAuditReport {
         out.append("Ledger net:        \(fmt(totalLedgerNet))")
         out.append("Filed:             \(fmt(totalFiled))")
         out.append("Paid:              \(fmt(totalPaid))")
-        out.append("Refunded:          \(fmt(totalRefunded))")
+        out.append("Received:          \(fmt(totalReceived))")
         out.append("Corrected:         \(fmt(totalCorrected))")
         out.append("Ledger vs declared Δ: \(fmt(totalLedgerVsDeclaredDelta))")
 
@@ -110,7 +110,7 @@ public extension VATAuditReport {
             out.append("ledger net:        \(fmt(quarter.ledgerNet))")
             out.append("filed:             \(fmt(quarter.filed))")
             out.append("paid:              \(fmt(quarter.paid))")
-            out.append("refunded:          \(fmt(quarter.refunded))")
+            out.append("received:          \(fmt(quarter.received))")
             out.append("corrected:         \(fmt(quarter.corrected))")
             out.append("ledger vs declared Δ: \(fmt(quarter.ledgerVsDeclaredDelta))")
 
@@ -131,7 +131,7 @@ public extension VATAuditReport {
                     : entry.vatAccountCodes.joined(separator: ", ")
 
                 out.append(
-                    "  • \(entry.kind.rawValue)  \(fmt(entry.amount))  "
+                    "  • \(entry.displayKind)  \(fmt(entry.amount))  "
                         + "\(dateLabel(entry.postingDate))"
                         + (entry.entryId.map { "  [entry \($0)]" } ?? "")
                 )

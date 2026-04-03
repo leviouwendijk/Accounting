@@ -82,11 +82,17 @@ public enum VATAuditBuilder {
                     .reduce(Decimal(0)) { $0 + $1.amount }
 
                 let paid = entries
-                    .filter { $0.kind == .payment }
+                    .filter {
+                        $0.kind == .settlement
+                            && $0.settlementFlow == .paid
+                    }
                     .reduce(Decimal(0)) { $0 + $1.amount }
 
-                let refunded = entries
-                    .filter { $0.kind == .refund }
+                let received = entries
+                    .filter {
+                        $0.kind == .settlement
+                            && $0.settlementFlow == .received
+                    }
                     .reduce(Decimal(0)) { $0 + $1.amount }
 
                 let corrected = entries
@@ -105,7 +111,7 @@ public enum VATAuditBuilder {
                     ledgerNet: ledgerNet,
                     filed: filed,
                     paid: paid,
-                    refunded: refunded,
+                    received: received,
                     corrected: corrected,
                     ledgerVsDeclaredDelta: ledgerVsDeclaredDelta,
                     entries: entries

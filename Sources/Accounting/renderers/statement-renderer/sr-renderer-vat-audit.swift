@@ -83,8 +83,8 @@ public extension StatementHTMLRenderer {
                                 currencySymbol: options.currencySymbol
                             )
                             renderSummaryRow(
-                                "Refunded",
-                                report.totalRefunded,
+                                "Received",
+                                report.totalReceived,
                                 currencySymbol: options.currencySymbol
                             )
                             renderSummaryRow(
@@ -141,8 +141,8 @@ public extension StatementHTMLRenderer {
                                             currencySymbol: options.currencySymbol
                                         )
                                         renderSummaryRow(
-                                            "Refunded",
-                                            quarter.refunded,
+                                            "Received",
+                                            quarter.received,
                                             currencySymbol: options.currencySymbol
                                         )
                                         renderSummaryRow(
@@ -184,7 +184,7 @@ public extension StatementHTMLRenderer {
                                             for entry in quarter.entries {
                                                 HTML.tr {
                                                     HTML.td {
-                                                        HTML.text(entry.kind.rawValue)
+                                                        HTML.text(entry.displayKind)
                                                     }
                                                     HTML.td {
                                                         HTML.text(

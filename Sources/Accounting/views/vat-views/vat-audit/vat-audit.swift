@@ -4,6 +4,7 @@ public struct VATAuditEntry: Sendable, Codable, Hashable {
     public let entryId: Int?
     public let postingDate: Date
     public let kind: VATKind
+    public let settlementFlow: VATSettlementFlow?
     public let period: VATPeriod
 
     /// Absolute VAT-relevant movement extracted from VAT accounts
@@ -17,6 +18,7 @@ public struct VATAuditEntry: Sendable, Codable, Hashable {
         entryId: Int?,
         postingDate: Date,
         kind: VATKind,
+        settlementFlow: VATSettlementFlow? = nil,
         period: VATPeriod,
         amount: Decimal,
         vatAccountCodes: [String],
@@ -25,28 +27,46 @@ public struct VATAuditEntry: Sendable, Codable, Hashable {
         self.entryId = entryId
         self.postingDate = postingDate
         self.kind = kind
+        self.settlementFlow = settlementFlow
         self.period = period
         self.amount = amount
         self.vatAccountCodes = vatAccountCodes
         self.details = details
+    }
+
+    public var displayKind: String {
+        switch kind {
+        case .settlement:
+            switch settlementFlow {
+            case .paid?:
+                return "settlement paid"
+            case .received?:
+                return "settlement received"
+            case nil:
+                return "settlement"
+            }
+
+        case .filing:
+            return "filing"
+
+        case .correction:
+            return "correction"
+        }
     }
 }
 
 public struct VATAuditQuarter: Sendable, Codable, Hashable {
     public let period: VATPeriod
 
-    /// Quarter ledger picture based on resolved postings dated in the quarter.
     public let ledgerOwed: Decimal
     public let ledgerReceivable: Decimal
     public let ledgerNet: Decimal
 
-    /// Explicit VAT-tagged events assigned to this VAT period.
     public let filed: Decimal
     public let paid: Decimal
-    public let refunded: Decimal
+    public let received: Decimal
     public let corrected: Decimal
 
-    /// ledgerNet - (filed + corrected)
     public let ledgerVsDeclaredDelta: Decimal
 
     public let entries: [VATAuditEntry]
@@ -58,7 +78,7 @@ public struct VATAuditQuarter: Sendable, Codable, Hashable {
         ledgerNet: Decimal,
         filed: Decimal,
         paid: Decimal,
-        refunded: Decimal,
+        received: Decimal,
         corrected: Decimal,
         ledgerVsDeclaredDelta: Decimal,
         entries: [VATAuditEntry]
@@ -69,7 +89,7 @@ public struct VATAuditQuarter: Sendable, Codable, Hashable {
         self.ledgerNet = ledgerNet
         self.filed = filed
         self.paid = paid
-        self.refunded = refunded
+        self.received = received
         self.corrected = corrected
         self.ledgerVsDeclaredDelta = ledgerVsDeclaredDelta
         self.entries = entries
@@ -115,8 +135,8 @@ public struct VATAuditReport: Sendable, Codable, SectionedPresentableOutput {
         quarters.reduce(0) { $0 + $1.paid }
     }
 
-    public var totalRefunded: Decimal {
-        quarters.reduce(0) { $0 + $1.refunded }
+    public var totalReceived: Decimal {
+        quarters.reduce(0) { $0 + $1.received }
     }
 
     public var totalCorrected: Decimal {
