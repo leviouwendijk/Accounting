@@ -9,11 +9,35 @@ public enum VATStatusBuilder {
         calendar: Calendar,
         businessEntity: BusinessEntity = .vof
     ) -> VATStatusReport {
-        let allowedPeriods = period.map {
+        let roots = businessEntity.vatRoots
+
+        // The selected period is no longer treated as the whole computation window.
+        // Instead, status is backsolved from inception through the selected end.
+        let historyEnd = period?.to
+
+        // Keep selected periods only so we can still include an empty selected quarter/year
+        // in the final report even when there was no movement there.
+        let selectedPeriods = period.map {
             Set(periodsOverlapping($0, calendar: calendar))
+        } ?? []
+
+        let includedDates = resolvedEntries.compactMap { entry -> Date? in
+            guard case .absolute(let postingDate) = entry.date else {
+                return nil
+            }
+
+            guard shouldIncludeHistoryPosting(
+                postingDate: postingDate,
+                through: historyEnd
+            ) else {
+                return nil
+            }
+
+            return postingDate
         }
 
-        let roots = businessEntity.vatRoots
+        let earliestIncludedDate = includedDates.min()
+        let latestIncludedDate = includedDates.max()
 
         var ordinaryByPeriod: [VATPeriod: StatusBreakdown] = [:]
         var correctionsByPeriod: [VATPeriod: Decimal] = [:]
@@ -24,6 +48,13 @@ public enum VATStatusBuilder {
                 continue
             }
 
+            guard shouldIncludeHistoryPosting(
+                postingDate: postingDate,
+                through: historyEnd
+            ) else {
+                continue
+            }
+
             let postingQuarter = vatPeriod(
                 for: postingDate,
                 calendar: calendar
@@ -31,10 +62,7 @@ public enum VATStatusBuilder {
 
             let annotation = entry.vat
 
-            if shouldIncludePosting(
-                postingDate: postingDate,
-                period: period
-            ), shouldCountInOrdinaryLedger(annotation: annotation) {
+            if shouldCountInOrdinaryLedger(annotation: annotation) {
                 let breakdown = ordinaryBreakdown(
                     for: entry,
                     roots: roots
@@ -46,11 +74,6 @@ public enum VATStatusBuilder {
             }
 
             guard let annotation else {
-                continue
-            }
-
-            if let allowedPeriods,
-               !allowedPeriods.contains(annotation.period) {
                 continue
             }
 
@@ -78,8 +101,17 @@ public enum VATStatusBuilder {
             .union(correctionsByPeriod.keys)
             .union(taggedEntriesByPeriod.keys)
 
-        if let allowedPeriods {
-            periods.formUnion(allowedPeriods)
+        periods.formUnion(selectedPeriods)
+
+        if let earliestIncludedDate,
+           let latestIncludedDate {
+            periods.formUnion(
+                contiguousPeriods(
+                    from: earliestIncludedDate,
+                    through: latestIncludedDate,
+                    calendar: calendar
+                )
+            )
         }
 
         var carryBag: [VATPeriod: Decimal] = [:]
@@ -103,6 +135,7 @@ public enum VATStatusBuilder {
                 let ordinary = ordinaryByPeriod[periodKey] ?? .zero
                 let correctionsNet = correctionsByPeriod[periodKey] ?? 0
 
+                // This is now meaningful, because earlier quarters are included too.
                 let carryIn = carryBag.values.reduce(0, +)
 
                 let paid = entries
@@ -128,10 +161,13 @@ public enum VATStatusBuilder {
                     + ordinary.net
                     + correctionsNet
 
-                if ordinary.net != 0 || correctionsNet != 0 {
-                    carryBag[periodKey, default: 0] += ordinary.net + correctionsNet
+                // Quarter-local movement becomes a new open source for this quarter.
+                let quarterMovement = ordinary.net + correctionsNet
+                if quarterMovement != 0 {
+                    carryBag[periodKey, default: 0] += quarterMovement
                 }
 
+                // Settlements clear against the running carry bag.
                 if settlementNet != 0 {
                     carryBag[periodKey, default: 0] += settlementNet
                 }
@@ -233,18 +269,15 @@ private extension VATStatusBuilder {
     }
 
     @inline(__always)
-    static func shouldIncludePosting(
+    static func shouldIncludeHistoryPosting(
         postingDate: Date,
-        period: PeriodWindow?
+        through historyEnd: Date?
     ) -> Bool {
-        guard let period else {
+        guard let historyEnd else {
             return true
         }
 
-        return contains(
-            postingDate,
-            in: period
-        )
+        return postingDate <= historyEnd
     }
 
     @inline(__always)
@@ -259,22 +292,6 @@ private extension VATStatusBuilder {
         case .settlement, .filing, .correction:
             return false
         }
-    }
-
-    @inline(__always)
-    static func contains(
-        _ date: Date,
-        in window: PeriodWindow
-    ) -> Bool {
-        if let from = window.from, date < from {
-            return false
-        }
-
-        if let to = window.to, date > to {
-            return false
-        }
-
-        return true
     }
 
     @inline(__always)
@@ -525,6 +542,18 @@ private extension VATStatusBuilder {
             return []
         }
 
+        return contiguousPeriods(
+            from: start,
+            through: end,
+            calendar: calendar
+        )
+    }
+
+    static func contiguousPeriods(
+        from start: Date,
+        through end: Date,
+        calendar: Calendar
+    ) -> [VATPeriod] {
         var periods: [VATPeriod] = []
         var seen = Set<VATPeriod>()
         var current = start
