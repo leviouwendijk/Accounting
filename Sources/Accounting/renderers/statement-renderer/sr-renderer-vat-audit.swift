@@ -59,12 +59,12 @@ public extension StatementHTMLRenderer {
                         HTML.tbody {
                             renderSummaryRow(
                                 "Ledger owed",
-                                report.totalLedgerOwed,
+                                report.displayTotalLedgerOwed,
                                 currencySymbol: options.currencySymbol
                             )
                             renderSummaryRow(
                                 "Ledger receivable",
-                                report.totalLedgerReceivable,
+                                report.displayTotalLedgerReceivable,
                                 currencySymbol: options.currencySymbol
                             )
                             renderSummaryRow(
@@ -117,12 +117,12 @@ public extension StatementHTMLRenderer {
                                     HTML.tbody {
                                         renderSummaryRow(
                                             "Ledger owed",
-                                            quarter.ledgerOwed,
+                                            quarter.displayLedgerOwed,
                                             currencySymbol: options.currencySymbol
                                         )
                                         renderSummaryRow(
                                             "Ledger receivable",
-                                            quarter.ledgerReceivable,
+                                            quarter.displayLedgerReceivable,
                                             currencySymbol: options.currencySymbol
                                         )
                                         renderSummaryRow(

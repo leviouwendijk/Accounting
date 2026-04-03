@@ -63,6 +63,7 @@ public struct VATAuditEntry: Sendable, Codable, Hashable {
 public struct VATAuditQuarter: Sendable, Codable, Hashable {
     public let period: VATPeriod
 
+    /// Raw buckets from VAT-account family matching.
     public let ledgerOwed: Decimal
     public let ledgerReceivable: Decimal
     public let ledgerNet: Decimal
@@ -102,6 +103,16 @@ public struct VATAuditQuarter: Sendable, Codable, Hashable {
 
     public var declaredTotal: Decimal {
         filed + corrected
+    }
+
+    /// User-facing economic position.
+    public var displayLedgerOwed: Decimal {
+        ledgerNet > 0 ? ledgerNet : 0
+    }
+
+    /// User-facing economic position.
+    public var displayLedgerReceivable: Decimal {
+        ledgerNet < 0 ? (-ledgerNet) : 0
     }
 }
 
@@ -156,5 +167,15 @@ public struct VATAuditReport: Sendable, Codable, SectionedPresentableOutput {
         quarters.filter {
             DecimalFuncs.absDec($0.ledgerVsDeclaredDelta) > tolerance
         }
+    }
+
+    /// User-facing economic position.
+    public var displayTotalLedgerOwed: Decimal {
+        totalLedgerNet > 0 ? totalLedgerNet : 0
+    }
+
+    /// User-facing economic position.
+    public var displayTotalLedgerReceivable: Decimal {
+        totalLedgerNet < 0 ? (-totalLedgerNet) : 0
     }
 }
