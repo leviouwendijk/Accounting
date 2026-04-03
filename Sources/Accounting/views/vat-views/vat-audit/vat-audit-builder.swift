@@ -29,10 +29,12 @@ public enum VATAuditBuilder {
                 calendar: calendar
             )
 
+            let annotation = entry.vat
+
             if shouldIncludeLedgerPosting(
                 postingDate: postingDate,
                 period: period
-            ) {
+            ), shouldCountInBaseLedger(annotation: annotation) {
                 let movement = vatLedgerMovement(
                     for: entry,
                     roots: roots
@@ -47,7 +49,7 @@ public enum VATAuditBuilder {
                 }
             }
 
-            guard let annotation = entry.vat else {
+            guard let annotation else {
                 continue
             }
 
@@ -114,13 +116,24 @@ public enum VATAuditBuilder {
                     .filter { $0.kind == .correction }
                     .reduce(Decimal(0)) { $0 + $1.amount }
 
+                let correctionNet = entries
+                    .filter { $0.kind == .correction }
+                    .reduce(Decimal(0)) { $0 + $1.netAmount }
+
+                let settlementNet = entries
+                    .filter { $0.kind == .settlement }
+                    .reduce(Decimal(0)) { $0 + $1.netAmount }
+
                 let ledgerOwed = ledgerOwedByPeriod[periodKey] ?? 0
                 let ledgerReceivable = ledgerReceivableByPeriod[periodKey] ?? 0
                 let ledgerNet = ledgerOwed - ledgerReceivable
 
-                // Keep this semantic as-is:
-                // compare ledger VAT position vs declared obligation/corrections.
-                let ledgerVsDeclaredDelta = ledgerNet - (filed + corrected)
+                // Clearing logic:
+                // 1. Start from compiled ordinary VAT movement in the quarter.
+                // 2. Layer in semantic corrections assigned to this VAT period.
+                // 3. Check whether semantic settlements clear that position.
+                let expectedSettlementNet = ledgerNet + correctionNet
+                let ledgerVsDeclaredDelta = expectedSettlementNet + settlementNet
 
                 return VATAuditQuarter(
                     period: periodKey,
@@ -158,6 +171,20 @@ private extension VATAuditBuilder {
             postingDate,
             in: period
         )
+    }
+
+    @inline(__always)
+    static func shouldCountInBaseLedger(
+        annotation: VATAnnotation?
+    ) -> Bool {
+        guard let annotation else {
+            return true
+        }
+
+        switch annotation.kind {
+        case .settlement, .filing, .correction:
+            return false
+        }
     }
 
     @inline(__always)
@@ -301,6 +328,7 @@ private extension VATAuditBuilder {
             kind: annotation.kind,
             settlementFlow: settlementFlow,
             period: annotation.period,
+            netAmount: netMovement,
             amount: DecimalFuncs.absDec(netMovement),
             vatAccountCodes: Array(Set(vatCodes)).sorted(),
             details: entry.details

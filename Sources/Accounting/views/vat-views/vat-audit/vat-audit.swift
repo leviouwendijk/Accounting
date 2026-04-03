@@ -7,8 +7,11 @@ public struct VATAuditEntry: Sendable, Codable, Hashable {
     public let settlementFlow: VATSettlementFlow?
     public let period: VATPeriod
 
-    /// Absolute VAT-relevant movement extracted from VAT accounts
+    /// Signed VAT-relevant movement extracted from VAT accounts
     /// touched by this annotated entry.
+    public let netAmount: Decimal
+
+    /// Absolute display amount.
     public let amount: Decimal
 
     public let vatAccountCodes: [String]
@@ -20,6 +23,7 @@ public struct VATAuditEntry: Sendable, Codable, Hashable {
         kind: VATKind,
         settlementFlow: VATSettlementFlow? = nil,
         period: VATPeriod,
+        netAmount: Decimal,
         amount: Decimal,
         vatAccountCodes: [String],
         details: String?
@@ -29,6 +33,7 @@ public struct VATAuditEntry: Sendable, Codable, Hashable {
         self.kind = kind
         self.settlementFlow = settlementFlow
         self.period = period
+        self.netAmount = netAmount
         self.amount = amount
         self.vatAccountCodes = vatAccountCodes
         self.details = details
