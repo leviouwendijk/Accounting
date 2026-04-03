@@ -15,8 +15,6 @@ public enum VATStatusBuilder {
         // Instead, status is backsolved from inception through the selected end.
         let historyEnd = period?.to
 
-        // Keep selected periods only so we can still include an empty selected quarter/year
-        // in the final report even when there was no movement there.
         let selectedPeriods = period.map {
             Set(periodsOverlapping($0, calendar: calendar))
         } ?? []
@@ -135,7 +133,6 @@ public enum VATStatusBuilder {
                 let ordinary = ordinaryByPeriod[periodKey] ?? .zero
                 let correctionsNet = correctionsByPeriod[periodKey] ?? 0
 
-                // This is now meaningful, because earlier quarters are included too.
                 let carryIn = carryBag.values.reduce(0, +)
 
                 let paid = entries
@@ -161,13 +158,11 @@ public enum VATStatusBuilder {
                     + ordinary.net
                     + correctionsNet
 
-                // Quarter-local movement becomes a new open source for this quarter.
                 let quarterMovement = ordinary.net + correctionsNet
                 if quarterMovement != 0 {
                     carryBag[periodKey, default: 0] += quarterMovement
                 }
 
-                // Settlements clear against the running carry bag.
                 if settlementNet != 0 {
                     carryBag[periodKey, default: 0] += settlementNet
                 }
@@ -379,7 +374,9 @@ private extension VATStatusBuilder {
                 continue
             }
 
-            let effect = -signedRaw(line)
+            // Native BS polarity for status:
+            // debit = positive, credit = negative
+            let effect = signedRaw(line)
 
             switch family {
             case .output:
@@ -405,8 +402,8 @@ private extension VATStatusBuilder {
     static func auditMovement(
         for entry: ResolvedEntry,
         roots: VATRoots
-    ) -> (owed: Decimal, receivable: Decimal) {
-        var owed: Decimal = 0
+    ) -> (payable: Decimal, receivable: Decimal) {
+        var payable: Decimal = 0
         var receivable: Decimal = 0
 
         for line in entry.lines {
@@ -417,7 +414,7 @@ private extension VATStatusBuilder {
                 code,
                 roots: roots
             ) {
-                owed += (-raw)
+                payable += raw
             }
 
             if isReceivableVATCode(
@@ -429,7 +426,7 @@ private extension VATStatusBuilder {
         }
 
         return (
-            owed,
+            payable,
             receivable
         )
     }
@@ -442,12 +439,15 @@ private extension VATStatusBuilder {
             return nil
         }
 
+        // Native BS polarity:
+        // debit settlement = paid
+        // credit settlement = received
         if netMovement > 0 {
-            return .received
+            return .paid
         }
 
         if netMovement < 0 {
-            return .paid
+            return .received
         }
 
         return nil
@@ -473,7 +473,7 @@ private extension VATStatusBuilder {
             roots: roots
         )
 
-        let netMovement = movement.owed - movement.receivable
+        let netMovement = movement.payable + movement.receivable
         let settlementFlow = inferredSettlementFlow(
             kind: annotation.kind,
             netMovement: netMovement

@@ -1,4 +1,5 @@
 import Foundation
+import Terminal
 
 public struct VATStatusTextOptions: Sendable {
     public var title: String
@@ -30,7 +31,7 @@ public extension VATStatusReport {
     func renderText(
         _ opts: VATStatusTextOptions = .init()
     ) -> String {
-        func fmt(
+        func fmtNumber(
             _ x: Decimal
         ) -> String {
             guard let digits = opts.fractionDigits else {
@@ -47,9 +48,33 @@ public extension VATStatusReport {
             formatter.minimumFractionDigits = digits
             formatter.maximumFractionDigits = digits
 
-            return formatter.string(
-                from: rounded as NSDecimalNumber
-            ) ?? rounded.description
+            let absolute = DecimalFuncs.absDec(rounded)
+
+            let core = formatter.string(
+                from: absolute as NSDecimalNumber
+            ) ?? absolute.description
+
+            if rounded < 0 {
+                return "(\(core))"
+            }
+
+            return core
+        }
+
+        func fmt(
+            _ x: Decimal
+        ) -> String {
+            let rendered = fmtNumber(x)
+
+            if x > 0 {
+                return rendered.ansi(.bold, .green)
+            }
+
+            if x < 0 {
+                return rendered.ansi(.bold, .red)
+            }
+
+            return rendered
         }
 
         func quarterLabel(
@@ -126,7 +151,7 @@ public extension VATStatusReport {
                     for entry in quarter.entries {
                         let idLabel = entry.entryId.map { "[entry \($0)]" } ?? ""
                         out.append(
-                            "  • \(entry.displayKind)  \(fmt(entry.amount))  \(dateLabel(entry.postingDate))  \(idLabel)"
+                            "  • \(entry.displayKind)  \(fmt(entry.netAmount))  \(dateLabel(entry.postingDate))  \(idLabel)"
                         )
 
                         if !entry.vatAccountCodes.isEmpty {

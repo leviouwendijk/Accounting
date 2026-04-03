@@ -27,7 +27,8 @@ public struct VATStatusQuarter: Sendable, Codable, Hashable {
     /// Running open amount brought in from earlier quarters in the selected view.
     public let carryIn: Decimal
 
-    /// Ordinary quarter VAT composition, excluding tagged settlement / filing / correction entries.
+    /// Native account-polarity composition:
+    /// debit = positive, credit = negative.
     public let outputNet: Decimal
     public let deductibleNet: Decimal
     public let privateUseNet: Decimal
@@ -47,10 +48,13 @@ public struct VATStatusQuarter: Sendable, Codable, Hashable {
     public let paid: Decimal
     public let received: Decimal
 
-    /// Signed settlement effect. Negative = paid, positive = received.
+    /// Native account-polarity settlement effect:
+    /// debit settlement = positive, credit settlement = negative.
     public let settlementNet: Decimal
 
     /// Remaining open amount after settlement.
+    /// Negative = owed (credit liability left open)
+    /// Positive = receivable / debit residue left open
     public let residual: Decimal
 
     /// Compact breakdown of which source quarter(s) still contribute to the residual.
@@ -96,11 +100,11 @@ public struct VATStatusQuarter: Sendable, Codable, Hashable {
     }
 
     public var displayResidualOwed: Decimal {
-        residual > 0 ? residual : 0
+        residual < 0 ? (-residual) : 0
     }
 
     public var displayResidualReceivable: Decimal {
-        residual < 0 ? (-residual) : 0
+        residual > 0 ? residual : 0
     }
 
     public var isCleared: Bool {
@@ -134,10 +138,10 @@ public struct VATStatusReport: Sendable, Codable, SectionedPresentableOutput {
     }
 
     public var latestDisplayResidualOwed: Decimal {
-        latestResidual > 0 ? latestResidual : 0
+        latestResidual < 0 ? (-latestResidual) : 0
     }
 
     public var latestDisplayResidualReceivable: Decimal {
-        latestResidual < 0 ? (-latestResidual) : 0
+        latestResidual > 0 ? latestResidual : 0
     }
 }
