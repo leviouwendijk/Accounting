@@ -18,6 +18,10 @@ public enum BusinessEntity: Sendable, Codable {
         canonicalRoots.capital
     }
 
+    public var vatRoots: VATRoots {
+        canonicalRoots.vat
+    }
+
     public func autoCloseTargets() -> AutoCloseTargets {
         canonicalRoots.autoCloseTargets
     }

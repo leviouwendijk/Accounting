@@ -41,6 +41,17 @@ public extension CanonicalRoots {
             otherCurrentLiabilitiesCodes: ["BSchOvs"],
             accruedCurrentLiabilitiesCodes: ["BSchOpa"],
             workInProgressLiabilityCodes: ["BSchOpp"]
+        ),
+        vat: .init(
+            payableCodes: [
+                "BSchBepBtw",
+                "BSchBepEob",
+                "BSchBepBaf",
+            ],
+            receivableCodes: [
+                "BVorVbkTvo",
+                "BVorVbkEob",
+            ]
         )
     )
 }

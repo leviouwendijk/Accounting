@@ -6,11 +6,14 @@ public enum VATAuditBuilder {
         title: String = "VAT audit trail",
         period: PeriodWindow? = nil,
         tolerance: Decimal = 0.01,
-        calendar: Calendar
+        calendar: Calendar,
+        businessEntity: BusinessEntity = .vof
     ) -> VATAuditReport {
         let allowedPeriods = period.map {
             Set(periodsOverlapping($0, calendar: calendar))
         }
+
+        let roots = businessEntity.vatRoots
 
         var ledgerOwedByPeriod: [VATPeriod: Decimal] = [:]
         var ledgerReceivableByPeriod: [VATPeriod: Decimal] = [:]
@@ -31,7 +34,8 @@ public enum VATAuditBuilder {
                 period: period
             ) {
                 let movement = vatLedgerMovement(
-                    for: entry
+                    for: entry,
+                    roots: roots
                 )
 
                 if movement.owed != 0 {
@@ -55,7 +59,8 @@ public enum VATAuditBuilder {
             let event = makeAuditEntry(
                 entry: entry,
                 postingDate: postingDate,
-                annotation: annotation
+                annotation: annotation,
+                roots: roots
             )
 
             taggedEntriesByPeriod[annotation.period, default: []].append(
@@ -72,10 +77,20 @@ public enum VATAuditBuilder {
         }
 
         let quarters = periods
-            .sorted(by: vatPeriodSort)
+            .sorted { lhs, rhs in
+                Self.vatPeriodSort(
+                    lhs: lhs,
+                    rhs: rhs
+                )
+            }
             .map { periodKey in
                 let entries = (taggedEntriesByPeriod[periodKey] ?? [])
-                    .sorted(by: auditEntrySort)
+                    .sorted { lhs, rhs in
+                        Self.auditEntrySort(
+                            lhs: lhs,
+                            rhs: rhs
+                        )
+                    }
 
                 let filed = entries
                     .filter { $0.kind == .filing }
@@ -102,6 +117,9 @@ public enum VATAuditBuilder {
                 let ledgerOwed = ledgerOwedByPeriod[periodKey] ?? 0
                 let ledgerReceivable = ledgerReceivableByPeriod[periodKey] ?? 0
                 let ledgerNet = ledgerOwed - ledgerReceivable
+
+                // Keep this semantic as-is:
+                // compare ledger VAT position vs declared obligation/corrections.
                 let ledgerVsDeclaredDelta = ledgerNet - (filed + corrected)
 
                 return VATAuditQuarter(
@@ -127,17 +145,7 @@ public enum VATAuditBuilder {
 }
 
 private extension VATAuditBuilder {
-    static let payablePrefixes: [String] = [
-        "BSchBepBtw",
-        "BSchBepEob",
-        "BSchBepBaf",
-    ]
-
-    static let receivablePrefixes: [String] = [
-        "BVorVbkTvo",
-        "BVorVbkEob",
-    ]
-
+    @inline(__always)
     static func shouldIncludeLedgerPosting(
         postingDate: Date,
         period: PeriodWindow?
@@ -152,6 +160,7 @@ private extension VATAuditBuilder {
         )
     }
 
+    @inline(__always)
     static func contains(
         _ date: Date,
         in window: PeriodWindow
@@ -167,8 +176,46 @@ private extension VATAuditBuilder {
         return true
     }
 
+    @inline(__always)
+    static func matchesAnyPrefix(
+        _ code: String,
+        prefixes: [String],
+        excluded: [String]
+    ) -> Bool {
+        guard !excluded.contains(where: { code.hasPrefix($0) }) else {
+            return false
+        }
+
+        return prefixes.contains(where: { code.hasPrefix($0) })
+    }
+
+    @inline(__always)
+    static func isPayableVATCode(
+        _ code: String,
+        roots: VATRoots
+    ) -> Bool {
+        matchesAnyPrefix(
+            code,
+            prefixes: roots.payableCodes,
+            excluded: roots.excludedCodes
+        )
+    }
+
+    @inline(__always)
+    static func isReceivableVATCode(
+        _ code: String,
+        roots: VATRoots
+    ) -> Bool {
+        matchesAnyPrefix(
+            code,
+            prefixes: roots.receivableCodes,
+            excluded: roots.excludedCodes
+        )
+    }
+
     static func vatLedgerMovement(
-        for entry: ResolvedEntry
+        for entry: ResolvedEntry,
+        roots: VATRoots
     ) -> (owed: Decimal, receivable: Decimal) {
         var owed: Decimal = 0
         var receivable: Decimal = 0
@@ -177,42 +224,82 @@ private extension VATAuditBuilder {
             let code = line.account.code
             let raw = signedRaw(line)
 
-            if payablePrefixes.contains(where: { code.hasPrefix($0) }) {
+            if isPayableVATCode(
+                code,
+                roots: roots
+            ) {
                 // liability normal balance = credit
                 owed += (-raw)
             }
 
-            if receivablePrefixes.contains(where: { code.hasPrefix($0) }) {
+            if isReceivableVATCode(
+                code,
+                roots: roots
+            ) {
                 // asset normal balance = debit
                 receivable += raw
             }
         }
 
-        return (owed, receivable)
+        return (
+            owed,
+            receivable
+        )
+    }
+
+    static func inferredSettlementFlow(
+        kind: VATKind,
+        netMovement: Decimal
+    ) -> VATSettlementFlow? {
+        guard kind == .settlement else {
+            return nil
+        }
+
+        if netMovement > 0 {
+            return .received
+        }
+
+        if netMovement < 0 {
+            return .paid
+        }
+
+        return nil
     }
 
     static func makeAuditEntry(
         entry: ResolvedEntry,
         postingDate: Date,
-        annotation: VATAnnotation
+        annotation: VATAnnotation,
+        roots: VATRoots
     ) -> VATAuditEntry {
         let vatCodes = entry.lines
             .map(\.account.code)
             .filter { code in
-                payablePrefixes.contains(where: { code.hasPrefix($0) })
-                    || receivablePrefixes.contains(where: { code.hasPrefix($0) })
+                isPayableVATCode(
+                    code,
+                    roots: roots
+                ) || isReceivableVATCode(
+                    code,
+                    roots: roots
+                )
             }
 
         let movement = vatLedgerMovement(
-            for: entry
+            for: entry,
+            roots: roots
         )
 
         let netMovement = movement.owed - movement.receivable
+        let settlementFlow = inferredSettlementFlow(
+            kind: annotation.kind,
+            netMovement: netMovement
+        )
 
         return .init(
             entryId: entry.id,
             postingDate: postingDate,
             kind: annotation.kind,
+            settlementFlow: settlementFlow,
             period: annotation.period,
             amount: DecimalFuncs.absDec(netMovement),
             vatAccountCodes: Array(Set(vatCodes)).sorted(),
@@ -220,6 +307,7 @@ private extension VATAuditBuilder {
         )
     }
 
+    @inline(__always)
     static func signedRaw(
         _ line: ResolvedLine
     ) -> Decimal {
@@ -256,60 +344,39 @@ private extension VATAuditBuilder {
         _ window: PeriodWindow,
         calendar: Calendar
     ) -> [VATPeriod] {
-        guard let from = window.from else {
+        guard let start = window.from, let end = window.to else {
             return []
         }
 
-        let to = window.to ?? from
+        var periods: [VATPeriod] = []
+        var seen = Set<VATPeriod>()
+        var current = start
 
-        var cursor = startOfQuarter(
-            containing: from,
-            calendar: calendar
-        )
-
-        var result: [VATPeriod] = []
-
-        while cursor <= to {
-            result.append(
-                vatPeriod(for: cursor, calendar: calendar)
+        while current <= end {
+            let period = vatPeriod(
+                for: current,
+                calendar: calendar
             )
+
+            if seen.insert(period).inserted {
+                periods.append(period)
+            }
 
             guard let next = calendar.date(
                 byAdding: .month,
-                value: 3,
-                to: cursor
+                value: 1,
+                to: current
             ) else {
                 break
             }
 
-            cursor = next
+            current = next
         }
 
-        return result
+        return periods
     }
 
-    static func startOfQuarter(
-        containing date: Date,
-        calendar: Calendar
-    ) -> Date {
-        let comps = calendar.dateComponents(
-            [.year, .month],
-            from: date
-        )
-
-        let month = comps.month ?? 1
-        let startMonth = (((month - 1) / 3) * 3) + 1
-
-        return calendar.date(
-            from: DateComponents(
-                timeZone: calendar.timeZone,
-                year: comps.year,
-                month: startMonth,
-                day: 1
-            )
-        ) ?? date
-    }
-
+    @inline(__always)
     static func vatPeriodSort(
         lhs: VATPeriod,
         rhs: VATPeriod
@@ -321,6 +388,7 @@ private extension VATAuditBuilder {
         return lhs.quarter.rawValue < rhs.quarter.rawValue
     }
 
+    @inline(__always)
     static func auditEntrySort(
         lhs: VATAuditEntry,
         rhs: VATAuditEntry
@@ -332,10 +400,13 @@ private extension VATAuditBuilder {
         switch (lhs.entryId, rhs.entryId) {
         case let (.some(a), .some(b)):
             return a < b
+
         case (.some, .none):
             return true
+
         case (.none, .some):
             return false
+
         case (.none, .none):
             return lhs.kind.rawValue < rhs.kind.rawValue
         }
