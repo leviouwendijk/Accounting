@@ -51,6 +51,23 @@ public extension CanonicalRoots {
             receivableCodes: [
                 "BVorVbkTvo",
                 "BVorVbkEob",
+            ],
+
+            // Status/filing-focused families.
+            //
+            // Keep these specific and let the status builder fall back to the
+            // broad payable/receivable roots only when none of the specific
+            // families matched.
+            outputCodes: [
+                "BSchBepBtwOla",
+                "BSchBepEob",
+                "BSchBepBaf",
+            ],
+            deductibleCodes: [
+                "BSchBepBtwVoo",
+            ],
+            privateUseCodes: [
+                "BSchBepBtwOop",
             ]
         )
     )
