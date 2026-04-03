@@ -568,65 +568,6 @@ extension AssetViews {
             return formatter.string(from: date)
         }
 
-        // private static func visibleShareBreakdown(
-        //     _ overview: AssetsOverview
-        // ) -> [AssetsOverviewOwnerShareAmounts] {
-        //     var byOwner: [String: (
-        //         openingCarryingAmount: Decimal,
-        //         periodInvestment: Decimal,
-        //         closingCarryingAmount: Decimal
-        //     )] = [:]
-
-        //     for group in overview.groups {
-        //         if group.section == .unclassified {
-        //             continue
-        //         }
-
-        //         for item in group.totals.shareBreakdown {
-        //             var bucket = byOwner[item.ownerLabel] ?? (0, 0, 0)
-        //             bucket.openingCarryingAmount += item.openingCarryingAmount
-        //             bucket.periodInvestment += item.periodInvestment
-        //             bucket.closingCarryingAmount += item.closingCarryingAmount
-        //             byOwner[item.ownerLabel] = bucket
-        //         }
-        //     }
-
-        //     return byOwner.keys.sorted().map { ownerLabel in
-        //         let bucket = byOwner[ownerLabel] ?? (0, 0, 0)
-
-        //         return AssetsOverviewOwnerShareAmounts(
-        //             ownerLabel: ownerLabel,
-        //             openingCarryingAmount: bucket.openingCarryingAmount,
-        //             periodInvestment: bucket.periodInvestment,
-        //             closingCarryingAmount: bucket.closingCarryingAmount
-        //         )
-        //     }
-        // }
-
-        // private static func totalShareOpeningAcrossVisibleSections(
-        //     _ overview: AssetsOverview
-        // ) -> Decimal {
-        //     visibleShareBreakdown(overview).reduce(0) {
-        //         $0 + $1.openingCarryingAmount
-        //     }
-        // }
-
-        // private static func totalSharePeriodInvestmentAcrossVisibleSections(
-        //     _ overview: AssetsOverview
-        // ) -> Decimal {
-        //     visibleShareBreakdown(overview).reduce(0) {
-        //         $0 + $1.periodInvestment
-        //     }
-        // }
-
-        // private static func totalShareClosingAcrossVisibleSections(
-        //     _ overview: AssetsOverview
-        // ) -> Decimal {
-        //     visibleShareBreakdown(overview).reduce(0) {
-        //         $0 + $1.closingCarryingAmount
-        //     }
-        // }
-
         private static func appendShareBreakdown(
             _ breakdown: [AssetsOverviewOwnerShareAmounts],
             value: KeyPath<AssetsOverviewOwnerShareAmounts, Decimal>,

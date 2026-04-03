@@ -47,7 +47,6 @@ public struct MetaAuditReport: Sendable {
     public let acquired: AcquiredAssetsReport
     public let period: NativePeriodCompileOutput
     public let costBreakdown: CostBreakdownReport
-    // public let kia: KIAProjectionResult
     public let kia: MetaAuditKIASection
     public let equity: MetaAuditEquitySection
     public let depreciation: DepreciationAuditReport
@@ -61,7 +60,6 @@ public struct MetaAuditReport: Sendable {
         acquired: AcquiredAssetsReport,
         period: NativePeriodCompileOutput,
         costBreakdown: CostBreakdownReport,
-        // kia: KIAProjectionResult,
         kia: MetaAuditKIASection,
         equity: MetaAuditEquitySection,
         depreciation: DepreciationAuditReport

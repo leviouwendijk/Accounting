@@ -1,14 +1,5 @@
 import Foundation
 
-// @available(
-//     *,
-//     deprecated,
-//     message: """
-//     Superseded by TaxonomyBalanceSourceBuilder.
-//     Auto-close and roll-up logic interferes with accurate concept fact balances in taxonomy projection.
-//     """
-// )
-// reimplemented for hybrid path
 enum TaxonomyNativeBalanceExtractor {
     static func balances(
         chart: CompiledChart,

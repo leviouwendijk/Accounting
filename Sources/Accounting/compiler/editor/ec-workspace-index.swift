@@ -127,21 +127,6 @@ public struct ECWorkspaceIndex: Sendable {
                 )
             }
 
-        // self.entityCompletionItems = result.entities.byFull
-        //     .values
-        //     .sorted {
-        //         $0.key.identifier(displaying: .fullchain)
-        //             < $1.key.identifier(displaying: .fullchain)
-        //     }
-        //     .map { def in
-        //         ECCompletionItem(
-        //             kind: .entity,
-        //             label: def.key.identifier(displaying: .fullchain),
-        //             detail: def.effectiveDisplayName,
-        //             documentation: def.effectiveDetails ?? def.effectiveDisplayName
-        //         )
-        //     }
-
         var accountItems: [ECCompletionItem] = []
         accountItems.reserveCapacity(
             result.accounts.byCode.count + result.accounts.byIdentifier.count

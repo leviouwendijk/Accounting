@@ -42,10 +42,6 @@ public enum Direction: String, Codable, Sendable {
 
     @inlinable 
     public init(sign: Int8) throws {
-        // precondition(sign == 1 || sign == -1, "Direction sign must be 1 or -1")
-        // guard sign == 1 || sign == -1 else {
-        //     throw DirectionError.invalidInt8(sign)
-        // }
         switch sign {
             case 1:
                 self = .debit
