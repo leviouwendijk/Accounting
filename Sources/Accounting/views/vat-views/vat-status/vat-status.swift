@@ -21,6 +21,44 @@ public struct VATStatusContribution: Sendable, Codable, Hashable {
     }
 }
 
+public struct VATStatusTreeNode: Sendable, Codable, Hashable {
+    public let id: Int
+    public let code: String
+    public let label: String
+    public let amount: Decimal
+    public let children: [VATStatusTreeNode]
+
+    public init(
+        id: Int,
+        code: String,
+        label: String,
+        amount: Decimal,
+        children: [VATStatusTreeNode]
+    ) {
+        self.id = id
+        self.code = code
+        self.label = label
+        self.amount = amount
+        self.children = children
+    }
+}
+
+public struct VATStatusFamilyBreakdown: Sendable, Codable, Hashable {
+    public let family: VATStatusFamily
+    public let amount: Decimal
+    public let nodes: [VATStatusTreeNode]
+
+    public init(
+        family: VATStatusFamily,
+        amount: Decimal,
+        nodes: [VATStatusTreeNode]
+    ) {
+        self.family = family
+        self.amount = amount
+        self.nodes = nodes
+    }
+}
+
 public struct VATStatusQuarter: Sendable, Codable, Hashable {
     public let period: VATPeriod
 
@@ -37,6 +75,9 @@ public struct VATStatusQuarter: Sendable, Codable, Hashable {
 
     /// Sum of the ordinary composition buckets.
     public let ordinaryNet: Decimal
+
+    /// Per-family per-RGS-node tree for the ordinary composition.
+    public let ordinaryBreakdownTree: [VATStatusFamilyBreakdown]
 
     /// Signed semantic corrections assigned to this VAT quarter.
     public let correctionsNet: Decimal
@@ -72,6 +113,7 @@ public struct VATStatusQuarter: Sendable, Codable, Hashable {
         receivableNet: Decimal,
         payableFallbackNet: Decimal,
         ordinaryNet: Decimal,
+        ordinaryBreakdownTree: [VATStatusFamilyBreakdown],
         correctionsNet: Decimal,
         expectedSettlementNet: Decimal,
         paid: Decimal,
@@ -89,6 +131,7 @@ public struct VATStatusQuarter: Sendable, Codable, Hashable {
         self.receivableNet = receivableNet
         self.payableFallbackNet = payableFallbackNet
         self.ordinaryNet = ordinaryNet
+        self.ordinaryBreakdownTree = ordinaryBreakdownTree
         self.correctionsNet = correctionsNet
         self.expectedSettlementNet = expectedSettlementNet
         self.paid = paid

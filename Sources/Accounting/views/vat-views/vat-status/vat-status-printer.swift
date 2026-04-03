@@ -93,6 +93,35 @@ public extension VATStatusReport {
             return formatter.string(from: date)
         }
 
+        func familyBreakdown(
+            _ family: VATStatusFamily,
+            in quarter: VATStatusQuarter
+        ) -> VATStatusFamilyBreakdown? {
+            quarter.ordinaryBreakdownTree.first {
+                $0.family == family
+            }
+        }
+
+        func renderTreeNodes(
+            _ nodes: [VATStatusTreeNode],
+            indent: String,
+            into out: inout [String]
+        ) {
+            for node in nodes {
+                out.append(
+                    "\(indent)• \(node.code) — \(node.label): \(fmt(node.amount))"
+                )
+
+                if !node.children.isEmpty {
+                    renderTreeNodes(
+                        node.children,
+                        indent: indent + "    ",
+                        into: &out
+                    )
+                }
+            }
+        }
+
         let rows = opts.onlyFlagged
             ? flaggedQuarters
             : quarters
@@ -116,11 +145,57 @@ public extension VATStatusReport {
             out.append("──────")
             out.append("carry in:                 \(fmt(quarter.carryIn))")
             out.append("ordinary net:             \(fmt(quarter.ordinaryNet))")
+
             out.append("  output:                 \(fmt(quarter.outputNet))")
+            if let breakdown = familyBreakdown(.output, in: quarter),
+               !breakdown.nodes.isEmpty {
+                renderTreeNodes(
+                    breakdown.nodes,
+                    indent: "    ",
+                    into: &out
+                )
+            }
+
             out.append("  deductible:             \(fmt(quarter.deductibleNet))")
+            if let breakdown = familyBreakdown(.deductible, in: quarter),
+               !breakdown.nodes.isEmpty {
+                renderTreeNodes(
+                    breakdown.nodes,
+                    indent: "    ",
+                    into: &out
+                )
+            }
+
             out.append("  private use:            \(fmt(quarter.privateUseNet))")
+            if let breakdown = familyBreakdown(.privateUse, in: quarter),
+               !breakdown.nodes.isEmpty {
+                renderTreeNodes(
+                    breakdown.nodes,
+                    indent: "    ",
+                    into: &out
+                )
+            }
+
             out.append("  receivable:             \(fmt(quarter.receivableNet))")
+            if let breakdown = familyBreakdown(.receivable, in: quarter),
+               !breakdown.nodes.isEmpty {
+                renderTreeNodes(
+                    breakdown.nodes,
+                    indent: "    ",
+                    into: &out
+                )
+            }
+
             out.append("  payable fallback:       \(fmt(quarter.payableFallbackNet))")
+            if let breakdown = familyBreakdown(.payableFallback, in: quarter),
+               !breakdown.nodes.isEmpty {
+                renderTreeNodes(
+                    breakdown.nodes,
+                    indent: "    ",
+                    into: &out
+                )
+            }
+
             out.append("corrections net:          \(fmt(quarter.correctionsNet))")
             out.append("expected before settle:   \(fmt(quarter.expectedSettlementNet))")
             out.append("paid:                     \(fmt(quarter.paid))")

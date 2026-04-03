@@ -3,13 +3,23 @@ import Foundation
 public enum VATStatusBuilder {
     public static func build(
         resolvedEntries: [ResolvedEntry],
+        chart: CompiledChart,
         title: String = "VAT status",
         period: PeriodWindow? = nil,
         tolerance: Decimal = 0.01,
         calendar: Calendar,
         businessEntity: BusinessEntity = .vof
-    ) -> VATStatusReport {
+    ) throws -> VATStatusReport {
         let roots = businessEntity.vatRoots
+        let maps = try RGSAssembler.makeMaps(from: chart)
+
+        let idByCode = Dictionary(
+            uniqueKeysWithValues: chart.nodes.map { ($0.codes.code, $0.id) }
+        )
+
+        let codeById = Dictionary(
+            uniqueKeysWithValues: chart.nodes.map { ($0.id, $0.codes.code) }
+        )
 
         // The selected period is no longer treated as the whole computation window.
         // Instead, status is backsolved from inception through the selected end.
@@ -38,6 +48,7 @@ public enum VATStatusBuilder {
         let latestIncludedDate = includedDates.max()
 
         var ordinaryByPeriod: [VATPeriod: StatusBreakdown] = [:]
+        var ordinaryTreeSeedByPeriod: [VATPeriod: FamilySeed] = [:]
         var correctionsByPeriod: [VATPeriod: Decimal] = [:]
         var taggedEntriesByPeriod: [VATPeriod: [VATAuditEntry]] = [:]
 
@@ -69,6 +80,19 @@ public enum VATStatusBuilder {
                 if !breakdown.isZero {
                     ordinaryByPeriod[postingQuarter, default: .zero] += breakdown
                 }
+
+                let treeSeed = ordinaryBreakdownTreeSeed(
+                    for: entry,
+                    roots: roots,
+                    idByCode: idByCode
+                )
+
+                if !treeSeed.isEmpty {
+                    mergeOrdinaryTreeSeed(
+                        into: &ordinaryTreeSeedByPeriod[postingQuarter, default: [:]],
+                        adding: treeSeed
+                    )
+                }
             }
 
             guard let annotation else {
@@ -96,6 +120,7 @@ public enum VATStatusBuilder {
         }
 
         var periods = Set(ordinaryByPeriod.keys)
+            .union(ordinaryTreeSeedByPeriod.keys)
             .union(correctionsByPeriod.keys)
             .union(taggedEntriesByPeriod.keys)
 
@@ -131,6 +156,13 @@ public enum VATStatusBuilder {
                     }
 
                 let ordinary = ordinaryByPeriod[periodKey] ?? .zero
+                let ordinaryTree = makeOrdinaryFamilyBreakdowns(
+                    ordinaryTreeSeedByPeriod[periodKey] ?? [:],
+                    roots: roots,
+                    maps: maps,
+                    codeById: codeById
+                )
+
                 let correctionsNet = correctionsByPeriod[periodKey] ?? 0
 
                 let carryIn = carryBag.values.reduce(0, +)
@@ -197,6 +229,7 @@ public enum VATStatusBuilder {
                     receivableNet: ordinary.receivable,
                     payableFallbackNet: ordinary.payableFallback,
                     ordinaryNet: ordinary.net,
+                    ordinaryBreakdownTree: ordinaryTree,
                     correctionsNet: correctionsNet,
                     expectedSettlementNet: expectedSettlementNet,
                     paid: paid,
@@ -217,6 +250,8 @@ public enum VATStatusBuilder {
 }
 
 private extension VATStatusBuilder {
+    typealias FamilySeed = [VATStatusFamily: [Int: Decimal]]
+
     struct StatusBreakdown: Sendable {
         var output: Decimal = 0
         var deductible: Decimal = 0
@@ -397,6 +432,292 @@ private extension VATStatusBuilder {
         }
 
         return out
+    }
+
+    static func ordinaryBreakdownTreeSeed(
+        for entry: ResolvedEntry,
+        roots: VATRoots,
+        idByCode: [String: Int]
+    ) -> FamilySeed {
+        var out: FamilySeed = [:]
+
+        for line in entry.lines {
+            let code = line.account.code
+
+            guard let family = classifyStatusFamily(
+                code,
+                roots: roots
+            ) else {
+                continue
+            }
+
+            guard let id = idByCode[code] else {
+                continue
+            }
+
+            let effect = signedRaw(line)
+            guard effect != 0 else {
+                continue
+            }
+
+            out[family, default: [:]][id, default: 0] += effect
+        }
+
+        return out
+    }
+
+    static func mergeOrdinaryTreeSeed(
+        into lhs: inout FamilySeed,
+        adding rhs: FamilySeed
+    ) {
+        for (family, seed) in rhs {
+            for (id, amount) in seed {
+                lhs[family, default: [:]][id, default: 0] += amount
+            }
+        }
+    }
+
+    static func makeOrdinaryFamilyBreakdowns(
+        _ seedByFamily: FamilySeed,
+        roots: VATRoots,
+        maps: RGSAssemblerResult,
+        codeById: [Int: String]
+    ) -> [VATStatusFamilyBreakdown] {
+        let families = seedByFamily.keys.sorted {
+            familySortOrder($0) < familySortOrder($1)
+        }
+
+        return families.compactMap { family in
+            guard let seed = seedByFamily[family],
+                  !seed.isEmpty
+            else {
+                return nil
+            }
+
+            let rolled = RGSAssembler.rollupAmounts(
+                seed,
+                parentById: maps.parentById
+            )
+
+            let activeIDs = Set(
+                rolled.compactMap { key, value in
+                    value != 0 ? key : nil
+                }
+            )
+
+            guard !activeIDs.isEmpty else {
+                return nil
+            }
+
+            let rootIDs = familyRootIDs(
+                family: family,
+                activeIDs: activeIDs,
+                roots: roots,
+                maps: maps,
+                codeById: codeById
+            )
+
+            let childrenByParent = activeChildrenByParent(
+                activeIDs: activeIDs,
+                parentById: maps.parentById
+            )
+
+            let nodes = makeStatusTreeNodes(
+                from: rootIDs,
+                rolled: rolled,
+                childrenByParent: childrenByParent,
+                maps: maps,
+                codeById: codeById
+            )
+
+            return VATStatusFamilyBreakdown(
+                family: family,
+                amount: seed.values.reduce(0, +),
+                nodes: nodes
+            )
+        }
+    }
+
+    @inline(__always)
+    static func familySortOrder(
+        _ family: VATStatusFamily
+    ) -> Int {
+        switch family {
+        case .output:
+            return 0
+
+        case .deductible:
+            return 1
+
+        case .privateUse:
+            return 2
+
+        case .receivable:
+            return 3
+
+        case .payableFallback:
+            return 4
+        }
+    }
+
+    @inline(__always)
+    static func prefixes(
+        for family: VATStatusFamily,
+        roots: VATRoots
+    ) -> [String] {
+        switch family {
+        case .output:
+            return roots.outputCodes
+
+        case .deductible:
+            return roots.deductibleCodes
+
+        case .privateUse:
+            return roots.privateUseCodes
+
+        case .receivable:
+            return roots.receivableCodes
+
+        case .payableFallback:
+            return roots.payableCodes
+        }
+    }
+
+    static func familyRootIDs(
+        family: VATStatusFamily,
+        activeIDs: Set<Int>,
+        roots: VATRoots,
+        maps: RGSAssemblerResult,
+        codeById: [Int: String]
+    ) -> [Int] {
+        let familyPrefixes = prefixes(
+            for: family,
+            roots: roots
+        )
+
+        let matchingRoots = activeIDs.filter { id in
+            guard let code = codeById[id] else {
+                return false
+            }
+
+            guard matchesAnyPrefix(
+                code,
+                prefixes: familyPrefixes,
+                excluded: roots.excludedCodes
+            ) else {
+                return false
+            }
+
+            guard let parentId = maps.parentById[id],
+                  let parentCode = codeById[parentId]
+            else {
+                return true
+            }
+
+            return !matchesAnyPrefix(
+                parentCode,
+                prefixes: familyPrefixes,
+                excluded: roots.excludedCodes
+            )
+        }
+
+        if !matchingRoots.isEmpty {
+            return sortStatusIDs(
+                Array(matchingRoots),
+                maps: maps,
+                codeById: codeById
+            )
+        }
+
+        let fallbackRoots = activeIDs.filter { id in
+            guard let parentId = maps.parentById[id] else {
+                return true
+            }
+
+            return !activeIDs.contains(parentId)
+        }
+
+        return sortStatusIDs(
+            Array(fallbackRoots),
+            maps: maps,
+            codeById: codeById
+        )
+    }
+
+    static func activeChildrenByParent(
+        activeIDs: Set<Int>,
+        parentById: [Int: Int]
+    ) -> [Int: [Int]] {
+        var out: [Int: [Int]] = [:]
+
+        for id in activeIDs {
+            guard let parentId = parentById[id],
+                  activeIDs.contains(parentId)
+            else {
+                continue
+            }
+
+            out[parentId, default: []].append(id)
+        }
+
+        return out
+    }
+
+    static func makeStatusTreeNodes(
+        from rootIDs: [Int],
+        rolled: [Int: Decimal],
+        childrenByParent: [Int: [Int]],
+        maps: RGSAssemblerResult,
+        codeById: [Int: String]
+    ) -> [VATStatusTreeNode] {
+        let orderedIDs = sortStatusIDs(
+            rootIDs,
+            maps: maps,
+            codeById: codeById
+        )
+
+        return orderedIDs.compactMap { id in
+            let amount = rolled[id] ?? 0
+            guard amount != 0 else {
+                return nil
+            }
+
+            let code = codeById[id] ?? "node#\(id)"
+            let label = maps.nameById[id] ?? code
+
+            let children = makeStatusTreeNodes(
+                from: childrenByParent[id] ?? [],
+                rolled: rolled,
+                childrenByParent: childrenByParent,
+                maps: maps,
+                codeById: codeById
+            )
+
+            return VATStatusTreeNode(
+                id: id,
+                code: code,
+                label: label,
+                amount: amount,
+                children: children
+            )
+        }
+    }
+
+    static func sortStatusIDs(
+        _ ids: [Int],
+        maps: RGSAssemblerResult,
+        codeById: [Int: String]
+    ) -> [Int] {
+        ids.sorted { lhs, rhs in
+            let lhsKey = maps.sortKeyById[lhs] ?? codeById[lhs] ?? ""
+            let rhsKey = maps.sortKeyById[rhs] ?? codeById[rhs] ?? ""
+
+            if lhsKey != rhsKey {
+                return lhsKey < rhsKey
+            }
+
+            return lhs < rhs
+        }
     }
 
     static func auditMovement(
