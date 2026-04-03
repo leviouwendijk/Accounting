@@ -1,19 +1,28 @@
 import Foundation
 
-public enum PeriodSlicer {
+extension PeriodSlicer {
+    // public static func resolve(
+    //     shape: PeriodShape,
+    //     anchor: Date = Date(),
+    //     customFrom: Date? = nil,
+    //     customTo: Date? = nil,
+    //     tz: TimeZone = .current,
+    //     calendar base: Calendar = {
+    //         var c = Calendar(identifier: .iso8601)
+    //         c.firstWeekday = 2 // Monday
+    //         return c
+    //     }()
+    // ) -> PeriodWindows {
     public static func resolve(
         shape: PeriodShape,
         anchor: Date = Date(),
         customFrom: Date? = nil,
         customTo: Date? = nil,
-        tz: TimeZone = .current,
-        calendar base: Calendar = {
-            var c = Calendar(identifier: .iso8601)
-            c.firstWeekday = 2 // Monday
-            return c
-        }()
+        calendar: Calendar = periodCalendar()
     ) -> PeriodWindows {
-        var cal = base; cal.timeZone = tz
+        let cal = calendar
+        // var cal = base
+        // cal.timeZone = tz
 
         func dayStart(_ d: Date) -> Date {
             let c = cal.dateComponents([.year,.month,.day], from: d)
@@ -225,25 +234,4 @@ public enum PeriodSlicer {
             previous: prev
         )
     }
-}
-
-@inline(__always)
-public func absDate(_ d: DateSpecification) -> Date? {
-    if case let .absolute(x) = d { return x }
-    return nil
-}
-
-@inline(__always)
-public func filterEntries(_ src: [ResolvedEntry], within w: PeriodWindow) -> [ResolvedEntry] {
-    src.filter { re in
-        guard let d = absDate(re.date) else { return false }
-        return within(d, window: w)
-    }
-}
-
-@inline(__always)
-public func within(_ date: Date, window w: PeriodWindow) -> Bool {
-    if let f = w.from, date < f { return false }
-    if let t = w.to,   date > t { return false }
-    return true
 }

@@ -23,8 +23,8 @@ public extension DepreciationProjectionPolicy {
         let profileAccess = try DepreciationProfileAccess.resolve(
             for: key,
             entity: entity,
-            fallbackSchedule: config.schedule,
-            fallbackAcquisition: config.acquistion
+            // fallbackSchedule: config.schedule,
+            // fallbackAcquisition: config.acquistion
         )
 
         return DepreciationProjectionPolicy(

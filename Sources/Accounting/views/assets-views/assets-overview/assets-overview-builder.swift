@@ -41,8 +41,8 @@ extension AssetViews {
                 let profileAccess = try? DepreciationProfileAccess.resolve(
                     for: key,
                     entity: entity,
-                    fallbackSchedule: depreciation?.schedule,
-                    fallbackAcquisition: depreciation?.acquistion
+                    // fallbackSchedule: depreciation?.schedule,
+                    // fallbackAcquisition: depreciation?.acquistion
                 )
 
                 let projectionPolicy: DepreciationProjectionPolicy? = {

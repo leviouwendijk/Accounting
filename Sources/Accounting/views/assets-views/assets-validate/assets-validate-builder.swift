@@ -26,13 +26,13 @@ extension AssetViews {
                     continue
                 }
 
-                let depreciation = entity.depreciation
+                // let depreciation = entity.depreciation
 
                 let profileAccess = try? DepreciationProfileAccess.resolve(
                     for: key,
                     entity: entity,
-                    fallbackSchedule: depreciation?.schedule,
-                    fallbackAcquisition: depreciation?.acquistion
+                    // fallbackSchedule: depreciation?.schedule,
+                    // fallbackAcquisition: depreciation?.acquistion
                 )
 
                 let displayName = AssetViews.normalizedDisplayName(

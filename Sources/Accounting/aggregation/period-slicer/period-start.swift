@@ -1,27 +1,10 @@
 import Foundation
-import Primitives
 
-public enum PeriodKind: String, Codable, Sendable, StringParsableEnum {
-    case year
-    case half // half year
-    case quarter
-    case month
-    case week            // ISO-8601 week (Mon–Sun)
-    case custom
-    case lifetime             // no filter
-}
-
-// additions:
-
-/// ISO-8601-ish calendar: Monday is first day, week 1 has ≥4 days.
-public func isoWeekCalendar(_ base: Calendar = .init(identifier: .gregorian)) -> Calendar {
-    var cal = base
-    cal.firstWeekday = 2                 // Monday
-    cal.minimumDaysInFirstWeek = 4
-    return cal
-}
-
-public func periodStart(for date: Date, kind: PeriodKind, calendar base: Calendar) -> Date {
+public func periodStart(
+    for date: Date,
+        kind: PeriodKind,
+        calendar base: Calendar
+) -> Date {
     var cal = base
     if kind == .week {
         cal.firstWeekday = 2
@@ -61,7 +44,11 @@ public func periodStart(for date: Date, kind: PeriodKind, calendar base: Calenda
     }
 }
 
-public func nextPeriodStart(after start: Date, kind: PeriodKind, calendar base: Calendar) -> Date {
+public func nextPeriodStart(
+    after start: Date,
+    kind: PeriodKind,
+    calendar base: Calendar
+) -> Date {
     var cal = base
     if kind == .week {
         cal.firstWeekday = 2

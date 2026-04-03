@@ -23,20 +23,20 @@ public extension EntryCompilerParsing {
         var accountRef: AccountRef?
         var contraRef: AccountRef?
 
-        // deprecated compatibility only
-        var schedule: DepreciationScheduleSetting?
-        var acquisition: AssetAcquisitionCost?
+        // // deprecated compatibility only
+        // var schedule: DepreciationScheduleSetting?
+        // var acquisition: AssetAcquisitionCost?
 
         while current != .rBrace && current != .eof {
-            if try parseDepreciationValuation(into: &meta) {
-                let direct = Decimal(string: meta["dep.valuation.acquisition.direct"] ?? "0") ?? 0
-                let indirect = Decimal(string: meta["dep.valuation.acquisition.indirect"] ?? "0") ?? 0
-                acquisition = AssetAcquisitionCost(
-                    direct: direct,
-                    indirect: indirect
-                )
-                continue
-            }
+            // if try parseDepreciationValuation(into: &meta) {
+            //     let direct = Decimal(string: meta["dep.valuation.acquisition.direct"] ?? "0") ?? 0
+            //     let indirect = Decimal(string: meta["dep.valuation.acquisition.indirect"] ?? "0") ?? 0
+            //     acquisition = AssetAcquisitionCost(
+            //         direct: direct,
+            //         indirect: indirect
+            //     )
+            //     continue
+            // }
 
             if try parseUsefulLifeMonths(into: &meta) {
                 continue
@@ -129,32 +129,32 @@ public extension EntryCompilerParsing {
                 meta["dep.useful_life_years"] = "\(n)"
                 advance()
 
-            case .ident("commission_date"), .keyword("commission_date"),
-                 .ident("effective_date"), .keyword("effective_date"),
-                 .ident("date"), .keyword("date"):
-                let (_, spec) = try parseNamedDateOrInferExpecting(
-                    names: ["date", "effective_date", "commission_date"],
-                    tz: tz,
-                    allowInfer: false,
-                    allowUnixEpoch: true
-                )
+            // case .ident("commission_date"), .keyword("commission_date"),
+            //      .ident("effective_date"), .keyword("effective_date"),
+            //      .ident("date"), .keyword("date"):
+            //     let (_, spec) = try parseNamedDateOrInferExpecting(
+            //         names: ["date", "effective_date", "commission_date"],
+            //         tz: tz,
+            //         allowInfer: false,
+            //         allowUnixEpoch: true
+            //     )
 
-                let effectiveDate = try spec.asAbsolute(loc: loc())
+            //     let effectiveDate = try spec.asAbsolute(loc: loc())
 
-                if let method, let usefulLifeYears {
-                    schedule = DepreciationScheduleSetting(
-                        method: method,
-                        usefulLifeYears: usefulLifeYears,
-                        effectiveDate: effectiveDate
-                    )
-                } else {
-                    meta["dep.effective_date"] = isoDate(effectiveDate)
-                    schedule = DepreciationScheduleSetting(
-                        method: .straight_line,
-                        usefulLifeYears: usefulLifeYears ?? 0,
-                        effectiveDate: effectiveDate
-                    )
-                }
+            //     if let method, let usefulLifeYears {
+            //         schedule = DepreciationScheduleSetting(
+            //             method: method,
+            //             usefulLifeYears: usefulLifeYears,
+            //             effectiveDate: effectiveDate
+            //         )
+            //     } else {
+            //         meta["dep.effective_date"] = isoDate(effectiveDate)
+            //         schedule = DepreciationScheduleSetting(
+            //             method: .straight_line,
+            //             usefulLifeYears: usefulLifeYears ?? 0,
+            //             effectiveDate: effectiveDate
+            //         )
+            //     }
 
             case .ident("account"), .keyword("account"):
                 advance()
@@ -169,11 +169,11 @@ public extension EntryCompilerParsing {
                 contraRef = try parseAccountRefFlexible()
                 meta["dep.account.contra.ref"] = contraRef?.debugString ?? "<ref>"
 
-            case .ident("valuation"), .keyword("valuation"):
-                advance()
-                acquisition = try parseValuationAcquisitionCostBlock()
-                meta["dep.valuation.acquisition.direct"] = "\(acquisition?.direct ?? 0)"
-                meta["dep.valuation.acquisition.indirect"] = "\(acquisition?.indirect ?? 0)"
+            // case .ident("valuation"), .keyword("valuation"):
+            //     advance()
+            //     acquisition = try parseValuationAcquisitionCostBlock()
+            //     meta["dep.valuation.acquisition.direct"] = "\(acquisition?.direct ?? 0)"
+            //     meta["dep.valuation.acquisition.indirect"] = "\(acquisition?.indirect ?? 0)"
 
             default:
                 throw ParserError.unexpectedToken(
@@ -186,14 +186,14 @@ public extension EntryCompilerParsing {
 
         try expect(.rBrace)
 
-        if acquisition == nil {
-            let direct = Decimal(string: meta["dep.valuation.acquisition.direct"] ?? "0") ?? 0
-            let indirect = Decimal(string: meta["dep.valuation.acquisition.indirect"] ?? "0") ?? 0
-            acquisition = AssetAcquisitionCost(
-                direct: direct,
-                indirect: indirect
-            )
-        }
+        // if acquisition == nil {
+        //     let direct = Decimal(string: meta["dep.valuation.acquisition.direct"] ?? "0") ?? 0
+        //     let indirect = Decimal(string: meta["dep.valuation.acquisition.indirect"] ?? "0") ?? 0
+        //     acquisition = AssetAcquisitionCost(
+        //         direct: direct,
+        //         indirect: indirect
+        //     )
+        // }
 
         guard let method else {
             throw ParserError.unexpectedToken(
@@ -227,20 +227,20 @@ public extension EntryCompilerParsing {
             )
         }
 
-        let finalSchedule: DepreciationScheduleSetting? = {
-            if let schedule {
-                return DepreciationScheduleSetting(
-                    method: method,
-                    usefulLifeYears: usefulLifeYears,
-                    effectiveDate: schedule.effectiveDate
-                )
-            }
-            return nil
-        }()
+        // let finalSchedule: DepreciationScheduleSetting? = {
+        //     if let schedule {
+        //         return DepreciationScheduleSetting(
+        //             method: method,
+        //             usefulLifeYears: usefulLifeYears,
+        //             effectiveDate: schedule.effectiveDate
+        //         )
+        //     }
+        //     return nil
+        // }()
 
         return DepreciationConfigDraft(
-            schedule: finalSchedule,
-            acquisition: acquisition,
+            // schedule: finalSchedule,
+            // acquisition: acquisition,
             residualPercentage: residualPercentage,
             accountRef: accountRef,
             contraRef: contraRef,

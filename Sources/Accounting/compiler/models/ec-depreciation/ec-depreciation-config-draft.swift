@@ -1,11 +1,11 @@
 import Foundation
 
 public struct DepreciationConfigDraft: Sendable, Codable {
-    @available(*, deprecated, message: "Use entity.unit.profile.commission_date instead.")
-    public var schedule: DepreciationScheduleSetting?
+    // @available(*, deprecated, message: "Use entity.unit.profile.commission_date instead.")
+    // public var schedule: DepreciationScheduleSetting?
 
-    @available(*, deprecated, message: "Use entity.unit.profile.valuation.acquisition_cost instead.")
-    public var acquisition: AssetAcquisitionCost?
+    // @available(*, deprecated, message: "Use entity.unit.profile.valuation.acquisition_cost instead.")
+    // public var acquisition: AssetAcquisitionCost?
 
     public var residualPercentage: Decimal
     public var accountRef: AccountRef
@@ -15,16 +15,16 @@ public struct DepreciationConfigDraft: Sendable, Codable {
     public var usefulLifeYears: Decimal
 
     public init(
-        schedule: DepreciationScheduleSetting? = nil,
-        acquisition: AssetAcquisitionCost? = nil,
+        // schedule: DepreciationScheduleSetting? = nil,
+        // acquisition: AssetAcquisitionCost? = nil,
         residualPercentage: Decimal,
         accountRef: AccountRef,
         contraRef: AccountRef,
         method: DepreciationMethod,
         usefulLifeYears: Decimal
     ) {
-        self.schedule = schedule
-        self.acquisition = acquisition
+        // self.schedule = schedule
+        // self.acquisition = acquisition
         self.residualPercentage = residualPercentage
         self.accountRef = accountRef
         self.contraRef = contraRef
@@ -47,8 +47,8 @@ public struct DepreciationConfigDraft: Sendable, Codable {
         let profile = try DepreciationProfileAccess.resolve(
             for: key,
             entity: entity,
-            fallbackSchedule: schedule,
-            fallbackAcquisition: acquisition
+            // fallbackSchedule: schedule,
+            // fallbackAcquisition: acquisition
         )
 
         let resolvedSchedule = DepreciationScheduleSetting(
@@ -66,45 +66,3 @@ public struct DepreciationConfigDraft: Sendable, Codable {
         )
     }
 }
-
-// public struct DepreciationConfigDraft: Sendable, Codable {
-//     public var schedule: DepreciationScheduleSetting
-//     public var acquisition: AssetAcquisitionCost
-//     public var residualPercentage: Decimal
-//     public var accountRef: AccountRef
-//     public var contraRef: AccountRef
-
-//     public init(
-//         schedule: DepreciationScheduleSetting,
-//         acquisition: AssetAcquisitionCost,
-//         residualPercentage: Decimal,
-//         accountRef: AccountRef,
-//         contraRef: AccountRef
-//     ) {
-//         self.schedule = schedule
-//         self.acquisition = acquisition
-//         self.residualPercentage = residualPercentage
-//         self.accountRef = accountRef
-//         self.contraRef = contraRef
-//     }
-
-//     public func resolve(
-//         using entities: EntityStore,
-//         accounts: AccountStore,
-//         at loc: SourceLocation? = nil
-//     ) throws -> DepreciationConfig {
-//         let expenseNode = try accounts.resolve(accountRef, at: loc)
-//         let expense = AccountKey(expenseNode.codes.code)
-
-//         let contraNode = try accounts.resolve(contraRef, at: loc)
-//         let contra = AccountKey(contraNode.codes.code)
-
-//         return DepreciationConfig(
-//             schedule: schedule,
-//             acquistion: acquisition,
-//             residualPercentage: residualPercentage,
-//             account: expense,
-//             contra: contra
-//         )
-//     }
-// }
