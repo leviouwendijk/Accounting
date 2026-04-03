@@ -36,6 +36,7 @@ public struct ResolvedEntry: Hashable, Codable, Sendable {
     public var timezone: String?
     public var metadata: [String: String]
     public var transactionReferences: [TransactionKey]
+    public var vat: VATAnnotation?
 
     public var location: SourceLocation?
     public var mistake: Mistake?
@@ -51,6 +52,7 @@ public struct ResolvedEntry: Hashable, Codable, Sendable {
         timezone: String?,
         metadata: [String: String],
         transactionReferences: [TransactionKey],
+        vat: VATAnnotation? = nil,
 
         location: SourceLocation? = nil,
         mistake: Mistake? = nil,
@@ -64,6 +66,7 @@ public struct ResolvedEntry: Hashable, Codable, Sendable {
         self.timezone = timezone
         self.metadata = metadata
         self.transactionReferences = transactionReferences
+        self.vat = vat
 
         self.location = location
         self.mistake = mistake

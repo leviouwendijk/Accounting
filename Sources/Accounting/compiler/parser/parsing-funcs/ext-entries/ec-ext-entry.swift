@@ -67,6 +67,16 @@ public extension EntryCompilerParsing {
                 let refs = try parseTransactionsBlock()
                 entry.transactionReferences.append(contentsOf: refs)
 
+            case .keyword("vat"), .ident("vat"):
+                if entry.vat != nil {
+                    throw ParserError.unexpectedToken(
+                        current,
+                        expected: "single vat block",
+                        at: loc()
+                    )
+                }
+                entry.vat = try parseVATBlock()
+
             case .keyword("metadata"):
                 let m = try parseStringMapBlock(named: "metadata") // consumes 'metadata' and the block
                 // merge (allow multiple blocks; last write wins per key)
@@ -82,7 +92,7 @@ public extension EntryCompilerParsing {
             default:
                 throw ParserError.unexpectedToken(
                     current,
-                    expected: "id|timezone|date|history|sort|details|for|in|posting|line|transactions|metadata|mistake|select",
+                    expected: "id|timezone|date|history|sort|details|for|in|posting|line|transactions|vat|metadata|mistake|select",
                     at: loc()
                 )
             }

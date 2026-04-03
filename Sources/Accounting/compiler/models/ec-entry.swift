@@ -15,6 +15,7 @@ public struct Entry: Hashable, Codable, Sendable {
     public var details: String? = nil
     public var timezone: String? = nil
     public var transactionReferences: [Int]
+    public var vat: VATAnnotation? = nil
     public var metadata: [String: String] = [:]
     public var location: SourceLocation?
     public var mistake: Mistake? = nil
@@ -30,6 +31,7 @@ public struct Entry: Hashable, Codable, Sendable {
         details: String? = nil,
         timezone: String? = nil,
         transactionReferences: [Int] = [],
+        vat: VATAnnotation? = nil,
         metadata: [String: String] = [:],
         location: SourceLocation? = nil,
         mistake: Mistake? = nil,
@@ -44,6 +46,7 @@ public struct Entry: Hashable, Codable, Sendable {
         self.details = details
         self.timezone = timezone
         self.transactionReferences = transactionReferences
+        self.vat = vat
         self.metadata = metadata
         self.location = location
         self.mistake = mistake
@@ -174,6 +177,7 @@ public struct Entry: Hashable, Codable, Sendable {
             out.append(lineStr)
         }
         if let d = details { out.append("Details: \(d)") }
+        if let v = vat { out.append("VAT Annotation: \(v)") }
         if let m = mistake { 
             out.append("[!] Mistake:".ansi(.yellow)) 
             out.append("\n")

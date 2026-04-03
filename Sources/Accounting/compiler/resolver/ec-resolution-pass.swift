@@ -53,6 +53,7 @@ public enum EntryResolutionPass {
                         timezone: e.timezone,
                         metadata: e.metadata,
                         transactionReferences: txKeys,
+                        vat: e.vat,
                         location: e.location,
                         mistake: e.mistake,
                         select: e.select,
