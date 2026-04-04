@@ -65,106 +65,14 @@ extension StatementHTMLRenderer {
                     decl("width", "auto")
                 ),
                 rule(
-                    ".sr-summary-comparative",
-                    decl("display", "grid"),
-                    decl("gap", "12px")
+                    ".tbl-comparative-summary .summary-child",
+                    decl("padding-left", "24px"),
+                    decl("color", "#5b6475")
                 ),
                 rule(
-                    ".sr-summary-comparative-head",
-                    decl("display", "grid"),
-                    decl("grid-template-columns", "minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr)"),
-                    decl("gap", "12px"),
-                    decl("align-items", "end")
-                ),
-                rule(
-                    ".sr-summary-comparative-head-item",
-                    decl("font-size", "0.82rem"),
-                    decl("font-weight", "600"),
-                    decl("text-transform", "uppercase"),
-                    decl("letter-spacing", "0.04em"),
-                    decl("color", "#6b7280")
-                ),
-                rule(
-                    ".sr-summary-comparative-head-item.is-amount",
-                    decl("text-align", "right")
-                ),
-                rule(
-                    ".sr-summary-comparative-row",
-                    decl("display", "grid"),
-                    decl("grid-template-columns", "minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr)"),
-                    decl("gap", "12px"),
-                    decl("align-items", "baseline")
-                ),
-                rule(
-                    ".sr-summary-comparative-group",
-                    decl("display", "grid"),
-                    decl("gap", "8px")
-                ),
-                rule(
-                    ".sr-summary-comparative-children",
-                    decl("display", "grid"),
-                    decl("gap", "6px"),
-                    decl("padding-left", "16px")
-                ),
-                rule(
-                    ".sr-summary-comparative-label",
-                    decl("font-weight", "500")
-                ),
-                rule(
-                    ".sr-summary-comparative-row-parent .sr-summary-comparative-label",
+                    ".tbl-comparative-summary .summary-diff-amt",
+                    decl("color", "#b42318"),
                     decl("font-weight", "700")
-                ),
-                rule(
-                    ".sr-summary-comparative-row-diff .sr-summary-comparative-label",
-                    decl("font-weight", "700")
-                ),
-                rule(
-                    ".sr-summary-comparative-value",
-                    decl("text-align", "right"),
-                    decl("font-variant-numeric", "tabular-nums")
-                ),
-                rule(
-                    ".sr-summary-comparative-row-parent .sr-summary-comparative-value",
-                    decl("font-weight", "700")
-                ),
-                rule(
-                    ".sr-summary-comparative-row-diff .sr-summary-comparative-value",
-                    decl("font-weight", "700")
-                ),
-                rule(
-                    ".sr-summary-comparative-value-warn",
-                    decl("color", "#b42318")
-                )
-            ],
-            media: [
-                media(
-                    "(max-width: 720px)",
-                    rule(
-                        ".sr-summary-comparative-head",
-                        decl("grid-template-columns", "minmax(0, 1fr)"),
-                        decl("gap", "4px")
-                    ),
-                    rule(
-                        ".sr-summary-comparative-head-item.is-label",
-                        decl("display", "none")
-                    ),
-                    rule(
-                        ".sr-summary-comparative-head-item.is-amount",
-                        decl("text-align", "left")
-                    ),
-                    rule(
-                        ".sr-summary-comparative-row",
-                        decl("grid-template-columns", "minmax(0, 1fr)"),
-                        decl("gap", "4px")
-                    ),
-                    rule(
-                        ".sr-summary-comparative-value",
-                        decl("text-align", "left")
-                    ),
-                    rule(
-                        ".sr-summary-comparative-children",
-                        decl("padding-left", "12px")
-                    )
                 )
             ]
         )

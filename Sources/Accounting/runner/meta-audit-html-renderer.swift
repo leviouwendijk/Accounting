@@ -27,6 +27,7 @@ public enum MetaAuditHTMLRenderer {
 
         public var showStatementSummary: Bool
         public var showStatementRatios: Bool
+        public var showStatementAverages: Bool
 
         public var showAssetsDiagnostics: Bool
         public var showAssetsUnderlyingRows: Bool
@@ -53,6 +54,7 @@ public enum MetaAuditHTMLRenderer {
             currencySymbol: String = "€",
             showStatementSummary: Bool = true,
             showStatementRatios: Bool = true,
+            showStatementAverages: Bool = true,
             showAssetsDiagnostics: Bool = true,
             showAssetsUnderlyingRows: Bool = true,
             showAssetsOnlyFlaggedUnderlyingRows: Bool = false,
@@ -75,6 +77,7 @@ public enum MetaAuditHTMLRenderer {
 
             self.showStatementSummary = showStatementSummary
             self.showStatementRatios = showStatementRatios
+            self.showStatementAverages = showStatementAverages
 
             self.showAssetsDiagnostics = showAssetsDiagnostics
             self.showAssetsUnderlyingRows = showAssetsUnderlyingRows
@@ -298,6 +301,8 @@ public enum MetaAuditHTMLRenderer {
             omitIncomeLevel1Root: true,
             company: options.company,
             hierarchyPrefixStyle: .spacing,
+            showRatios: options.showStatementRatios,
+            showAverages: options.showStatementAverages,
             periodShape: report.period.shape
         )
 
@@ -330,6 +335,11 @@ public enum MetaAuditHTMLRenderer {
 
             if options.showStatementRatios {
                 nodes.append(contentsOf: StatementHTMLRenderer.renderRatiosSection(model.ratios))
+            }
+
+            if options.showStatementAverages {
+                nodes.append(
+                    contentsOf: StatementHTMLRenderer.renderAveragesSection(model.averages))
             }
 
             return nodes
@@ -370,6 +380,12 @@ public enum MetaAuditHTMLRenderer {
         if options.showStatementRatios {
             nodes.append(contentsOf: StatementHTMLRenderer.renderComparativeRatiosSection(
                 comparativeModel.ratios
+            ))
+        }
+
+        if options.showStatementAverages {
+            nodes.append(contentsOf: StatementHTMLRenderer.renderComparativeAveragesSection(
+                comparativeModel.averages
             ))
         }
 
