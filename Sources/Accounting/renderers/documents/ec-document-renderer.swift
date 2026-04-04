@@ -10,7 +10,7 @@ public enum ECDocumentRenderer {
             return try renderDiscrepancyStatement(document)
 
         case .generic:
-            return try renderDiscrepancyStatement(document)
+            return try renderGenericDocument(document)
         }
     }
 }

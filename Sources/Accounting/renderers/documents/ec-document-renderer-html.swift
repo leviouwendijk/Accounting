@@ -562,3 +562,268 @@ extension ECDocumentRenderer {
             .render()
     }
 }
+
+extension ECDocumentRenderer {
+    public static func renderGenericDocument(
+        _ document: ECDocument
+    ) throws -> String {
+        let date = document.date.map(formatDateNL) ?? formatDateNL(Date())
+        let title = document.title ?? "Document"
+        let subtitle = document.subtitle ?? ""
+        let senderName = document.senderName ?? "Onbekende afzender"
+        let senderRole = document.senderRole ?? "Ondertekenaar"
+
+        let metaRows = genericMetaRows(
+            for: document,
+            date: date
+        )
+
+        let css = renderGenericStylesheet()
+
+        let doc = HTML.document {
+            HTML.html(["lang": "nl"]) {
+                HTML.head {
+                    HTML.meta(["charset": "utf-8"])
+                    HTML.meta([
+                        "name": "viewport",
+                        "content": "width=device-width, initial-scale=1"
+                    ])
+                    HTML.title(title)
+                    HTML.style(css)
+                }
+
+                HTML.body {
+                    HTML.div(["class": "page"]) {
+                        HTML.article(["class": "generic-doc"]) {
+                            HTML.header(["class": "doc-header"]) {
+                                HTML.h1(["class": "doc-title"]) {
+                                    HTML.text(title)
+                                }
+
+                                if !subtitle.isEmpty {
+                                    HTML.p(["class": "doc-sub"]) {
+                                        HTML.text(subtitle)
+                                    }
+                                }
+                            }
+
+                            if !metaRows.isEmpty {
+                                HTML.div(["class": "kv-block"]) {
+                                    for row in metaRows {
+                                        HTML.div(["class": "kv-row"]) {
+                                            HTML.span(["class": "kv-label"]) {
+                                                HTML.text("\(row.label):")
+                                            }
+
+                                            HTML.span(["class": "kv-value"]) {
+                                                HTML.text(row.value)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            for block in document.blocks {
+                                switch block {
+                                case .section(let section):
+                                    if let header = section.header, !header.isEmpty {
+                                        HTML.h2(["class": "section-title"]) {
+                                            HTML.text(header)
+                                        }
+                                    }
+
+                                    if let template = section.template {
+                                        HTML.p(["class": "para"]) {
+                                            HTML.text(
+                                                expandTemplate(
+                                                    template,
+                                                    senderName: senderName,
+                                                    senderRole: senderRole,
+                                                    recipient: document.recipient ?? "",
+                                                    subjectPrefix: document.subjectPrefix ?? "",
+                                                    periodsSentence: joinedForSentenceNl(document.periods),
+                                                    periodPrefix: document.periods.count == 1 ? "periode" : "periodes",
+                                                    date: date
+                                                )
+                                            )
+                                        }
+                                    }
+
+                                    for paragraph in section.paragraphs {
+                                        HTML.p(["class": "para"]) {
+                                            HTML.text(paragraph)
+                                        }
+                                    }
+
+                                case .discrepancy(let discrepancy):
+                                    HTML.h2(["class": "section-title"]) {
+                                        HTML.text(discrepancy.heading)
+                                    }
+
+                                    if let label = discrepancy.label, !label.isEmpty {
+                                        HTML.p(["class": "para"]) {
+                                            HTML.text(label)
+                                        }
+                                    }
+
+                                    for paragraph in discrepancy.paragraphs {
+                                        HTML.p(["class": "para"]) {
+                                            HTML.text(paragraph)
+                                        }
+                                    }
+
+                                case .attachments(let attachments):
+                                    if let title = attachments.title, !title.isEmpty {
+                                        HTML.h2(["class": "section-title"]) {
+                                            HTML.text(title)
+                                        }
+                                    }
+
+                                    HTML.div(["class": "attachments-block"]) {
+                                        for group in attachments.groups {
+                                            if !group.items.isEmpty {
+                                                HTML.div(["class": "attachments-group"]) {
+                                                    HTML.ul(["class": "attachments-list"]) {
+                                                        for item in group.items {
+                                                            HTML.li {
+                                                                HTML.text(item)
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                case .signature(let signature):
+                                    HTML.div(["class": "signature-wrap"]) {
+                                        if signature.includeSignatureImage,
+                                           let rawPath = document.assets?.signatureImagePath,
+                                           !rawPath.isEmpty {
+
+                                            let src: String = {
+                                                if rawPath.contains("://") {
+                                                    return rawPath
+                                                }
+
+                                                return URL(fileURLWithPath: rawPath).absoluteString
+                                            }()
+
+                                            HTML.img(
+                                                src: src,
+                                                [
+                                                    "alt": "Handtekening",
+                                                    "class": "signature-image"
+                                                ]
+                                            )
+                                        }
+
+                                        HTML.div {
+                                            HTML.text(senderName)
+                                        }
+
+                                        HTML.div {
+                                            HTML.text(senderRole)
+                                        }
+
+                                        if signature.includeDate {
+                                            HTML.div {
+                                                HTML.text(date)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if !document.footerLines.isEmpty || !document.administratorLines.isEmpty {
+                                let hasFooter = !document.footerLines.isEmpty
+                                let hasAdministrator = !document.administratorLines.isEmpty
+
+                                HTML.footer(["class": "doc-footer"]) {
+                                    if hasFooter {
+                                        HTML.div(["class": "footer-col"]) {
+                                            for line in document.footerLines {
+                                                HTML.div(["class": "footer-line"]) {
+                                                    HTML.text(line)
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if hasAdministrator {
+                                        HTML.div(["class": "footer-col"]) {
+                                            for line in document.administratorLines {
+                                                HTML.div(["class": "footer-line"]) {
+                                                    HTML.text(line)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if let footerNote = document.footerNote, !footerNote.isEmpty {
+                                HTML.p(["class": "footer-note"]) {
+                                    HTML.text(footerNote)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return doc.render()
+    }
+
+    public static func genericMetaRows(
+        for document: ECDocument,
+        date: String
+    ) -> [ECDocumentMetaRow] {
+        var rows: [ECDocumentMetaRow] = [
+            .init(label: "Datum", value: date)
+        ]
+
+        if let recipient = document.recipient, !recipient.isEmpty {
+            rows.append(
+                .init(label: "Aan", value: recipient)
+            )
+        }
+
+        if let subjectPrefix = document.subjectPrefix, !subjectPrefix.isEmpty {
+            rows.append(
+                .init(label: "Onderwerp", value: subjectPrefix)
+            )
+        }
+
+        if let place = document.place, !place.isEmpty {
+            rows.append(
+                .init(label: "Plaats", value: place)
+            )
+        }
+
+        if !document.periods.isEmpty {
+            rows.append(
+                .init(
+                    label: "Periode",
+                    value: joinedForSentenceNl(document.periods)
+                )
+            )
+        }
+
+        if !document.metaRows.isEmpty {
+            rows.append(contentsOf: document.metaRows)
+        }
+
+        return rows
+    }
+
+    public static func renderGenericStylesheet() -> String {
+        CSSStyleSheet
+            .merged([
+                Style.common(),
+                Style.discrepancy()
+            ])
+            .render()
+    }
+}
