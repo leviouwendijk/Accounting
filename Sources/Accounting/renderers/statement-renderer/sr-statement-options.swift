@@ -11,7 +11,8 @@ extension StatementHTMLRenderer {
         public var company: Company? = nil
         public var hierarchyPrefixStyle: HierarchyPrefixStyle = .spacing
         // public var showSummary: Bool = true
-        // public var showRatios: Bool = true
+        public var showRatios: Bool = true
+        public var showAverages: Bool = true
         public var periodShape: PeriodShape? = nil
 
         public init(
@@ -24,7 +25,8 @@ extension StatementHTMLRenderer {
             company: Company? = nil,
             hierarchyPrefixStyle: HierarchyPrefixStyle = .spacing,
             // showSummary: Bool = true,
-            // showRatios: Bool = true
+            showRatios: Bool = true,
+            showAverages: Bool = true,
             periodShape: PeriodShape? = nil
         ) {
             self.title = title
@@ -36,7 +38,8 @@ extension StatementHTMLRenderer {
             self.company = company
             self.hierarchyPrefixStyle = hierarchyPrefixStyle
             // self.showSummary = showSummary
-            // self.showRatios = showRatios
+            self.showRatios = showRatios
+            self.showAverages = showAverages
             self.periodShape = periodShape
         }
     }

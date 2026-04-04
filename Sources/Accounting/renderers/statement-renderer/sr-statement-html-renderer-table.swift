@@ -36,12 +36,19 @@ extension StatementHTMLRenderer {
                     // renderSummary(
                     //     renderedBalanceSummary(from: model.balances)
                     // )
-                    renderRatiosSection(model.ratios)
+
+                    if options.showRatios {
+                        renderRatiosSection(model.ratios)
+                    }
+
+                    if options.showAverages {
+                        renderAveragesSection(model.averages)
+                    }
                 }
             }
         }
 
-        return doc.render(default: .pretty, doctype: true)
+        return doc.render(default: .minified, doctype: true)
     }
 
     @HTMLBuilder

@@ -81,6 +81,18 @@ public enum NativePeriodRenderer {
             entities: entities,
             options: presentation
         )
+
+        if options.showRatios {
+            renderRatios(
+                period.bundle.analytics?.ratios
+            )
+        }
+
+        if options.showAverages {
+            renderAverages(
+                period.bundle.analytics?.averages
+            )
+        }
     }
 }
 

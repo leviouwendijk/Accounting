@@ -6,19 +6,23 @@ extension StatementHTMLRenderer {
         let balances: [TableSection]
         let summary: BalanceSummary?
         let ratios: RatiosSection?
+        let averages: AveragesSection?
 
         init(
             income: TableSection,
             balances: [TableSection],
             summary: BalanceSummary?,
-            ratios: RatiosSection?
+            ratios: RatiosSection?,
+            averages: AveragesSection?
         ) {
             self.income = income
             self.balances = balances
             self.summary = summary
             self.ratios = ratios
+            self.averages = averages
         }
     }
+
 
     struct RatiosSection: Sendable {
         let title: String
@@ -58,6 +62,35 @@ extension StatementHTMLRenderer {
     enum RatioValueStyle: Sendable {
         case percentage
         case multiple
+    }
+
+    struct AveragesSection: Sendable {
+        let title: String
+        let rows: [AverageRow]
+
+        init(
+            title: String,
+            rows: [AverageRow]
+        ) {
+            self.title = title
+            self.rows = rows
+        }
+    }
+
+    struct AverageRow: Sendable {
+        let label: String
+        let description: String?
+        let value: Decimal?
+
+        init(
+            label: String,
+            description: String? = nil,
+            value: Decimal?
+        ) {
+            self.label = label
+            self.description = description
+            self.value = value
+        }
     }
 
     enum TableSectionKind: Sendable {

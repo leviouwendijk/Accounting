@@ -84,15 +84,15 @@ extension StatementHTMLRenderer {
             )
         }
 
-        let ratios = buildRatiosSection(
-            from: bundle.analytics?.ratios
-        )
+        let ratios = buildRatiosSection(from: bundle.analytics?.ratios)
+        let averages = buildAveragesSection(from: bundle.analytics?.averages)
 
         return DocumentModel(
             income: income,
             balances: balances,
             summary: summary,
-            ratios: ratios
+            ratios: ratios,
+            averages: averages
         )
     }
 }

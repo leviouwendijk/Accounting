@@ -21,17 +21,20 @@ extension StatementHTMLRenderer {
         let balances: [ComparativeSection]
         let summary: ComparativeBalanceSummary?
         let ratios: ComparativeRatiosSection?
+        let averages: ComparativeAveragesSection?
 
         init(
             income: ComparativeSection,
             balances: [ComparativeSection],
             summary: ComparativeBalanceSummary?,
-            ratios: ComparativeRatiosSection?
+            ratios: ComparativeRatiosSection?,
+            averages: ComparativeAveragesSection?
         ) {
             self.income = income
             self.balances = balances
             self.summary = summary
             self.ratios = ratios
+            self.averages = averages
         }
     }
 
@@ -118,6 +121,20 @@ extension StatementHTMLRenderer {
             self.previousValue = previousValue
             self.style = style
         }
+    }
+
+    struct ComparativeAverageRow: Sendable {
+        let label: String
+        let description: String?
+        let currentValue: Decimal?
+        let previousValue: Decimal?
+    }
+
+    struct ComparativeAveragesSection: Sendable {
+        let title: String
+        let currentTitle: String
+        let previousTitle: String
+        let rows: [ComparativeAverageRow]
     }
 
     struct ComparativeSection: Sendable {

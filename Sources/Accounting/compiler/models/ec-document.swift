@@ -77,6 +77,7 @@ public struct ECDocument: Sendable {
 public enum ECDocumentKind: String, Sendable {
     case declaration_of_truthfulness
     case discrepancy_statement
+    case generic
 }
 
 public struct ECDocumentMetaRow: Sendable {

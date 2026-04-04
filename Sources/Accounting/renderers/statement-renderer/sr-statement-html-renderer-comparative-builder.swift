@@ -156,29 +156,45 @@ extension StatementHTMLRenderer {
             )
         }
 
+        let summary = buildComparativeSummary(
+            current: currentSummary,
+            previous: previousSummary,
+            currentColumnTitle: currentColumnTitle,
+            previousColumnTitle: previousColumnTitle
+        )
+
         let currentRatios = buildRatiosSection(
             from: currentBundle.analytics?.ratios
         )
-
         let previousRatios = buildRatiosSection(
             from: previousBundle.analytics?.ratios
+        )
+        let ratios = buildComparativeRatiosSection(
+            current: currentRatios,
+            previous: previousRatios,
+            currentColumnTitle: currentColumnTitle,
+            previousColumnTitle: previousColumnTitle
+        )
+
+        let currentAverages = buildAveragesSection(
+            from: currentBundle.analytics?.averages
+        )
+        let previousAverages = buildAveragesSection(
+            from: previousBundle.analytics?.averages
+        )
+        let averages = buildComparativeAveragesSection(
+            current: currentAverages,
+            previous: previousAverages,
+            currentColumnTitle: currentColumnTitle,
+            previousColumnTitle: previousColumnTitle
         )
 
         return ComparativeDocumentModel(
             income: income,
             balances: balances,
-            summary: buildComparativeSummary(
-                current: currentSummary,
-                previous: previousSummary,
-                currentColumnTitle: currentColumnTitle,
-                previousColumnTitle: previousColumnTitle
-            ),
-            ratios: buildComparativeRatiosSection(
-                current: currentRatios,
-                previous: previousRatios,
-                currentColumnTitle: currentColumnTitle,
-                previousColumnTitle: previousColumnTitle
-            )
+            summary: summary,
+            ratios: ratios,
+            averages: averages
         )
     }
 
@@ -311,6 +327,40 @@ extension StatementHTMLRenderer {
             previousSubtotal: previous?.subtotal,
             maps: maps,
             options: options
+        )
+    }
+
+    static func buildComparativeAveragesSection(
+        current: AveragesSection?,
+        previous: AveragesSection?,
+        currentColumnTitle: String,
+        previousColumnTitle: String
+    ) -> ComparativeAveragesSection? {
+        guard let current else {
+            return nil
+        }
+
+        var previousRowsByLabel: [String: AverageRow] = [:]
+        for row in previous?.rows ?? [] {
+            previousRowsByLabel[row.label] = row
+        }
+
+        let rows = current.rows.map { row in
+            let previousRow = previousRowsByLabel[row.label]
+
+            return ComparativeAverageRow(
+                label: row.label,
+                description: row.description,
+                currentValue: row.value,
+                previousValue: previousRow?.value
+            )
+        }
+
+        return ComparativeAveragesSection(
+            title: current.title,
+            currentTitle: currentColumnTitle,
+            previousTitle: previousColumnTitle,
+            rows: rows
         )
     }
 

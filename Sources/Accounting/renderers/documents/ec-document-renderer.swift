@@ -8,6 +8,9 @@ public enum ECDocumentRenderer {
 
         case .discrepancy_statement:
             return try renderDiscrepancyStatement(document)
+
+        case .generic:
+            return try renderDiscrepancyStatement(document)
         }
     }
 }
