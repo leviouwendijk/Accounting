@@ -7,7 +7,8 @@ extension NativeRenderOptions {
             caption: presentationCaptionStyle(),
             detail: presentationDetailStyle(),
             showMatchedCodes: false,
-            showEntityBreakdown: showEntityBreakdown
+            showEntityBreakdown: showEntityBreakdown,
+            periodShape: periodShape
         )
     }
 

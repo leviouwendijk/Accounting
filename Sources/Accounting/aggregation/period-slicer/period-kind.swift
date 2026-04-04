@@ -10,3 +10,27 @@ public enum PeriodKind: String, Codable, Sendable, StringParsableEnum {
     case custom
     case lifetime             // no filter
 }
+
+extension PeriodKind {
+    public var previousPeriodLabel: String {
+        switch self {
+        case .year:
+            return "vorig jaar"
+
+        case .half:
+            return "vorig halfjaar"
+
+        case .quarter:
+            return "vorig kwartaal"
+
+        case .month:
+            return "vorige maand"
+
+        case .week:
+            return "vorige week"
+
+        case .custom, .lifetime:
+            return "vorige periode"
+        }
+    }
+}

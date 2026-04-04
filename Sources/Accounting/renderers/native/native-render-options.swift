@@ -1,13 +1,14 @@
 import Foundation
 
 public struct NativeRenderOptions: Sendable {
-    public let caption: String
-    public let detail: String
-    public let equityCode: String
-    public let includeOtherBucket: Bool
-    public let comparePrevious: Bool
-    public let showRangeHeading: Bool
-    public let showEntityBreakdown: Bool
+    public var caption: String
+    public var detail: String
+    public var equityCode: String
+    public var includeOtherBucket: Bool
+    public var comparePrevious: Bool
+    public var showRangeHeading: Bool
+    public var showEntityBreakdown: Bool
+    public var periodShape: PeriodShape?
 
     public init(
         caption: String = "label",
@@ -17,6 +18,7 @@ public struct NativeRenderOptions: Sendable {
         comparePrevious: Bool = true,
         showRangeHeading: Bool = true,
         showEntityBreakdown: Bool = false,
+        periodShape: PeriodShape? = nil
     ) {
         self.caption = caption
         self.detail = detail
@@ -25,5 +27,6 @@ public struct NativeRenderOptions: Sendable {
         self.comparePrevious = comparePrevious
         self.showRangeHeading = showRangeHeading
         self.showEntityBreakdown = showEntityBreakdown
+        self.periodShape = periodShape
     }
 }

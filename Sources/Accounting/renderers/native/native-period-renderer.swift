@@ -5,7 +5,9 @@ public enum NativePeriodRenderer {
         _ output: NativePeriodCompileOutput,
         options: NativeRenderOptions = .init()
     ) throws {
-        let presentation = options.presentationOptions()
+        var opts = options
+        opts.periodShape = options.periodShape ?? output.shape
+        let presentation = opts.presentationOptions()
 
         try renderPeriod(
             titleBalance: "Balance Sheet (current)",
@@ -13,7 +15,7 @@ public enum NativePeriodRenderer {
             period: output.assembled.current,
             chart: output.chart,
             entities: output.result.entities,
-            options: options,
+            options: opts,
             presentation: presentation
         )
 
@@ -31,7 +33,7 @@ public enum NativePeriodRenderer {
             period: previous,
             chart: output.chart,
             entities: output.result.entities,
-            options: options,
+            options: opts,
             presentation: presentation
         )
     }

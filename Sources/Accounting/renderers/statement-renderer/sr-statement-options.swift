@@ -12,6 +12,7 @@ extension StatementHTMLRenderer {
         public var hierarchyPrefixStyle: HierarchyPrefixStyle = .spacing
         // public var showSummary: Bool = true
         // public var showRatios: Bool = true
+        public var periodShape: PeriodShape? = nil
 
         public init(
             title: String = "Financial Statements",
@@ -24,6 +25,7 @@ extension StatementHTMLRenderer {
             hierarchyPrefixStyle: HierarchyPrefixStyle = .spacing,
             // showSummary: Bool = true,
             // showRatios: Bool = true
+            periodShape: PeriodShape? = nil
         ) {
             self.title = title
             self.subtitle = subtitle
@@ -35,6 +37,7 @@ extension StatementHTMLRenderer {
             self.hierarchyPrefixStyle = hierarchyPrefixStyle
             // self.showSummary = showSummary
             // self.showRatios = showRatios
+            self.periodShape = periodShape
         }
     }
 

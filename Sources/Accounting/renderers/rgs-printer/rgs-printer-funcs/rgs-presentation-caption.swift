@@ -18,17 +18,20 @@ public struct PresentationPrintOptions: Sendable {
     public var detail: PresentationDetailStyle
     public var showMatchedCodes: Bool
     public var showEntityBreakdown: Bool
+    public var periodShape: PeriodShape?
 
     public init(
         caption: PresentationCaptionStyle = .label,
         detail: PresentationDetailStyle = .standard,
         showMatchedCodes: Bool = false,
-        showEntityBreakdown: Bool = false
+        showEntityBreakdown: Bool = false,
+        periodShape: PeriodShape? = nil
     ) {
         self.caption = caption
         self.detail = detail
         self.showMatchedCodes = showMatchedCodes
         self.showEntityBreakdown = showEntityBreakdown
+        self.periodShape = periodShape
     }
 }
 

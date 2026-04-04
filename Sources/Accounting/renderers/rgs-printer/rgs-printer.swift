@@ -47,6 +47,11 @@ public enum RGSPrinter {
                 : normalized
         }
 
+        // adding for label
+        let nodeById: [Int: RGSNode] = Dictionary(
+            uniqueKeysWithValues: chart.nodes.map { ($0.id, $0) }
+        )
+
         let codeById: [Int: String] = Dictionary(
             uniqueKeysWithValues: chart.nodes.map { ($0.id, $0.codes.code) }
         )
@@ -67,11 +72,23 @@ public enum RGSPrinter {
             }
 
             let code = codeById[accId] ?? ""
+
+            let label = nodeById[accId]?
+                .presentationLabelIfNeeded(
+                    .short,
+                    shape: resolvedOptions.periodShape
+                ) ?? line.label
+
             let text = caption(
-                label: line.label,
+                label: label,
                 code: code,
                 style: resolvedOptions.caption
             )
+            // let text = caption(
+            //     label: line.label,
+            //     code: code,
+            //     style: resolvedOptions.caption
+            // )
 
             print("• \(text)  \(total)")
 
@@ -263,6 +280,10 @@ public enum RGSPrinter {
             includeOtherBucket: includeOtherBucket
         )
 
+        let nodeById: [Int: RGSNode] = Dictionary(
+            uniqueKeysWithValues: chart.nodes.map { ($0.id, $0) }
+        )
+
         func printSection(_ sec: RGSBalanceBucketsOutput.Section?) {
             guard let sec = sec else {
                 return
@@ -273,7 +294,20 @@ public enum RGSPrinter {
 
             for r in sec.lines {
                 let indent = String(repeating: "  ", count: r.relativeIndent)
-                let text = caption(for: r, style: options.caption)
+                // let text = caption(for: r, style: options.caption)
+
+                let label = nodeById[r.id]?
+                    .presentationLabelIfNeeded(
+                        .short,
+                        shape: options.periodShape
+                    ) ?? r.label
+
+                let text = caption(
+                    label: label,
+                    code: r.code,
+                    style: options.caption
+                )
+
                 print("\(indent)• \(text)  \(r.amount)")
             }
 
@@ -310,6 +344,11 @@ public enum RGSPrinter {
         options: PresentationPrintOptions = .init()
     ) throws {
         let maps = try RGSAssembler.makeMaps(from: chart)
+
+        let nodeById: [Int: RGSNode] = Dictionary(
+            uniqueKeysWithValues: chart.nodes.map { ($0.id, $0) }
+        )
+
         let codeById: [Int: String] = Dictionary(
             uniqueKeysWithValues: chart.nodes.map { ($0.id, $0.codes.code) }
         )
@@ -323,11 +362,23 @@ public enum RGSPrinter {
                 count: max(0, graphDepth(of: r.id, parentById: maps.parentById) - 1)
             )
 
+            let label = nodeById[r.id]?
+                .presentationLabelIfNeeded(
+                    .short,
+                    shape: options.periodShape
+                ) ?? r.label
+
             let text = caption(
-                label: r.label,
+                label: label,
                 code: codeById[r.id] ?? "",
                 style: options.caption
             )
+
+            // let text = caption(
+            //     label: r.label,
+            //     code: codeById[r.id] ?? "",
+            //     style: options.caption
+            // )
 
             print("\(indent)• \(text)  \(r.amount)")
         }
@@ -374,6 +425,10 @@ public enum RGSPrinter {
                 : normalized
         }
 
+        let nodeById: [Int: RGSNode] = Dictionary(
+            uniqueKeysWithValues: chart.nodes.map { ($0.id, $0) }
+        )
+
         let codeById: [Int: String] = Dictionary(
             uniqueKeysWithValues: chart.nodes.map { ($0.id, $0.codes.code) }
         )
@@ -394,8 +449,20 @@ public enum RGSPrinter {
             }
 
             let code = codeById[accId] ?? ""
+            // let text = caption(
+            //     label: line.label,
+            //     code: code,
+            //     style: resolvedOptions.caption
+            // )
+
+            let label = nodeById[accId]?
+                .presentationLabelIfNeeded(
+                    .short,
+                    shape: resolvedOptions.periodShape
+                ) ?? line.label
+
             let text = caption(
-                label: line.label,
+                label: label,
                 code: code,
                 style: resolvedOptions.caption
             )
