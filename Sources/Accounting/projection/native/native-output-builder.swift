@@ -17,7 +17,7 @@ public enum NativeOutputBuilder {
             cut: cut,
             omslag: omslag,
             for: entity,
-            autoClose: autoClose
+            autoClose: autoClose,
         )
 
         return .init(

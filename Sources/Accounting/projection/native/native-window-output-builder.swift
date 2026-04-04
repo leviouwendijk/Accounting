@@ -4,10 +4,11 @@ public extension NativeOutputBuilder {
     static func buildWindowOutput(
         result: EntryCompileDriver.Result,
         windows: PeriodWindows,
-        rangeToDate: Bool = false,
+        shape: PeriodShape,
         cut: AssembleCut,
         omslag: OmslagMode,
-        entity: BusinessEntity = .vof
+        entity: BusinessEntity = .vof,
+        calendar: Calendar = periodCalendar()
     ) throws -> NativeCompileOutput {
         let chart = try PeriodAssembler.buildChart(from: result)
 
@@ -18,7 +19,8 @@ public extension NativeOutputBuilder {
             cut: cut,
             omslag: omslag,
             entity: entity,
-            rangeToDate: rangeToDate
+            shape: shape,
+            calendar: calendar
         )
 
         return .init(
