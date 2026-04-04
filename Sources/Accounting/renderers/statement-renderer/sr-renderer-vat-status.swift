@@ -163,6 +163,19 @@ public extension StatementHTMLRenderer {
                                     }
                                 }
 
+                                if !quarter.ordinaryBreakdownTree.isEmpty {
+                                    HTML.h3 {
+                                        HTML.text("Ordinary breakdown by VAT family")
+                                    }
+
+                                    for breakdown in quarter.ordinaryBreakdownTree {
+                                        renderVATStatusFamilyBreakdown(
+                                            breakdown,
+                                            currencySymbol: options.currencySymbol
+                                        )
+                                    }
+                                }
+
                                 if !quarter.residualContributions.isEmpty {
                                     HTML.table(["class": "tbl tbl-vat-status-residual"]) {
                                         HTML.thead {
@@ -299,6 +312,127 @@ public extension StatementHTMLRenderer {
             }
         }
     }
+
+    @HTMLBuilder
+    private static func renderVATStatusFamilyBreakdown(
+        _ breakdown: VATStatusFamilyBreakdown,
+        currencySymbol: String
+    ) -> [any HTMLNode] {
+        HTML.h3 {
+            HTML.text(
+                "\(vatStatusFamilyLabel(breakdown.family)) (\(fmtVATStatusAmount(breakdown.amount, currencySymbol: currencySymbol)))"
+            )
+        }
+
+        if breakdown.nodes.isEmpty {
+            HTML.div(["class": "summary"]) {
+                HTML.text("(no matched accounts)")
+            }
+        } else {
+            HTML.table(["class": "tbl tbl-vat-status-tree"]) {
+                HTML.thead {
+                    HTML.tr {
+                        HTML.th(["class": "col-label"]) {
+                            HTML.text("Post")
+                        }
+                        HTML.th {
+                            HTML.text("Code")
+                        }
+                        HTML.th(["class": "col-money"]) {
+                            HTML.text("Amount")
+                        }
+                    }
+                }
+
+                HTML.tbody {
+                    renderVATStatusTreeRows(
+                        breakdown.nodes,
+                        depth: 0,
+                        currencySymbol: currencySymbol
+                    )
+                }
+            }
+        }
+    }
+
+    @HTMLBuilder
+    private static func renderVATStatusTreeRows(
+        _ nodes: [VATStatusTreeNode],
+        depth: Int,
+        currencySymbol: String
+    ) -> [any HTMLNode] {
+        for node in nodes {
+            let indent = "padding-left: calc(16px * \(depth));"
+            let levelClass = "sr-level-\(min(3, depth))"
+            let weightClass = "sr-weight-\(min(3, depth))"
+            let amountClass = vatStatusAmountClass(node.amount)
+
+            HTML.tr {
+                HTML.td(["class": "col-label"]) {
+                    HTML.div([
+                        "class": "sr-label \(levelClass) \(weightClass)",
+                        "style": indent
+                    ]) {
+                        HTML.text(node.label)
+                    }
+                }
+
+                HTML.td {
+                    HTML.text(node.code)
+                }
+
+                HTML.td(["class": "col-money \(amountClass)"]) {
+                    HTML.span([
+                        "class": "sr-amount \(weightClass)"
+                    ]) {
+                        HTML.text(
+                            fmtVATStatusAmount(
+                                node.amount,
+                                currencySymbol: currencySymbol
+                            )
+                        )
+                    }
+                }
+            }
+
+            if !node.children.isEmpty {
+                renderVATStatusTreeRows(
+                    node.children,
+                    depth: depth + 1,
+                    currencySymbol: currencySymbol
+                )
+            }
+        }
+    }
+}
+
+@inline(__always)
+private func vatStatusFamilyLabel(
+    _ family: VATStatusFamily
+) -> String {
+    switch family {
+    case .output:
+        return "Output"
+
+    case .deductible:
+        return "Deductible"
+
+    case .privateUse:
+        return "Private use"
+
+    case .receivable:
+        return "Receivable"
+
+    case .payableFallback:
+        return "Payable fallback"
+    }
+}
+
+@inline(__always)
+private func vatStatusAmountClass(
+    _ value: Decimal
+) -> String {
+    value < 0 ? "sr-vat-amount sr-vat-neg" : "sr-vat-amount"
 }
 
 @inline(__always)
