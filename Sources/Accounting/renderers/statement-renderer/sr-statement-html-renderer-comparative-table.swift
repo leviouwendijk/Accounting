@@ -64,15 +64,94 @@ extension StatementHTMLRenderer {
                     ".tbl-comparative .col-label",
                     decl("width", "auto")
                 ),
+
                 rule(
-                    ".tbl-comparative-summary .summary-child",
-                    decl("padding-left", "24px"),
-                    decl("color", "#5b6475")
+                    ".tbl-comparative-summary",
+                    decl("width", "100%"),
+                    decl("border-collapse", "separate"),
+                    decl("border-spacing", "0"),
+                    decl("background", "#f7f7f8"),
+                    decl("border", "1px solid #d9dee4"),
+                    decl("border-radius", "18px"),
+                    decl("overflow", "hidden")
+                ),
+                rule(
+                    ".tbl-comparative-summary thead",
+                    decl("display", "none")
+                ),
+                rule(
+                    ".tbl-comparative-summary tbody tr:first-child td",
+                    decl("padding-top", "18px")
+                ),
+                rule(
+                    ".tbl-comparative-summary tbody tr:last-child td",
+                    decl("padding-bottom", "18px")
+                ),
+                rule(
+                    ".tbl-comparative-summary td",
+                    decl("padding", "10px 26px"),
+                    decl("vertical-align", "middle"),
+                    decl("border", "none"),
+                    decl("background", "transparent")
+                ),
+                rule(
+                    ".tbl-comparative-summary td.label",
+                    decl("color", "#4b5563")
+                ),
+                rule(
+                    ".tbl-comparative-summary td.amt",
+                    decl("text-align", "right"),
+                    decl("white-space", "nowrap"),
+                    decl("font-variant-numeric", "tabular-nums"),
+                    decl("color", "#111827")
+                ),
+                rule(
+                    ".tbl-comparative-summary tr.summary-parent td",
+                    decl("padding-top", "18px")
+                ),
+                rule(
+                    ".tbl-comparative-summary tr.summary-parent td",
+                    decl("border-top", "1px solid #d9dee4")
+                ),
+                rule(
+                    ".tbl-comparative-summary td.label.summary-child",
+                    decl("padding-left", "48px"),
+                    decl("color", "#6b7280")
+                ),
+                rule(
+                    ".tbl-comparative-summary tr.summary-child-row td",
+                    decl("padding-top", "6px"),
+                    decl("padding-bottom", "6px")
+                ),
+                rule(
+                    ".tbl-comparative-summary tr.summary-parent td.label",
+                    decl("color", "#4b5563")
+                ),
+                rule(
+                    ".tbl-comparative-summary tr.summary-parent td.amt",
+                    decl("font-weight", "400")
                 ),
                 rule(
                     ".tbl-comparative-summary .summary-diff-amt",
                     decl("color", "#b42318"),
-                    decl("font-weight", "700")
+                    decl("font-weight", "600")
+                ),
+                rule(
+                    ".tbl-comparative-summary tr.summary-diff td.label",
+                    decl("color", "#b42318")
+                )
+            ],
+            media: [
+                media(
+                    "(max-width: 720px)",
+                    rule(
+                        ".tbl-comparative-summary td",
+                        decl("padding", "8px 14px")
+                    ),
+                    rule(
+                        ".tbl-comparative-summary td.label.summary-child",
+                        decl("padding-left", "28px")
+                    )
                 )
             ]
         )

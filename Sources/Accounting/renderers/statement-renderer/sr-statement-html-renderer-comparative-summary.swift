@@ -40,13 +40,14 @@ extension StatementHTMLRenderer {
                             label: "Som vermogen + passiva",
                             currentAmount: summary.currentEquityPlusLiabilities,
                             previousAmount: summary.previousEquityPlusLiabilities,
-                            rowClass: "total"
+                            rowClass: "summary-parent"
                         )
 
                         renderComparativeSummaryRow(
                             label: "vermogen",
                             currentAmount: summary.currentEquity,
                             previousAmount: summary.previousEquity,
+                            rowClass: "summary-child-row",
                             labelClass: "summary-child"
                         )
 
@@ -54,6 +55,7 @@ extension StatementHTMLRenderer {
                             label: "passiva",
                             currentAmount: summary.currentLiabilities,
                             previousAmount: summary.previousLiabilities,
+                            rowClass: "summary-child-row",
                             labelClass: "summary-child"
                         )
 
@@ -95,60 +97,41 @@ extension StatementHTMLRenderer {
 
         HTML.tr(trAttrs) {
             HTML.td(["class": tdLabelClass]) {
-                renderComparativeSummaryLabelNode(
-                    label,
-                    isEmphasized: rowClass == "total"
-                )
+                renderComparativeSummaryLabelNode(label)
             }
 
-            HTML.td(["class": comparativeSummaryAmountCellClass(
-                amount: currentAmount,
-                rowClass: rowClass
-            )]) {
-                renderComparativeSummaryAmountNode(
-                    currentAmount,
-                    isEmphasized: rowClass == "total"
+            HTML.td([
+                "class": comparativeSummaryAmountCellClass(
+                    amount: currentAmount,
+                    rowClass: rowClass
                 )
+            ]) {
+                renderComparativeSummaryAmountNode(currentAmount)
             }
 
-            HTML.td(["class": comparativeSummaryAmountCellClass(
-                amount: previousAmount,
-                rowClass: rowClass
-            )]) {
-                renderComparativeSummaryAmountNode(
-                    previousAmount,
-                    isEmphasized: rowClass == "total"
+            HTML.td([
+                "class": comparativeSummaryAmountCellClass(
+                    amount: previousAmount,
+                    rowClass: rowClass
                 )
+            ]) {
+                renderComparativeSummaryAmountNode(previousAmount)
             }
         }
     }
 
     static func renderComparativeSummaryLabelNode(
-        _ label: String,
-        isEmphasized: Bool
+        _ label: String
     ) -> any HTMLNode {
-        if isEmphasized {
-            return HTML.strong {
-                HTML.text(label)
-            }
-        }
-
-        return HTML.text(label)
+        HTML.text(label)
     }
 
     static func renderComparativeSummaryAmountNode(
-        _ amount: Decimal?,
-        isEmphasized: Bool
+        _ amount: Decimal?
     ) -> any HTMLNode {
         guard let amount else {
             return HTML.span(["class": "sr-amount"]) {
                 HTML.text("—")
-            }
-        }
-
-        if isEmphasized {
-            return HTML.strong {
-                HTML.text(fmt(amount))
             }
         }
 
