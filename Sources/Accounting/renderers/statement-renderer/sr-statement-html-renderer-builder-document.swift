@@ -24,6 +24,7 @@ extension StatementHTMLRenderer {
 
         let income = buildIncomeSection(
             from: incomeSections.first?.lines ?? [],
+            chart: chart,
             maps: maps,
             options: options
         )
@@ -34,6 +35,7 @@ extension StatementHTMLRenderer {
             kind: .assets,
             title: "Balans: Activa",
             source: balanceSections.assets,
+            chart: chart,
             maps: maps,
             options: options
         ) {
@@ -44,6 +46,7 @@ extension StatementHTMLRenderer {
             kind: .equity,
             title: "Balans: Eigen Vermogen",
             source: balanceSections.equity,
+            chart: chart,
             maps: maps,
             options: options
         ) {
@@ -54,6 +57,7 @@ extension StatementHTMLRenderer {
             kind: .liabilities,
             title: "Balans: Passiva",
             source: balanceSections.liabilities,
+            chart: chart,
             maps: maps,
             options: options
         ) {
@@ -65,6 +69,7 @@ extension StatementHTMLRenderer {
                 kind: .other,
                 title: "Balans: Overig",
                 source: balanceSections.other,
+                chart: chart,
                 maps: maps,
                 options: options
            ) {

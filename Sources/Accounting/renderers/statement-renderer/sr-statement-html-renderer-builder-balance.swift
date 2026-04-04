@@ -5,12 +5,17 @@ extension StatementHTMLRenderer {
         kind: BalanceSectionKind,
         title: String,
         source: RGSBalanceBucketsOutput.Section?,
+        chart: CompiledChart,
         maps: RGSAssemblerResult,
         options: Options
     ) -> TableSection? {
         guard let source else {
             return nil
         }
+
+        let nodeById: [Int: RGSNode] = Dictionary(
+            uniqueKeysWithValues: chart.nodes.map { ($0.id, $0) }
+        )
 
         let ids = source.lines.map(\.id)
 
@@ -30,12 +35,19 @@ extension StatementHTMLRenderer {
                 options: options
             )
 
+            let label = nodeById[line.id]?
+                .presentationLabelIfNeeded(
+                    .short,
+                    shape: options.periodShape
+                ) ?? line.label
+
             return TableRow(
                 id: line.id,
                 parentId: h?.parentId,
                 depth: depth,
                 prefix: prefix,
-                label: line.label,
+                // label: line.label,
+                label: label,
                 amount: line.amount,
                 direction: line.direction,
                 orientation: line.orientation,

@@ -3,6 +3,7 @@ import Foundation
 extension StatementHTMLRenderer {
     static func buildIncomeSection(
         from lines: [StatementLine],
+        chart: CompiledChart,
         maps: RGSAssemblerResult,
         options: Options
     ) -> TableSection {
@@ -11,6 +12,10 @@ extension StatementHTMLRenderer {
                 ? true
                 : DecimalFuncs.absDec(line.amount) >= options.minAbsIncome
         }
+
+        let nodeById: [Int: RGSNode] = Dictionary(
+            uniqueKeysWithValues: chart.nodes.map { ($0.id, $0) }
+        )
 
         let ids = filtered.map(\.id)
 
@@ -30,12 +35,18 @@ extension StatementHTMLRenderer {
                 options: options
             )
 
+            let label = nodeById[line.id]?
+                .presentationLabelIfNeeded(
+                    .short,
+                    shape: options.periodShape
+                ) ?? line.label
+
             return TableRow(
                 id: line.id,
                 parentId: h?.parentId,
                 depth: depth,
                 prefix: prefix,
-                label: line.label,
+                label: label,
                 amount: line.amount,
                 direction: line.direction,
                 orientation: line.orientation,

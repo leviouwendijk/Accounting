@@ -297,7 +297,8 @@ public enum MetaAuditHTMLRenderer {
             includeOtherBucket: false,
             omitIncomeLevel1Root: true,
             company: options.company,
-            hierarchyPrefixStyle: .spacing
+            hierarchyPrefixStyle: .spacing,
+            periodShape: report.period.shape
         )
 
         var nodes: [any HTMLNode] = []

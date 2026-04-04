@@ -74,6 +74,7 @@ extension StatementHTMLRenderer {
         let income = buildComparativeIncomeSection(
             current: currentIncomeSections.first?.lines ?? [],
             previous: previousIncomeSections.first?.lines ?? [],
+            chart: chart,
             currentColumnTitle: currentColumnTitle,
             previousColumnTitle: previousColumnTitle,
             maps: maps,
@@ -87,6 +88,7 @@ extension StatementHTMLRenderer {
             title: "Balans: Activa",
             current: currentBalanceSections.assets,
             previous: previousBalanceSections.assets,
+            chart: chart,
             currentColumnTitle: currentColumnTitle,
             previousColumnTitle: previousColumnTitle,
             maps: maps,
@@ -100,6 +102,7 @@ extension StatementHTMLRenderer {
             title: "Balans: Eigen Vermogen",
             current: currentBalanceSections.equity,
             previous: previousBalanceSections.equity,
+            chart: chart,
             currentColumnTitle: currentColumnTitle,
             previousColumnTitle: previousColumnTitle,
             maps: maps,
@@ -113,6 +116,7 @@ extension StatementHTMLRenderer {
             title: "Balans: Passiva",
             current: currentBalanceSections.liabilities,
             previous: previousBalanceSections.liabilities,
+            chart: chart,
             currentColumnTitle: currentColumnTitle,
             previousColumnTitle: previousColumnTitle,
             maps: maps,
@@ -127,6 +131,7 @@ extension StatementHTMLRenderer {
                 title: "Balans: Overig",
                 current: currentBalanceSections.other,
                 previous: previousBalanceSections.other,
+                chart: chart,
                 currentColumnTitle: currentColumnTitle,
                 previousColumnTitle: previousColumnTitle,
                 maps: maps,
@@ -180,11 +185,16 @@ extension StatementHTMLRenderer {
     static func buildComparativeIncomeSection(
         current: [StatementLine],
         previous: [StatementLine],
+        chart: CompiledChart,
         currentColumnTitle: String,
         previousColumnTitle: String,
         maps: RGSAssemblerResult,
         options: Options
     ) -> ComparativeSection {
+        let nodeById: [Int: RGSNode] = Dictionary(
+            uniqueKeysWithValues: chart.nodes.map { ($0.id, $0) }
+        )
+
         let currentRows = current
             .filter { line in
                 options.minAbsIncome == 0
@@ -194,7 +204,12 @@ extension StatementHTMLRenderer {
             .map {
                 ComparativeMergeSeed(
                     id: $0.id,
-                    label: $0.label,
+                    // label: $0.label,
+                    label: nodeById[$0.id]?
+                        .presentationLabelIfNeeded(
+                            .short,
+                            shape: options.periodShape
+                        ) ?? $0.label,
                     amount: $0.amount,
                     direction: $0.direction,
                     orientation: $0.orientation
@@ -210,7 +225,12 @@ extension StatementHTMLRenderer {
             .map {
                 ComparativeMergeSeed(
                     id: $0.id,
-                    label: $0.label,
+                    // label: $0.label,
+                    label: nodeById[$0.id]?
+                        .presentationLabelIfNeeded(
+                            .short,
+                            shape: options.periodShape
+                        ) ?? $0.label,
                     amount: $0.amount,
                     direction: $0.direction,
                     orientation: $0.orientation
@@ -236,6 +256,7 @@ extension StatementHTMLRenderer {
         title: String,
         current: RGSBalanceBucketsOutput.Section?,
         previous: RGSBalanceBucketsOutput.Section?,
+        chart: CompiledChart,
         currentColumnTitle: String,
         previousColumnTitle: String,
         maps: RGSAssemblerResult,
@@ -245,10 +266,19 @@ extension StatementHTMLRenderer {
             return nil
         }
 
+        let nodeById: [Int: RGSNode] = Dictionary(
+            uniqueKeysWithValues: chart.nodes.map { ($0.id, $0) }
+        )
+
         let currentRows = (current?.lines ?? []).map {
             ComparativeMergeSeed(
                 id: $0.id,
-                label: $0.label,
+                // label: $0.label,
+                label: nodeById[$0.id]?
+                    .presentationLabelIfNeeded(
+                        .short,
+                        shape: options.periodShape
+                    ) ?? $0.label,
                 amount: $0.amount,
                 direction: $0.direction,
                 orientation: $0.orientation
@@ -258,7 +288,12 @@ extension StatementHTMLRenderer {
         let previousRows = (previous?.lines ?? []).map {
             ComparativeMergeSeed(
                 id: $0.id,
-                label: $0.label,
+                // label: $0.label,
+                label: nodeById[$0.id]?
+                    .presentationLabelIfNeeded(
+                        .short,
+                        shape: options.periodShape
+                    ) ?? $0.label,
                 amount: $0.amount,
                 direction: $0.direction,
                 orientation: $0.orientation
