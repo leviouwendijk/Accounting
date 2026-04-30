@@ -5,8 +5,8 @@ types {
 }
 versions {
     release {
-        major = 0
-        minor = 1
+        major = 2
+        minor = 0
         patch = 0
     }
 }
