@@ -1,5 +1,6 @@
 import Foundation
 import Primitives
+import Arguments
 
 public struct EntryCompilerProject: Sendable {
     public let root: URL
@@ -99,7 +100,7 @@ public struct EntryCompilerProject: Sendable {
 // config/resources/rgs/v3_8.json -> source of RGSNode objects array
 
 extension EntryCompilerProject {
-    public enum Scope: String, Sendable, CaseIterable, StringParsableEnum {
+    public enum Scope: String, Sendable, CaseIterable, StringParsableEnum, ArgumentValue {
         case entries
         case config
         case transactions

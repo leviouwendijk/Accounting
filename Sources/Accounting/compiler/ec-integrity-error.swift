@@ -1,8 +1,17 @@
 import Foundation
+import Arguments
 
 public enum EntryCompilerIntegrityError: Error, CustomStringConvertible, Sendable {
-    public enum IDKind: String, Codable, Sendable { case transaction, entry }
-    public enum RefKind: String, Codable, Sendable { case transactionRef, entryRef }
+
+    public enum IDKind: String, Codable, Sendable, ArgumentValue { 
+        case transaction
+        case entry 
+    }
+
+    public enum RefKind: String, Codable, Sendable, ArgumentValue { 
+        case transactionRef 
+        case entryRef 
+    }
 
     /// Two or more files declare the same global integer id.
     case idCollision(kind: IDKind, id: Int, paths: [String])

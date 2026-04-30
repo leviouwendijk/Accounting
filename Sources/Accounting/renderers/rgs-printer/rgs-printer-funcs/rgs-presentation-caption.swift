@@ -1,13 +1,14 @@
 import Foundation
 import Primitives
+import Arguments
 
-public enum PresentationCaptionStyle: String, Sendable, StringParsableEnum {
+public enum PresentationCaptionStyle: String, Sendable, StringParsableEnum, ArgumentValue {
     case label
     case label_code
     case code_label
 }
 
-public enum PresentationDetailStyle: String, Sendable, StringParsableEnum {
+public enum PresentationDetailStyle: String, Sendable, StringParsableEnum, ArgumentValue {
     case concise
     case standard
     case verbose

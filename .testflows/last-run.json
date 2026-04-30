@@ -1,0 +1,58 @@
+{
+  "failed" : 0,
+  "failed_names" : [
+
+  ],
+  "generated_at" : "2026-04-30T16:53:48Z",
+  "passed" : 4,
+  "results" : [
+    {
+      "display_name" : "argument-surface",
+      "duration_seconds" : 0.005385994911193848,
+      "name" : "argument-surface",
+      "status" : "passed",
+      "tags" : [
+        "arguments",
+        "cli",
+        "migration",
+        "shape"
+      ]
+    },
+    {
+      "display_name" : "compiler-project-model",
+      "duration_seconds" : 0.0019030570983886719,
+      "name" : "compiler-project-model",
+      "status" : "passed",
+      "tags" : [
+        "compiler",
+        "filesystem",
+        "project"
+      ]
+    },
+    {
+      "display_name" : "lsp-accounting-surface",
+      "duration_seconds" : 0.00040602684020996094,
+      "name" : "lsp-accounting-surface",
+      "status" : "passed",
+      "tags" : [
+        "lexer",
+        "lsp",
+        "surface"
+      ]
+    },
+    {
+      "display_name" : "parsing-lexing-sets",
+      "duration_seconds" : 0.00034606456756591797,
+      "name" : "parsing-lexing-sets",
+      "status" : "passed",
+      "tags" : [
+        "flavors",
+        "lexer",
+        "parsing"
+      ]
+    }
+  ],
+  "skipped" : 0,
+  "title" : "Accounting test flows",
+  "total" : 4
+}

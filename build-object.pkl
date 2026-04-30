@@ -1,0 +1,19 @@
+uuid = "B43E5155-4D63-4211-BA6A-34F13D95A6BD"
+name = "accounting"
+types {
+    "binary"
+}
+versions {
+    release {
+        major = 0
+        minor = 1
+        patch = 0
+    }
+}
+compile {
+    use = true
+    arguments { "--targets" "ec" "eclsp" "ecvparity" }
+}
+details = ""
+author = "leviouwendijk"
+update = "https://raw.githubusercontent.com/leviouwendijk/Accounting/master/build-object.pkl"

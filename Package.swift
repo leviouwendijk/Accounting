@@ -9,7 +9,6 @@ let package = Package(
         .macOS(.v13)
     ],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "Accounting",
             targets: ["Accounting"]
@@ -17,6 +16,25 @@ let package = Package(
         .library(
             name: "AccountingLegacy",
             targets: ["AccountingLegacy"]
+        ),
+        .executable(
+            name: "ec",
+            targets: ["ec"]
+        ),
+
+        .executable(
+            name: "eclsp",
+            targets: ["eclsp"]
+        ),
+
+        .executable(
+            name: "ecvparity",
+            targets: ["ecvparity"]
+        ),
+
+        .executable(
+            name: "acctest",
+            targets: ["AccountingTestFlows"]
         ),
     ],
     dependencies: [
@@ -27,6 +45,10 @@ let package = Package(
         .package(url: "https://github.com/leviouwendijk/CSS.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Writers.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Terminal.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Interfaces.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Arguments.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Difference.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/TestFlows.git", branch: "master"),
     ],
     targets: [
         .target(
@@ -39,12 +61,14 @@ let package = Package(
                 .product(name: "CSS", package: "CSS"),
                 .product(name: "Writers", package: "Writers"),
                 .product(name: "Terminal", package: "Terminal"),
+                .product(name: "Arguments", package: "Arguments"),
             ],
         ),
 
         .target(
             name: "AccountingLegacy",
             dependencies: [
+                "Accounting",
                 .product(name: "plate", package: "plate"),
                 .product(name: "Primitives", package: "Primitives"),
                 .product(name: "Methods", package: "Methods"),
@@ -55,18 +79,58 @@ let package = Package(
             ],
         ),
 
-        .testTarget(
-            name: "AccountingTests",
+        .executableTarget(
+            name: "ec",
             dependencies: [
                 "Accounting",
                 .product(name: "plate", package: "plate"),
+                .product(name: "Primitives", package: "Primitives"),
+                .product(name: "Methods", package: "Methods"),
                 .product(name: "HTML", package: "HTML"),
                 .product(name: "CSS", package: "CSS"),
                 .product(name: "Writers", package: "Writers"),
                 .product(name: "Terminal", package: "Terminal"),
-            ]
+                .product(name: "Interfaces", package: "Interfaces"),
+                .product(name: "Arguments", package: "Arguments"),
+            ],
+            path: "Sources/EntryCompilerCLI"
+        ),
+
+        .executableTarget(
+            name: "eclsp",
+            dependencies: [
+                "Accounting",
+            ],
+            path: "Sources/EntryCompilerLSP"
+        ),
+
+        .executableTarget(
+            name: "ecvparity",
+            dependencies: [
+                "Accounting",
+                .product(name: "Difference", package: "Difference"),
+                .product(name: "Writers", package: "Writers"),
+                .product(name: "Interfaces", package: "Interfaces"),
+                .product(name: "Arguments", package: "Arguments"),
+                .product(name: "Terminal", package: "Terminal"),
+            ],
+            path: "Sources/EntryCompilerParity"
+        ),
+
+        .executableTarget(
+            name: "AccountingTestFlows",
+            dependencies: [
+                "Accounting",
+                .product(name: "plate", package: "plate"),
+                .product(name: "Primitives", package: "Primitives"),
+                .product(name: "Methods", package: "Methods"),
+                .product(name: "HTML", package: "HTML"),
+                .product(name: "CSS", package: "CSS"),
+                .product(name: "Writers", package: "Writers"),
+                .product(name: "Terminal", package: "Terminal"),
+                .product(name: "Arguments", package: "Arguments"),
+                .product(name: "TestFlows", package: "TestFlows"),
+            ],
         ),
     ]
 )
-
-

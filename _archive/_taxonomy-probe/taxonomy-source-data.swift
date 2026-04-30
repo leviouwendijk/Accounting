@@ -1,4 +1,5 @@
 import Foundation
+import Arguments
 
 public enum TaxonomyLinkbaseKind: String, Sendable {
     case presentation
@@ -359,7 +360,7 @@ public struct TaxonomySourceData: Sendable {
     ]
 }
 
-public enum TaxonomySourceProfile: String, CaseIterable, Sendable {
+public enum TaxonomySourceProfile: String, CaseIterable, Sendable, ArgumentValue {
     case bd_ihz_2025
     case bd_vpb_2025
 

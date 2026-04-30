@@ -15,3 +15,8 @@ libAccounting.dylib*
 .build/
 
 current
+
+# auto-added ignorables:
+compiled.pkl
+/compiled.pkl
+**/compiled.pkl

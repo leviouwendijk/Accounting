@@ -1,7 +1,8 @@
 import Foundation
 import Primitives
+import Arguments
 
-public enum PeriodKind: String, Codable, Sendable, StringParsableEnum {
+public enum PeriodKind: String, Codable, Sendable, StringParsableEnum, ArgumentValue {
     case year
     case half // half year
     case quarter

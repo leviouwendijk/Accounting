@@ -1,6 +1,7 @@
 import Foundation
+import Arguments
 
-public enum FinancialPeriodUnit: String, Sendable, Codable, CaseIterable {
+public enum FinancialPeriodUnit: String, Sendable, Codable, CaseIterable, ArgumentValue {
     case day
     case week
     case month

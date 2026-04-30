@@ -1,6 +1,7 @@
 import Foundation
+import Arguments
 
-public enum BusinessEntity: Sendable, Codable {
+public enum BusinessEntity: String, Sendable, Codable, ArgumentValue {
     case vof
 
     public var canonicalRoots: CanonicalRoots {

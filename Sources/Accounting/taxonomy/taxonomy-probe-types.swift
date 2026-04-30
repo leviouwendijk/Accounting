@@ -1,4 +1,5 @@
 import Foundation
+import Arguments
 
 public enum TaxonomyProbe {}
 public enum TaxonomyProber {}
@@ -9,13 +10,13 @@ public enum TaxonomyProjection {}
 public enum TaxonomyPresentation {}
 public enum TaxonomyTester {}
 
-public enum TaxonomyProbeMode: String, Sendable, CaseIterable {
+public enum TaxonomyProbeMode: String, Sendable, CaseIterable, ArgumentValue {
     case probePackage
     case inspectGenericMapping
     case csvMapping
 }
 
-public enum TaxonomyProbeBalanceInputMode: String, Sendable, CaseIterable {
+public enum TaxonomyProbeBalanceInputMode: String, Sendable, CaseIterable, ArgumentValue {
     case demo
     case project
 }
