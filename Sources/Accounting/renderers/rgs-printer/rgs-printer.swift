@@ -126,10 +126,10 @@ public enum RGSPrinter {
             )
             return BundleAnalytics(l2Buckets: l2, l2Totals: tot)
         }()
-
+        
         let buckets = analytics.l2Buckets
-        let assetsAnchorSet = Set(buckets.assets)
-        let liabilitiesAnchorSet = Set(buckets.liabilities)
+        let assetAnchorIds = Set(buckets.assets)
+        let liabilityAnchorIds = Set(buckets.liabilities)
         let equityAnchor = buckets.equity
 
         @inline(__always)
@@ -213,19 +213,117 @@ public enum RGSPrinter {
             if let eq = equityAnchor, anc == eq {
                 let line = makeBucketLine(r, anchorId: eq)
                 equityLines.append(line)
-            } else if assetsAnchorSet.contains(anc) {
-                let anchor = assetsAnchorSet.first
-                let line = makeBucketLine(r, anchorId: anchor)
+            } else if assetAnchorIds.contains(anc) {
+                let line = makeBucketLine(r, anchorId: anc)
                 assetsLines.append(line)
-            } else if liabilitiesAnchorSet.contains(anc) {
-                let anchor = liabilitiesAnchorSet.first
-                let line = makeBucketLine(r, anchorId: anchor)
+            } else if liabilityAnchorIds.contains(anc) {
+                let line = makeBucketLine(r, anchorId: anc)
                 liabilitiesLines.append(line)
             } else if includeOtherBucket {
                 let line = makeOtherBucketLine(r)
                 otherLines.append(line)
             }
         }
+
+        // let buckets = analytics.l2Buckets
+        // let assetsAnchorSet = Set(buckets.assets)
+        // let liabilitiesAnchorSet = Set(buckets.liabilities)
+        // let equityAnchor = buckets.equity
+
+        // @inline(__always)
+        // func l2AncestorId(of id: Int) -> Int? {
+        //     var cur: Int? = id
+        //     while let c = cur {
+        //         if levelById[c] == 2 {
+        //             return c
+        //         }
+        //         cur = maps.parentById[c]
+        //     }
+        //     return nil
+        // }
+
+        // @inline(__always)
+        // func relativeIndent(of id: Int, anchorId: Int?) -> Int {
+        //     guard let anchor = anchorId else {
+        //         return max(0, Int((levelById[id] ?? 1)) - 1)
+        //     }
+
+        //     var depth = 0
+        //     var cur: Int? = id
+
+        //     while let c = cur, c != anchor {
+        //         depth += 1
+        //         cur = maps.parentById[c]
+        //     }
+
+        //     return max(0, depth)
+        // }
+
+        // var assetsLines: [RGSBalanceBucketsOutput.Line] = []
+        // var equityLines: [RGSBalanceBucketsOutput.Line] = []
+        // var liabilitiesLines: [RGSBalanceBucketsOutput.Line] = []
+        // var otherLines: [RGSBalanceBucketsOutput.Line] = []
+
+        // @inline(__always)
+        // func makeBucketLine(
+        //     _ r: StatementLine,
+        //     anchorId: Int?
+        // ) -> RGSBalanceBucketsOutput.Line {
+        //     RGSBalanceBucketsOutput.Line(
+        //         id: r.id,
+        //         code: codeById[r.id] ?? "",
+        //         label: r.label,
+        //         rawAmount: r.rawAmount,
+        //         amount: r.amount,
+        //         level: Int(r.level),
+        //         relativeIndent: relativeIndent(of: r.id, anchorId: anchorId),
+        //         direction: r.direction,
+        //         orientation: r.orientation
+        //     )
+        // }
+
+        // @inline(__always)
+        // func makeOtherBucketLine(
+        //     _ r: StatementLine
+        // ) -> RGSBalanceBucketsOutput.Line {
+        //     RGSBalanceBucketsOutput.Line(
+        //         id: r.id,
+        //         code: codeById[r.id] ?? "",
+        //         label: r.label,
+        //         rawAmount: r.rawAmount,
+        //         amount: r.amount,
+        //         level: Int(r.level),
+        //         relativeIndent: max(0, Int((levelById[r.id] ?? 1)) - 1),
+        //         direction: r.direction,
+        //         orientation: r.orientation
+        //     )
+        // }
+
+        // for r in bundle.balance {
+        //     guard let anc = l2AncestorId(of: r.id) else {
+        //         if includeOtherBucket {
+        //             let line = makeOtherBucketLine(r)
+        //             otherLines.append(line)
+        //         }
+        //         continue
+        //     }
+
+        //     if let eq = equityAnchor, anc == eq {
+        //         let line = makeBucketLine(r, anchorId: eq)
+        //         equityLines.append(line)
+        //     } else if assetsAnchorSet.contains(anc) {
+        //         let anchor = assetsAnchorSet.first
+        //         let line = makeBucketLine(r, anchorId: anchor)
+        //         assetsLines.append(line)
+        //     } else if liabilitiesAnchorSet.contains(anc) {
+        //         let anchor = liabilitiesAnchorSet.first
+        //         let line = makeBucketLine(r, anchorId: anchor)
+        //         liabilitiesLines.append(line)
+        //     } else if includeOtherBucket {
+        //         let line = makeOtherBucketLine(r)
+        //         otherLines.append(line)
+        //     }
+        // }
 
         func sortByKey(_ a: RGSBalanceBucketsOutput.Line, _ b: RGSBalanceBucketsOutput.Line) -> Bool {
             let ka = maps.sortKeyById[a.id] ?? ""
