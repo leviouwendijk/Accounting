@@ -8,5 +8,6 @@ enum VATCommand: ArgumentCommand {
         Overview.self,
         Audit.self,
         Status.self,
+        Filing.self,
     ]
 }

@@ -77,6 +77,12 @@ public extension VATStatusReport {
             return rendered
         }
 
+        func fmtPlain(
+            _ x: Decimal
+        ) -> String {
+            fmtNumber(x)
+        }
+
         func quarterLabel(
             _ period: VATPeriod
         ) -> String {
@@ -102,15 +108,96 @@ public extension VATStatusReport {
             }
         }
 
+        func padded(
+            _ value: String,
+            to width: Int
+        ) -> String {
+            if value.count >= width {
+                return value
+            }
+
+            return value + String(repeating: " ", count: width - value.count)
+        }
+
+        func left(
+            _ value: String,
+            width: Int
+        ) -> String {
+            String(value.prefix(width)).padding(
+                toLength: width,
+                withPad: " ",
+                startingAt: 0
+            )
+        }
+
+        func right(
+            _ value: String,
+            width: Int
+        ) -> String {
+            if value.count >= width {
+                return String(value.suffix(width))
+            }
+
+            return String(repeating: " ", count: width - value.count) + value
+        }
+
+        func wrapWords(
+            _ text: String,
+            width: Int
+        ) -> [String] {
+            guard width > 8 else {
+                return [text]
+            }
+
+            var lines: [String] = []
+            var current = ""
+
+            for word in text.split(separator: " ") {
+                let next = current.isEmpty
+                    ? String(word)
+                    : current + " " + word
+
+                if next.count <= width {
+                    current = next
+                } else {
+                    if !current.isEmpty {
+                        lines.append(current)
+                    }
+
+                    current = String(word)
+                }
+            }
+
+            if !current.isEmpty {
+                lines.append(current)
+            }
+
+            return lines.isEmpty ? [""] : lines
+        }
+
         func renderTreeNodes(
             _ nodes: [VATStatusTreeNode],
             indent: String,
             into out: inout [String]
         ) {
+            let textWidth = 72
+
             for node in nodes {
-                out.append(
-                    "\(indent)• \(node.code) — \(node.label): \(fmt(node.amount))"
-                )
+                let label = "\(node.code) — \(node.label)"
+                let wrapped = wrapWords(label, width: textWidth)
+
+                if let first = wrapped.first {
+                    out.append(
+                        "\(indent)• \(first)"
+                            + "  \(fmt(node.amount))"
+                    )
+                }
+
+                for line in wrapped.dropFirst() {
+                    out.append(
+                        "\(indent)  \(line)"
+                    )
+                }
 
                 if !node.children.isEmpty {
                     renderTreeNodes(
@@ -120,6 +207,71 @@ public extension VATStatusReport {
                     )
                 }
             }
+        }
+
+        func renderFilingBreakdown(
+            _ rows: [VATStatusFilingRow],
+            into out: inout [String]
+        ) {
+            guard !rows.isEmpty else {
+                return
+            }
+
+            let labelWidth = 24
+            let amountWidth = 13
+
+            out.append("filing overview:")
+            out.append(
+                "  "
+                    + left("rubriek / family", width: labelWidth)
+                    + right("carry in", width: amountWidth)
+                    + "  "
+                    + right("period", width: amountWidth)
+                    + "  "
+                    + right("net", width: amountWidth)
+            )
+
+            out.append(
+                "  "
+                    + String(
+                        repeating: "─",
+                        count: labelWidth + amountWidth * 3 + 4
+                    )
+            )
+
+            for row in rows {
+                out.append(
+                    "  "
+                        + left(row.family.displayLabel, width: labelWidth)
+                        + right(fmtPlain(row.carryIn), width: amountWidth)
+                        + "  "
+                        + right(fmtPlain(row.period), width: amountWidth)
+                        + "  "
+                        + right(fmtPlain(row.net), width: amountWidth)
+                )
+            }
+
+            let totalCarry = rows.reduce(Decimal(0)) { $0 + $1.carryIn }
+            let totalPeriod = rows.reduce(Decimal(0)) { $0 + $1.period }
+            let totalNet = rows.reduce(Decimal(0)) { $0 + $1.net }
+
+            out.append(
+                "  "
+                    + String(
+                        repeating: "─",
+                        count: labelWidth + amountWidth * 3 + 4
+                    )
+            )
+
+            out.append(
+                "  "
+                    + left("total", width: labelWidth)
+                    + right(fmtPlain(totalCarry), width: amountWidth)
+                    + "  "
+                    + right(fmtPlain(totalPeriod), width: amountWidth)
+                    + "  "
+                    + right(fmtPlain(totalNet), width: amountWidth)
+            )
         }
 
         let rows = opts.onlyFlagged
@@ -195,6 +347,11 @@ public extension VATStatusReport {
                     into: &out
                 )
             }
+
+            renderFilingBreakdown(
+                quarter.filingBreakdown,
+                into: &out
+            )
 
             out.append("corrections net:          \(fmt(quarter.correctionsNet))")
             out.append("expected before settle:   \(fmt(quarter.expectedSettlementNet))")

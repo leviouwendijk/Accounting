@@ -694,6 +694,123 @@ enum ECVersionParityRunner {
                     anchor,
                 ]
             ),
+
+            .init(
+                "id-used-entry",
+                [
+                    "id",
+                    "used",
+                ]
+            ),
+
+            .init(
+                "id-used-transaction",
+                [
+                    "id",
+                    "used",
+                    "--kind",
+                    "transaction",
+                ]
+            ),
+
+            .init(
+                "id-next-entry",
+                [
+                    "id",
+                    "next",
+                ]
+            ),
+
+            .init(
+                "id-next-transaction",
+                [
+                    "id",
+                    "next",
+                    "--kind",
+                    "transaction",
+                ]
+            ),
+
+            .init(
+                "depreciation-monthly",
+                [
+                    "depreciation",
+                ]
+            ),
+
+            .init(
+                "depreciation-periods",
+                [
+                    "depreciation",
+                    "--detail",
+                    "periods",
+                ]
+            ),
+
+            .init(
+                "kia-audit-year",
+                [
+                    "kia",
+                    "audit",
+                    "--year",
+                    yearAnchor,
+                ]
+            ),
+
+            .init(
+                "kia-audit-year-diagnostics",
+                [
+                    "kia",
+                    "audit",
+                    "--year",
+                    yearAnchor,
+                    "--diagnostics",
+                ]
+            ),
+
+            .init(
+                "rgs-hierarchy-balance-l2",
+                [
+                    "rgs-hierarchy",
+                    "--side",
+                    "balance",
+                    "--max-level",
+                    "2",
+                ]
+            ),
+
+            .init(
+                "rgs-hierarchy-profit-l2",
+                [
+                    "rgs-hierarchy",
+                    "--side",
+                    "profit",
+                    "--max-level",
+                    "2",
+                ]
+            ),
+
+            .init(
+                "meta-audit-year",
+                [
+                    "meta",
+                    "audit",
+                    "year",
+                    "--anchor",
+                    yearAnchor,
+                ]
+            ),
+
+            .init(
+                "meta-audit-quarter",
+                [
+                    "meta",
+                    "audit",
+                    "quarter",
+                    "--anchor",
+                    anchor,
+                ]
+            ),
         ]
     }
 

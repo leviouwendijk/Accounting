@@ -1,11 +1,30 @@
 import Foundation
 
-public enum VATStatusFamily: String, Codable, Sendable, Hashable {
+public enum VATStatusFamily: String, Codable, Sendable, Hashable, CaseIterable {
     case output
     case deductible
     case privateUse
     case receivable
     case payableFallback
+
+    public var displayLabel: String {
+        switch self {
+        case .output:
+            return "output / 1a"
+
+        case .deductible:
+            return "deductible / 5b"
+
+        case .privateUse:
+            return "private use / 1d"
+
+        case .receivable:
+            return "receivable"
+
+        case .payableFallback:
+            return "payable fallback"
+        }
+    }
 }
 
 public struct VATStatusContribution: Sendable, Codable, Hashable {
@@ -59,6 +78,25 @@ public struct VATStatusFamilyBreakdown: Sendable, Codable, Hashable {
     }
 }
 
+public struct VATStatusFilingRow: Sendable, Codable, Hashable {
+    public let family: VATStatusFamily
+    public let carryIn: Decimal
+    public let period: Decimal
+    public let net: Decimal
+
+    public init(
+        family: VATStatusFamily,
+        carryIn: Decimal,
+        period: Decimal,
+        net: Decimal
+    ) {
+        self.family = family
+        self.carryIn = carryIn
+        self.period = period
+        self.net = net
+    }
+}
+
 public struct VATStatusQuarter: Sendable, Codable, Hashable {
     public let period: VATPeriod
 
@@ -78,6 +116,9 @@ public struct VATStatusQuarter: Sendable, Codable, Hashable {
 
     /// Per-family per-RGS-node tree for the ordinary composition.
     public let ordinaryBreakdownTree: [VATStatusFamilyBreakdown]
+
+    /// Per-filing-family carry-in + period + net view.
+    public let filingBreakdown: [VATStatusFilingRow]
 
     /// Signed semantic corrections assigned to this VAT quarter.
     public let correctionsNet: Decimal
@@ -114,6 +155,7 @@ public struct VATStatusQuarter: Sendable, Codable, Hashable {
         payableFallbackNet: Decimal,
         ordinaryNet: Decimal,
         ordinaryBreakdownTree: [VATStatusFamilyBreakdown],
+        filingBreakdown: [VATStatusFilingRow],
         correctionsNet: Decimal,
         expectedSettlementNet: Decimal,
         paid: Decimal,
@@ -132,6 +174,7 @@ public struct VATStatusQuarter: Sendable, Codable, Hashable {
         self.payableFallbackNet = payableFallbackNet
         self.ordinaryNet = ordinaryNet
         self.ordinaryBreakdownTree = ordinaryBreakdownTree
+        self.filingBreakdown = filingBreakdown
         self.correctionsNet = correctionsNet
         self.expectedSettlementNet = expectedSettlementNet
         self.paid = paid

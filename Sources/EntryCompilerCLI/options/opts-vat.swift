@@ -155,6 +155,50 @@ struct VATStatusOptions: Sendable, ArgumentParsed {
     }
 }
 
+struct VATFilingOptions: Sendable, ArgumentParsed {
+    typealias ArgumentPayload = Options
+
+    var project: ProjectOptions
+    var period: VATPeriodRequest
+    var trace: Bool
+    var tolerance: Decimal
+    var hideSourceRows: Bool
+
+    init(
+        arguments: Options
+    ) throws {
+        self.project = arguments.project
+        self.period = try VATPeriodRequest(
+            arguments: arguments.period
+        )
+        self.trace = arguments.trace
+        self.tolerance = arguments.tolerance
+        self.hideSourceRows = arguments.hideSourceRows
+    }
+
+    struct Options: ArgumentGroup {
+        @Group("project")
+        var project: ProjectOptions
+
+        @Group("period")
+        var period: VATPeriodRequest.QuarterOptions
+
+        @Flag("trace")
+        var trace: Bool
+
+        @Opt(
+            "tolerance",
+            default: Decimal(1) / Decimal(100)
+        )
+        var tolerance: Decimal
+
+        @Flag("hide-source-rows")
+        var hideSourceRows: Bool
+
+        init() {}
+    }
+}
+
 struct ProjectOptions: ArgumentGroup {
     @Opt(
         "project",

@@ -50,6 +50,7 @@ public enum VATStatusBuilder {
         var ordinaryByPeriod: [VATPeriod: StatusBreakdown] = [:]
         var ordinaryTreeSeedByPeriod: [VATPeriod: FamilySeed] = [:]
         var correctionsByPeriod: [VATPeriod: Decimal] = [:]
+        var correctionBreakdownByPeriod: [VATPeriod: StatusBreakdown] = [:]
         var taggedEntriesByPeriod: [VATPeriod: [VATAuditEntry]] = [:]
 
         for entry in resolvedEntries {
@@ -114,6 +115,15 @@ public enum VATStatusBuilder {
             case .correction:
                 correctionsByPeriod[annotation.period, default: 0] += event.netAmount
 
+                let correctionBreakdown = ordinaryBreakdown(
+                    for: entry,
+                    roots: roots
+                )
+
+                if !correctionBreakdown.isZero {
+                    correctionBreakdownByPeriod[annotation.period, default: .zero] += correctionBreakdown
+                }
+
             case .settlement, .filing:
                 break
             }
@@ -138,6 +148,7 @@ public enum VATStatusBuilder {
         }
 
         var carryBag: [VATPeriod: Decimal] = [:]
+        var sourceBreakdownByPeriod: [VATPeriod: StatusBreakdown] = [:]
 
         let quarters = periods
             .sorted { lhs, rhs in
@@ -163,9 +174,17 @@ public enum VATStatusBuilder {
                     codeById: codeById
                 )
 
+                let correctionBreakdown = correctionBreakdownByPeriod[periodKey] ?? .zero
                 let correctionsNet = correctionsByPeriod[periodKey] ?? 0
+                let periodBreakdown = ordinary + correctionBreakdown
 
                 let carryIn = carryBag.values.reduce(0, +)
+
+                let filingBreakdown = makeFilingBreakdown(
+                    carryBag: carryBag,
+                    sourceBreakdownByPeriod: sourceBreakdownByPeriod,
+                    periodBreakdown: periodBreakdown
+                )
 
                 let paid = entries
                     .filter {
@@ -189,6 +208,8 @@ public enum VATStatusBuilder {
                     carryIn
                     + ordinary.net
                     + correctionsNet
+
+                sourceBreakdownByPeriod[periodKey] = periodBreakdown
 
                 let quarterMovement = ordinary.net + correctionsNet
                 if quarterMovement != 0 {
@@ -230,6 +251,7 @@ public enum VATStatusBuilder {
                     payableFallbackNet: ordinary.payableFallback,
                     ordinaryNet: ordinary.net,
                     ordinaryBreakdownTree: ordinaryTree,
+                    filingBreakdown: filingBreakdown,
                     correctionsNet: correctionsNet,
                     expectedSettlementNet: expectedSettlementNet,
                     paid: paid,
@@ -297,6 +319,180 @@ private extension VATStatusBuilder {
             lhs = lhs + rhs
         }
     }
+
+    @inline(__always)
+    static func amount(
+        _ breakdown: StatusBreakdown,
+        for family: VATStatusFamily
+    ) -> Decimal {
+        switch family {
+        case .output:
+            return breakdown.output
+
+        case .deductible:
+            return breakdown.deductible
+
+        case .privateUse:
+            return breakdown.privateUse
+
+        case .receivable:
+            return breakdown.receivable
+
+        case .payableFallback:
+            return breakdown.payableFallback
+        }
+    }
+
+    static func makeFilingBreakdown(
+        carryBag: [VATPeriod: Decimal],
+        sourceBreakdownByPeriod: [VATPeriod: StatusBreakdown],
+        periodBreakdown: StatusBreakdown
+    ) -> [VATStatusFilingRow] {
+        let carryBreakdown = residualFamilyBreakdown(
+            carryBag: carryBag,
+            sourceBreakdownByPeriod: sourceBreakdownByPeriod
+        )
+
+        return VATStatusFamily.allCases.compactMap { family in
+            let carryIn = amount(
+                carryBreakdown,
+                for: family
+            )
+
+            let period = amount(
+                periodBreakdown,
+                for: family
+            )
+
+            let net = carryIn + period
+
+            guard carryIn != 0 || period != 0 || net != 0 else {
+                return nil
+            }
+
+            return VATStatusFilingRow(
+                family: family,
+                carryIn: carryIn,
+                period: period,
+                net: net
+            )
+        }
+    }
+
+    static func residualFamilyBreakdown(
+        carryBag: [VATPeriod: Decimal],
+        sourceBreakdownByPeriod: [VATPeriod: StatusBreakdown]
+    ) -> StatusBreakdown {
+        var result = StatusBreakdown.zero
+
+        for (sourcePeriod, residual) in carryBag where residual != 0 {
+            guard let sourceBreakdown = sourceBreakdownByPeriod[sourcePeriod] else {
+                result.payableFallback += residual
+                continue
+            }
+
+            let sourceNet = sourceBreakdown.net
+
+            guard sourceNet != 0 else {
+                result.payableFallback += residual
+                continue
+            }
+
+            let ratio = residual / sourceNet
+
+            result.output += sourceBreakdown.output * ratio
+            result.deductible += sourceBreakdown.deductible * ratio
+            result.privateUse += sourceBreakdown.privateUse * ratio
+            result.receivable += sourceBreakdown.receivable * ratio
+            result.payableFallback += sourceBreakdown.payableFallback * ratio
+        }
+
+        return result
+    }
+
+    // static func addPeriodBreakdown(
+    //     _ breakdown: StatusBreakdown,
+    //     sourcePeriod: VATPeriod,
+    //     to bag: inout [VATStatusFamily: [VATPeriod: Decimal]]
+    // ) {
+    //     for family in VATStatusFamily.allCases {
+    //         let value = amount(
+    //             breakdown,
+    //             for: family
+    //         )
+
+    //         guard value != 0 else {
+    //             continue
+    //         }
+
+    //         bag[family, default: [:]][sourcePeriod, default: 0] += value
+    //     }
+    // }
+
+    // static func applySettlement(
+    //     _ settlementNet: Decimal,
+    //     sourcePeriod: VATPeriod,
+    //     to bag: inout [VATStatusFamily: [VATPeriod: Decimal]]
+    // ) {
+    //     var remaining = settlementNet
+
+    //     for family in VATStatusFamily.allCases {
+    //         guard remaining != 0 else {
+    //             break
+    //         }
+
+    //         let open = bag[family]?[sourcePeriod] ?? 0
+
+    //         guard open != 0 else {
+    //             continue
+    //         }
+
+    //         guard signsAreOpposed(open, remaining) else {
+    //             continue
+    //         }
+
+    //         let openAbs = DecimalFuncs.absDec(open)
+    //         let remainingAbs = DecimalFuncs.absDec(remaining)
+    //         let appliedAbs = min(openAbs, remainingAbs)
+    //         let applied = remaining > 0 ? appliedAbs : -appliedAbs
+
+    //         bag[family, default: [:]][sourcePeriod, default: 0] += applied
+    //         remaining -= applied
+    //     }
+
+    //     if remaining != 0 {
+    //         bag[.payableFallback, default: [:]][sourcePeriod, default: 0] += remaining
+    //     }
+    // }
+
+    // @inline(__always)
+    // static func signsAreOpposed(
+    //     _ lhs: Decimal,
+    //     _ rhs: Decimal
+    // ) -> Bool {
+    //     (lhs < 0 && rhs > 0) || (lhs > 0 && rhs < 0)
+    // }
+
+    // @inline(__always)
+    // static func min(
+    //     _ lhs: Decimal,
+    //     _ rhs: Decimal
+    // ) -> Decimal {
+    //     lhs < rhs ? lhs : rhs
+    // }
+
+    // @inline(__always)
+    // static func pruneZeroes(
+    //     _ bag: inout [VATStatusFamily: [VATPeriod: Decimal]]
+    // ) {
+    //     bag = bag.compactMapValues { periodBag in
+    //         let clean = periodBag.filter { _, value in
+    //             value != 0
+    //         }
+
+    //         return clean.isEmpty ? nil : clean
+    //     }
+    // }
 
     @inline(__always)
     static func shouldIncludeHistoryPosting(
