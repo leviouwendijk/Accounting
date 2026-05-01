@@ -1,5 +1,6 @@
 import Foundation
 import Accounting
+import AccountingParsers
 
 func eclspFindProjectRoot(
     startingAt start: URL,

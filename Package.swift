@@ -21,17 +21,14 @@ let package = Package(
             name: "ec",
             targets: ["ec"]
         ),
-
         .executable(
             name: "eclsp",
             targets: ["eclsp"]
         ),
-
         .executable(
             name: "ecvparity",
             targets: ["ecvparity"]
         ),
-
         .executable(
             name: "acctest",
             targets: ["AccountingTestFlows"]
@@ -64,7 +61,35 @@ let package = Package(
                 .product(name: "Arguments", package: "Arguments"),
             ],
         ),
-
+        .target(
+            name: "AccountingParsers",
+            dependencies: [
+                "Accounting",
+                .product(name: "plate", package: "plate"),
+                .product(name: "Primitives", package: "Primitives"),
+                .product(name: "Methods", package: "Methods"),
+                .product(name: "HTML", package: "HTML"),
+                .product(name: "CSS", package: "CSS"),
+                .product(name: "Writers", package: "Writers"),
+                .product(name: "Terminal", package: "Terminal"),
+                .product(name: "Arguments", package: "Arguments"),
+            ],
+        ),
+        .target(
+            name: "AccountingCompiler",
+            dependencies: [
+                "Accounting",
+                "AccountingParsers",
+                .product(name: "plate", package: "plate"),
+                .product(name: "Primitives", package: "Primitives"),
+                .product(name: "Methods", package: "Methods"),
+                .product(name: "HTML", package: "HTML"),
+                .product(name: "CSS", package: "CSS"),
+                .product(name: "Writers", package: "Writers"),
+                .product(name: "Terminal", package: "Terminal"),
+                .product(name: "Arguments", package: "Arguments"),
+            ],
+        ),
         .target(
             name: "AccountingLegacy",
             dependencies: [
@@ -78,11 +103,12 @@ let package = Package(
                 .product(name: "Terminal", package: "Terminal"),
             ],
         ),
-
         .executableTarget(
             name: "ec",
             dependencies: [
                 "Accounting",
+                "AccountingParsers",
+                "AccountingCompiler",
                 .product(name: "plate", package: "plate"),
                 .product(name: "Primitives", package: "Primitives"),
                 .product(name: "Methods", package: "Methods"),
@@ -95,15 +121,15 @@ let package = Package(
             ],
             path: "Sources/EntryCompilerCLI"
         ),
-
         .executableTarget(
             name: "eclsp",
             dependencies: [
                 "Accounting",
+                "AccountingCompiler",
+                "AccountingParsers",
             ],
             path: "Sources/EntryCompilerLSP"
         ),
-
         .executableTarget(
             name: "ecvparity",
             dependencies: [
@@ -121,6 +147,8 @@ let package = Package(
             name: "AccountingTestFlows",
             dependencies: [
                 "Accounting",
+                "AccountingParsers",
+                "AccountingCompiler",
                 .product(name: "plate", package: "plate"),
                 .product(name: "Primitives", package: "Primitives"),
                 .product(name: "Methods", package: "Methods"),

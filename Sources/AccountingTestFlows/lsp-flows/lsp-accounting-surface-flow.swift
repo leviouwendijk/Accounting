@@ -1,4 +1,6 @@
 import Accounting
+import AccountingCompiler
+import AccountingParsers
 import TestFlows
 
 extension AccountingTestFlowsSuite {

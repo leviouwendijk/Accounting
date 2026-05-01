@@ -1,26 +1,11 @@
 import Accounting
+import AccountingCompiler
 import Arguments
 import Foundation
 import Interfaces
 import Milieu
 import Terminal
 import Writers
-
-enum EntryCompilerIDKind: String, Sendable, ArgumentValue {
-    case entry
-    case transaction
-
-    var idKind: Accounting.IDKind {
-        switch self {
-        case .entry:
-            .entry
-
-        case .transaction:
-            .transaction
-        }
-    }
-}
-
 
 enum IDCommand: ArgumentCommand {
     static let name = "id"
@@ -38,7 +23,7 @@ enum IDCommand: ArgumentCommand {
             var project: ProjectOptions
 
             @Opt("kind", default: .entry)
-            var kind: EntryCompilerIDKind
+            var kind: IDKind
 
             @Flag("raw")
             var raw: Bool
@@ -71,7 +56,7 @@ enum IDCommand: ArgumentCommand {
             let ids = try IDScanner.usedIDs(
                 project: project,
                 settings: settings,
-                kind: options.kind.idKind,
+                kind: options.kind,
                 allowCollisions: true,
                 verbose: options.verbose,
                 onCollision: reporter.callback()
@@ -114,7 +99,7 @@ enum IDCommand: ArgumentCommand {
             var project: ProjectOptions
 
             @Opt("kind", default: .entry)
-            var kind: EntryCompilerIDKind
+            var kind: IDKind
 
             @Flag("verbose")
             var verbose: Bool
@@ -155,7 +140,7 @@ enum IDCommand: ArgumentCommand {
             let ids = try IDScanner.usedIDs(
                 project: project,
                 settings: settings,
-                kind: options.kind.idKind,
+                kind: options.kind,
                 allowCollisions: true,
                 verbose: options.verbose,
                 onCollision: reporter.callback()

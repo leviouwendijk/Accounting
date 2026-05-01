@@ -3,12 +3,12 @@
   "failed_names" : [
 
   ],
-  "generated_at" : "2026-04-30T16:53:48Z",
-  "passed" : 4,
+  "generated_at" : "2026-05-01T00:07:54Z",
+  "passed" : 5,
   "results" : [
     {
       "display_name" : "argument-surface",
-      "duration_seconds" : 0.005385994911193848,
+      "duration_seconds" : 0.07472491264343262,
       "name" : "argument-surface",
       "status" : "passed",
       "tags" : [
@@ -20,7 +20,7 @@
     },
     {
       "display_name" : "compiler-project-model",
-      "duration_seconds" : 0.0019030570983886719,
+      "duration_seconds" : 0.0024290084838867188,
       "name" : "compiler-project-model",
       "status" : "passed",
       "tags" : [
@@ -31,7 +31,7 @@
     },
     {
       "display_name" : "lsp-accounting-surface",
-      "duration_seconds" : 0.00040602684020996094,
+      "duration_seconds" : 0.0004360675811767578,
       "name" : "lsp-accounting-surface",
       "status" : "passed",
       "tags" : [
@@ -42,7 +42,7 @@
     },
     {
       "display_name" : "parsing-lexing-sets",
-      "duration_seconds" : 0.00034606456756591797,
+      "duration_seconds" : 0.00023293495178222656,
       "name" : "parsing-lexing-sets",
       "status" : "passed",
       "tags" : [
@@ -50,9 +50,21 @@
         "lexer",
         "parsing"
       ]
+    },
+    {
+      "display_name" : "accounting-entry-core",
+      "duration_seconds" : 0.0005099773406982422,
+      "name" : "accounting-entry-core",
+      "status" : "passed",
+      "tags" : [
+        "accounting",
+        "core",
+        "entries",
+        "trial-balance"
+      ]
     }
   ],
   "skipped" : 0,
   "title" : "Accounting test flows",
-  "total" : 4
+  "total" : 5
 }

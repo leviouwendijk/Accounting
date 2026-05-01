@@ -1,5 +1,7 @@
 import Foundation
 import Accounting
+import AccountingCompiler
+import AccountingParsers
 
 private struct ECLSPDocumentState {
     let uri: String
