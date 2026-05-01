@@ -1,16 +1,17 @@
 import Foundation
 import Accounting
+import Position
 
 public struct EntryCompilerPreparedTokenStream: Sendable {
     public let tokens: [EntryCompilerToken]
     public let lineMap: [Int]?
-    public let spanMap: [SourceSpan]?
+    public let spanMap: [PositionSpan]?
     public let diagnostics: [EntryCompilerLexDiagnostic]
 
     public init(
         tokens: [EntryCompilerToken],
         lineMap: [Int]?,
-        spanMap: [SourceSpan]?,
+        spanMap: [PositionSpan]?,
         diagnostics: [EntryCompilerLexDiagnostic]
     ) {
         self.tokens = tokens

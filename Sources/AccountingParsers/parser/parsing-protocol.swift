@@ -1,10 +1,11 @@
 import Foundation
 import Accounting
+import Position
 
 public protocol EntryCompilerParsing: AnyObject {
     var core: EntryCompilerParserCore { get set }
     var current: EntryCompilerToken { get }
-    func loc() -> SourceLocation
+    func loc() -> Position
 }
 
 public extension EntryCompilerParsing {

@@ -1,4 +1,5 @@
 import Foundation
+import Position
 
 public struct Line: Hashable, Codable, Sendable {
     public let entity: EntityRef
@@ -6,7 +7,7 @@ public struct Line: Hashable, Codable, Sendable {
     public let direction: Direction
     public let amount: Decimal
     public let adjustment: InventoryAdjustment?
-    public let location: SourceLocation?
+    public let location: Position?
 
     public init(
         entity: EntityRef,
@@ -14,7 +15,7 @@ public struct Line: Hashable, Codable, Sendable {
         direction: Direction,
         amount: Decimal,
         adjustment: InventoryAdjustment? = nil,
-        location: SourceLocation? = nil
+        location: Position? = nil
     ) {
         self.entity = entity
         self.account = account

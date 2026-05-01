@@ -1,4 +1,5 @@
 import Foundation
+import Position
 
 public struct EntityStore: Sendable, Codable {
     public let byFull: [EntityKey: EntityDef]
@@ -11,7 +12,7 @@ public struct EntityStore: Sendable, Codable {
         self.byAlias = idx
     }
 
-    public func resolve(_ ref: EntityRef, at loc: SourceLocation?) throws -> EntityDef {
+    public func resolve(_ ref: EntityRef, at loc: Position?) throws -> EntityDef {
         // 1) Full key → direct lookup
         if let c = ref.`class`, let f = ref.family {
             let key = EntityKey(class: c, family: f, alias: ref.alias)

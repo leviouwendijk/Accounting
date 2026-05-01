@@ -1,5 +1,6 @@
 import Foundation
 import Accounting
+import Position
 
 // Parses project config account overrides:
 // account { use code 10201 ... }
@@ -16,7 +17,7 @@ public final class EntryCompilerAccountsFileParser: EntryCompilerParsing {
         tokens: [EntryCompilerToken],
         fileURL: URL? = nil,
         lineMap: [Int]? = nil,
-        spanMap: [SourceSpan]? = nil,
+        spanMap: [PositionSpan]? = nil,
         verbose: Bool = false
     ) {
         self.init(

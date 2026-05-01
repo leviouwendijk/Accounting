@@ -1,8 +1,9 @@
 import Foundation
+import Position
 
 public enum InferenceError: Error, CustomStringConvertible, Sendable {
-    case missingEntityClass(alias: String, filePathHint: String, location: SourceLocation)
-    case missingEntityFamily(alias: String, filePathHint: String, location: SourceLocation)
+    case missingEntityClass(alias: String, filePathHint: String, location: Position)
+    case missingEntityFamily(alias: String, filePathHint: String, location: Position)
 
     public var description: String {
         switch self {

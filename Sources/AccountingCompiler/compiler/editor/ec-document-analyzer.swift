@@ -1,6 +1,7 @@
 import Accounting
 import AccountingParsers
 import Foundation
+import Position
 
 public enum ECDocumentAnalyzer {
     public static func analyze(
@@ -13,7 +14,7 @@ public enum ECDocumentAnalyzer {
         )
 
         var tokens: [EntryCompilerToken] = []
-        var spans: [SourceSpan] = []
+        var spans: [PositionSpan] = []
 
         while true {
             let token = lexer.nextToken()
@@ -25,9 +26,17 @@ public enum ECDocumentAnalyzer {
                 spans.append(span)
             } else {
                 spans.append(
-                    SourceSpan(
-                        start: SourceLocation(line: 1, column: 1),
-                        end: SourceLocation(line: 1, column: 1)
+                    PositionSpan(
+                        uncheckedStart: Position(
+                            uncheckedFile: nil,
+                            line: 1,
+                            column: 1
+                        ),
+                        uncheckedEnd: Position(
+                            uncheckedFile: nil,
+                            line: 1,
+                            column: 1
+                        )
                     )
                 )
             }
@@ -115,7 +124,7 @@ private extension ECDocumentAnalyzer {
     static func makeEditorDiagnostics(
         flavor: EntryCompilerLexingFlavor,
         tokens: [EntryCompilerToken],
-        spans: [SourceSpan]
+        spans: [PositionSpan]
     ) -> [ECDocumentDiagnostic] {
         switch flavor {
         case .entries,
@@ -132,7 +141,7 @@ private extension ECDocumentAnalyzer {
 
     static func duplicateIDDiagnostics(
         tokens: [EntryCompilerToken],
-        spans: [SourceSpan]
+        spans: [PositionSpan]
     ) -> [ECDocumentDiagnostic] {
         let occurrences = ecDocumentIDOccurrences(
             tokens: tokens,
@@ -179,7 +188,7 @@ private extension ECDocumentAnalyzer {
     @inline(__always)
     static func occurrence(
         for token: EntryCompilerToken,
-        span: SourceSpan
+        span: PositionSpan
     ) -> ECSymbolOccurrence? {
         switch token {
         case .keyword(let s):

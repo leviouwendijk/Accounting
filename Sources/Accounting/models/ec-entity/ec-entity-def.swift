@@ -1,4 +1,5 @@
 import Foundation
+import Position
 
 public struct EntityDef: Sendable, Codable {
     public let key: EntityKey
@@ -14,7 +15,7 @@ public struct EntityDef: Sendable, Codable {
 
     public var collapses: Bool?
 
-    public var location: SourceLocation?
+    public var location: Position?
 
     public init(
         key: EntityKey,
@@ -29,7 +30,7 @@ public struct EntityDef: Sendable, Codable {
         kiaDraft: KIADraft? = nil,
         collapses: Bool? = nil,
 
-        location: SourceLocation? = nil
+        location: Position? = nil
     ) {
         self.key = key
         self.displayName = displayName

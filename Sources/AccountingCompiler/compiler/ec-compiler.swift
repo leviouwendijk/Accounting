@@ -1,6 +1,7 @@
 import Accounting
 import AccountingParsers
 import Foundation
+import Position
 
 public struct EntryCompiler: Sendable {
     public let project: EntryCompilerProject
@@ -43,7 +44,7 @@ public struct EntryCompiler: Sendable {
     public func lexWithSpanMap(
         _ source: String,
         flavor: EntryCompilerLexingFlavor = .fallback
-    ) -> ([EntryCompilerToken], [SourceSpan]) {
+    ) -> ([EntryCompilerToken], [PositionSpan]) {
         let result = lexDetailed(source, flavor: flavor)
         return (result.tokens, result.spans)
     }

@@ -1,6 +1,7 @@
 import Accounting
 import AccountingParsers
 import Foundation
+import Position
 
 public extension ECEditorService {
     static func diagnostics(
@@ -62,15 +63,15 @@ public extension ECEditorService {
 }
 
 private struct ECEntryBalanceState {
-    let anchorSpan: SourceSpan
-    var idSpan: SourceSpan?
+    let anchorSpan: PositionSpan
+    var idSpan: PositionSpan?
     var debitTotal: Decimal
     var creditTotal: Decimal
 }
 
 private func entryBalanceDiagnostics(
     tokens: [EntryCompilerToken],
-    spans: [SourceSpan]
+    spans: [PositionSpan]
 ) -> [ECDocumentDiagnostic] {
     var out: [ECDocumentDiagnostic] = []
     var stack: [ECEditorBlockKind] = []

@@ -1,5 +1,6 @@
 import Foundation
 import Accounting
+import Position
 
 public extension EntryCompilerParsing {
     @inlinable
@@ -137,7 +138,7 @@ public extension EntryCompilerParsing {
 }
 
 public extension DateSpecification {
-    func asAbsolute(loc: SourceLocation) throws -> Date {
+    func asAbsolute(loc: Position) throws -> Date {
         switch self {
         case let .absolute(d): return d
         case .infer:

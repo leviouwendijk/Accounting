@@ -1,9 +1,10 @@
 import Foundation
+import Position
 
 public enum EntityStoreError: Error, CustomStringConvertible, Sendable {
     case duplicateKey(EntityKey)
-    case notFound(ref: String, at: SourceLocation? = nil)
-    case ambiguousAlias(alias: String, candidates: [String], at: SourceLocation? = nil)
+    case notFound(ref: String, at: Position? = nil)
+    case ambiguousAlias(alias: String, candidates: [String], at: Position? = nil)
 
     public var description: String {
         switch self {
@@ -24,13 +25,13 @@ public enum EntityStoreError: Error, CustomStringConvertible, Sendable {
 }
 
 public enum AccountStoreError: Error, CustomStringConvertible, Sendable {
-    case duplicateCode(String, at: SourceLocation?)
-    case notFound(code: String, at: SourceLocation?)
-    case invalidReference(path: [String], at: SourceLocation?)
-    case missingRequiredForNewAccount(code: String, missing: String, at: SourceLocation?)
-    case empty(at: SourceLocation?)
+    case duplicateCode(String, at: Position?)
+    case notFound(code: String, at: Position?)
+    case invalidReference(path: [String], at: Position?)
+    case missingRequiredForNewAccount(code: String, missing: String, at: Position?)
+    case empty(at: Position?)
     case compiledChartIndexEmpty
-    case hierarchyIssue(problem: RGSIdentifierHierarchy.Problem, at: SourceLocation?)
+    case hierarchyIssue(problem: RGSIdentifierHierarchy.Problem, at: Position?)
 
     public var description: String {
         switch self {
@@ -57,7 +58,7 @@ public enum AccountStoreError: Error, CustomStringConvertible, Sendable {
 
 public enum TransactionStoreError: Error, CustomStringConvertible, Sendable {
     case duplicateID(Int)
-    case notFound(id: Int, at: SourceLocation? = nil)
+    case notFound(id: Int, at: Position? = nil)
 
     public var description: String {
         switch self {

@@ -1,4 +1,5 @@
 import Foundation
+import Position
 
 public enum EntryCompilerResolverError: Error, LocalizedError, CustomStringConvertible {
     case notImplemented
@@ -7,7 +8,7 @@ public enum EntryCompilerResolverError: Error, LocalizedError, CustomStringConve
         entity: String,
         account: String,
         reason: String,
-        at: SourceLocation?
+        at: Position?
     )
 
     public var errorDescription: String? {

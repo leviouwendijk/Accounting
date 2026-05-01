@@ -1,4 +1,5 @@
 import Foundation
+import Position
 
 public struct AccountStore: Codable, Sendable {
     /// Canonical map: posting code -> node
@@ -58,7 +59,7 @@ public struct AccountStore: Codable, Sendable {
     }
 
     // @inlinable
-    // public func resolve(_ ref: AccountRef, at loc: SourceLocation?) throws -> RGSNode {
+    // public func resolve(_ ref: AccountRef, at loc: Position?) throws -> RGSNode {
     //     switch ref {
     //     case .code(let s):
     //         if let node = byCode[s] { return node }
@@ -93,7 +94,7 @@ public struct AccountStore: Codable, Sendable {
     // }
 
     @inlinable
-    public func resolve(_ ref: AccountRef, at loc: SourceLocation?) throws -> RGSNode {
+    public func resolve(_ ref: AccountRef, at loc: Position?) throws -> RGSNode {
         let node: RGSNode
         switch ref {
         case .code(let s):

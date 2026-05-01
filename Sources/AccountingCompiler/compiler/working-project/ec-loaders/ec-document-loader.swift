@@ -1,6 +1,7 @@
 import Accounting
 import AccountingParsers
 import Foundation
+import Position
 
 public enum ECDocumentLoader {
     public static func load(
@@ -73,7 +74,7 @@ public enum ECDocumentLoader {
 
 //             let toks: [EntryCompilerToken]
 //             let lineMap: [Int]?
-//             let spanMap: [SourceSpan]?
+//             let spanMap: [PositionSpan]?
 
 //             if trace {
 //                 // (toks, lineMap) = lx.collectAllTokensWithLineMap()

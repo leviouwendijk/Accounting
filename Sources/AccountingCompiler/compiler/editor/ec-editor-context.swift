@@ -1,6 +1,7 @@
 import Accounting
 import AccountingParsers
 import Foundation
+import Position
 
 enum ECEditorBlockKind: String, Sendable {
     case anonymous
@@ -28,7 +29,7 @@ enum ECDocumentIDNamespace: String, Sendable {
 struct ECDocumentIDOccurrence: Sendable, Hashable {
     let namespace: ECDocumentIDNamespace
     let id: Int
-    let span: SourceSpan
+    let span: PositionSpan
 }
 
 enum ECEditorParenContext: Sendable {
@@ -39,7 +40,7 @@ enum ECEditorParenContext: Sendable {
 
 @inline(__always)
 func ecStartsBeforeOrAt(
-    _ span: SourceSpan,
+    _ span: PositionSpan,
     line: Int,
     column: Int
 ) -> Bool {
@@ -396,7 +397,7 @@ func ecFieldNameBeforeCursor(
 
 func ecDocumentIDOccurrences(
     tokens: [EntryCompilerToken],
-    spans: [SourceSpan]
+    spans: [PositionSpan]
 ) -> [ECDocumentIDOccurrence] {
     var out: [ECDocumentIDOccurrence] = []
     var stack: [ECEditorBlockKind] = []

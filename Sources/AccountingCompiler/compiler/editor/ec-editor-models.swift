@@ -1,6 +1,7 @@
 import Accounting
 import AccountingParsers
 import Foundation
+import Position
 
 public enum ECSymbolKind: String, Sendable, Codable {
     case keyword
@@ -16,12 +17,12 @@ public enum ECSymbolKind: String, Sendable, Codable {
 public struct ECSymbolOccurrence: Sendable, Codable, Hashable {
     public let kind: ECSymbolKind
     public let text: String
-    public let span: SourceSpan
+    public let span: PositionSpan
 
     public init(
         kind: ECSymbolKind,
         text: String,
-        span: SourceSpan
+        span: PositionSpan
     ) {
         self.kind = kind
         self.text = text
@@ -39,13 +40,13 @@ public struct ECDocumentDiagnostic: Sendable, Codable, Hashable {
     public let severity: ECDocumentDiagnosticSeverity
     public let code: String
     public let message: String
-    public let span: SourceSpan
+    public let span: PositionSpan
 
     public init(
         severity: ECDocumentDiagnosticSeverity,
         code: String,
         message: String,
-        span: SourceSpan
+        span: PositionSpan
     ) {
         self.severity = severity
         self.code = code
@@ -58,7 +59,7 @@ public struct ECDocumentAnalysis: Sendable {
     public let source: String
     public let flavor: EntryCompilerLexingFlavor
     public let tokens: [EntryCompilerToken]
-    public let spans: [SourceSpan]
+    public let spans: [PositionSpan]
     public let diagnostics: [ECDocumentDiagnostic]
     public let occurrences: [ECSymbolOccurrence]
 
@@ -66,7 +67,7 @@ public struct ECDocumentAnalysis: Sendable {
         source: String,
         flavor: EntryCompilerLexingFlavor,
         tokens: [EntryCompilerToken],
-        spans: [SourceSpan],
+        spans: [PositionSpan],
         diagnostics: [ECDocumentDiagnostic],
         occurrences: [ECSymbolOccurrence]
     ) {

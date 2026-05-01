@@ -1,5 +1,6 @@
 import Foundation
 import Accounting
+import Position
 
 public enum EntryCompilerDetailsState: Sendable {
     case none
@@ -30,7 +31,7 @@ public protocol EntryCompilerLexing: Sendable {
     var referenceState: EntryCompilerReferenceState { get set }
 
     var diagnostics: [EntryCompilerLexDiagnostic] { get set }
-    var lastTokenSpan: SourceSpan? { get set }
+    var lastTokenSpan: PositionSpan? { get set }
 
     mutating func nextToken() -> EntryCompilerToken
 }

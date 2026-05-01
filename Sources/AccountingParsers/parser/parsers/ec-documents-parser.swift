@@ -1,5 +1,6 @@
 import Foundation
 import Accounting
+import Position
 
 public final class ECDocumentFileParser: EntryCompilerParsing {
     public var core: EntryCompilerParserCore
@@ -21,7 +22,7 @@ public final class ECDocumentFileParser: EntryCompilerParsing {
         defaultTimeZone: TimeZone,
         fileURL: URL? = nil,
         lineMap: [Int]? = nil,
-        spanMap: [SourceSpan]? = nil,
+        spanMap: [PositionSpan]? = nil,
         verbose: Bool = false
     ) {
         self.init(

@@ -1,5 +1,6 @@
 import Foundation
 import Accounting
+import Position
 
 public extension EntryCompilerLexing {
     mutating func resetLexingState() {
@@ -21,15 +22,23 @@ public extension EntryCompilerLexing {
         resetLexingState()
 
         var tokens: [EntryCompilerToken] = []
-        var spans: [SourceSpan] = []
+        var spans: [PositionSpan] = []
 
         while true {
             let token = nextToken()
             tokens.append(token)
 
-            let fallback = SourceSpan(
-                start: SourceLocation(line: line, column: column),
-                end: SourceLocation(line: line, column: column)
+            let fallback = PositionSpan(
+                uncheckedStart: Position(
+                    uncheckedFile: nil,
+                    line: line,
+                    column: column
+                ),
+                uncheckedEnd: Position(
+                    uncheckedFile: nil,
+                    line: line,
+                    column: column
+                )
             )
 
             spans.append(lastTokenSpan ?? fallback)

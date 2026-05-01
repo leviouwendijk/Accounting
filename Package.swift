@@ -45,6 +45,7 @@ let package = Package(
         .package(url: "https://github.com/leviouwendijk/Interfaces.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Arguments.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Difference.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Position.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/TestFlows.git", branch: "master"),
     ],
     targets: [
@@ -88,6 +89,7 @@ let package = Package(
                 .product(name: "Writers", package: "Writers"),
                 .product(name: "Terminal", package: "Terminal"),
                 .product(name: "Arguments", package: "Arguments"),
+                .product(name: "Position", package: "Position"),
             ],
         ),
         .target(

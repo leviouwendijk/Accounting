@@ -1,6 +1,7 @@
 import Accounting
 import AccountingParsers
 import Foundation
+import Position
 
 public enum AccountStoreLoader {
     /// Loads project-local account defs (currently parsed but not applied) and returns an AccountStore.
@@ -56,7 +57,13 @@ public enum AccountStoreLoader {
 
         // remove RGSAccount fallback until further notice
         // require use of JSON chart of accounts (config/resources/rgs/v#_#.json)
-        throw AccountStoreError.empty(at: SourceLocation(file: compiledChartURL.path, line: 0, column: 0))
+        throw AccountStoreError.empty(
+            at: Position(
+                uncheckedFile: compiledChartURL.path,
+                line: 0,
+                column: 0
+            )
+        )
     }
 
     // Convenience shims for node-backed API only

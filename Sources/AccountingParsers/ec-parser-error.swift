@@ -1,10 +1,11 @@
 import Foundation
 import Accounting
+import Position
 
 public enum ParserError: Error, CustomStringConvertible {
-    case unexpectedToken(EntryCompilerToken, expected: String, at: SourceLocation)
-    case unterminatedBlock(SourceLocation)
-    case deprecatedPathSegment(segment: String, suggestion: String, at: SourceLocation)
+    case unexpectedToken(EntryCompilerToken, expected: String, at: Position)
+    case unterminatedBlock(Position)
+    case deprecatedPathSegment(segment: String, suggestion: String, at: Position)
 
     public var description: String {
         switch self {

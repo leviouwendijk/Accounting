@@ -1,4 +1,5 @@
 import Foundation
+import Position
 
 public struct ResolvedLine: Hashable, Codable, Sendable {
     public let entity: EntityKey
@@ -7,7 +8,7 @@ public struct ResolvedLine: Hashable, Codable, Sendable {
     public let amount: Decimal
     public let adjustment: InventoryAdjustment?
 
-    public let location: SourceLocation?
+    public let location: Position?
     
     public init(
         entity: EntityKey,
@@ -16,7 +17,7 @@ public struct ResolvedLine: Hashable, Codable, Sendable {
         amount: Decimal,
         adjustment: InventoryAdjustment?,
 
-        location: SourceLocation? = nil
+        location: Position? = nil
     ) {
         self.entity = entity
         self.account = account
@@ -38,7 +39,7 @@ public struct ResolvedEntry: Hashable, Codable, Sendable {
     public var transactionReferences: [TransactionKey]
     public var vat: VATAnnotation?
 
-    public var location: SourceLocation?
+    public var location: Position?
     public var mistake: Mistake?
     public var select: EntrySelect?
     public var verbose: Bool
@@ -54,7 +55,7 @@ public struct ResolvedEntry: Hashable, Codable, Sendable {
         transactionReferences: [TransactionKey],
         vat: VATAnnotation? = nil,
 
-        location: SourceLocation? = nil,
+        location: Position? = nil,
         mistake: Mistake? = nil,
         select: EntrySelect? = nil,
         verbose: Bool = false

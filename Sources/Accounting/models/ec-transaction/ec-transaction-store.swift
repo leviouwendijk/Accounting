@@ -1,4 +1,5 @@
 import Foundation
+import Position
 
 public struct TransactionStore: Codable, Sendable {
     public let byID: [TransactionKey: Transaction]
@@ -16,7 +17,7 @@ public struct TransactionStore: Codable, Sendable {
     }
 
     @inlinable
-    public func resolve(id: Int, at loc: SourceLocation?) throws -> Transaction {
+    public func resolve(id: Int, at loc: Position?) throws -> Transaction {
         guard let t = byID[TransactionKey(id)] else {
             throw TransactionStoreError.notFound(id: id, at: loc)
         }
@@ -24,7 +25,7 @@ public struct TransactionStore: Codable, Sendable {
     }
 
     @inlinable
-    public func resolveAll(ids: [Int], at loc: SourceLocation?) throws -> [TransactionKey] {
+    public func resolveAll(ids: [Int], at loc: Position?) throws -> [TransactionKey] {
         try ids.map { i in
             guard byID[TransactionKey(i)] != nil else {
                 throw TransactionStoreError.notFound(id: i, at: loc)

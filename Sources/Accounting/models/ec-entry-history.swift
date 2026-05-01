@@ -1,5 +1,6 @@
 import Foundation
 import Primitives
+import Position
 
 public enum EntryHistoryEventKind: String, Hashable, Codable, Sendable, StringParsableEnum {
     case recorded
@@ -11,13 +12,13 @@ public struct EntryHistoryEvent: Hashable, Codable, Sendable {
     public var kind: EntryHistoryEventKind
     public var date: DateSpecification
     public var details: String?
-    public var location: SourceLocation?
+    public var location: Position?
 
     public init(
         kind: EntryHistoryEventKind,
         date: DateSpecification,
         details: String? = nil,
-        location: SourceLocation? = nil
+        location: Position? = nil
     ) {
         self.kind = kind
         self.date = date

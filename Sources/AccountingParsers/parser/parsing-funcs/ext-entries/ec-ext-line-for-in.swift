@@ -1,8 +1,9 @@
 import Foundation
 import Accounting
+import Position
 
 public extension EntryCompilerParsing {
-    func parseLineBody(entity: EntityRef, account: AccountRef, at lineLoc: SourceLocation?) throws -> Line {
+    func parseLineBody(entity: EntityRef, account: AccountRef, at lineLoc: Position?) throws -> Line {
         try expect(.lBrace)
 
         var direction: Direction?

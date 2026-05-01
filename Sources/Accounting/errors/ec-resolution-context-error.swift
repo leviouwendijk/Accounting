@@ -1,11 +1,12 @@
 import Foundation
+import Position
 
 public struct ResolutionContextError: Error, CustomStringConvertible, Sendable {
     public let entryID: Int?
-    public let location: SourceLocation?
+    public let location: Position?
     public let underlying: Error
 
-    public init(entryID: Int?, location: SourceLocation?, underlying: Error) {
+    public init(entryID: Int?, location: Position?, underlying: Error) {
         self.entryID = entryID
         self.location = location
         self.underlying = underlying

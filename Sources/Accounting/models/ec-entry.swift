@@ -1,5 +1,6 @@
 import Foundation
 import Primitives
+import Position
 
 public enum EntrySort: String, RawRepresentable, Hashable, Codable, Sendable, StringParsableEnum {
     case regular
@@ -17,7 +18,7 @@ public struct Entry: Hashable, Codable, Sendable {
     public var transactionReferences: [Int]
     public var vat: VATAnnotation? = nil
     public var metadata: [String: String] = [:]
-    public var location: SourceLocation?
+    public var location: Position?
     public var mistake: Mistake? = nil
     public var select: EntrySelect? = nil
     public var verbose: Bool = false
@@ -33,7 +34,7 @@ public struct Entry: Hashable, Codable, Sendable {
         transactionReferences: [Int] = [],
         vat: VATAnnotation? = nil,
         metadata: [String: String] = [:],
-        location: SourceLocation? = nil,
+        location: Position? = nil,
         mistake: Mistake? = nil,
         select: EntrySelect? = nil,
         verbose: Bool = false
@@ -81,7 +82,7 @@ public struct Entry: Hashable, Codable, Sendable {
             kind: String? = nil,
             value: String? = nil,
             loweredAlias: String? = nil,
-            at location: SourceLocation? = nil
+            at location: Position? = nil
         ) {
             matches.append("! WARNING: Placeholder detected")
             if let kind {

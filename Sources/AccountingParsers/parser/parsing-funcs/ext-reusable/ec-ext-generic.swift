@@ -1,11 +1,12 @@
 import Foundation
 import Accounting
+import Position
 
 public extension EntryCompilerParsing {
     @inline(__always) var current: EntryCompilerToken { core.current }
     @inline(__always) func advance() { var c = core; c.advance(); core = c }
     @inline(__always) func expect(_ t: EntryCompilerToken) throws { var c = core; try c.expect(t); core = c }
-    @inline(__always) func loc() -> SourceLocation { core.currentLocation() }
+    @inline(__always) func loc() -> Position { core.currentLocation() }
 
     func beginBlock() throws { try expect(.lBrace) }
     func endBlock()   throws { try expect(.rBrace)  }

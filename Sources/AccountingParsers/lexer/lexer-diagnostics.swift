@@ -1,5 +1,6 @@
 import Foundation
 import Accounting
+import Position
 
 public enum EntryCompilerLexDiagnosticSeverity: String, Codable, Sendable {
     case error
@@ -18,14 +19,14 @@ public struct EntryCompilerLexDiagnostic: CustomStringConvertible, Codable, Send
     public let severity: EntryCompilerLexDiagnosticSeverity
     public let kind: EntryCompilerLexDiagnosticKind
     public let message: String
-    public let span: SourceSpan
+    public let span: PositionSpan
     public let lexeme: String?
 
     public init(
         severity: EntryCompilerLexDiagnosticSeverity,
         kind: EntryCompilerLexDiagnosticKind,
         message: String,
-        span: SourceSpan,
+        span: PositionSpan,
         lexeme: String? = nil
     ) {
         self.severity = severity
@@ -42,12 +43,12 @@ public struct EntryCompilerLexDiagnostic: CustomStringConvertible, Codable, Send
 
 public struct EntryCompilerLexResult: Sendable {
     public let tokens: [EntryCompilerToken]
-    public let spans: [SourceSpan]
+    public let spans: [PositionSpan]
     public let diagnostics: [EntryCompilerLexDiagnostic]
 
     public init(
         tokens: [EntryCompilerToken],
-        spans: [SourceSpan],
+        spans: [PositionSpan],
         diagnostics: [EntryCompilerLexDiagnostic]
     ) {
         self.tokens = tokens

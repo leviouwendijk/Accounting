@@ -1,4 +1,5 @@
 import Foundation
+import Position
 
 public enum EntryResolutionPass {
     public static func resolve(
@@ -140,7 +141,7 @@ private func liquidAccountKind(
 private func validateEntityAccountIntersection(
     entity: EntityDef,
     account node: RGSNode,
-    at loc: SourceLocation?
+    at loc: Position?
 ) throws {
     guard
         let entityKind = liquidEntityKind(from: entity),

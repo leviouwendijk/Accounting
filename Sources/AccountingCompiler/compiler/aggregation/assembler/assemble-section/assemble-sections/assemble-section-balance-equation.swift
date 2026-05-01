@@ -35,8 +35,10 @@ public struct BalanceEquation: Sendable {
 }
 
 extension RGSAssembler {
-    public static func equation(from alpha: BalanceAlphaSections,
-                         maps: RGSAssemblerResult) throws -> BalanceEquation {
+    public static func equation(
+        from alpha: BalanceAlphaSections,
+        maps: RGSAssemblerResult
+    ) throws -> BalanceEquation {
         let A = try resolveSectionRoot("A", maps: maps)
         let J = try resolveSectionRoot("J", maps: maps)
         let K = try resolveSectionRoot("K", maps: maps)

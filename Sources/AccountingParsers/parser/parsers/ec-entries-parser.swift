@@ -1,5 +1,6 @@
 import Foundation
 import Accounting
+import Position
 // import plate
 
 public final class EntryCompilerEntriesParser: EntryCompilerParsing {
@@ -19,7 +20,7 @@ public final class EntryCompilerEntriesParser: EntryCompilerParsing {
         defaultTimeZone: TimeZone,
         fileURL: URL? = nil,
         lineMap: [Int]? = nil,
-        spanMap: [SourceSpan]? = nil,
+        spanMap: [PositionSpan]? = nil,
         verbose: Bool = false
     ) {
         self.init(

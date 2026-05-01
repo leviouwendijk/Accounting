@@ -1,6 +1,7 @@
 import Accounting
 import AccountingParsers
 import Foundation
+import Position
 
 public enum ECEditorService {
     public static func analyzeDocument(
@@ -250,7 +251,7 @@ internal extension ECEditorService {
     ) -> (
         raw: String,
         ref: EntityRef,
-        start: SourceLocation
+        start: Position
     )? {
         guard analysis.tokens.indices.contains(index) else {
             return nil
@@ -351,7 +352,7 @@ internal extension ECEditorService {
 
     static func hoverEntity(
         _ raw: String,
-        at loc: SourceLocation,
+        at loc: Position,
         workspace: ECWorkspaceIndex
     ) -> ECHoverResult {
         let ref = parseFlexibleEntityRef(raw)
@@ -372,7 +373,7 @@ internal extension ECEditorService {
     static func hoverEntity(
         _ ref: EntityRef,
         raw: String,
-        at loc: SourceLocation,
+        at loc: Position,
         workspace: ECWorkspaceIndex
     ) -> ECHoverResult {
         do {
@@ -408,7 +409,7 @@ internal extension ECEditorService {
 
     static func hoverAccount(
         _ raw: String,
-        at loc: SourceLocation,
+        at loc: Position,
         workspace: ECWorkspaceIndex
     ) -> ECHoverResult {
         do {
@@ -454,7 +455,7 @@ internal extension ECEditorService {
 
     static func hoverTransaction(
         _ id: Int,
-        at loc: SourceLocation,
+        at loc: Position,
         workspace: ECWorkspaceIndex
     ) -> ECHoverResult {
         do {
@@ -489,7 +490,7 @@ internal extension ECEditorService {
 extension ECEditorService {
     static func definitionEntity(
         _ raw: String,
-        at loc: SourceLocation,
+        at loc: Position,
         workspace: ECWorkspaceIndex
     ) -> ECDefinitionResult? {
         let ref = parseFlexibleEntityRef(raw)
@@ -508,7 +509,7 @@ extension ECEditorService {
 
     static func definitionEntity(
         _ ref: EntityRef,
-        at loc: SourceLocation,
+        at loc: Position,
         workspace: ECWorkspaceIndex
     ) -> ECDefinitionResult? {
         do {
@@ -525,7 +526,7 @@ extension ECEditorService {
 
     static func definitionAccount(
         _ raw: String,
-        at loc: SourceLocation,
+        at loc: Position,
         workspace: ECWorkspaceIndex
     ) -> ECDefinitionResult? {
         do {

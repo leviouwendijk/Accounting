@@ -1,5 +1,6 @@
 import Foundation
 import Accounting
+import Position
 
 public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
     public let scalars: [UnicodeScalar]
@@ -15,7 +16,7 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
     public var lastConsumedColumn: Int = 0
 
     public var diagnostics: [EntryCompilerLexDiagnostic] = []
-    public var lastTokenSpan: SourceSpan?
+    public var lastTokenSpan: PositionSpan?
 
     public let lexingSets: EntryCompilerLexingSets
 
@@ -45,10 +46,18 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
         startColumn: Int,
         endLine: Int,
         endColumn: Int
-    ) -> SourceSpan {
-        SourceSpan(
-            start: SourceLocation(line: startLine, column: startColumn),
-            end: SourceLocation(line: endLine, column: endColumn)
+    ) -> PositionSpan {
+        PositionSpan(
+            uncheckedStart: Position(
+                uncheckedFile: nil,
+                line: startLine,
+                column: startColumn
+            ),
+            uncheckedEnd: Position(
+                uncheckedFile: nil,
+                line: endLine,
+                column: endColumn
+            )
         )
     }
 
@@ -95,9 +104,14 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
         endColumn: Int? = nil,
         lexeme: String? = nil
     ) {
-        let span = SourceSpan(
-            start: SourceLocation(line: startLine, column: startColumn),
-            end: SourceLocation(
+        let span = PositionSpan(
+            uncheckedStart: Position(
+                uncheckedFile: nil,
+                line: startLine,
+                column: startColumn
+            ),
+            uncheckedEnd: Position(
+                uncheckedFile: nil,
                 line: endLine ?? startLine,
                 column: endColumn ?? startColumn
             )

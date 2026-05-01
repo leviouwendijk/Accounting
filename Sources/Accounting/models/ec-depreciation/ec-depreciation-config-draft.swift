@@ -1,4 +1,5 @@
 import Foundation
+import Position
 
 public struct DepreciationConfigDraft: Sendable, Codable {
     // @available(*, deprecated, message: "Use entity.unit.profile.commission_date instead.")
@@ -36,7 +37,7 @@ public struct DepreciationConfigDraft: Sendable, Codable {
         for key: EntityKey,
         entity: EntityDef,
         accounts: AccountStore,
-        at loc: SourceLocation? = nil
+        at loc: Position? = nil
     ) throws -> DepreciationConfig {
         let expenseNode = try accounts.resolve(accountRef, at: loc)
         let expense = AccountKey(expenseNode.codes.code)

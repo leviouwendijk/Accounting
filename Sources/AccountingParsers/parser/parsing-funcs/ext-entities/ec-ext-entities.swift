@@ -1,6 +1,7 @@
 import Foundation
 import Accounting
 import plate
+import Position
 
 public extension EntryCompilerParsing {
     @inlinable
@@ -322,7 +323,7 @@ public extension EntryCompilerParsing {
         collapses: Bool,
         ownerEquity: OwnerEquity?,
         timeZone: TimeZone,
-        at location: SourceLocation,
+        at location: Position,
     ) throws {
         guard collapses, let ownerEquity else {
             return

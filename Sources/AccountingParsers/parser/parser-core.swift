@@ -1,5 +1,6 @@
 import Foundation
 import Accounting
+import Position
 
 public struct EntryCompilerParserCore: Sendable {
     internal var tokens: [EntryCompilerToken]
@@ -7,7 +8,7 @@ public struct EntryCompilerParserCore: Sendable {
 
     internal var filePath: String?
     internal var lineMap: [Int]?
-    internal var spanMap: [SourceSpan]?
+    internal var spanMap: [PositionSpan]?
     internal var callSiteStack: [InvocationCallSite] = []
 
     public var verbose: Bool
@@ -16,7 +17,7 @@ public struct EntryCompilerParserCore: Sendable {
         tokens: [EntryCompilerToken],
         filePath: String? = nil,
         lineMap: [Int]? = nil,
-        spanMap: [SourceSpan]? = nil,
+        spanMap: [PositionSpan]? = nil,
         verbose: Bool = false
     ) {
         self.tokens = tokens
@@ -54,18 +55,25 @@ public struct EntryCompilerParserCore: Sendable {
         advance()
     }
 
-    public func currentLocation() -> SourceLocation {
+    public func currentLocation() -> Position {
         if let spanMap {
             let i = min(index, max(spanMap.count - 1, 0))
-            let span = spanMap.isEmpty
-                ? SourceSpan(
-                    start: SourceLocation(line: 1, column: 1),
-                    end: SourceLocation(line: 1, column: 1)
+            // let span = spanMap.isEmpty
+            //     ? PositionSpan(
+            //         start: Position(line: 1, column: 1),
+            //         end: Position(line: 1, column: 1)
+            //     )
+            //     : spanMap[i]
+            let span =
+                spanMap.isEmpty
+                ? PositionSpan(
+                    uncheckedStart: Position(uncheckedFile: nil, line: 1, column: 1),
+                    uncheckedEnd: Position(uncheckedFile: nil, line: 1, column: 1)
                 )
                 : spanMap[i]
 
-            return SourceLocation(
-                file: filePath ?? span.start.file,
+            return Position(
+                uncheckedFile: filePath ?? span.start.file,
                 line: span.start.line,
                 column: span.start.column,
                 invocation: callSiteStack.last
@@ -77,8 +85,8 @@ public struct EntryCompilerParserCore: Sendable {
             return map.isEmpty ? 1 : map[i]
         } ?? max(index, 1)
 
-        return SourceLocation(
-            file: filePath,
+        return Position(
+            uncheckedFile: filePath,
             line: line,
             column: 1,
             invocation: callSiteStack.last
@@ -149,12 +157,12 @@ public struct EntryCompilerParserCore: Sendable {
 //         advance()
 //     }
 
-//     public func currentLocation() -> SourceLocation {
+//     public func currentLocation() -> Position {
 //         let line = lineMap.flatMap { map in
 //             let i = min(index, max(map.count - 1, 0))
 //             return map.isEmpty ? 1 : map[i]
 //         } ?? max(index, 1)
-//         return SourceLocation(file: filePath, line: line, column: 1, invocation: callSiteStack.last)
+//         return Position(file: filePath, line: line, column: 1, invocation: callSiteStack.last)
 //     }
 
 //     public mutating func pushCallSite(_ site: InvocationCallSite) { callSiteStack.append(site) }
