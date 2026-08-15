@@ -8,6 +8,14 @@ enum AccountingTestFlowsSuite: TestFlowRegistry {
         compilerProjectModelFlow,
         lspAccountingSurfaceFlow,
         parsingLexingSetsFlow,
+
+        entryGrammarFlow,
+        vatGrammarFlow,
+        entityGrammarFlow,
+        transactionGrammarFlow,
+        entityStoreResolutionFlow,
+        transactionStoreInvariantFlow,
+
         entryCoreFlow,
     ]
 }

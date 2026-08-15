@@ -3,12 +3,12 @@
   "failed_names" : [
 
   ],
-  "generated_at" : "2026-05-01T00:07:54Z",
-  "passed" : 5,
+  "generated_at" : "2026-08-15T11:00:55Z",
+  "passed" : 11,
   "results" : [
     {
       "display_name" : "argument-surface",
-      "duration_seconds" : 0.07472491264343262,
+      "duration_seconds" : 0.050237059593200684,
       "name" : "argument-surface",
       "status" : "passed",
       "tags" : [
@@ -20,7 +20,7 @@
     },
     {
       "display_name" : "compiler-project-model",
-      "duration_seconds" : 0.0024290084838867188,
+      "duration_seconds" : 0.0036759376525878906,
       "name" : "compiler-project-model",
       "status" : "passed",
       "tags" : [
@@ -31,7 +31,7 @@
     },
     {
       "display_name" : "lsp-accounting-surface",
-      "duration_seconds" : 0.0004360675811767578,
+      "duration_seconds" : 0.0006760358810424805,
       "name" : "lsp-accounting-surface",
       "status" : "passed",
       "tags" : [
@@ -42,7 +42,7 @@
     },
     {
       "display_name" : "parsing-lexing-sets",
-      "duration_seconds" : 0.00023293495178222656,
+      "duration_seconds" : 0.00033402442932128906,
       "name" : "parsing-lexing-sets",
       "status" : "passed",
       "tags" : [
@@ -52,8 +52,74 @@
       ]
     },
     {
+      "display_name" : "accounting-entry-grammar",
+      "duration_seconds" : 0.004200935363769531,
+      "name" : "accounting-entry-grammar",
+      "status" : "passed",
+      "tags" : [
+        "accounting",
+        "entry",
+        "parser"
+      ]
+    },
+    {
+      "display_name" : "accounting-vat-grammar",
+      "duration_seconds" : 0.0032140016555786133,
+      "name" : "accounting-vat-grammar",
+      "status" : "passed",
+      "tags" : [
+        "accounting",
+        "parser",
+        "vat"
+      ]
+    },
+    {
+      "display_name" : "accounting-entity-grammar",
+      "duration_seconds" : 0.0020519495010375977,
+      "name" : "accounting-entity-grammar",
+      "status" : "passed",
+      "tags" : [
+        "accounting",
+        "entity",
+        "parser"
+      ]
+    },
+    {
+      "display_name" : "accounting-transaction-grammar",
+      "duration_seconds" : 0.002022981643676758,
+      "name" : "accounting-transaction-grammar",
+      "status" : "passed",
+      "tags" : [
+        "accounting",
+        "parser",
+        "transaction"
+      ]
+    },
+    {
+      "display_name" : "accounting-entity-store-resolution",
+      "duration_seconds" : 0.003314971923828125,
+      "name" : "accounting-entity-store-resolution",
+      "status" : "passed",
+      "tags" : [
+        "accounting",
+        "entity",
+        "resolution"
+      ]
+    },
+    {
+      "display_name" : "accounting-transaction-store-invariants",
+      "duration_seconds" : 0.002515077590942383,
+      "name" : "accounting-transaction-store-invariants",
+      "status" : "passed",
+      "tags" : [
+        "accounting",
+        "store",
+        "transaction"
+      ]
+    },
+    {
       "display_name" : "accounting-entry-core",
-      "duration_seconds" : 0.0005099773406982422,
+      "duration_seconds" : 0.00032198429107666016,
       "name" : "accounting-entry-core",
       "status" : "passed",
       "tags" : [
@@ -66,5 +132,5 @@
   ],
   "skipped" : 0,
   "title" : "Accounting test flows",
-  "total" : 5
+  "total" : 11
 }
