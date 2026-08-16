@@ -1,9 +1,10 @@
 import Foundation
+import struct Primitives.DayOfMonth
 import plate
 
 public enum DateSpecification: Hashable, Codable, Sendable, Equatable {
     case absolute(Date)
-    case infer(day: Int)
+    case infer(day: DayOfMonth)
 
     private enum CodingKeys: String, CodingKey { case absolute, infer }
     private enum LegacyAbsoluteKey: String, CodingKey { case _0 }
@@ -15,7 +16,7 @@ public enum DateSpecification: Hashable, Codable, Sendable, Equatable {
             let iso = ISO8601DateFormatter()
             try c.encode(iso.string(from: date), forKey: .absolute)
         case .infer(let day):
-            try c.encode(day, forKey: .infer)   // <— number, not {"day": …}
+            try c.encode(day.value, forKey: .infer)   // <— number, not {"day": …}
         }
     }
 
@@ -36,12 +37,45 @@ public enum DateSpecification: Hashable, Codable, Sendable, Equatable {
         }
 
         if c.contains(.infer) {
-            if let day = try? c.decode(Int.self, forKey: .infer) {
-                self = .infer(day: day); return
+            let day: Int?
+
+            if let direct =
+                try? c.decode(
+                    Int.self,
+                    forKey: .infer
+                )
+            {
+                day = direct
+            } else if
+                let object =
+                    try? c.decode(
+                        [String: Int].self,
+                        forKey: .infer
+                    )
+            {
+                day = object["day"]
+            } else {
+                day = nil
             }
-            if let obj = try? c.decode([String:Int].self, forKey: .infer),
-               let day = obj["day"] {
-                self = .infer(day: day); return
+
+            if let day {
+                do {
+                    self = .infer(
+                        day: try DayOfMonth(
+                            day
+                        )
+                    )
+
+                    return
+                } catch {
+                    throw DecodingError
+                        .dataCorruptedError(
+                            forKey: .infer,
+                            in: c,
+                            debugDescription:
+                                "Invalid inferred day: \(day)"
+                        )
+                }
             }
         }
 
@@ -68,10 +102,14 @@ public enum DateSpecification: Hashable, Codable, Sendable, Equatable {
             var comps = DateComponents()
             comps.year = year
             comps.month = month
-            comps.day = day
+            comps.day = day.value
 
             guard let d = cal.date(from: comps) else {
-                throw EntryDateInferenceError.badDay(year, month, day)
+                throw EntryDateInferenceError.badDay(
+                    year,
+                    month,
+                    day.value
+                )
             }
             return .absolute(d)
         }

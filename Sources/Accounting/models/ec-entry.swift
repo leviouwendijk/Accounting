@@ -142,7 +142,7 @@ public struct Entry: Hashable, Codable, Sendable {
             case .absolute(let d):
                 return fmt.string(from: d)
             case .infer(let day):
-                return "inferred-day \(day)"
+                return "inferred-day \(day.value)"
             }
         }
 

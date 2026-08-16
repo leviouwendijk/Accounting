@@ -1,6 +1,7 @@
 import Foundation
 import Accounting
 import Position
+import struct Primitives.DayOfMonth
 
 public extension EntryCompilerParsing {
     @inlinable
@@ -44,7 +45,14 @@ public extension EntryCompilerParsing {
             }
             let day = (n as NSDecimalNumber).intValue
             advance()
-            return (matched, .infer(day: day))
+            return (
+                matched,
+                .infer(
+                    day: try DayOfMonth(
+                        day
+                    )
+                )
+            )
         }
 
         switch current {
