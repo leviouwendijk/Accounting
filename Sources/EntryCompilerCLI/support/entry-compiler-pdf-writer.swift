@@ -11,7 +11,7 @@ enum EntryCompilerPDFWriter {
         filename: String,
         html: String,
         margins: Double
-    ) throws {
+    ) async throws {
         let project = EntryCompilerProject(
             root: root
         )
@@ -31,7 +31,7 @@ enum EntryCompilerPDFWriter {
             )
         )
 
-        try html.weasyPDF(
+        try await html.weasyPDF(
             css: css,
             destination: outDir
                 .appendingPathComponent(

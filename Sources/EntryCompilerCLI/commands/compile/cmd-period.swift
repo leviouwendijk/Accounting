@@ -137,7 +137,7 @@ enum PeriodCommandRunner {
 
         let slug = native.assembled.current.range.filenameSlug()
 
-        try EntryCompilerPDFWriter.write(
+        try await EntryCompilerPDFWriter.write(
             root: context.root,
             filename: "\(slug).pdf",
             html: html,

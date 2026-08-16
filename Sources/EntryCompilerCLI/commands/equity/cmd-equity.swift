@@ -248,7 +248,7 @@ enum EquityCommandRunner {
         .compactMap { $0 }
         .joined(separator: "-")
 
-        try EntryCompilerPDFWriter.write(
+        try await EntryCompilerPDFWriter.write(
             root: context.root,
             filename: "\(slug).pdf",
             html: html,

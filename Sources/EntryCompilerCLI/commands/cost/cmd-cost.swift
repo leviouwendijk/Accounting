@@ -80,7 +80,7 @@ enum CostCommand: ArgumentCommand {
                 )
             )
 
-            try EntryCompilerPDFWriter.write(
+            try await EntryCompilerPDFWriter.write(
                 root: context.root,
                 filename: "\(current.assembled.current.range.filenameSlug())-cost-breakdown.pdf",
                 html: html,

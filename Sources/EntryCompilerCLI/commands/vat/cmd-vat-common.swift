@@ -56,8 +56,8 @@ extension VATCommand {
         filename: String,
         html: String,
         margins: Double
-    ) throws {
-        try EntryCompilerPDFWriter.write(
+    ) async throws {
+        try await EntryCompilerPDFWriter.write(
             root: root,
             filename: filename,
             html: html,

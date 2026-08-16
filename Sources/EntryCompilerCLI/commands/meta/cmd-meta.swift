@@ -184,7 +184,7 @@ enum MetaCommand: ArgumentCommand {
 
             let slug = "\(report.period.assembled.current.range.filenameSlug())-meta-audit"
 
-            try EntryCompilerPDFWriter.write(
+            try await EntryCompilerPDFWriter.write(
                 root: context.root,
                 filename: "\(slug).pdf",
                 html: html,

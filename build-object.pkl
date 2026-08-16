@@ -12,7 +12,7 @@ versions {
 }
 compile {
     use = true
-    arguments { "--targets" "ec" "eclsp" "ecvparity" }
+    arguments { "--products" "ec" "eclsp" "ecvparity" }
 }
 details = ""
 author = "leviouwendijk"

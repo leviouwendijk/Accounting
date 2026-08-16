@@ -219,7 +219,7 @@ enum DocumentCommand: ArgumentCommand {
                         options: safeWriteOptions
                     )
 
-                    try renderedHTML.weasyPDF(
+                    try await renderedHTML.weasyPDF(
                         css: CSSPageSetting(
                             margins: CSSMargins(options.margins)
                         ),

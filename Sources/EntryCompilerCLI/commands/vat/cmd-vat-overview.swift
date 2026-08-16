@@ -81,7 +81,7 @@ extension VATCommand {
                 calendar: calendar
             )
 
-            try VATCommand.writePDF(
+            try await VATCommand.writePDF(
                 root: context.root,
                 filename: "vat-\(slug).pdf",
                 html: html,

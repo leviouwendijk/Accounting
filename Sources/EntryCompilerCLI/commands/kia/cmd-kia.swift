@@ -108,7 +108,7 @@ enum KIACommand: ArgumentCommand {
                 currencySymbol: "€"
             )
 
-            try EntryCompilerPDFWriter.write(
+            try await EntryCompilerPDFWriter.write(
                 root: root,
                 filename: "kia-\(resolvedYear).pdf",
                 html: html,
