@@ -16,6 +16,11 @@ enum AccountingTestFlowsSuite: TestFlowRegistry {
         entityStoreResolutionFlow,
         transactionStoreInvariantFlow,
 
+        entryResolutionFlow,
+        rgsIndexFlow,
+        canonicalRootsFlow,
+        compilerFixtureFlow,
+
         entryCoreFlow,
     ]
 }
