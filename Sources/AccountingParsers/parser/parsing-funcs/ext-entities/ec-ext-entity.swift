@@ -8,13 +8,13 @@ public extension EntryCompilerParsing {
     func makeEntityRef(from segs: [String]) throws -> EntityRef {
         switch segs.count {
         case 1:
-            return .init(class: nil, family: nil, alias: EntityAlias.parse(segs[0]))
+            return .init(class: nil, family: nil, alias: try EntityAlias.parse(segs[0]))
 
         case 2:
-            return .init(class: segs[0], family: nil, alias: EntityAlias.parse(segs[1]))
+            return .init(class: segs[0], family: nil, alias: try EntityAlias.parse(segs[1]))
 
         case 3:
-            return .init(class: segs[0], family: segs[1], alias: EntityAlias.parse(segs[2]))
+            return .init(class: segs[0], family: segs[1], alias: try EntityAlias.parse(segs[2]))
 
         default:
             throw ParserError.unexpectedToken(
@@ -108,7 +108,7 @@ public extension EntryCompilerParsing {
         }
 
         try expect(.rPar)
-        return EntityRef(placeholder: EntityPlaceholder(kind))
+        return try EntityRef(placeholder: EntityPlaceholder(kind))
     }
 }
 

@@ -9,6 +9,7 @@ public enum EntryCompilerLexDiagnosticSeverity: String, Codable, Sendable {
 
 public enum EntryCompilerLexDiagnosticKind: String, Codable, Sendable {
     case invalidCharacter
+    case invalidNumberLiteral
     case unterminatedQuotedString
     case missingBlockOpeningBrace
     case unterminatedBlock

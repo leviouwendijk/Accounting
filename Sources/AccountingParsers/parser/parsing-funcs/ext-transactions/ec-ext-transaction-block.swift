@@ -26,7 +26,7 @@ public extension EntryCompilerParsing {
                 guard case let .number(n) = current else {
                     throw ParserError.unexpectedToken(current, expected: "number", at: loc())
                 }
-                id = (n as NSDecimalNumber).intValue
+                id = try exactInteger(n)
                 advance()
 
             case .ident("date"), .keyword("date"):

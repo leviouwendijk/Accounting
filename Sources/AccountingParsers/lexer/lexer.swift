@@ -362,9 +362,36 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
                     )
 
                 case .none, .awaitingEntityOpen, .awaitingAccountOpen, .entity:
-                    let number = readNumber()
+                    // Unicode decimal digits cannot be consumed by the ASCII number scanner.
+                    // Reject them explicitly and advance; otherwise lexing can loop forever.
+                    guard c.value >= 48 && c.value <= 57 else {
+                        let raw = readDigitsRaw()
+                        appendDiagnostic(
+                            kind: .invalidNumberLiteral,
+                            message: "numeric literal contains non-ASCII digits: '\(raw)'",
+                            startLine: startLine,
+                            startColumn: startColumn,
+                            endLine: lastConsumedLine,
+                            endColumn: lastConsumedColumn,
+                            lexeme: raw
+                        )
+                        continue
+                    }
+                    let number = readNumberResult()
+                    guard let value = number.value else {
+                        appendDiagnostic(
+                            kind: .invalidNumberLiteral,
+                            message: "invalid or unrepresentable numeric literal '\(number.raw)'",
+                            startLine: startLine,
+                            startColumn: startColumn,
+                            endLine: lastConsumedLine,
+                            endColumn: lastConsumedColumn,
+                            lexeme: number.raw
+                        )
+                        continue
+                    }
                     return emitToken(
-                        .number(number),
+                        .number(value),
                         startLine: startLine,
                         startColumn: startColumn
                     )

@@ -15,10 +15,10 @@ extension AccountingTestFlowsSuite {
             ]
         ) {
             Step("resolved entries balance and produce trial balance rows") {
-                let entity = EntityKey(
+                let entity = try EntityKey(
                     class: "owner",
                     family: "capital",
-                    alias: EntityAlias.parse("levi")
+                    alias: try EntityAlias.parse("levi")
                 )
 
                 let entry = ResolvedEntry(
@@ -27,14 +27,14 @@ extension AccountingTestFlowsSuite {
                     lines: [
                         ResolvedLine(
                             entity: entity,
-                            account: AccountKey("BLimBanRba"),
+                            account: try AccountKey("BLimBanRba"),
                             direction: .debit,
                             amount: 100,
                             adjustment: nil
                         ),
                         ResolvedLine(
                             entity: entity,
-                            account: AccountKey("BEivKapOndAow"),
+                            account: try AccountKey("BEivKapOndAow"),
                             direction: .credit,
                             amount: 100,
                             adjustment: nil

@@ -17,6 +17,7 @@ let package = Package(
             name: "AccountingLegacy",
             targets: ["AccountingLegacy"]
         ),
+
         .executable(
             name: "ec",
             targets: ["ec"]
@@ -29,13 +30,16 @@ let package = Package(
             name: "ecvparity",
             targets: ["ecvparity"]
         ),
+
+        // test
         .executable(
-            name: "acctest",
+            name: "t_accounting",
             targets: ["AccountingTestFlows"]
         ),
     ],
     dependencies: [
         .package(url: "https://github.com/leviouwendijk/plate.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Math.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Primitives.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Methods.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/HTML.git", branch: "master"),
@@ -82,6 +86,7 @@ let package = Package(
                 "Accounting",
                 "AccountingParsers",
                 .product(name: "plate", package: "plate"),
+                .product(name: "Math", package: "Math"),
                 .product(name: "Primitives", package: "Primitives"),
                 .product(name: "Methods", package: "Methods"),
                 .product(name: "HTML", package: "HTML"),
@@ -161,6 +166,34 @@ let package = Package(
                 .product(name: "Arguments", package: "Arguments"),
                 .product(name: "TestFlows", package: "TestFlows"),
             ],
+            path: "Testing/AccountingTestFlows"
         ),
     ]
 )
+
+for target in package.targets {
+    switch target.type {
+    case .regular, .executable, .test, .macro:
+        var settings = target.swiftSettings ?? []
+
+        settings.append(
+            .treatAllWarnings(as: .error)
+        )
+
+        settings.append(
+            .unsafeFlags(
+                [
+                    "-continue-building-after-errors"
+                ]
+            )
+        )
+
+        target.swiftSettings = settings
+
+    case .plugin, .system, .binary:
+        break
+
+    @unknown default:
+        break
+    }
+}

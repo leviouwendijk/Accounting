@@ -4,6 +4,10 @@ enum AccountingTestFlowsSuite: TestFlowRegistry {
     static let title = "Accounting test flows"
 
     static let flows: [TestFlow] = [
+        accountingStructuralIdentitiesFlow,
+        accountingEntityIdentitiesFlow,
+        accountingInputIntegrityFlow,
+        accountingInvarianceFlow,
         argumentSurfaceFlow,
         compilerProjectModelFlow,
         lspAccountingSurfaceFlow,

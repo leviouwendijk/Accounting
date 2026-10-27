@@ -25,7 +25,7 @@ public struct Entry: Hashable, Codable, Sendable {
 
     public init(
         id: Int? = nil,
-        date: DateSpecification = .absolute(Date()),
+        date: DateSpecification,
         history: EntryHistory? = nil,
         sort: EntrySort? = nil,
         lines: [Line] = [],

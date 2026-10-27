@@ -25,7 +25,7 @@ public extension EntryCompilerParsing {
         guard case let .number(n0) = current else {
             throw ParserError.unexpectedToken(current, expected: "number (transaction id)", at: loc())
         }
-        out.append((n0 as NSDecimalNumber).intValue)
+        out.append(try exactInteger(n0))
         advance()
 
         // subsequent ", <number>" pairs; allow trailing comma
@@ -35,7 +35,7 @@ public extension EntryCompilerParsing {
                 // trailing comma before next token (e.g. next 'ref' or '}') – accept & stop
                 break
             }
-            out.append((n as NSDecimalNumber).intValue)
+            out.append(try exactInteger(n))
             advance()
         }
     }

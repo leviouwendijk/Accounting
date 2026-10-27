@@ -323,30 +323,16 @@ internal extension ECEditorService {
             return nil
         }
 
-        switch segments.count {
-        case 1:
-            return EntityRef(
-                class: nil,
-                family: nil,
-                alias: EntityAlias.parse(segments[0])
-            )
-
-        case 2:
-            return EntityRef(
-                class: segments[0],
-                family: nil,
-                alias: EntityAlias.parse(segments[1])
-            )
-
-        case 3:
-            return EntityRef(
-                class: segments[0],
-                family: segments[1],
-                alias: EntityAlias.parse(segments[2])
-            )
-
-        default:
+        guard let aliasText = segments.last,
+              let alias = try? EntityAlias.parse(aliasText) else {
             return nil
+        }
+
+        switch segments.count {
+        case 1: return EntityRef(class: nil, family: nil, alias: alias)
+        case 2: return EntityRef(class: segments[0], family: nil, alias: alias)
+        case 3: return EntityRef(class: segments[0], family: segments[1], alias: alias)
+        default: return nil
         }
     }
 
@@ -355,12 +341,14 @@ internal extension ECEditorService {
         at loc: Position,
         workspace: ECWorkspaceIndex
     ) -> ECHoverResult {
-        let ref = parseFlexibleEntityRef(raw)
-            ?? EntityRef(
-                class: nil,
-                family: nil,
-                alias: EntityAlias.parse(raw)
+        guard let ref = parseFlexibleEntityRef(raw) else {
+            return ECHoverResult(
+                kind: .entity,
+                title: "Entity",
+                subtitle: raw,
+                body: "Invalid entity reference"
             )
+        }
 
         return hoverEntity(
             ref,
@@ -493,12 +481,7 @@ extension ECEditorService {
         at loc: Position,
         workspace: ECWorkspaceIndex
     ) -> ECDefinitionResult? {
-        let ref = parseFlexibleEntityRef(raw)
-            ?? EntityRef(
-                class: nil,
-                family: nil,
-                alias: EntityAlias.parse(raw)
-            )
+        guard let ref = parseFlexibleEntityRef(raw) else { return nil }
 
         return definitionEntity(
             ref,

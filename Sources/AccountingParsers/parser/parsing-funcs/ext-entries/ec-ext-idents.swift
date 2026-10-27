@@ -18,7 +18,7 @@ public extension EntryCompilerParsing {
         advance()
         try expect(.lPar)
         let (_, segs) = try readSegmentsUntilRPar(allowAllAsAlias: true)
-        return AccountPath(segments: segs)
+        return try AccountPath(segments: segs)
     }
 
     func parseAccountGroup(flexible: Bool) throws -> AccountPath {
@@ -36,7 +36,7 @@ public extension EntryCompilerParsing {
                         at: loc()
                     )
                 }
-                return AccountPath(segments: segs)
+                return try AccountPath(segments: segs)
 
             default:
                 break
@@ -46,16 +46,16 @@ public extension EntryCompilerParsing {
         switch current {
         case let .number(n):
             advance()
-            return AccountPath(segments: ["\(n)"])
+            return try AccountPath(segments: ["\(n)"])
 
         case let .account(raw):
             advance()
-            return AccountPath(segments: [raw])
+            return try AccountPath(segments: [raw])
 
         case .lPar:
             try expect(.lPar)
             let (_, segs) = try readSegmentsUntilRPar(allowAllAsAlias: true)
-            return AccountPath(segments: segs)
+            return try AccountPath(segments: segs)
 
         default:
             throw ParserError.unexpectedToken(

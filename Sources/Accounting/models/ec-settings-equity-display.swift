@@ -40,21 +40,21 @@ public extension StatementEntityPath {
             return EntityRef(
                 class: nil,
                 family: nil,
-                alias: EntityAlias.parse(segments[0])
+                alias: try EntityAlias.parse(segments[0])
             )
 
         case 2:
             return EntityRef(
                 class: segments[0],
                 family: nil,
-                alias: EntityAlias.parse(segments[1])
+                alias: try EntityAlias.parse(segments[1])
             )
 
         case 3:
             return EntityRef(
                 class: segments[0],
                 family: segments[1],
-                alias: EntityAlias.parse(segments[2])
+                alias: try EntityAlias.parse(segments[2])
             )
 
         default:

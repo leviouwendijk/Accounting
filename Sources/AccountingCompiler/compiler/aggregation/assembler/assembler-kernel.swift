@@ -1,6 +1,6 @@
 import Accounting
 import Foundation
-import Methods
+import Math
 
 public enum AssemblerKernel {}
 
@@ -188,10 +188,9 @@ extension AssemblerKernel {
             let entityTotal = collapsedEntityBalance[id] ?? 0
             let diff = balance - entityTotal
 
-            guard Compare.Number.Decimal.exceeds(
+            guard DecimalComparison.exceeds(
                 diff,
-                tolerance: tolerance,
-                via: .direct
+                tolerance: tolerance
             ) else {
                 continue
             }

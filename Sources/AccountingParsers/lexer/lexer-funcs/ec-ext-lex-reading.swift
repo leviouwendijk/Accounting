@@ -75,15 +75,40 @@ public extension EntryCompilerLexing {
         }
     }
 
-    mutating func readNumber() -> Decimal {
+    /// Lex decimal digits and an optional fractional part without regexes.
+    /// Always consume the entire number-like candidate before reporting invalid input.
+    mutating func readNumberResult() -> (raw: String, value: Decimal?) {
         var buffer = ""
+        var sawDot = false
+        var integerDigits = 0
+        var fractionDigits = 0
+        var valid = true
 
-        while let c = peek(), LexerReadingSets.digitsDot.contains(c) {
+        while let c = peek(), c == "." || CharacterSet.decimalDigits.contains(c) {
             buffer.append(Character(c))
             advance()
+
+            if c == "." {
+                if sawDot { valid = false }
+                sawDot = true
+            } else if c.value >= 48 && c.value <= 57 {
+                if sawDot { fractionDigits += 1 }
+                else { integerDigits += 1 }
+            } else {
+                // Unicode decimal digits aren't in the .ec numeric grammar.
+                valid = false
+            }
         }
 
-        return Decimal(string: buffer) ?? 0
+        guard valid,
+              integerDigits > 0,
+              (!sawDot || fractionDigits > 0),
+              integerDigits + fractionDigits <= 38,
+              let value = Decimal(string: buffer, locale: Locale(identifier: "en_US_POSIX")),
+              !value.isNaN else {
+            return (buffer, nil)
+        }
+        return (buffer, value)
     }
 
     mutating func readIdent() -> String {

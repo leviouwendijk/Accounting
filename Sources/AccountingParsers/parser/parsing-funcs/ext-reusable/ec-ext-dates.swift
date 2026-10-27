@@ -4,6 +4,27 @@ import Position
 import struct Primitives.DayOfMonth
 
 public extension EntryCompilerParsing {
+    /// Shared `.ec` absolute-date reader. A date block and a date literal have
+    /// identical semantics with or without `=`, while Unix epoch is permitted
+    /// only where the caller explicitly enables it.
+    @inlinable
+    func parseAbsoluteDateValue(tz: TimeZone, allowUnixEpoch: Bool = false) throws -> Date {
+        switch current {
+        case let .dateLiteral(text):
+            let date = try parseDateLiteral(text, in: tz)
+            advance()
+            return date
+        case .lBrace:
+            return try parseDateBlock(tz: tz)
+        case let .number(number) where allowUnixEpoch:
+            let date = Date(timeIntervalSince1970: (number as NSDecimalNumber).doubleValue)
+            advance()
+            return date
+        default:
+            throw ParserError.unexpectedToken(current, expected: "date literal or { … }", at: loc())
+        }
+    }
+
     @inlinable
     func parseNamedDateOrInferIfPresent(
         names: [String],
@@ -17,22 +38,7 @@ public extension EntryCompilerParsing {
 
         if current == .equals {
             advance()
-            switch current {
-            case let .dateLiteral(txt):
-                let d = try parseDateLiteral(txt, in: tz); advance()
-                return (matched, .absolute(d))
-
-            case .lBrace:
-                let d = try parseDateBlock(tz: tz) // consumes the closing brace
-                return (matched, .absolute(d))
-
-            case let .number(n) where allowUnixEpoch:
-                let d = Date(timeIntervalSince1970: (n as NSDecimalNumber).doubleValue); advance()
-                return (matched, .absolute(d))
-
-            default:
-                throw ParserError.unexpectedToken(current, expected: "date literal or { … }", at: loc())
-            }
+            return (matched, .absolute(try parseAbsoluteDateValue(tz: tz, allowUnixEpoch: allowUnixEpoch)))
         }
 
         if allowInfer {
@@ -43,7 +49,7 @@ public extension EntryCompilerParsing {
             guard case let .number(n) = current else {
                 throw ParserError.unexpectedToken(current, expected: "number (day of month)", at: loc())
             }
-            let day = (n as NSDecimalNumber).intValue
+            let day = try exactInteger(n)
             advance()
             return (
                 matched,
@@ -55,16 +61,7 @@ public extension EntryCompilerParsing {
             )
         }
 
-        switch current {
-        case let .dateLiteral(txt):
-            let d = try parseDateLiteral(txt, in: tz); advance()
-            return (matched, .absolute(d))
-        case .lBrace:
-            let d = try parseDateBlock(tz: tz)
-            return (matched, .absolute(d))
-        default:
-            throw ParserError.unexpectedToken(current, expected: "date literal or { … }", at: loc())
-        }
+        return (matched, .absolute(try parseAbsoluteDateValue(tz: tz)))
     }
 
     @inlinable

@@ -6,9 +6,9 @@ enum ECSourceHTMLRendererCSS {
     static func base(
         compact: Bool
     ) -> CSSStyleSheet {
-        let blockSpacing = compact ? "12px" : "18px"
-        let lineSize = compact ? "11px" : "12px"
-        let lineHeight = compact ? "1.32" : "1.42"
+        let blockSpacing: CSSValue = compact ? "12px" : "18px"
+        let lineSize: CSSValue = compact ? "11px" : "12px"
+        let lineHeight: CSSValue = compact ? "1.32" : "1.42"
 
         return CSSStyleSheet(
             rules: [

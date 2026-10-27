@@ -1,5 +1,6 @@
 import Foundation
 import plate
+import Primitives
 
 public extension EntryCompilerParsing {
     /// Parse `id = <number>` into a provided slot.
@@ -13,7 +14,7 @@ public extension EntryCompilerParsing {
         guard case let .number(n) = current else {
             throw ParserError.unexpectedToken(current, expected: "number (\(what))", at: loc())
         }
-        slot = (n as NSDecimalNumber).intValue
+        slot = try exactInteger(n)
         advance()
     }
 
@@ -25,27 +26,29 @@ public extension EntryCompilerParsing {
             case .keyword("year"):
                 try expect(.keyword("year")); try expect(.equals)
                 guard case let .number(n) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: loc()) }
-                comps.year = (n as NSDecimalNumber).intValue; advance()
+                comps.year = try exactInteger(n); advance()
             case .keyword("month"):
                 try expect(.keyword("month")); try expect(.equals)
                 if case let .ident(s) = current { comps.month = try monthIndex(from: s); advance() }
-                else if case let .number(n) = current { comps.month = (n as NSDecimalNumber).intValue; advance() }
+                else if case let .number(n) = current { comps.month = try exactInteger(n); advance() }
                 else { throw ParserError.unexpectedToken(current, expected: "identifier or number", at: loc()) }
             case .keyword("day"):
                 try expect(.keyword("day")); try expect(.equals)
                 guard case let .number(n) = current else { throw ParserError.unexpectedToken(current, expected: "number", at: loc()) }
-                comps.day = (n as NSDecimalNumber).intValue; advance()
+                comps.day = try exactInteger(n); advance()
             default:
                 throw ParserError.unexpectedToken(current, expected: "year, month, or day", at: loc())
             }
         }
         try expect(.rBrace)
-        var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = tz
-        guard let d = cal.date(from: comps) else {
-            throw ParserError.unexpectedToken(current, expected: "valid date", at: loc()) // force throw invalids!
-        }
-        return d
+        return try resolveValidatedDate(
+            year: comps.year,
+            month: comps.month,
+            day: comps.day,
+            in: tz,
+            unexpected: current,
+            expected: "valid date"
+        )
     }
     
     func parseDateLiteral(_ s: String, in tz: TimeZone) throws -> Date {
@@ -55,12 +58,46 @@ public extension EntryCompilerParsing {
         else if parts[2].count == 4 { format = .ddMMyyyy }          // 20-01-2025
         else { format = .yyyyMMdd }                                  // fallback
         let comps = try format.components(from: parts)               // plate
-        var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = tz
-        guard let d = cal.date(from: comps) else {
-            throw ParserError.unexpectedToken(.string(s), expected: "valid date literal", at: loc())
+        return try resolveValidatedDate(
+            year: comps.year,
+            month: comps.month,
+            day: comps.day,
+            in: tz,
+            unexpected: .string(s),
+            expected: "valid date literal"
+        )
+    }
+
+    /// Canonical finalization for both `.ec` date literals and date blocks.
+    /// PartialDate supplies Gregorian component invariants; retain the calendar
+    /// round-trip guard to preserve the existing time-zone/date semantics.
+    private func resolveValidatedDate(
+        year: Int?,
+        month: Int?,
+        day: Int?,
+        in timeZone: TimeZone,
+        unexpected token: EntryCompilerToken,
+        expected: String
+    ) throws -> Date {
+        guard let year, let month, let day else {
+            throw ParserError.unexpectedToken(token, expected: expected, at: loc())
         }
-        return d
+
+        do {
+            let partial = try PartialDate(year: year, month: month, day: day)
+            let date = try partial.resolve(in: timeZone)
+            var calendar = Calendar(identifier: .gregorian)
+            calendar.timeZone = timeZone
+            let resolved = calendar.dateComponents([.year, .month, .day], from: date)
+            guard resolved.year == year,
+                  resolved.month == month,
+                  resolved.day == day else {
+                throw ParserError.unexpectedToken(token, expected: expected, at: loc())
+            }
+            return date
+        } catch {
+            throw ParserError.unexpectedToken(token, expected: expected, at: loc())
+        }
     }
 }
 

@@ -92,7 +92,7 @@ public extension EntryCompilerParsing {
                         location: loc()
                     )
                 }
-                key = EntityKey(class: c!, family: f!, alias: ref.alias)
+                key = try EntityKey(class: c!, family: f!, alias: ref.alias)
                 core.trace("  use alias \(ref.alias.string) → \(key!.identifier(displaying: .fullchain))")
 
             case .ident("collapses"), .keyword("collapses"):

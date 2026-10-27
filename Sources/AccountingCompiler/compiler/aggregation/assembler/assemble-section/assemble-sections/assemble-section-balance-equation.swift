@@ -1,6 +1,6 @@
 import Accounting
 import Foundation
-import Methods
+import Math
 
 public enum BalanceEquationError: LocalizedError, Sendable {
     // case sectionRootNotFound(letter: String)
@@ -73,10 +73,9 @@ extension RGSAssembler {
         //         diff: diff, assets: s.assets, equity: s.equity, liabilities: s.liabilities, eps: eps
         //     )
         // }
-        if Compare.Number.Decimal.exceeds(
+        if DecimalComparison.exceeds(
             diff,
-            tolerance: eps,
-            via: .direct
+            tolerance: eps
         ) {
             throw BalanceEquationError.unbalanced(
                 diff: diff, assets: s.assets, equity: s.equity, liabilities: s.liabilities, eps: eps

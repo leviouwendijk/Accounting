@@ -25,44 +25,41 @@ public enum EntryCompilerEntriesLoader {
         var out: [Entry] = []
         var seen: [Int: String] = [:]     // id → first location (file:line:col)
 
-        let fm = FileManager.default
-        if let e = fm.enumerator(at: root, includingPropertiesForKeys: nil) {
-            for case let url as URL in e where url.pathExtension == "ec" {
-                let src = try String(contentsOf: url, encoding: .utf8)
-                var lx = EntryCompilerLexer(source: src, flavor: .entries)
+        for url in ecFiles(at: root) {
+            let src = try String(contentsOf: url, encoding: .utf8)
+            var lx = EntryCompilerLexer(source: src, flavor: .entries)
 
-                let prepared = try lx.prepareTokenStream(
-                    trace: trace,
-                    filePath: url.path
-                )
+            let prepared = try lx.prepareTokenStream(
+                trace: trace,
+                filePath: url.path
+            )
 
-                let parser = EntryCompilerEntriesParser(
-                    tokens: prepared.tokens,
-                    defaultTimeZone: settings.entry.defaultTimezone,
-                    fileURL: url,
-                    lineMap: prepared.lineMap,
-                    spanMap: prepared.spanMap,
+            let parser = EntryCompilerEntriesParser(
+                tokens: prepared.tokens,
+                defaultTimeZone: settings.entry.defaultTimezone,
+                fileURL: url,
+                lineMap: prepared.lineMap,
+                spanMap: prepared.spanMap,
 
-                    verbose: verbose
-                )
-                let entries = try parser.parseEntries()
+                verbose: verbose
+            )
+            let entries = try parser.parseEntries()
 
-                // check uniqueness
-                for en in entries {
-                    guard let id = en.id else { continue }
-                    let here = en.location?.description ?? url.path  // "file:line:col"
-                    if let first = seen[id] {
-                        if !allowCollisions {
-                            throw EntryCompilerIntegrityError.idCollision(
-                                kind: .entry, id: id, paths: [first, here]
-                            )
-                        }
-                        onCollision?(id, first, here)
+            // check uniqueness
+            for en in entries {
+                guard let id = en.id else { continue }
+                let here = en.location?.description ?? url.path  // "file:line:col"
+                if let first = seen[id] {
+                    if !allowCollisions {
+                        throw EntryCompilerIntegrityError.idCollision(
+                            kind: .entry, id: id, paths: [first, here]
+                        )
                     }
-                    seen[id] = here
+                    onCollision?(id, first, here)
                 }
-                out.append(contentsOf: entries)
+                seen[id] = here
             }
+            out.append(contentsOf: entries)
         }
         emitPlaceholderWarnings(
             out,
@@ -130,7 +127,7 @@ public enum EntryCompilerEntriesLoader {
         var seen: [Int: String] = [:]
         var out: [Entry] = []
 
-        for fe in perFile {
+        for fe in perFile.sorted(by: { $0.file.path < $1.file.path }) {
             for en in fe.entries {
                 guard let id = en.id else { continue }
                 let here = en.location?.description ?? fe.file.path

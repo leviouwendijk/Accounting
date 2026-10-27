@@ -89,21 +89,26 @@ public extension EntryCompilerParsing {
         }
     }
 
+    /// Shared exact conversion for every .ec numeric integer field.
+    /// Never truncate, saturate or wrap an out-of-range Decimal.
+    @inlinable
+    func exactInteger(_ number: Decimal) throws -> Int {
+        let candidate = NSDecimalNumber(decimal: number).int64Value
+        guard !number.isNaN,
+              let value = Int(exactly: candidate),
+              Decimal(value) == number else {
+            throw ParserError.unexpectedToken(current, expected: "representable integer", at: loc())
+        }
+        return value
+    }
+
     @discardableResult
     func expectInteger() throws -> Int {
         switch current {
 
         // number literal (Decimal/NSDecimalNumber) – verify it's integral
         case let .number(n):
-            let dn = n as NSDecimalNumber
-            var dec = dn.decimalValue
-            var rounded = Decimal()
-            NSDecimalRound(&rounded, &dec, 0, .plain)
-            guard rounded == dn.decimalValue else {
-                throw ParserError.unexpectedToken(current, expected: "integer", at: loc())
-            }
-            // NOTE: bounds/truncation are caller's responsibility if it doesn't fit in Int
-            let value = NSDecimalNumber(decimal: rounded).intValue
+            let value = try exactInteger(n)
             advance()
             return value
 

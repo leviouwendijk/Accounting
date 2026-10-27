@@ -23,10 +23,10 @@ public struct EntityRef: Hashable, Codable, Sendable {
         class: String? = nil,
         family: String? = nil,
         placeholder: EntityPlaceholder
-    ) {
+    ) throws {
         self.`class` = `class`
         self.family = family
-        self.alias = EntityAlias.parse(placeholder.loweredAlias)
+        self.alias = try EntityAlias.parse(placeholder.loweredAlias)
         self.placeholder = placeholder
     }
 

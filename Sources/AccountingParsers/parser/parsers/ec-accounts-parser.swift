@@ -110,7 +110,7 @@ public extension EntryCompilerParsing {
                 guard case let .number(n) = current else {
                     throw ParserError.unexpectedToken(current, expected: "number (account code)", at: loc())
                 }
-                code = String((n as NSDecimalNumber).intValue); advance()
+                code = String(try exactInteger(n)); advance()
 
             case .keyword("label"):
                 label = try parseScalarOrFreeTextField(
@@ -141,7 +141,7 @@ public extension EntryCompilerParsing {
                 guard case let .number(n) = current else {
                     throw ParserError.unexpectedToken(current, expected: "number", at: loc())
                 }
-                level = (n as NSDecimalNumber).intValue; advance()
+                level = try exactInteger(n); advance()
 
             case .keyword("identifiers"):
                 identifiers = try parseAccountIdentifiersBlock()

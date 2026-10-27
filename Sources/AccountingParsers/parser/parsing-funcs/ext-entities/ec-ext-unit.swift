@@ -28,11 +28,11 @@ public extension EntryCompilerParsing {
                     owner = try readSingleAliasFlexible()
                     // allow optional inline alias after owner
                     if current != .lBrace {
-                        alias = EntityAlias.parse(try readSingleAliasFlexible())
+                        alias = try EntityAlias.parse(try readSingleAliasFlexible())
                     }
                 } else {
                     // old style: unit <alias> { … }
-                    alias = EntityAlias.parse(try readSingleAliasFlexible())
+                    alias = try EntityAlias.parse(try readSingleAliasFlexible())
                 }
             }
 
@@ -51,7 +51,7 @@ public extension EntryCompilerParsing {
                         throw ParserError.unexpectedToken(current, expected: "metadata/details/depreciation/of", at: loc())
                     }
                     advance(); try expect(.keyword("alias"))
-                    alias = EntityAlias.parse(try readSingleAliasFlexible())
+                    alias = try EntityAlias.parse(try readSingleAliasFlexible())
 
                 // NEW: block-form owner
                 case .ident("of"), .keyword("of"):
@@ -103,29 +103,24 @@ public extension EntryCompilerParsing {
             // Compose final alias:
             // - If owner is present: base#owner#(unit alias and its variants)
             // - If no owner: preserve old behavior (just the unit alias – back-compat)
-            func merged(_ base: EntityAlias, with child: EntityAlias) -> EntityAlias {
-                var out = base.appendingVariant(child.name)
-                if let vs = child.variant { 
-                    for v in vs { 
-                        out = out.appendingVariant(v) 
-                    } 
+            func merged(_ base: EntityAlias, with child: EntityAlias) throws -> EntityAlias {
+                var out = try base.appendingVariant(child.name)
+                if let variants = child.variant {
+                    for variant in variants {
+                        out = try out.appendingVariant(variant)
+                    }
                 }
                 return out
             }
 
-            let finalAlias: EntityAlias = {
-                if let o = owner {
-                    return merged(baseKey.alias.appendingVariant(o), with: a)
-                } else {
-                    // // back-compat path: DO NOT prefix with base alias
-                    // return a
+            let finalAlias: EntityAlias
+            if let o = owner {
+                finalAlias = try merged(try baseKey.alias.appendingVariant(o), with: a)
+            } else {
+                finalAlias = try merged(baseKey.alias, with: a)
+            }
 
-                    // prefix with base alias
-                    return merged(baseKey.alias, with: a)
-                }
-            }()
-
-            let unitKey = EntityKey(class: baseKey.class, family: baseKey.family, alias: finalAlias)
+            let unitKey = try EntityKey(class: baseKey.class, family: baseKey.family, alias: finalAlias)
             var mergedMeta = metadata
             if let d = details { mergedMeta["details"] = d }
 

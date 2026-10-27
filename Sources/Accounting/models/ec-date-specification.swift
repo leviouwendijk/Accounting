@@ -1,5 +1,5 @@
 import Foundation
-import struct Primitives.DayOfMonth
+import Primitives
 import plate
 
 public enum DateSpecification: Hashable, Codable, Sendable, Equatable {
@@ -84,34 +84,39 @@ public enum DateSpecification: Hashable, Codable, Sendable, Equatable {
         )
     }
 
-    public func resolved(for entry: Entry, using settings: EntryCompilerSettings) throws -> DateSpecification {
-        let tz = entry.timezone.flatMap(TimeZone.init(identifier:)) ?? settings.entry.defaultTimezone
-
+    /// Use the date-completion invariant implemented in Primitives.
+    /// Accounting retains its existing Codable and error contracts.
+    public func resolved(using context: DateCompletionContext) throws -> DateSpecification {
         switch self {
         case .absolute:
             return self
         case .infer(let day):
+            do {
+                let primitive = Primitives.DateSpecification(infer: day)
+                return .absolute(try primitive.resolve(using: context))
+            } catch {
+                throw EntryDateInferenceError.badDay(context.year, context.month, day.value)
+            }
+        }
+    }
+
+    /// Complete an inferred date from a validated project period, without reading a path.
+    public func resolved(using period: EntrySourcePeriod, timezone: TimeZone) throws -> DateSpecification {
+        try resolved(using: period.completionContext(timezone: timezone))
+    }
+
+    /// Compatibility boundary while source paths remain in Position.file.
+    public func resolved(for entry: Entry, using settings: EntryCompilerSettings) throws -> DateSpecification {
+        switch self {
+        case .absolute:
+            return self
+        case .infer:
             guard let path = entry.location?.file, !path.isEmpty else {
                 throw EntryDateInferenceError.badPath("<missing file path on entry>")
             }
-            let (year, _, month) = try inferYearQuarterMonth(from: path)
-
-            var cal = Calendar(identifier: .gregorian)
-            cal.timeZone = tz
-
-            var comps = DateComponents()
-            comps.year = year
-            comps.month = month
-            comps.day = day.value
-
-            guard let d = cal.date(from: comps) else {
-                throw EntryDateInferenceError.badDay(
-                    year,
-                    month,
-                    day.value
-                )
-            }
-            return .absolute(d)
+            let period = try inferEntrySourcePeriod(from: path)
+            let timezone = entry.timezone.flatMap(TimeZone.init(identifier:)) ?? settings.entry.defaultTimezone
+            return try resolved(using: period, timezone: timezone)
         }
     }
 }

@@ -13,7 +13,7 @@ public extension EntryCompilerParsing {
     func parseAccountRefFlexible() throws -> AccountRef {
         // Single number
         if case let .number(n) = current {
-            let code = String((n as NSDecimalNumber).intValue)
+            let code = String(try exactInteger(n))
             advance()
             return .code(code)
         }
@@ -28,7 +28,7 @@ public extension EntryCompilerParsing {
 
                 switch current {
                 case let .number(n):
-                    let code = String((n as NSDecimalNumber).intValue)
+                    let code = String(try exactInteger(n))
                     advance()
                     try expect(.rPar)
                     return .code(code)
@@ -57,7 +57,7 @@ public extension EntryCompilerParsing {
 
             switch current {
             case let .number(n):
-                let code = String((n as NSDecimalNumber).intValue)
+                let code = String(try exactInteger(n))
                 advance()
                 return .code(code)
 

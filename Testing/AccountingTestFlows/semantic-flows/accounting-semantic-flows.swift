@@ -38,18 +38,14 @@ extension AccountingTestFlowsSuite {
 
                 try Expect.true(
                     resolved[0].lines.contains {
-                        $0.account == AccountKey(
-                            "BLimBanRba"
-                        )
+                        $0.account.code == "BLimBanRba"
                     },
                     "bank posting resolves to canonical account code"
                 )
 
                 try Expect.true(
                     resolved[1].lines.contains {
-                        $0.account == AccountKey(
-                            "BLimKasKas"
-                        )
+                        $0.account.code == "BLimKasKas"
                     },
                     "cash posting resolves to canonical account code"
                 )
@@ -685,18 +681,14 @@ extension AccountingTestFlowsSuite {
 
                 try Expect.true(
                     entry.lines.contains {
-                        $0.account == AccountKey(
-                            "BLimBanRba"
-                        )
+                        $0.account.code == "BLimBanRba"
                     },
                     "compiled bank posting"
                 )
 
                 try Expect.true(
                     entry.lines.contains {
-                        $0.account == AccountKey(
-                            "WOmzNodOdh"
-                        )
+                        $0.account.code == "WOmzNodOdh"
                     },
                     "compiled revenue posting"
                 )

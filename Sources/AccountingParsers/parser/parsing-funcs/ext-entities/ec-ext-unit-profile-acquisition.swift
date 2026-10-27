@@ -33,7 +33,7 @@ public extension EntryCompilerParsing {
                     )
                 }
 
-                entry = (n as NSDecimalNumber).intValue
+                entry = try exactInteger(n)
                 advance()
 
             case .ident("account"), .keyword("account"):

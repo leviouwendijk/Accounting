@@ -1,6 +1,6 @@
 import Accounting
 import Foundation
-import Methods
+import Math
 
 extension RGSAssembler {
     @inline(__always)
@@ -22,10 +22,9 @@ extension RGSAssembler {
         // Assets == Equity + Liabilities  (display magnitudes)
         let diff = t.assets - (t.equity + t.liabilities)
         // if diff != 0 && abs((diff as NSDecimalNumber).doubleValue) > (eps as NSDecimalNumber).doubleValue {
-        if Compare.Number.Decimal.exceeds(
+        if DecimalComparison.exceeds(
             diff,
-            tolerance: eps,
-            via: .direct
+            tolerance: eps
         ) {
             throw RGSAssemblerError.unbalanced(diff: diff, assets: t.assets, equity: t.equity, liabilities: t.liabilities, eps: eps)
         }
@@ -50,10 +49,9 @@ extension RGSAssembler {
 
         let diff = debitSum + creditSum
         // if diff != 0 && abs((diff as NSDecimalNumber).doubleValue) > (eps as NSDecimalNumber).doubleValue {
-        if Compare.Number.Decimal.exceeds(
+        if DecimalComparison.exceeds(
             diff,
-            tolerance: eps,
-            via: .direct
+            tolerance: eps
         ) {
             throw RGSAssemblerError.unbalanced(diff: diff, assets: debitSum, equity: 0, liabilities: creditSum, eps: eps)
         }

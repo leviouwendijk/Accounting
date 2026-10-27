@@ -15,7 +15,7 @@ public struct EntityStore: Sendable, Codable {
     public func resolve(_ ref: EntityRef, at loc: Position?) throws -> EntityDef {
         // 1) Full key → direct lookup
         if let c = ref.`class`, let f = ref.family {
-            let key = EntityKey(class: c, family: f, alias: ref.alias)
+            let key = try EntityKey(class: c, family: f, alias: ref.alias)
             if let d = byFull[key] { return d }
             throw EntityStoreError.notFound(ref: ref.printable, at: loc)
         }

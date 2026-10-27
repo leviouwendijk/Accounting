@@ -1,15 +1,6 @@
 import Foundation
 import Accounting
 
-public extension EntityAlias {
-    @inlinable
-    func appendingVariant(_ v: String) -> EntityAlias {
-        var vs = self.variant ?? []
-        vs.append(v)
-        return EntityAlias(name: self.name, variant: vs.isEmpty ? nil : vs)
-    }
-}
-
 public extension EntryCompilerParsing {
     // allow: variant { use alias 20x4mm }  OR  variant 20x4mm { … }
     @inlinable
@@ -51,10 +42,10 @@ public extension EntryCompilerParsing {
                     guard let v = vName else {
                         throw ParserError.unexpectedToken(current, expected: "variant alias before subvariant", at: loc())
                     }
-                    let parent = EntityKey(
+                    let parent = try EntityKey(
                         class: baseKey.class,
                         family: baseKey.family,
-                        alias: baseKey.alias.appendingVariant(v)
+                        alias: try baseKey.alias.appendingVariant(v)
                     )
                     defs.append(contentsOf: try parseSubvariantBlocks(parentKey: parent))
 
@@ -65,10 +56,10 @@ public extension EntryCompilerParsing {
             try expect(.rBrace)
 
             if let v = vName {
-                let k = EntityKey(
+                let k = try EntityKey(
                     class: baseKey.class,
                     family: baseKey.family,
-                    alias: baseKey.alias.appendingVariant(v)
+                    alias: try baseKey.alias.appendingVariant(v)
                 )
                 defs.append(
                     EntityDef(
@@ -124,10 +115,10 @@ public extension EntryCompilerParsing {
                         )
                     }
 
-                    let childParent = EntityKey(
+                    let childParent = try EntityKey(
                         class: parentKey.class,
                         family: parentKey.family,
-                        alias: parentKey.alias.appendingVariant(sv)
+                        alias: try parentKey.alias.appendingVariant(sv)
                     )
 
                     defs.append(contentsOf: try parseTraitBlocks(parentKey: childParent))
@@ -139,8 +130,8 @@ public extension EntryCompilerParsing {
             try expect(.rBrace)
 
             if let sv = name {
-                let k = EntityKey(class: parentKey.class, family: parentKey.family,
-                                  alias: parentKey.alias.appendingVariant(sv))
+                let k = try EntityKey(class: parentKey.class, family: parentKey.family,
+                                  alias: try parentKey.alias.appendingVariant(sv))
                 defs.append(EntityDef(key: k, displayName: details, metadata: meta, depreciation: nil))
             }
         }
@@ -195,10 +186,10 @@ public extension EntryCompilerParsing {
             try expect(.rBrace)
 
             if let t = name {
-                let k = EntityKey(
+                let k = try EntityKey(
                     class: parentKey.class,
                     family: parentKey.family,
-                    alias: parentKey.alias.appendingVariant(t)
+                    alias: try parentKey.alias.appendingVariant(t)
                 )
 
                 defs.append(EntityDef(

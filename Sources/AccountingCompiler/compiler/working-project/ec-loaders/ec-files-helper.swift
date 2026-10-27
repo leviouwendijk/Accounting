@@ -10,5 +10,5 @@ internal func ecFiles(at root: URL) -> [URL] {
             urls.append(next)
         }
     }
-    return urls
+    return urls.sorted { $0.path < $1.path }
 }

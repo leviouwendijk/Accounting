@@ -40,10 +40,10 @@ public struct DepreciationConfigDraft: Sendable, Codable {
         at loc: Position? = nil
     ) throws -> DepreciationConfig {
         let expenseNode = try accounts.resolve(accountRef, at: loc)
-        let expense = AccountKey(expenseNode.codes.code)
+        let expense = try AccountKey(expenseNode.codes.code)
 
         let contraNode = try accounts.resolve(contraRef, at: loc)
-        let contra = AccountKey(contraNode.codes.code)
+        let contra = try AccountKey(contraNode.codes.code)
 
         let profile = try DepreciationProfileAccess.resolve(
             for: key,

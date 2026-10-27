@@ -6,14 +6,14 @@ public extension EntryCompilerParsing {
         guard case let .number(n0) = current else {
             throw ParserError.unexpectedToken(current, expected: "number", at: loc())
         }
-        out.append((n0 as NSDecimalNumber).intValue)
+        out.append(try exactInteger(n0))
         advance()
 
         while current == .comma {
             advance()
             switch current {
             case let .number(n):
-                out.append((n as NSDecimalNumber).intValue)
+                out.append(try exactInteger(n))
                 advance()
             case .rBrace, .rPar, .eof:
                 return

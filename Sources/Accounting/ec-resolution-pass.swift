@@ -35,7 +35,7 @@ public enum EntryResolutionPass {
 
                     return ResolvedLine(
                         entity: eDef.key,
-                        account: AccountKey(postingCode),
+                        account: try AccountKey(postingCode),
                         direction: l.direction,
                         amount: l.amount,
                         adjustment: l.adjustment
