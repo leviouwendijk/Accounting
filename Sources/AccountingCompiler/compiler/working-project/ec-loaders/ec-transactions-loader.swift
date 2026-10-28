@@ -14,7 +14,7 @@ public enum EntryCompilerTransactionsLoader {
 
         if let e = fm.enumerator(at: root, includingPropertiesForKeys: nil) {
             for case let url as URL in e where url.pathExtension == "ec" {
-                let src = try String(contentsOf: url, encoding: .utf8)
+                let src = try readECSource(at: url)
                 var lx = EntryCompilerLexer(source: src, flavor: .transactions)
 
                 let prepared = try lx.prepareTokenStream(
@@ -61,7 +61,7 @@ public enum EntryCompilerTransactionsLoader {
         ) { group in
             for url in urls {
                 group.addTask {
-                    let src = try String(contentsOf: url, encoding: .utf8)
+                    let src = try readECSource(at: url)
                     var lx = EntryCompilerLexer(source: src, flavor: .transactions)
 
                     let prepared = try lx.prepareTokenStream(

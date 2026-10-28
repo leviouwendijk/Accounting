@@ -17,7 +17,7 @@ public enum EntityStoreLoader {
         let fm = FileManager.default
         if let e = fm.enumerator(at: root, includingPropertiesForKeys: nil) {
             for case let url as URL in e where url.pathExtension == "ec" {
-                let src = try String(contentsOf: url, encoding: .utf8)
+                let src = try readECSource(at: url)
                 var lx = EntryCompilerLexer(source: src, flavor: .entities)
 
                 let prepared = try lx.prepareTokenStream(
@@ -71,7 +71,7 @@ public enum EntityStoreLoader {
         ) { group in
             for url in urls {
                 group.addTask {
-                    let src = try String(contentsOf: url, encoding: .utf8)
+                    let src = try readECSource(at: url)
                     var lx = EntryCompilerLexer(source: src, flavor: .entities)
 
                     let prepared = try lx.prepareTokenStream(

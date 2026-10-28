@@ -58,7 +58,7 @@ public struct EntryCompiler: Sendable {
     public func compileFile(
         _ url: URL
     ) throws -> [Entry] {
-        let src = try String(contentsOf: url, encoding: .utf8)
+        let src = try readECSource(at: url)
         let toks = lex(src)
         return try parseEntries(tokens: toks)
     }

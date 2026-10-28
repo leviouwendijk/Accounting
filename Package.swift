@@ -14,6 +14,10 @@ let package = Package(
             targets: ["Accounting"]
         ),
         .library(
+            name: "AccountingCompiler",
+            targets: ["AccountingCompiler"]
+        ),
+        .library(
             name: "AccountingLegacy",
             targets: ["AccountingLegacy"]
         ),
@@ -50,6 +54,8 @@ let package = Package(
         .package(url: "https://github.com/leviouwendijk/Arguments.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Difference.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Position.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/IO.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Readers.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/TestFlows.git", branch: "master"),
     ],
     targets: [
@@ -95,6 +101,7 @@ let package = Package(
                 .product(name: "Terminal", package: "Terminal"),
                 .product(name: "Arguments", package: "Arguments"),
                 .product(name: "Position", package: "Position"),
+                .product(name: "Readers", package: "Readers"),
             ],
         ),
         .target(
@@ -165,6 +172,8 @@ let package = Package(
                 .product(name: "Terminal", package: "Terminal"),
                 .product(name: "Arguments", package: "Arguments"),
                 .product(name: "TestFlows", package: "TestFlows"),
+                .product(name: "Readers", package: "Readers"),
+                .product(name: "IO", package: "IO"),
             ],
             path: "Testing/AccountingTestFlows"
         ),

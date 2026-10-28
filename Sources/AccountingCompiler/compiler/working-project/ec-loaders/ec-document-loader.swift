@@ -20,7 +20,7 @@ public enum ECDocumentLoader {
         var out: [ECDocument] = []
 
         for url in urls {
-            let src = try String(contentsOf: url, encoding: .utf8)
+            let src = try readECSource(at: url)
             var lx = EntryCompilerLexer(source: src, flavor: .documents)
 
             let prepared = try lx.prepareTokenStream(

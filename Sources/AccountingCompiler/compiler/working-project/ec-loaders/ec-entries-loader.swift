@@ -26,7 +26,7 @@ public enum EntryCompilerEntriesLoader {
         var seen: [Int: String] = [:]     // id → first location (file:line:col)
 
         for url in ecFiles(at: root) {
-            let src = try String(contentsOf: url, encoding: .utf8)
+            let src = try readECSource(at: url)
             var lx = EntryCompilerLexer(source: src, flavor: .entries)
 
             let prepared = try lx.prepareTokenStream(
@@ -95,7 +95,7 @@ public enum EntryCompilerEntriesLoader {
         ) { group in
             for url in urls {
                 group.addTask {
-                    let src = try String(contentsOf: url, encoding: .utf8)
+                    let src = try readECSource(at: url)
                     var lx = EntryCompilerLexer(source: src, flavor: .entries)
 
                     let prepared = try lx.prepareTokenStream(

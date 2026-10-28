@@ -28,7 +28,7 @@ public enum EntryCompilerSettingsLoader {
         guard FileManager.default.fileExists(atPath: url.path) else {
             throw EntryCompilerSettingsLoaderError.fileNotFound(url)
         }
-        let src = try String(contentsOf: url, encoding: .utf8)
+        let src = try readECSource(at: url)
         guard src.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false else {
             throw EntryCompilerSettingsLoaderError.fileEmpty(url)
         }

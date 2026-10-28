@@ -2,7 +2,9 @@ import Accounting
 import AccountingCompiler
 import AccountingParsers
 import Foundation
+import IO
 import struct Primitives.DateCompletionContext
+import Readers
 import TestFlows
 
 extension AccountingTestFlowsSuite {
@@ -68,6 +70,9 @@ extension AccountingTestFlowsSuite {
             }
             Step("entry loaders preserve canonical file order across concurrency") {
                 try await verifyEntryLoaderOrder()
+            }
+            Step("EC source reader rejects invalid UTF-8 without fallback decoding") {
+                try verifyECSourceDecoding()
             }
             Step("date blocks reject calendar normalization") {
                 let tz = TimeZone(secondsFromGMT: 0)!
@@ -165,6 +170,37 @@ extension AccountingTestFlowsSuite {
         try EntryCompilerEntriesLoader.load(
             from: project, settings: settings, trace: false, placeholderWarnings: .silent
         )
+    }
+
+    private static func verifyECSourceDecoding() throws {
+        let fm = FileManager.default
+        let root = fm.temporaryDirectory.appendingPathComponent(
+            "accounting-source-decoding-\(UUID().uuidString)", isDirectory: true
+        )
+        let directory = root.appendingPathComponent("entries", isDirectory: true)
+        try fm.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? fm.removeItem(at: root) }
+
+        let file = directory.appendingPathComponent("invalid.ec")
+        try Data([0xC3, 0x28]).write(to: file)
+        let project = EntryCompilerProject(root: root)
+        let settings = try ECModelFixtures.parseSettings()
+        do {
+            _ = try loadEntriesSynchronously(from: project, settings: settings)
+            try Expect.true(false, "invalid UTF-8 must fail before lexing")
+        } catch let error as TextReadError {
+            switch error {
+            case .undecodable(let url, let attempted):
+                try Expect.equal(
+                    FileSystem.default.resolve(url),
+                    FileSystem.default.resolve(file),
+                    "decode error identifies the same filesystem-resolved source file"
+                )
+                try Expect.equal(attempted.count, 1, "decode policy uses only one encoding")
+            default:
+                try Expect.true(false, "expected an undecodable-text error")
+            }
+        }
     }
 
     private static func verifyDateCompletion() throws {
