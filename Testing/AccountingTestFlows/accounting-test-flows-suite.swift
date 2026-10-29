@@ -12,6 +12,7 @@ enum AccountingTestFlowsSuite: TestFlowRegistry {
         compilerProjectModelFlow,
         accountingPathWorkspaceFlow,
         idScannerStdoutFlow,
+        entryPlaceholderInspectionFlow,
         lspAccountingSurfaceFlow,
         parsingLexingSetsFlow,
 

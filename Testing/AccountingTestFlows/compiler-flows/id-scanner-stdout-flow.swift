@@ -17,7 +17,7 @@ enum IDScannerStdoutProbe {
 
         switch mode {
         case "control":
-            // The general-purpose loader intentionally keeps its default warning.
+            // A general-purpose loader must not print placeholder warnings.
             let entries = try EntryCompilerEntriesLoader.load(
                 from: project,
                 settings: settings,
@@ -98,9 +98,9 @@ extension AccountingTestFlowsSuite {
                 let control = try capture("control")
                 try Expect.equal(control.0, 0, "Control loader exits successfully: \(control.2)")
                 try Expect.equal(
-                    control.1.contains("! WARNING: Placeholder entities detected"),
-                    true,
-                    "Fixture actually triggers the default loader warning"
+                    control.1,
+                    "",
+                    "General-purpose loader must not print"
                 )
 
                 let scanner = try capture("scanner")

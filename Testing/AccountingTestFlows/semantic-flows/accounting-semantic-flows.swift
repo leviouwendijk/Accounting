@@ -631,8 +631,7 @@ extension AccountingTestFlowsSuite {
 
                 let result = try EntryCompileDriver.compile(
                     projectRoot: root,
-                    verbose: false,
-                    placeholderWarnings: .silent
+                    verbose: false
                 )
 
                 try Expect.equal(

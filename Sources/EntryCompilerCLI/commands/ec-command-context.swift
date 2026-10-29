@@ -43,6 +43,8 @@ enum EntryCompilerCommandContextBuilder {
             verbose: verbose
         )
 
+        EntryPlaceholderCLIReporter.emit(entries: result.entries, verbose: verbose)
+
         return EntryCompilerCommandContext(
             root: root,
             settings: settings,

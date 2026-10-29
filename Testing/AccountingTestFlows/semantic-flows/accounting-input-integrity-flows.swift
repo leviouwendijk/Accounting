@@ -157,7 +157,7 @@ extension AccountingTestFlowsSuite {
         let settings = try ECModelFixtures.parseSettings()
         let sequential = try loadEntriesSynchronously(from: project, settings: settings)
         let concurrent = try await EntryCompilerEntriesLoader.load(
-            from: project, settings: settings, trace: false, placeholderWarnings: .silent
+            from: project, settings: settings, trace: false
         )
         try Expect.equal(sequential.compactMap(\.id), [91, 92], "sync lexical order")
         try Expect.equal(concurrent.compactMap(\.id), [91, 92], "async lexical order")
@@ -168,7 +168,7 @@ extension AccountingTestFlowsSuite {
         settings: EntryCompilerSettings
     ) throws -> [Entry] {
         try EntryCompilerEntriesLoader.load(
-            from: project, settings: settings, trace: false, placeholderWarnings: .silent
+            from: project, settings: settings, trace: false
         )
     }
 

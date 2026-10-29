@@ -74,11 +74,11 @@ extension AccountingTestFlowsSuite {
                 try Expect.equal(try project.readECSource(at: files[0]), "entry { id = 1 date = 2026-04-12 }", "authorized source")
                 let settings = try ECModelFixtures.parseSettings()
                 let loaded = try await EntryCompilerEntriesLoader.load(
-                    from: project, settings: settings, trace: false, placeholderWarnings: .silent
+                    from: project, settings: settings, trace: false
                 )
                 try Expect.equal(loaded.compactMap(\.id), [1], "authorized sync loader")
                 let concurrent = try await EntryCompilerEntriesLoader.load(
-                    from: project, settings: settings, trace: false, placeholderWarnings: .silent
+                    from: project, settings: settings, trace: false
                 )
                 try Expect.equal(concurrent.compactMap(\.id), [1], "authorized async loader")
                 try Expect.throwsError("out-of-workspace target rejected") {

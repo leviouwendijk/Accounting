@@ -6,28 +6,24 @@ public extension EntryCompileDriver {
     static func compile(
         projectRoot: URL,
         setting: CompileDriveSetting = .init(),
-        verbose: Bool = false,
-        placeholderWarnings: PlaceholderWarningMode = .summary
+        verbose: Bool = false
     ) throws -> Result {
         try compile(
             project: EntryCompilerProject(root: projectRoot),
             setting: setting,
-            verbose: verbose,
-            placeholderWarnings: placeholderWarnings
+            verbose: verbose
         )
     }
 
     static func compile(
         projectRoot: URL,
         setting: CompileDriveSetting = .init(),
-        verbose: Bool = false,
-        placeholderWarnings: PlaceholderWarningMode = .summary
+        verbose: Bool = false
     ) async throws -> Result {
         try await compile(
             project: EntryCompilerProject(root: projectRoot),
             setting: setting,
-            verbose: verbose,
-            placeholderWarnings: placeholderWarnings
+            verbose: verbose
         )
     }
 }

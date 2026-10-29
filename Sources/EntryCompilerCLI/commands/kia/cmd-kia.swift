@@ -61,6 +61,8 @@ enum KIACommand: ArgumentCommand {
                 verbose: false
             )
 
+            EntryPlaceholderCLIReporter.emit(entries: compiled.entries, verbose: options.verbose)
+
             let resolvedYear = options.year
                 ?? Calendar(identifier: .gregorian).component(
                     .year,

@@ -187,9 +187,10 @@ enum DepreciationCommand: BoundArgumentCommand {
                     entries: true,
                     assertion: false
                 ),
-                verbose: options.verbose,
-                placeholderWarnings: options.verbose ? .perEntry : .summary
+                verbose: options.verbose
             )
+
+            EntryPlaceholderCLIReporter.emit(entries: compiled.entries, verbose: options.verbose)
 
             let entitiesResolved = try DepreciationResolutionPass.run(
                 on: compiled.entities,

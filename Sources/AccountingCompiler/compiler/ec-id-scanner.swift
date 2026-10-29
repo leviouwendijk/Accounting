@@ -27,8 +27,7 @@ public enum IDScanner: Sendable {
         let entries = try EntryCompilerEntriesLoader.load(
             from: project,
             settings: settings,
-            allowCollisions: allowCollisions,
-            placeholderWarnings: .silent
+            allowCollisions: allowCollisions
         )
         let latest = latestEntryID(in: entries) ?? 0
         return latest + 1
@@ -57,8 +56,7 @@ public enum IDScanner: Sendable {
                 from: project,
                 settings: settings,
                 allowCollisions: allowCollisions,
-                onCollision: onCollision,
-                placeholderWarnings: .silent
+                onCollision: onCollision
             ) // scans entries/*.ec
             return Array(Set(entries.compactMap { $0.id })).sorted()
         case .transaction:

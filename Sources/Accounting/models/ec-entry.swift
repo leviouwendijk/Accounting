@@ -54,75 +54,7 @@ public struct Entry: Hashable, Codable, Sendable {
         self.select = select
         self.verbose = verbose
 
-        // printPlaceholderWarning(verbose: verbose)
-        // move this to ../ec-ext-entry.swift -> in parseEntry()
     }
-
-    public func printPlaceholderWarning(verbose: Bool = false) {
-        let (count, report) = entityPlaceholderWarning()
-
-        if count == 0 {
-            if verbose {
-                print("0")
-            }
-            return
-        }
-
-        print(report)
-        // print("\(count)".ansi(.red, .bold))
-        print("placeholders in entry (id: \(self.id, default: "unknown")): \(count)".ansi(.red, .bold))
-        print()
-    }
-
-    public func entityPlaceholderWarning() -> (Int, String) {
-        var count = 0
-        var matches: [String] = []
-
-        func record(
-            kind: String? = nil,
-            value: String? = nil,
-            loweredAlias: String? = nil,
-            at location: Position? = nil
-        ) {
-            matches.append("! WARNING: Placeholder detected")
-            if let kind {
-                matches.append("    kind: \"\(kind)\"")
-            }
-            if let value {
-                matches.append("    value: \"\(value)\"")
-            }
-            if let loweredAlias {
-                matches.append("    lowered alias: \"\(loweredAlias)\"")
-            }
-            if let location {
-                matches.append("    at: \(location.description)")
-            }
-        }
-
-        for l in lines {
-            if let placeholder = l.entity.placeholder {
-                count += 1
-                record(
-                    kind: placeholder.kind.rawValue,
-                    loweredAlias: placeholder.loweredAlias,
-                    at: l.location
-                )
-                continue
-            }
-
-            let alias = l.entity.alias.name
-            if alias.hasSuffix("_placeholder") {
-                count += 1
-                record(
-                    value: alias,
-                    at: l.location
-                )
-            }
-        }
-
-        return (count, matches.joined(separator: "\n"))
-    }
-
     public var viewableString: String {
         // let fmt = DateFormatter()
         // fmt.dateStyle = .short
