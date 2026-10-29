@@ -28,4 +28,3 @@ public func isoDate(_ d: Date) -> String {
     f.formatOptions = [.withFullDate]
     return f.string(from: d)
 }
-

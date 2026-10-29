@@ -1,4 +1,7 @@
-public func chainToRoot(_ id: Int, parentById: [Int:Int]) -> [Int] {
+public func chainToRoot(
+    _ id: Int,
+    parentById: [Int:Int]
+) -> [Int] {
     var out: [Int] = []
     var cur: Int? = id
     while let c = cur {

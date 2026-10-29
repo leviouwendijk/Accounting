@@ -16,16 +16,21 @@ public struct YQM: Hashable, Sendable {
         self.quarter = quarter
         self.month = month
     }
+
+    public enum Error: Swift.Error {
+        case invalid
+    }
 }
+
 
 @inlinable
 public func yqm(for date: Date, tz: TimeZone = .current) throws -> YQM {
     var cal = Calendar(identifier: .gregorian)
     cal.timeZone = tz
     let comps = cal.dateComponents([.year, .month], from: date)
-    let y = comps.year!
-    let m = comps.month!
-    let q = Int(try m.yearlyQuarter().rawValue)
+    guard let y = comps.year else { throw YQM.Error.invalid }
+    guard let m = comps.month else { throw YQM.Error.invalid }
+    let q = Int(try m.yearlyQuarter().rawValue) 
     return .init(year: y, quarter: q, month: m)
 }
 

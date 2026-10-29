@@ -1,0 +1,8 @@
+#!/bin/zsh
+set -e
+
+swift run ec period month --project Testing/accounting-example --anchor 2026-08-15 --to-date
+swift run ec period month --project Testing/accounting-example --anchor 2026-08-15
+swift run ec period year --project Testing/accounting-example --anchor 2026-08-15 --to-date
+swift run ec period year --project Testing/accounting-example --anchor 2026-08-15
+swift run ec period lifetime --project Testing/accounting-example --anchor 2026-08-15
