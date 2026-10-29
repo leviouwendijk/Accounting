@@ -38,8 +38,10 @@ extension AccountingTestFlowsSuite {
                 try Expect.equal(baseline.findings[0].location != nil, true, "Line provenance")
                 try Expect.equal(baseline.findings[0].location?.line, 4, "Actual source line")
                 try Expect.equal(
-                    baseline.findings[0].location?.file,
-                    entriesURL.appendingPathComponent("main.ec").path,
+                    baseline.findings[0].location?.file.map {
+                        URL(fileURLWithPath: $0).resolvingSymlinksInPath().path
+                    },
+                    entriesURL.appendingPathComponent("main.ec").resolvingSymlinksInPath().path,
                     "Actual source file"
                 )
 
