@@ -20,8 +20,9 @@ public enum AccountStoreLoader {
             version: settings.aggregation.chartVersion
         )
 
+        try project.require(compiledChartURL, capability: .read)
         if fm.fileExists(atPath: compiledChartURL.path) {
-            let data = try Data(contentsOf: compiledChartURL)
+            let data = try project.readData(at: compiledChartURL)
             let decoded = try JSONDecoder().decode(CompiledChart.self, from: data)
             let chart = try decoded.ensuringIndex(enrichNodes: true, strict: false)
             if verbose { fputs("  ✓ loaded compiled RGS chart (\(chart.nodes.count) nodes)\n", stderr) }

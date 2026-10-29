@@ -54,15 +54,14 @@ public struct EntryCompileDriver {
     }
 
     public static func compile(
-        projectRoot: URL,
+        project: EntryCompilerProject,
         setting: CompileDriveSetting = CompileDriveSetting(),
         verbose: Bool = false,
         placeholderWarnings: PlaceholderWarningMode = .summary
     ) throws -> Result {
         vprint(verbose, "▶ Settings …")
-        let project   = EntryCompilerProject(root: projectRoot)
         let settings  = try EntryCompilerSettingsLoader.load(
-            from: projectRoot,
+            from: project,
             trace: setting.loc_trace
         )
         let defaultTZ = settings.entry.defaultTimezone
@@ -162,16 +161,14 @@ public struct EntryCompileDriver {
 extension EntryCompileDriver {
     // async overload for parallel perf
     public static func compile(
-        projectRoot: URL,
+        project: EntryCompilerProject,
         setting: CompileDriveSetting = CompileDriveSetting(),
         verbose: Bool = false,
         placeholderWarnings: PlaceholderWarningMode = .summary
     ) async throws -> Result {
         vprint(verbose, "▶ Settings …")
-        let project   = EntryCompilerProject(root: projectRoot)
-        // can use async variant, but sync is fine here too
         let settings  = try EntryCompilerSettingsLoader.load(
-            from: projectRoot,
+            from: project,
             trace: setting.loc_trace
         )
         let defaultTZ = settings.entry.defaultTimezone

@@ -6,6 +6,7 @@ extension PeriodAssembler {
     public static func buildPreviousBundle(
         chart: CompiledChart,
         wins: PeriodWindows,
+        anchor: Date,
         result: EntryCompileDriver.Result,
         cut: AssembleCut,
         omslag: OmslagMode,
@@ -88,7 +89,7 @@ extension PeriodAssembler {
             : tbPrevWin
 
         let slicesPrev = result.entities.ownershipSlices(
-            asOf: p.to ?? Date()
+            asOf: p.to ?? anchor
         )
 
         let bundle = try assembleSplitSeeds(
@@ -120,6 +121,7 @@ extension PeriodAssembler {
     public static func buildPreviousBundleConcurrent(
         chart: CompiledChart,
         wins: PeriodWindows,
+        anchor: Date,
         result: EntryCompileDriver.Result,
         cut: AssembleCut,
         omslag: OmslagMode,
@@ -206,7 +208,7 @@ extension PeriodAssembler {
             : tbPrevWin
 
         let slicesPrev = result.entities.ownershipSlices(
-            asOf: p.to ?? Date()
+            asOf: p.to ?? anchor
         )
 
         let bundle = try assembleSplitSeeds(

@@ -1,5 +1,5 @@
 {
-  "originHash" : "c6f2f777627adfe4a15161cff3a20dc59234a483d3b9ba8ac0a83fa3e0d01f27",
+  "originHash" : "1d5500927a343afee0c280ce64acc820b401f5558ad6da569e922acdd154ea66",
   "pins" : [
     {
       "identity" : "ansi",
@@ -133,7 +133,7 @@
       "location" : "https://github.com/leviouwendijk/Math.git",
       "state" : {
         "branch" : "master",
-        "revision" : "9afa9549fc174fe6ff453af9fd6c1137db3f8f8a"
+        "revision" : "5a357079d1418897dc525712acd656e520a6250d"
       }
     },
     {
@@ -169,7 +169,7 @@
       "location" : "https://github.com/leviouwendijk/Path.git",
       "state" : {
         "branch" : "master",
-        "revision" : "eea4c72be87e58634f3654bd1783a5209fe82ff0"
+        "revision" : "dc0a6c12fb51692b1f3f4eb29c138d06de7e8eef"
       }
     },
     {
@@ -196,7 +196,7 @@
       "location" : "https://github.com/leviouwendijk/Primitives.git",
       "state" : {
         "branch" : "master",
-        "revision" : "cc5a5cef6cb9aba86ddc0e1767510e467dd6af44"
+        "revision" : "93f06221b2835f3e4a378824cde2e5752c900ba5"
       }
     },
     {
@@ -242,6 +242,15 @@
       "state" : {
         "branch" : "master",
         "revision" : "a3b2d62e52cb7e061d5a5cdadb63f4d31684dd4d"
+      }
+    },
+    {
+      "identity" : "selection",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/Selection.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "64eeaf22f35a548ea61cace15a8bba87479f101b"
       }
     },
     {
@@ -314,6 +323,15 @@
       "state" : {
         "branch" : "master",
         "revision" : "3e118cecca53a964099a0afe495e53fe9b325ff0"
+      }
+    },
+    {
+      "identity" : "workspace",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/leviouwendijk/Workspace.git",
+      "state" : {
+        "branch" : "master",
+        "revision" : "2bfc5c4b032592d316d9349222a7dde92edccc7a"
       }
     },
     {

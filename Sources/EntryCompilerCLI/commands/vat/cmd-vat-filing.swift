@@ -49,6 +49,7 @@ extension VATCommand {
             let native = try NativeOutputBuilder.buildWindowOutput(
                 result: context.result,
                 windows: period.windows,
+                anchor: period.anchor,
                 shape: period.effectiveShape,
                 cut: .init(
                     target: .L3,

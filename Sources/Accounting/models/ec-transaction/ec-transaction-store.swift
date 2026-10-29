@@ -7,8 +7,8 @@ public struct TransactionStore: Codable, Sendable {
     public init(_ txs: [Transaction]) throws {
         var m: [TransactionKey: Transaction] = [:]
         for t in txs {
-            guard let id = t.id else { 
-                continue 
+            guard let id = t.id else {
+                throw TransactionStoreError.missingID
             }
             let k = TransactionKey(id)
             if m.updateValue(t, forKey: k) != nil { throw TransactionStoreError.duplicateID(id) }
@@ -43,7 +43,9 @@ public struct TransactionStoreBuilder {
     public init() {}
 
     public mutating func add(_ t: Transaction) throws {
-        guard let id = t.id else { return }
+        guard let id = t.id else {
+            throw TransactionStoreError.missingID
+        }
         let k = TransactionKey(id)
         if map[k] != nil { throw TransactionStoreError.duplicateID(id) }
         map[k] = t

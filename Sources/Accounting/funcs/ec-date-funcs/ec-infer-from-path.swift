@@ -1,5 +1,6 @@
 import Foundation
 import Primitives
+import Path
 
 /// Validated directory period for entries stored in year/quarter/month folders.
 /// Independent of any filesystem representation; callers may supply native Path segments.
@@ -24,27 +25,21 @@ public struct EntrySourcePeriod: Hashable, Sendable {
         self.month = month
     }
 
-    /// The final component is the filename; the preceding three are year, quarter, month.
+    /// Compatibility for clients supplying an array with a final stem or .ec filename.
+    /// The actual year/quarter/month extraction belongs to EntrySourcePath.
     public init(pathComponents: [String]) throws {
-        guard pathComponents.count >= 4 else {
-            throw EntryDateInferenceError.badPath(
-                "need .../<year>/<quarter>/<month>/<file>.ec, got: \(pathComponents.joined(separator: "/"))"
-            )
+        guard pathComponents.count >= 4, let last = pathComponents.last else {
+            throw EntryDateInferenceError.badPath(pathComponents.joined(separator: "/"))
         }
-
-        let yearString = pathComponents[pathComponents.count - 4]
-        let quarterString = pathComponents[pathComponents.count - 3]
-        let monthString = pathComponents[pathComponents.count - 2]
-        guard let year = Int(yearString), year > 0 else {
-            throw EntryDateInferenceError.badYear(yearString)
+        guard pathComponents.allSatisfy({
+            !$0.isEmpty && $0 != "." && $0 != ".." && !$0.contains("/")
+        }) else {
+            throw EntryDateInferenceError.badPath(pathComponents.joined(separator: "/"))
         }
-        guard let quarter = Int(quarterString), (1...4).contains(quarter) else {
-            throw EntryDateInferenceError.badQuarter(quarterString)
-        }
-        guard let month = Int(monthString), (1...12).contains(month) else {
-            throw EntryDateInferenceError.badMonth(monthString)
-        }
-        try self.init(year: year, quarter: quarter, month: month)
+        let canonical = Array(pathComponents.dropLast()) + [
+            last.hasSuffix(".ec") ? last : last + ".ec"
+        ]
+        self = try EntrySourcePath.period(from: StandardPath(canonical))
     }
 
     public func completionContext(timezone: TimeZone) throws -> DateCompletionContext {
@@ -54,8 +49,7 @@ public struct EntrySourcePeriod: Hashable, Sendable {
 
 /// Compatibility adapter while entry source locations are stored as Position.file.
 public func inferEntrySourcePeriod(from filePath: String) throws -> EntrySourcePeriod {
-    let url = URL(fileURLWithPath: filePath)
-    return try EntrySourcePeriod(pathComponents: url.deletingPathExtension().pathComponents)
+    try EntrySourcePath.period(from: StandardPath(rawPath: filePath))
 }
 
 /// Compatibility tuple for existing clients; prefer EntrySourcePeriod for new code.

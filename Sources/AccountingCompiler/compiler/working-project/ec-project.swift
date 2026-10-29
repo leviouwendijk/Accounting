@@ -2,10 +2,23 @@ import Accounting
 import Foundation
 import Primitives
 import Arguments
+import Workspace
 
 public struct EntryCompilerProject: Sendable {
     public let root: URL
-    public init(root: URL) { self.root = root }
+    /// Nil only for an explicitly trusted local URL project.
+    public let workspaceContext: WorkspaceContext?
+
+    public init(root: URL) {
+        self.root = root.standardizedFileURL
+        self.workspaceContext = nil
+    }
+
+    /// Workspace permissions are supplied by the invoking host; no implicit grants.
+    public init(workspace context: WorkspaceContext) {
+        self.root = context.absoluteURL
+        self.workspaceContext = context
+    }
 
     public enum Base: String, Sendable, StringParsableEnum {
         case config

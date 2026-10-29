@@ -56,6 +56,8 @@ let package = Package(
         .package(url: "https://github.com/leviouwendijk/Position.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/IO.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Readers.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Path.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Workspace.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/TestFlows.git", branch: "master"),
     ],
     targets: [
@@ -70,6 +72,7 @@ let package = Package(
                 .product(name: "Writers", package: "Writers"),
                 .product(name: "Terminal", package: "Terminal"),
                 .product(name: "Arguments", package: "Arguments"),
+                .product(name: "Path", package: "Path"),
             ],
         ),
         .target(
@@ -102,6 +105,8 @@ let package = Package(
                 .product(name: "Arguments", package: "Arguments"),
                 .product(name: "Position", package: "Position"),
                 .product(name: "Readers", package: "Readers"),
+                .product(name: "Path", package: "Path"),
+                .product(name: "Workspace", package: "Workspace"),
             ],
         ),
         .target(
@@ -174,6 +179,8 @@ let package = Package(
                 .product(name: "TestFlows", package: "TestFlows"),
                 .product(name: "Readers", package: "Readers"),
                 .product(name: "IO", package: "IO"),
+                .product(name: "Path", package: "Path"),
+                .product(name: "Workspace", package: "Workspace"),
             ],
             path: "Testing/AccountingTestFlows"
         ),

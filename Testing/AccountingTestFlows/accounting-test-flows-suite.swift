@@ -10,6 +10,7 @@ enum AccountingTestFlowsSuite: TestFlowRegistry {
         accountingInvarianceFlow,
         argumentSurfaceFlow,
         compilerProjectModelFlow,
+        accountingPathWorkspaceFlow,
         lspAccountingSurfaceFlow,
         parsingLexingSetsFlow,
 

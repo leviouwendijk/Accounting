@@ -133,7 +133,7 @@ public enum MetaAuditRunner {
             accounts: result.accounts,
             resolvedEntries: result.resolved,
             through: windows.window.to ?? DepreciationAuditHorizon.endOfMonth(
-                using: result.resolved,
+                containing: anchor,
                 calendar: calendar
             ),
             options: resolvedDepreciationOptions

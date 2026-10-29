@@ -11,7 +11,7 @@ public enum ECDocumentLoader {
         trace: Bool = true
     ) throws -> [ECDocument] {
         let root = project.url(.documents)
-        let urls = ecFiles(at: root)
+        let urls = try project.ecFileURLs(at: root)
 
         if urls.isEmpty {
             return []
@@ -20,7 +20,7 @@ public enum ECDocumentLoader {
         var out: [ECDocument] = []
 
         for url in urls {
-            let src = try readECSource(at: url)
+            let src = try project.readECSource(at: url)
             var lx = EntryCompilerLexer(source: src, flavor: .documents)
 
             let prepared = try lx.prepareTokenStream(

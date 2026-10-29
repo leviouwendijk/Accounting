@@ -10,11 +10,8 @@ public enum EntryCompilerTransactionsLoader {
     ) throws -> TransactionStore {
         let root = project.url(.transactions)
         var txs: [Transaction] = []
-        let fm = FileManager.default
-
-        if let e = fm.enumerator(at: root, includingPropertiesForKeys: nil) {
-            for case let url as URL in e where url.pathExtension == "ec" {
-                let src = try readECSource(at: url)
+        for url in try project.ecFileURLs(at: root) {
+                let src = try project.readECSource(at: url)
                 var lx = EntryCompilerLexer(source: src, flavor: .transactions)
 
                 let prepared = try lx.prepareTokenStream(
@@ -39,7 +36,6 @@ public enum EntryCompilerTransactionsLoader {
                 if verbose {
                     fputs("  ✓ \(url.lastPathComponent): \(parsed.count) txn(s)\n", stderr)
                 }
-            }
         }
         return try TransactionStore(txs)
     }
@@ -50,7 +46,7 @@ public enum EntryCompilerTransactionsLoader {
         trace: Bool = true
     ) async throws -> TransactionStore {
         let root = project.url(.transactions)
-        let urls = ecFiles(at: root)
+        let urls = try project.ecFileURLs(at: root)
 
         if urls.isEmpty {
             return try TransactionStore([])
@@ -61,7 +57,7 @@ public enum EntryCompilerTransactionsLoader {
         ) { group in
             for url in urls {
                 group.addTask {
-                    let src = try readECSource(at: url)
+                    let src = try project.readECSource(at: url)
                     var lx = EntryCompilerLexer(source: src, flavor: .transactions)
 
                     let prepared = try lx.prepareTokenStream(

@@ -49,6 +49,7 @@ enum AssetsOverviewCommand: ParsedArgumentCommand {
         let current = try NativeOutputBuilder.buildWindowOutput(
             result: context.result,
             windows: period.windows,
+            anchor: period.anchor,
             shape: period.effectiveShape,
             cut: AssembleCut(
                 target: .L3,

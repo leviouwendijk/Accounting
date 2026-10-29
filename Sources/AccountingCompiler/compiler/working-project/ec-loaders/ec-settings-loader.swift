@@ -24,11 +24,19 @@ public enum EntryCompilerSettingsLoader {
         from projectRoot: URL,
         trace: Bool = true
     ) throws -> EntryCompilerSettings {
-        let url = projectRoot.appendingPathComponent("config/settings.ec")
+        try load(from: EntryCompilerProject(root: projectRoot), trace: trace)
+    }
+
+    public static func load(
+        from project: EntryCompilerProject,
+        trace: Bool = true
+    ) throws -> EntryCompilerSettings {
+        let url = project.url(.config, .settings)
+        try project.require(url, capability: .read)
         guard FileManager.default.fileExists(atPath: url.path) else {
             throw EntryCompilerSettingsLoaderError.fileNotFound(url)
         }
-        let src = try readECSource(at: url)
+        let src = try project.readECSource(at: url)
         guard src.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false else {
             throw EntryCompilerSettingsLoaderError.fileEmpty(url)
         }

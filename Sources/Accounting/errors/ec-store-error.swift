@@ -57,11 +57,14 @@ public enum AccountStoreError: Error, CustomStringConvertible, Sendable {
 }
 
 public enum TransactionStoreError: Error, CustomStringConvertible, Sendable {
+    case missingID
     case duplicateID(Int)
     case notFound(id: Int, at: Position? = nil)
 
     public var description: String {
         switch self {
+        case .missingID:
+            return "Transaction cannot be stored without an id."
         case .duplicateID(let id):
             return "Duplicate transaction id: \(id). IDs must be unique."
         case .notFound(let id, let loc):

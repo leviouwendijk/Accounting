@@ -1,4 +1,5 @@
 import Accounting
+import AccountingCompiler
 import Foundation
 import plate
 import Primitives
@@ -68,6 +69,112 @@ extension AccountingTestFlowsSuite {
                     date_violations[0].path,
                     [.field("date")],
                     "posting date path"
+                )
+            }
+
+            Step("depreciation audit horizons never depend on the current date") {
+                var calendar = Calendar(identifier: .gregorian)
+                calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+                do {
+                    _ = try DepreciationAuditHorizon.endOfMonth(using: [], calendar: calendar)
+                    try Expect.true(false, "empty resolved ledger cannot infer an audit month")
+                } catch let error as DepreciationAuditHorizonError {
+                    try Expect.equal(error, .noAbsoluteEntryDates, "typed missing-horizon error")
+                }
+
+                let resolved = try ECModelFixtures.resolveEntries(
+                    ECModelFixtures.validResolutionEntrySource
+                )
+                let horizon = try DepreciationAuditHorizon.endOfMonth(
+                    using: resolved, calendar: calendar
+                )
+                let components = calendar.dateComponents([.year, .month, .day], from: horizon)
+                try Expect.equal(components.year, 2026, "historical horizon year")
+                try Expect.equal(components.month, 8, "historical horizon month")
+                try Expect.equal(components.day, 31, "historical horizon final day")
+
+                var unresolved = resolved[0]
+                unresolved.date = .infer(day: try DayOfMonth(15))
+                let fixedEnd = Date(timeIntervalSince1970: 0)
+                do {
+                    _ = try DepreciationAuditRunner.run(
+                        entities: EntityStore([:]),
+                        accounts: AccountStore(nodes: []),
+                        resolvedEntries: [unresolved],
+                        through: fixedEnd
+                    )
+                    try Expect.true(false, "audit rejects unresolved posting dates")
+                } catch let error as DepreciationAuditHorizonError {
+                    try Expect.equal(error, .unresolvedEntryDate, "typed unresolved-date error")
+                }
+
+                let emptyReport = try DepreciationAuditRunner.run(
+                    entities: EntityStore([:]),
+                    accounts: AccountStore(nodes: []),
+                    resolvedEntries: [],
+                    through: fixedEnd
+                )
+                try Expect.equal(emptyReport.horizonEnd, fixedEnd, "explicit horizon permits empty ledger")
+            }
+
+            Step("ownership reporting dates remain explicit for unbounded windows") {
+                var calendar = Calendar(identifier: .gregorian)
+                calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+
+                let historical = calendar.date(from: DateComponents(
+                    year: 2022, month: 6, day: 15
+                ))!
+                let changeDate = calendar.date(from: DateComponents(
+                    year: 2025, month: 1, day: 1
+                ))!
+                let later = calendar.date(from: DateComponents(
+                    year: 2026, month: 6, day: 15
+                ))!
+
+                let ownership = OwnerEquity(
+                    initial: OwnershipState(
+                        date: historical, percentage: 25, details: nil
+                    ),
+                    changes: [
+                        OwnershipChange(
+                            state: OwnershipState(
+                                date: changeDate, percentage: 75, details: nil
+                            )
+                        )
+                    ]
+                )
+
+                let lifetime = PeriodSlicer.resolve(
+                    shape: .init(kind: .lifetime),
+                    anchor: historical,
+                    calendar: calendar
+                )
+                try Expect.equal(lifetime.window.to, nil, "lifetime window is open-ended")
+                try Expect.equal(
+                    ownership.percentage(on: lifetime.window.to ?? historical),
+                    Decimal(25),
+                    "unbounded historical reporting retains historical ownership"
+                )
+                try Expect.equal(
+                    ownership.percentage(on: lifetime.window.to ?? later),
+                    Decimal(75),
+                    "changing the explicit anchor changes the ownership snapshot"
+                )
+
+                let bounded = PeriodSlicer.resolve(
+                    shape: .init(kind: .year),
+                    anchor: historical,
+                    calendar: calendar
+                )
+                try Expect.true(bounded.window.to != nil, "year window has an end date")
+                try Expect.equal(
+                    ownership.percentage(on: bounded.window.to ?? later),
+                    Decimal(25),
+                    "bounded window end takes precedence over a later anchor"
+                )
+                try Expect.true(
+                    bounded.previous?.to != nil,
+                    "previous calendar-year comparison has a fixed end date"
                 )
             }
 
@@ -158,7 +265,7 @@ extension AccountingTestFlowsSuite {
                 try Expect.equal(
                     uniqueness.violations(for: [unidentified, unidentified]).count,
                     0,
-                    "nil IDs follow TransactionStore ignore policy"
+                    "ID uniqueness applies only to identified records; store rejects missing IDs separately"
                 )
 
                 let store = try TransactionStore([first])

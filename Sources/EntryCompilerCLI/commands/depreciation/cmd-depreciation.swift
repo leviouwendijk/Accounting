@@ -201,11 +201,20 @@ enum DepreciationCommand: BoundArgumentCommand {
             )
             calendar.timeZone = timeZone
 
+            // Explicit --month determines the audit horizon even for an empty ledger.
+            let requestedHorizon = try options.month.map { month in
+                let start = try parseDepreciationMonthStart(month, calendar: calendar)
+                return DepreciationAuditHorizon.endOfMonth(
+                    containing: start,
+                    calendar: calendar
+                )
+            }
+
             let report = try DepreciationAuditRunner.run(
                 entities: entitiesResolved,
                 accounts: compiled.accounts,
                 resolvedEntries: compiled.resolved,
-                through: nil,
+                through: requestedHorizon,
                 options: .init(
                     granularity: .monthly,
                     tolerance: options.tolerance,
@@ -243,7 +252,7 @@ enum DepreciationCommand: BoundArgumentCommand {
                 targets = failingMonths.isEmpty
                     ? [
                         DepreciationPostingWindow.monthStart(
-                            for: DepreciationAuditHorizon.endOfMonth(
+                            for: try DepreciationAuditHorizon.endOfMonth(
                                 using: compiled.resolved,
                                 calendar: calendar
                             ),
@@ -262,7 +271,7 @@ enum DepreciationCommand: BoundArgumentCommand {
             } else {
                 targets = [
                     DepreciationPostingWindow.monthStart(
-                        for: DepreciationAuditHorizon.endOfMonth(
+                        for: try DepreciationAuditHorizon.endOfMonth(
                             using: compiled.resolved,
                             calendar: calendar
                         ),

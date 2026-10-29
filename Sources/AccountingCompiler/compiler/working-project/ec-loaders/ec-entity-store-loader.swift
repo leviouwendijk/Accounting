@@ -14,10 +14,8 @@ public enum EntityStoreLoader {
         let root = project.url(.config, .entities)
         var builder = EntityStoreBuilder()
 
-        let fm = FileManager.default
-        if let e = fm.enumerator(at: root, includingPropertiesForKeys: nil) {
-            for case let url as URL in e where url.pathExtension == "ec" {
-                let src = try readECSource(at: url)
+        for url in try project.ecFileURLs(at: root) {
+                let src = try project.readECSource(at: url)
                 var lx = EntryCompilerLexer(source: src, flavor: .entities)
 
                 let prepared = try lx.prepareTokenStream(
@@ -42,7 +40,6 @@ public enum EntityStoreLoader {
                 if verbose {
                     fputs("  ✓ \(url.lastPathComponent): \(defs.count) def(s)\n", stderr)
                 }
-            }
         }
 
         return builder.freeze()
@@ -55,7 +52,7 @@ public enum EntityStoreLoader {
         trace: Bool = true
     ) async throws -> EntityStore {
         let root = project.url(.config, .entities)
-        let urls = ecFiles(at: root)
+        let urls = try project.ecFileURLs(at: root)
 
         if urls.isEmpty {
             return EntityStoreBuilder().freeze()
@@ -71,7 +68,7 @@ public enum EntityStoreLoader {
         ) { group in
             for url in urls {
                 group.addTask {
-                    let src = try readECSource(at: url)
+                    let src = try project.readECSource(at: url)
                     var lx = EntryCompilerLexer(source: src, flavor: .entities)
 
                     let prepared = try lx.prepareTokenStream(

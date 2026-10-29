@@ -2,6 +2,7 @@ import Accounting
 import AccountingParsers
 import Foundation
 import Position
+import Workspace
 
 public struct EntryCompiler: Sendable {
     public let project: EntryCompilerProject
@@ -13,6 +14,17 @@ public struct EntryCompiler: Sendable {
         self.project = .init(root: root)
         self.parsers = parsers
         self.settings = try parsers.makeSettings(root)
+        self.entities = try EntityStoreLoader.load(
+            from: self.project,
+            settings: settings,
+            verbose: false
+        )
+    }
+
+    public init(workspace context: WorkspaceContext, parsers: EntryCompilerParsers = .default) throws {
+        self.project = EntryCompilerProject(workspace: context)
+        self.parsers = parsers
+        self.settings = try EntryCompilerSettingsLoader.load(from: self.project)
         self.entities = try EntityStoreLoader.load(
             from: self.project,
             settings: settings,
@@ -58,7 +70,7 @@ public struct EntryCompiler: Sendable {
     public func compileFile(
         _ url: URL
     ) throws -> [Entry] {
-        let src = try readECSource(at: url)
+        let src = try project.readECSource(at: url)
         let toks = lex(src)
         return try parseEntries(tokens: toks)
     }

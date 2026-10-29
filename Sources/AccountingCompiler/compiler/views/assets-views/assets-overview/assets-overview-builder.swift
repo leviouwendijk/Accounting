@@ -13,7 +13,7 @@ extension AssetViews {
                 using: result.accounts
             )
 
-            let closingAsOf = period.to ?? DepreciationAuditHorizon.endOfMonth(
+            let closingAsOf = try period.to ?? DepreciationAuditHorizon.endOfMonth(
                 using: result.resolved,
                 calendar: calendar
             )

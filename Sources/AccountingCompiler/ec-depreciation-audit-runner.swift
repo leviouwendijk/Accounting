@@ -32,6 +32,14 @@ public struct DepreciationAuditRunner {
         through auditEnd: Date? = nil,
         options: Options = .init()
     ) throws -> DepreciationAuditReport {
+        // A resolved-entry audit must not silently reinterpret inferred dates as today.
+        guard resolvedEntries.allSatisfy({
+            if case .absolute = $0.date { return true }
+            return false
+        }) else {
+            throw DepreciationAuditHorizonError.unresolvedEntryDate
+        }
+
         // 0) Resolve entity depreciation drafts → final configs
         let entitiesResolved = try DepreciationResolutionPass.run(on: entities, using: accounts)
 
@@ -39,7 +47,7 @@ public struct DepreciationAuditRunner {
         let depConfigs = try entitiesResolved.collectDepreciationOrThrow()
 
         // 2) Decide horizon
-        let end = auditEnd ?? DepreciationAuditHorizon.endOfMonth(using: resolvedEntries, calendar: options.calendar)
+        let end = try auditEnd ?? DepreciationAuditHorizon.endOfMonth(using: resolvedEntries, calendar: options.calendar)
 
         // 3) Projections
         let projections = try entitiesResolved.projectDepreciation(
@@ -59,7 +67,8 @@ public struct DepreciationAuditRunner {
             horizonEnd: end,
             dateOf: { re in
                 if case let .absolute(d) = re.date { return d }
-                return Date()
+                // Unreachable: resolved entry dates are checked above.
+                return end
             }
         )
         return report

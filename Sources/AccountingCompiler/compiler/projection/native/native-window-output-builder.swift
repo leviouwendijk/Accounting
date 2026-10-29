@@ -5,6 +5,7 @@ public extension NativeOutputBuilder {
     static func buildWindowOutput(
         result: EntryCompileDriver.Result,
         windows: PeriodWindows,
+        anchor: Date,
         shape: PeriodShape,
         cut: AssembleCut,
         omslag: OmslagMode,
@@ -16,6 +17,7 @@ public extension NativeOutputBuilder {
         let bundle = try PeriodAssembler.buildCurrentBundle(
             chart: chart,
             wins: windows,
+            anchor: anchor,
             result: result,
             cut: cut,
             omslag: omslag,

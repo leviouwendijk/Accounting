@@ -602,7 +602,47 @@ extension AccountingTestFlowsSuite {
                 )
             }
 
-            Step("rejects missing transaction id") {
+            Step("rejects unidentifiable transactions instead of dropping them") {
+                let parsed = try ECModelFixtures.parseTransactions(
+                    ECModelFixtures.transactionSource
+                )
+                var unidentified = parsed[0]
+                unidentified.id = nil
+
+                do {
+                    _ = try TransactionStore([unidentified])
+                    try Expect.true(false, "store initializer must reject missing ID")
+                } catch TransactionStoreError.missingID {
+                    // Correct: cannot silently lose a parsed transaction.
+                }
+
+                var builder = TransactionStoreBuilder()
+                do {
+                    try builder.add(unidentified)
+                    try Expect.true(false, "builder must reject missing ID")
+                } catch TransactionStoreError.missingID {
+                    // Correct: the rejected transaction was not inserted.
+                }
+                try Expect.equal(
+                    try builder.freeze().count,
+                    0,
+                    "rejected transaction does not mutate builder"
+                )
+
+                do {
+                    try builder.addAll([unidentified])
+                    try Expect.true(false, "batch addition must reject missing ID")
+                } catch TransactionStoreError.missingID {
+                    // Correct: batch addition follows the same policy.
+                }
+                try Expect.equal(
+                    try builder.freeze().count,
+                    0,
+                    "rejected batch does not insert an unidentifiable transaction"
+                )
+            }
+
+            Step("rejects unknown transaction reference") {
                 let transactions = try ECModelFixtures.parseTransactions(
                     ECModelFixtures.transactionSource
                 )

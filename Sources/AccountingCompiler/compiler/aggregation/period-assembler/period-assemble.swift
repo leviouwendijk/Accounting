@@ -26,6 +26,7 @@ public enum PeriodAssembler {
         let currentBundle = try buildCurrentBundle(
             chart: chart,
             wins: wins,
+            anchor: anchor,
             result: result,
             cut: cut,
             omslag: omslag,
@@ -42,6 +43,7 @@ public enum PeriodAssembler {
         let previous = try buildPreviousBundle(
             chart: chart,
             wins: wins,
+            anchor: anchor,
             result: result,
             cut: cut,
             omslag: omslag,
@@ -85,6 +87,7 @@ public enum PeriodAssembler {
         async let currentBundleTask: StatementBundle = try await buildCurrentBundleConcurrent(
             chart: chart,
             wins: wins,
+            anchor: anchor,
             result: result,
             cut: cut,
             omslag: omslag,
@@ -96,6 +99,7 @@ public enum PeriodAssembler {
         async let previousTupleTask: (range: PeriodWindow, bundle: StatementBundle)? = try buildPreviousBundleConcurrent(
             chart: chart,
             wins: wins,
+            anchor: anchor,
             result: result,
             cut: cut,
             omslag: omslag,

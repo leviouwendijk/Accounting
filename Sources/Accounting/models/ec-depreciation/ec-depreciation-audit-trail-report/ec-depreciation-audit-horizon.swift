@@ -1,17 +1,32 @@
 import Foundation
 
-public enum DepreciationAuditHorizon {
-    /// End-of-month for the latest absolute date found in the resolved entries.
-    public static func endOfMonth(using entries: [ResolvedEntry], calendar: Calendar = .init(identifier: .gregorian)) -> Date {
-        // Extract absolute dates; resolved pass should have made dates absolute
-        let latest = entries.compactMap { re -> Date? in
-            if case let .absolute(d) = re.date { return d }
-            return nil
-        }.max() ?? Date()
+public enum DepreciationAuditHorizonError: Error, Equatable, Sendable {
+    case noAbsoluteEntryDates
+    case unresolvedEntryDate
+}
 
-        let startOfMonth = calendar.date(from: calendar.dateComponents([.year, .month], from: latest))!
-        let nextMonth    = calendar.date(byAdding: DateComponents(month: 1), to: startOfMonth)!
-        return calendar.date(byAdding: .day, value: -1, to: nextMonth)!
+public enum DepreciationAuditHorizon {
+    /// End-of-month for the latest absolute posting date.
+    /// Empty or unresolved input cannot silently acquire the current month.
+    public static func endOfMonth(
+        using entries: [ResolvedEntry],
+        calendar: Calendar = .init(identifier: .gregorian)
+    ) throws -> Date {
+        guard entries.allSatisfy({
+            if case .absolute = $0.date { return true }
+            return false
+        }) else {
+            throw DepreciationAuditHorizonError.unresolvedEntryDate
+        }
+
+        guard let latest = entries.compactMap({ re -> Date? in
+            if case let .absolute(date) = re.date { return date }
+            return nil
+        }).max() else {
+            throw DepreciationAuditHorizonError.noAbsoluteEntryDates
+        }
+
+        return endOfMonth(containing: latest, calendar: calendar)
     }
 
     // new for going past entries end?

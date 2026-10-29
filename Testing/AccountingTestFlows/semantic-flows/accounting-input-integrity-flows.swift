@@ -3,7 +3,7 @@ import AccountingCompiler
 import AccountingParsers
 import Foundation
 import IO
-import struct Primitives.DateCompletionContext
+import Primitives
 import Readers
 import TestFlows
 
@@ -208,6 +208,17 @@ extension AccountingTestFlowsSuite {
         let leap = try DateCompletionContext(year: 2024, month: 2, timezone: timezone)
         let spec = try JSONDecoder().decode(
             Accounting.DateSpecification.self, from: Data(#"{"infer":29}"#.utf8)
+        )
+        let encoded = try JSONEncoder().encode(spec)
+        try Expect.equal(
+            String(decoding: encoded, as: UTF8.self),
+            #"{"infer":29}"#,
+            "Accounting preserves its established flat date JSON"
+        )
+        try Expect.equal(
+            try JSONDecoder().decode(Primitives.DateSpecification.self, from: encoded),
+            spec,
+            "Accounting and Primitives share one date type and codec"
         )
         switch try spec.resolved(using: leap) {
         case .absolute(let date):
