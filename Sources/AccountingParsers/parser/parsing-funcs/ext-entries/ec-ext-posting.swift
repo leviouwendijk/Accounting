@@ -6,6 +6,7 @@ public extension EntryCompilerParsing {
         guard current == .keyword("posting") || current == .keyword("line") else {
             throw ParserError.unexpectedToken(current, expected: "posting or line", at: loc())
         }
+        let postingLocation = loc()
         advance()
         try expect(.lBrace)
 
@@ -48,6 +49,9 @@ public extension EntryCompilerParsing {
         guard let e = entityRef, let a = accountRef, let dir = direction, let amt = amount else {
             throw ParserError.unexpectedToken(current, expected: "entity, account, and amount", at: loc())
         }
-        return Line(entity: e, account: a, direction: dir, amount: amt, adjustment: adjustment)
+        return Line(
+            entity: e, account: a, direction: dir, amount: amt,
+            adjustment: adjustment, location: postingLocation
+        )
     }
 }

@@ -86,17 +86,19 @@ public extension EntryCompilerParsing {
 
     // for (…) in (…)
     func parseMultiLines_for_in() throws -> [Line] {
+        let lineLocation = loc()
         advance() // 'for'
         let entities = try parseEntityTargets()   // NEW: list-aware
         try expect(.keyword("in"))
         let accounts = try parseAccountTargets()  // NEW: list-aware
 
         let payload = try parseLineBodyPayload()  // parse { dr/cr, inventory? }
-        return expandLines(entities: entities, accounts: accounts, payload: payload)
+        return expandLines(entities: entities, accounts: accounts, payload: payload, at: lineLocation)
     }
 
     // in (…) for (…)
     func parseMultiLines_in_for() throws -> [Line] {
+        let lineLocation = loc()
         advance() // 'in'
         let accounts = try parseAccountTargets()
 
@@ -105,10 +107,13 @@ public extension EntryCompilerParsing {
             try expect(.lBrace)
             var out: [Line] = []
             while current != .rBrace && current != .eof {
+                let postingLocation = loc()
                 try expect(.keyword("for"))
                 let entities = try parseEntityTargets()
                 let payload = try parseLineBodyPayload()
-                out.append(contentsOf: expandLines(entities: entities, accounts: accounts, payload: payload))
+                out.append(contentsOf: expandLines(
+                    entities: entities, accounts: accounts, payload: payload, at: postingLocation
+                ))
             }
             try expect(.rBrace)
             return out
@@ -118,7 +123,7 @@ public extension EntryCompilerParsing {
         try expect(.keyword("for"))
         let entities = try parseEntityTargets()
         let payload = try parseLineBodyPayload()
-        return expandLines(entities: entities, accounts: accounts, payload: payload)
+        return expandLines(entities: entities, accounts: accounts, payload: payload, at: lineLocation)
     }
 
     // note: we keep the existing `parseLineBody(entity:account:)` for legacy single-target flows.
@@ -200,13 +205,17 @@ public extension EntryCompilerParsing {
     func expandLines(
         entities: [EntityRef],
         accounts: [AccountRef],
-        payload: (Direction, Decimal, InventoryAdjustment?)
+        payload: (Direction, Decimal, InventoryAdjustment?),
+        at location: Position
     ) -> [Line] {
         let (dir, amt, adj) = payload
         var lines: [Line] = []
         for e in entities {
             for a in accounts {
-                lines.append(Line(entity: e, account: a, direction: dir, amount: amt, adjustment: adj))
+                lines.append(Line(
+                    entity: e, account: a, direction: dir, amount: amt,
+                    adjustment: adj, location: location
+                ))
             }
         }
         return lines

@@ -28,7 +28,7 @@ extension AccountingTestFlowsSuite {
                 let project = EntryCompilerProject(root: root)
                 let settings = try ECModelFixtures.parseSettings()
                 let parsed = try await EntryCompilerEntriesLoader.load(
-                    from: project, settings: settings, trace: false
+                    from: project, settings: settings, trace: true
                 )
                 let baseline = EntryPlaceholderInspector.inspect(entries: parsed)
                 try Expect.equal(baseline.totalOccurrences, 1, "One explicit occurrence")
@@ -36,6 +36,12 @@ extension AccountingTestFlowsSuite {
                 try Expect.equal(baseline.findings[0].detection, .explicit, "Explicit classification")
                 try Expect.equal(baseline.findings[0].kind, .service, "Kind retained")
                 try Expect.equal(baseline.findings[0].location != nil, true, "Line provenance")
+                try Expect.equal(baseline.findings[0].location?.line, 4, "Actual source line")
+                try Expect.equal(
+                    baseline.findings[0].location?.file,
+                    entriesURL.appendingPathComponent("main.ec").path,
+                    "Actual source file"
+                )
 
                 var aliasOnly = parsed[0]
                 aliasOnly.lines = parsed[0].lines.map { line in
@@ -61,6 +67,33 @@ extension AccountingTestFlowsSuite {
                 let direct = try await EntryPlaceholderInspector.inspect(project: project, settings: settings)
                 let concurrent = try await EntryPlaceholderInspector.inspect(project: project, settings: settings)
                 try Expect.equal(direct, concurrent, "Project sync/async parity")
+                try Expect.equal(direct.findings[0].location?.line, 4, "Project inspection retains source line")
+            }
+
+            Step("retain source locations for all posting syntaxes") {
+                let manager = FileManager.default
+                let root = manager.temporaryDirectory.appendingPathComponent(
+                    "accounting-posting-locations-\(UUID().uuidString)", isDirectory: true
+                )
+                let entriesURL = root.appendingPathComponent("entries", isDirectory: true)
+                try manager.createDirectory(at: entriesURL, withIntermediateDirectories: true)
+                defer { try? manager.removeItem(at: root) }
+                try ECModelFixtures.entrySource.write(
+                    to: entriesURL.appendingPathComponent("main.ec"),
+                    atomically: true, encoding: .utf8
+                )
+                let entries = try EntryCompilerEntriesLoader.load(
+                    from: EntryCompilerProject(root: root),
+                    settings: ECModelFixtures.parseSettings(),
+                    trace: true
+                )
+                try Expect.equal(entries.count, 1, "One fixture entry")
+                try Expect.equal(entries[0].lines.count, 8, "Expanded and explicit posting lines")
+                try Expect.equal(
+                    entries[0].lines.compactMap { $0.location?.line },
+                    [6, 6, 6, 6, 16, 21, 25, 30],
+                    "All posting syntaxes retain their original source lines"
+                )
             }
         }
     }

@@ -56,7 +56,7 @@ public enum EntryPlaceholderInspector {
     public static func inspect(
         project: EntryCompilerProject,
         settings: EntryCompilerSettings,
-        trace: Bool = false
+        trace: Bool = true
     ) throws -> EntryPlaceholderReport {
         let entries = try EntryCompilerEntriesLoader.load(
             from: project, settings: settings,
@@ -68,7 +68,7 @@ public enum EntryPlaceholderInspector {
     public static func inspect(
         project: EntryCompilerProject,
         settings: EntryCompilerSettings,
-        trace: Bool = false
+        trace: Bool = true
     ) async throws -> EntryPlaceholderReport {
         let entries = try await EntryCompilerEntriesLoader.load(
             from: project, settings: settings,
