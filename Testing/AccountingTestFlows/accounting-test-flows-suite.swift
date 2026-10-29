@@ -11,6 +11,7 @@ enum AccountingTestFlowsSuite: TestFlowRegistry {
         argumentSurfaceFlow,
         compilerProjectModelFlow,
         accountingPathWorkspaceFlow,
+        idScannerStdoutFlow,
         lspAccountingSurfaceFlow,
         parsingLexingSetsFlow,
 

@@ -3,12 +3,12 @@
   "failed_names" : [
 
   ],
-  "generated_at" : "2026-10-29T15:36:17Z",
-  "passed" : 20,
+  "generated_at" : "2026-10-29T20:09:15Z",
+  "passed" : 21,
   "results" : [
     {
       "display_name" : "accounting-structural-identities",
-      "duration_seconds" : 0.0024210214614868164,
+      "duration_seconds" : 0.003206014633178711,
       "name" : "accounting-structural-identities",
       "status" : "passed",
       "tags" : [
@@ -18,7 +18,7 @@
     },
     {
       "display_name" : "accounting-entity-identities",
-      "duration_seconds" : 0.001817941665649414,
+      "duration_seconds" : 0.0011299848556518555,
       "name" : "accounting-entity-identities",
       "status" : "passed",
       "tags" : [
@@ -29,7 +29,7 @@
     },
     {
       "display_name" : "accounting-input-integrity",
-      "duration_seconds" : 0.010262012481689453,
+      "duration_seconds" : 0.008682966232299805,
       "name" : "accounting-input-integrity",
       "status" : "passed",
       "tags" : [
@@ -40,7 +40,7 @@
     },
     {
       "display_name" : "accounting-invariance",
-      "duration_seconds" : 0.008008003234863281,
+      "duration_seconds" : 0.006407976150512695,
       "name" : "accounting-invariance",
       "status" : "passed",
       "tags" : [
@@ -50,7 +50,7 @@
     },
     {
       "display_name" : "argument-surface",
-      "duration_seconds" : 0.04695701599121094,
+      "duration_seconds" : 0.04724395275115967,
       "name" : "argument-surface",
       "status" : "passed",
       "tags" : [
@@ -62,7 +62,7 @@
     },
     {
       "display_name" : "compiler-project-model",
-      "duration_seconds" : 0.0020319223403930664,
+      "duration_seconds" : 0.0010579824447631836,
       "name" : "compiler-project-model",
       "status" : "passed",
       "tags" : [
@@ -73,7 +73,7 @@
     },
     {
       "display_name" : "accounting-path-workspace",
-      "duration_seconds" : 0.021185994148254395,
+      "duration_seconds" : 0.0181809663772583,
       "name" : "accounting-path-workspace",
       "status" : "passed",
       "tags" : [
@@ -83,8 +83,19 @@
       ]
     },
     {
+      "display_name" : "accounting-id-scanner-stdout",
+      "duration_seconds" : 0.01634502410888672,
+      "name" : "accounting-id-scanner-stdout",
+      "status" : "passed",
+      "tags" : [
+        "accounting",
+        "id",
+        "stdout"
+      ]
+    },
+    {
       "display_name" : "lsp-accounting-surface",
-      "duration_seconds" : 0.00020706653594970703,
+      "duration_seconds" : 0.00028204917907714844,
       "name" : "lsp-accounting-surface",
       "status" : "passed",
       "tags" : [
@@ -95,7 +106,7 @@
     },
     {
       "display_name" : "parsing-lexing-sets",
-      "duration_seconds" : 0.00013589859008789062,
+      "duration_seconds" : 0.0001800060272216797,
       "name" : "parsing-lexing-sets",
       "status" : "passed",
       "tags" : [
@@ -106,7 +117,7 @@
     },
     {
       "display_name" : "accounting-entry-grammar",
-      "duration_seconds" : 0.0013279914855957031,
+      "duration_seconds" : 0.0014929771423339844,
       "name" : "accounting-entry-grammar",
       "status" : "passed",
       "tags" : [
@@ -117,7 +128,7 @@
     },
     {
       "display_name" : "accounting-vat-grammar",
-      "duration_seconds" : 0.0017529726028442383,
+      "duration_seconds" : 0.0017060041427612305,
       "name" : "accounting-vat-grammar",
       "status" : "passed",
       "tags" : [
@@ -128,7 +139,7 @@
     },
     {
       "display_name" : "accounting-entity-grammar",
-      "duration_seconds" : 0.0008749961853027344,
+      "duration_seconds" : 0.0008900165557861328,
       "name" : "accounting-entity-grammar",
       "status" : "passed",
       "tags" : [
@@ -139,7 +150,7 @@
     },
     {
       "display_name" : "accounting-transaction-grammar",
-      "duration_seconds" : 0.0009789466857910156,
+      "duration_seconds" : 0.0009990930557250977,
       "name" : "accounting-transaction-grammar",
       "status" : "passed",
       "tags" : [
@@ -150,7 +161,7 @@
     },
     {
       "display_name" : "accounting-entity-store-resolution",
-      "duration_seconds" : 0.002315998077392578,
+      "duration_seconds" : 0.0024820566177368164,
       "name" : "accounting-entity-store-resolution",
       "status" : "passed",
       "tags" : [
@@ -161,7 +172,7 @@
     },
     {
       "display_name" : "accounting-transaction-store-invariants",
-      "duration_seconds" : 0.0030210018157958984,
+      "duration_seconds" : 0.003113985061645508,
       "name" : "accounting-transaction-store-invariants",
       "status" : "passed",
       "tags" : [
@@ -172,7 +183,7 @@
     },
     {
       "display_name" : "accounting-entry-resolution",
-      "duration_seconds" : 0.009742975234985352,
+      "duration_seconds" : 0.010129928588867188,
       "name" : "accounting-entry-resolution",
       "status" : "passed",
       "tags" : [
@@ -183,7 +194,7 @@
     },
     {
       "display_name" : "accounting-rgs-index",
-      "duration_seconds" : 0.0008019208908081055,
+      "duration_seconds" : 0.0006220340728759766,
       "name" : "accounting-rgs-index",
       "status" : "passed",
       "tags" : [
@@ -194,7 +205,7 @@
     },
     {
       "display_name" : "accounting-canonical-roots",
-      "duration_seconds" : 0.00018894672393798828,
+      "duration_seconds" : 0.00018393993377685547,
       "name" : "accounting-canonical-roots",
       "status" : "passed",
       "tags" : [
@@ -205,7 +216,7 @@
     },
     {
       "display_name" : "accounting-compiler-fixture",
-      "duration_seconds" : 0.005642056465148926,
+      "duration_seconds" : 0.005365967750549316,
       "name" : "accounting-compiler-fixture",
       "status" : "passed",
       "tags" : [
@@ -216,7 +227,7 @@
     },
     {
       "display_name" : "accounting-entry-core",
-      "duration_seconds" : 0.0002129077911376953,
+      "duration_seconds" : 0.00018906593322753906,
       "name" : "accounting-entry-core",
       "status" : "passed",
       "tags" : [
@@ -229,5 +240,5 @@
   ],
   "skipped" : 0,
   "title" : "Accounting test flows",
-  "total" : 20
+  "total" : 21
 }
