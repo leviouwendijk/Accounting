@@ -14,7 +14,7 @@ extension PeriodAssembler {
         shape: PeriodShape,
         calendar: Calendar
     ) throws -> StatementBundle {
-        let (eHist, eWin, eYTD) = entriesForWindows(
+        let (eHist, eWin, _) = entriesForWindows(
             result.resolved,
             wins
         )
@@ -29,18 +29,6 @@ extension PeriodAssembler {
             eWin,
             entityId: { idIndex[$0] }
         )
-        let tbYTD = trialBalance(
-            eYTD,
-            entityId: { idIndex[$0] }
-        )
-
-        let bsBase = shape.rangeToDate
-            ? tbYTD
-            : tbWin
-
-        let niSource = shape.rangeToDate
-            ? tbYTD
-            : tbWin
 
         let slices = result.entities.ownershipSlices(
             asOf: wins.window.to ?? anchor
@@ -49,8 +37,8 @@ extension PeriodAssembler {
         let bundle = try assembleSplitSeeds(
             chart: chart,
             tbIncomeWindow: tbWin,
-            tbBalanceWindow: bsBase,
-            tbOverlayForNI: niSource,
+            tbBalanceWindow: tbWin,
+            tbOverlayForNI: tbWin,
             tbPreWindowForOpening: tbHist,
             cut: cut,
             omslag: omslag,
@@ -80,7 +68,7 @@ extension PeriodAssembler {
         shape: PeriodShape,
         calendar: Calendar
     ) async throws -> StatementBundle {
-        let (eHist, eWin, eYTD) = entriesForWindows(
+        let (eHist, eWin, _) = entriesForWindows(
             result.resolved,
             wins
         )
@@ -91,26 +79,13 @@ extension PeriodAssembler {
             eWin,
             entityId: { idIndex[$0] }
         )
-        async let tbYTDTask: [TrialBalanceRow] = trialBalance(
-            eYTD,
-            entityId: { idIndex[$0] }
-        )
         async let tbHistTask: [TrialBalanceRow] = trialBalance(
             eHist,
             entityId: { idIndex[$0] }
         )
 
         let tbWin = await tbWinTask
-        let tbYTD = await tbYTDTask
         let tbHist = await tbHistTask
-
-        let bsBase = shape.rangeToDate
-            ? tbYTD
-            : tbWin
-
-        let niSource = shape.rangeToDate
-            ? tbYTD
-            : tbWin
 
         let slices = result.entities.ownershipSlices(
             asOf: wins.window.to ?? anchor
@@ -119,8 +94,8 @@ extension PeriodAssembler {
         let bundle = try assembleSplitSeeds(
             chart: chart,
             tbIncomeWindow: tbWin,
-            tbBalanceWindow: bsBase,
-            tbOverlayForNI: niSource,
+            tbBalanceWindow: tbWin,
+            tbOverlayForNI: tbWin,
             tbPreWindowForOpening: tbHist,
             cut: cut,
             omslag: omslag,

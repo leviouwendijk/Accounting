@@ -35,14 +35,14 @@ extension AssemblerKernel {
         if !plan.suppressOverlay,
            plan.netIncomeOverlay != 0,
            let niId = plan.netIncomePresentationId {
-            let niPatch = RGSAssembler.rollupAmounts(
-                [niId: plan.netIncomeOverlay],
+            // Source postings already contribute to the P&L root; present NI
+            // at every NI subtotal without adding it to the root again.
+            RGSAssembler.addDerivedIncomePresentation(
+                plan.netIncomeOverlay,
+                at: niId,
+                into: &rolledIncome,
                 parentById: maps.parentById
             )
-
-            for (k, v) in niPatch where v != 0 {
-                rolledIncome[k, default: 0] += v
-            }
         }
 
         var rolledBalanceSeed = plan.balanceSeed

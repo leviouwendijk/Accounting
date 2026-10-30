@@ -136,6 +136,12 @@ private func depNormalizedStart(
             calendar: calendar
         )
 
+        // Calendar-date convention: commissioning on day 1 makes this
+        // a full depreciation month; later dates start next month.
+        if calendar.component(.day, from: rawStart) == 1 {
+            return currentMonthStart
+        }
+
         return calendar.date(
             byAdding: .month,
             value: 1,

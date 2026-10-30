@@ -1,8 +1,35 @@
 #!/bin/zsh
 set -e
 
-swift run ec period month --project Testing/accounting-example --anchor 2026-08-15 --to-date
-swift run ec period month --project Testing/accounting-example --anchor 2026-08-15
-swift run ec period year --project Testing/accounting-example --anchor 2026-08-15 --to-date
-swift run ec period year --project Testing/accounting-example --anchor 2026-08-15
-swift run ec period lifetime --project Testing/accounting-example --anchor 2026-08-15
+mode=${1:-}
+
+case "$mode" in
+    full)
+        (
+            sbm || return 1;
+            swift run t_accounting;
+            cd Testing/accounting-example && ec;
+        )
+        ;;
+    fast)
+        (
+            sbm || return 1;
+            cd Testing/accounting-example && ec;
+        )
+        ;;
+    ec)
+        (
+            cd Testing/accounting-example && ec;
+        )
+        ;;
+    *)
+        echo "usage: ./test <full|fast|ec>" >&2
+        exit 1
+        ;;
+esac
+
+# ec period month --project Testing/accounting-example --anchor 2026-08-15 --to-date
+# ec period month --project Testing/accounting-example --anchor 2026-08-15
+# ec period year --project Testing/accounting-example --anchor 2026-08-15 --to-date
+# ec period year --project Testing/accounting-example --anchor 2026-08-15
+# ec period lifetime --project Testing/accounting-example --anchor 2026-08-15

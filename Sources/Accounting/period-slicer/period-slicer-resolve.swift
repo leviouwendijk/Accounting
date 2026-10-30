@@ -217,10 +217,12 @@ extension PeriodSlicer {
             }
         }()
 
-        let historical = PeriodWindow(
-            from: nil,
-            to: window.from.map { dayEnd(cal.date(byAdding: .day, value: -1, to: $0)!) }
-        )
+        let historical = window.from.map { start in
+            PeriodWindow(
+                from: nil,
+                to: dayEnd(cal.date(byAdding: .day, value: -1, to: start)!)
+            )
+        }
         let ytd = PeriodWindow(from: nil, to: window.to)
         let prev = previousComparableWindow(
             shape: shape,

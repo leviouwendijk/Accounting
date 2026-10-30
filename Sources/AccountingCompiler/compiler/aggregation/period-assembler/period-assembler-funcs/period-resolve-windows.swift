@@ -37,7 +37,7 @@ public extension PeriodAssembler {
                 continue
             }
 
-            if within(d, window: w.historical) {
+            if let history = w.historical, within(d, window: history) {
                 historical.append(re)
             }
 

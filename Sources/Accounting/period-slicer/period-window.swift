@@ -33,10 +33,10 @@ public struct PeriodWindow: Sendable, Equatable {
 
 public struct PeriodWindows: Sendable {
     /// entries with date < window.from (basis for NI overlay into equity)
-    public let historical: PeriodWindow
+    public let historical: PeriodWindow?
     /// reporting slice [from ... to]
     public let window: PeriodWindow
-    /// cumulative up to window.to (for BS seed)
+    /// Cumulative through window.to for reconciliation only, never additional movements.
     public let ytd: PeriodWindow
     /// contiguous, same-length previous slice (optional)
     public let previous: PeriodWindow?

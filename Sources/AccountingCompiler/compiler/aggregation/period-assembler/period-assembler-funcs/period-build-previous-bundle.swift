@@ -19,10 +19,6 @@ extension PeriodAssembler {
         }
 
         let prevWin = p
-        let ytdPrev = PeriodWindow(
-            from: nil,
-            to: p.to
-        )
         let histPrev = PeriodWindow(
             from: nil,
             to: p.from.map { d in
@@ -41,11 +37,9 @@ extension PeriodAssembler {
 
         var ePrevWin: [ResolvedEntry] = []
         var ePrevHist: [ResolvedEntry] = []
-        var ePrevYTD: [ResolvedEntry] = []
 
         ePrevWin.reserveCapacity(result.resolved.count)
         ePrevHist.reserveCapacity(result.resolved.count)
-        ePrevYTD.reserveCapacity(result.resolved.count)
 
         for re in result.resolved {
             guard let d = absDate(re.date) else {
@@ -60,9 +54,6 @@ extension PeriodAssembler {
                 ePrevHist.append(re)
             }
 
-            if within(d, window: ytdPrev) {
-                ePrevYTD.append(re)
-            }
         }
 
         let idIndex = result.entities.idIndex
@@ -71,22 +62,10 @@ extension PeriodAssembler {
             ePrevWin,
             entityId: { idIndex[$0] }
         )
-        let tbPrevYTD = trialBalance(
-            ePrevYTD,
-            entityId: { idIndex[$0] }
-        )
         let tbPrevHist = trialBalance(
             ePrevHist,
             entityId: { idIndex[$0] }
         )
-
-        let bsBase = shape.rangeToDate
-            ? tbPrevYTD
-            : tbPrevWin
-
-        let niSource = shape.rangeToDate
-            ? tbPrevYTD
-            : tbPrevWin
 
         let slicesPrev = result.entities.ownershipSlices(
             asOf: p.to ?? anchor
@@ -95,8 +74,8 @@ extension PeriodAssembler {
         let bundle = try assembleSplitSeeds(
             chart: chart,
             tbIncomeWindow: tbPrevWin,
-            tbBalanceWindow: bsBase,
-            tbOverlayForNI: niSource,
+            tbBalanceWindow: tbPrevWin,
+            tbOverlayForNI: tbPrevWin,
             tbPreWindowForOpening: tbPrevHist,
             cut: cut,
             omslag: omslag,
@@ -134,10 +113,6 @@ extension PeriodAssembler {
         }
 
         let prevWin = p
-        let ytdPrev = PeriodWindow(
-            from: nil,
-            to: p.to
-        )
         let histPrev = PeriodWindow(
             from: nil,
             to: p.from.map { d in
@@ -156,11 +131,9 @@ extension PeriodAssembler {
 
         var ePrevWin: [ResolvedEntry] = []
         var ePrevHist: [ResolvedEntry] = []
-        var ePrevYTD: [ResolvedEntry] = []
 
         ePrevWin.reserveCapacity(result.resolved.count)
         ePrevHist.reserveCapacity(result.resolved.count)
-        ePrevYTD.reserveCapacity(result.resolved.count)
 
         for re in result.resolved {
             guard let d = absDate(re.date) else {
@@ -175,9 +148,6 @@ extension PeriodAssembler {
                 ePrevHist.append(re)
             }
 
-            if within(d, window: ytdPrev) {
-                ePrevYTD.append(re)
-            }
         }
 
         let idIndex = result.entities.idIndex
@@ -186,26 +156,13 @@ extension PeriodAssembler {
             ePrevWin,
             entityId: { idIndex[$0] }
         )
-        async let tbPrevYTDTask: [TrialBalanceRow] = trialBalance(
-            ePrevYTD,
-            entityId: { idIndex[$0] }
-        )
         async let tbPrevHistTask: [TrialBalanceRow] = trialBalance(
             ePrevHist,
             entityId: { idIndex[$0] }
         )
 
         let tbPrevWin = await tbPrevWinTask
-        let tbPrevYTD = await tbPrevYTDTask
         let tbPrevHist = await tbPrevHistTask
-
-        let bsBase = shape.rangeToDate
-            ? tbPrevYTD
-            : tbPrevWin
-
-        let niSource = shape.rangeToDate
-            ? tbPrevYTD
-            : tbPrevWin
 
         let slicesPrev = result.entities.ownershipSlices(
             asOf: p.to ?? anchor
@@ -214,8 +171,8 @@ extension PeriodAssembler {
         let bundle = try assembleSplitSeeds(
             chart: chart,
             tbIncomeWindow: tbPrevWin,
-            tbBalanceWindow: bsBase,
-            tbOverlayForNI: niSource,
+            tbBalanceWindow: tbPrevWin,
+            tbOverlayForNI: tbPrevWin,
             tbPreWindowForOpening: tbPrevHist,
             cut: cut,
             omslag: omslag,

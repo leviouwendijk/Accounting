@@ -17,6 +17,24 @@ extension RGSAssembler {
         return totals
     }
 
+    /// Mirror derived income along its presentation branch without adding it to
+    /// the P&L root, which already contains the underlying revenue and expenses.
+    /// The first ancestor without a parent is the rollup root, not a NI subtotal.
+    static func addDerivedIncomePresentation(
+        _ amount: Decimal,
+        at id: Int,
+        into totals: inout [Int: Decimal],
+        parentById: [Int: Int]
+    ) {
+        guard amount != 0 else { return }
+        var current = id
+        totals[current, default: 0] += amount
+        while let parent = parentById[current], parentById[parent] != nil {
+            totals[parent, default: 0] += amount
+            current = parent
+        }
+    }
+
     @inlinable
     public static func rollupByAccountPreservingEntity(
         _ seed: [AccEntKey: Decimal],

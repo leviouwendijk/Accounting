@@ -102,17 +102,17 @@ public extension PeriodAssembler {
         // }
         // if niWindow != 0 { totalsIncome[niId, default: 0] += niWindow }
 
-        // Put period NI onto IS NI line (presentation) — rolled patch so parents include it
+        // NI repeats the computed income within its own presentation branch,
+        // but must not be rolled into the already-authoritative P&L root.
         let niWindow = seedIncome.reduce(into: Decimal(0)) { acc, kv in
             if maps.kindById[kv.key] == .income { acc += kv.value }
         }
-        if niWindow != 0 {
-            let niPatch = RGSAssembler.rollupAmounts([niId: niWindow],
-                                                     parentById: maps.parentById)
-            for (k, v) in niPatch where v != 0 {
-                totalsIncome[k, default: 0] += v
-            }
-        }
+        RGSAssembler.addDerivedIncomePresentation(
+            niWindow,
+            at: niId,
+            into: &totalsIncome,
+            parentById: maps.parentById
+        )
 
         // -------- Entity breakdown (Balance) with ownership split on profit-share --------
         var breakdown: EntityBreakdown? = nil
