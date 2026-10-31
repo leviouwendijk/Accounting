@@ -329,25 +329,19 @@ public extension EntryCompilerParsing {
             return
         }
 
-
         for change in ownerEquity.changes {
             let shownDate = localDateString(change.date, timeZone: timeZone)
-            guard !change.divide.isEmpty else {
-                throw ParserError.unexpectedToken(
-                    .keyword("collapses"),
-                    expected: "divide block totaling 100.00 for collapsing entity ownership change on \(shownDate)",
-                    at: location
-                )
-            }
 
             let total = change.divide.reduce(Decimal(0)) { partial, entry in
                 partial + entry.percent
             }
 
-            if total != 100 {
+            let isValid = (change.state.percentage == 0) ? (change.divide.isEmpty) : (total == 100)
+
+            guard isValid else {
                 throw ParserError.unexpectedToken(
                     .keyword("collapses"),
-                    expected: "divide total of 100.00 for collapsing entity ownership change on \(shownDate), got \(total)",
+                    expected: "empty divide for zero equity, otherwise divide totaling 100.00 on \(shownDate), got \(total)",
                     at: location
                 )
             }
