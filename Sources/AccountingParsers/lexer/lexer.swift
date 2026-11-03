@@ -17,6 +17,9 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
 
     public var diagnostics: [EntryCompilerLexDiagnostic] = []
     public var lastTokenSpan: PositionSpan?
+    public private(set) var lastTokenScalarRange: Range<Int>?
+
+    private var currentTokenStartIndex: Int = 0
 
     public let lexingSets: EntryCompilerLexingSets
 
@@ -79,11 +82,13 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
             endLine: endLine,
             endColumn: endColumn
         )
+        lastTokenScalarRange = currentTokenStartIndex..<index
 
         return token
     }
 
     private mutating func emitEOF() -> EntryCompilerToken {
+        lastTokenScalarRange = index..<index
         lastTokenSpan = span(
             startLine: line,
             startColumn: column,
@@ -130,9 +135,11 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
 
     public mutating func nextToken() -> EntryCompilerToken {
         lastTokenSpan = nil
+        lastTokenScalarRange = nil
 
         while true {
             if detailsState == .awaitingContent {
+                currentTokenStartIndex = index
                 let startLine = line
                 let startColumn = column
 
@@ -161,6 +168,7 @@ public struct EntryCompilerLexer: EntryCompilerLexing, Sendable {
             }
 
             skipWhitespaceAndComments()
+            currentTokenStartIndex = index
 
             let startLine = line
             let startColumn = column

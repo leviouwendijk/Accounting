@@ -21,10 +21,19 @@ let package = Package(
             name: "AccountingLegacy",
             targets: ["AccountingLegacy"]
         ),
+        .library(
+            name: "AccountingV2",
+            targets: ["AccountingV2"]
+        ),
+        .library(name: "AccountingSyntax", targets: ["AccountingSyntax"]),
 
         .executable(
             name: "ec",
             targets: ["ec"]
+        ),
+        .executable(
+            name: "ec_v2",
+            targets: ["ec_v2"]
         ),
         .executable(
             name: "eclsp",
@@ -36,9 +45,14 @@ let package = Package(
         ),
 
         // test
+        .executable(name: "t_accounting_syntax", targets: ["AccountingSyntaxTests"]),
         .executable(
             name: "t_accounting",
             targets: ["AccountingTestFlows"]
+        ),
+        .executable(
+            name: "t_accounting_full",
+            targets: ["AccountingTestFlowsFull"]
         ),
     ],
     dependencies: [
@@ -59,6 +73,8 @@ let package = Package(
         .package(url: "https://github.com/leviouwendijk/Path.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/Workspace.git", branch: "master"),
         .package(url: "https://github.com/leviouwendijk/TestFlows.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Syntax.git", branch: "master"),
+        .package(url: "https://github.com/leviouwendijk/Testing.git", branch: "master"),
     ],
     targets: [
         .target(
@@ -87,6 +103,14 @@ let package = Package(
                 .product(name: "Writers", package: "Writers"),
                 .product(name: "Terminal", package: "Terminal"),
                 .product(name: "Arguments", package: "Arguments"),
+            ],
+        ),
+        .target(
+            name: "AccountingSyntax",
+            dependencies: [
+                "AccountingParsers",
+                .product(name: "Syntax", package: "Syntax"),
+                .product(name: "Position", package: "Position"),
             ],
         ),
         .target(
@@ -122,6 +146,18 @@ let package = Package(
                 .product(name: "Terminal", package: "Terminal"),
             ],
         ),
+        .target(
+            name: "AccountingV2",
+            dependencies: [
+                .product(name: "Primitives", package: "Primitives")
+            ],
+            path: "Sources/AccountingV2"
+        ),
+        .target(
+            name: "AccountingV2Fixtures",
+            dependencies: ["AccountingV2"],
+            path: "Testing/AccountingV2Fixtures"
+        ),
         .executableTarget(
             name: "ec",
             dependencies: [
@@ -139,6 +175,15 @@ let package = Package(
                 .product(name: "Arguments", package: "Arguments"),
             ],
             path: "Sources/EntryCompilerCLI"
+        ),
+        .executableTarget(
+            name: "ec_v2",
+            dependencies: [
+                "AccountingV2",
+                "AccountingV2Fixtures",
+                .product(name: "Arguments", package: "Arguments")
+            ],
+            path: "Sources/EntryCompilerV2CLI"
         ),
         .executableTarget(
             name: "eclsp",
@@ -163,7 +208,41 @@ let package = Package(
         ),
 
         .executableTarget(
+            name: "AccountingSyntaxTests",
+            dependencies: [
+                "AccountingSyntax",
+                .product(name: "Syntax", package: "Syntax"),
+                .product(name: "Testing", package: "Testing"),
+            ],
+            path: "Testing/AccountingSyntaxTests"
+        ),
+        .executableTarget(
             name: "AccountingTestFlows",
+            dependencies: [
+                "Accounting",
+                "AccountingV2",
+                "AccountingV2Fixtures",
+                "AccountingParsers",
+                "AccountingCompiler",
+                .product(name: "plate", package: "plate"),
+                .product(name: "Primitives", package: "Primitives"),
+                .product(name: "Methods", package: "Methods"),
+                .product(name: "HTML", package: "HTML"),
+                .product(name: "CSS", package: "CSS"),
+                .product(name: "Writers", package: "Writers"),
+                .product(name: "Terminal", package: "Terminal"),
+                .product(name: "Arguments", package: "Arguments"),
+                .product(name: "TestFlows", package: "TestFlows"),
+                .product(name: "Readers", package: "Readers"),
+                .product(name: "IO", package: "IO"),
+                .product(name: "Path", package: "Path"),
+                .product(name: "Workspace", package: "Workspace"),
+            ],
+            path: "Testing/AccountingTestFlows"
+        ),
+
+        .executableTarget(
+            name: "AccountingTestFlowsFull",
             dependencies: [
                 "Accounting",
                 "AccountingParsers",
@@ -182,7 +261,7 @@ let package = Package(
                 .product(name: "Path", package: "Path"),
                 .product(name: "Workspace", package: "Workspace"),
             ],
-            path: "Testing/AccountingTestFlows"
+            path: "Testing/AccountingTestFlowsFull"
         ),
     ]
 )
